@@ -1,0 +1,43 @@
+# 数据库文件
+*.db
+
+# 上传文件目录
+mk/*/uploads/
+uploads/
+
+# 用户数据目录
+mk/userdata/
+
+# Python 缓存文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+*.log
+
+# 编辑器配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 虚拟环境
+venv/
+env/
+*.egg-info/
+
+# 临时文件
+tmp/
+temp/
