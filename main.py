@@ -830,6 +830,11 @@ def change_password():
     users = {u.username: u.to_dict() for u in User.query.all()}
     return render_market_template('change_password.html', users=users)
 
+@app.route('/app/kn/d')
+def app_kn_detail():
+    users = {u.username: u.to_dict() for u in User.query.all()}
+    return render_market_template('app_detail.html', market_id='kn', users=users)
+
 @app.route('/switch_market/<market_id>')
 def switch_market(market_id):
     if market_id in MARKETS:

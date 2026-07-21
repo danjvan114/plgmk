@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>KN应用下载</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:url('https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
+header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
+.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+.logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
+.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
+.logo-icon img{width:100%;height:100%;object-fit:cover}
+.head-space{flex:1}
+.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
+.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
+.search input::placeholder{color:#999}
+.main-box{max-width:900px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
+.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);animation:slideDown 0.5s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#333;text-decoration:none}
+.nav-links a:hover{color:#2196f3}
+.nav-links a.active{color:#2196f3;font-weight:500}
+.btn{background:#2196f3;color:#fff;padding:12px 24px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:16px;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:#1976d2}
+.btn-large{padding:16px 32px;font-size:18px}
+.app-header{padding:40px;text-align:center;border-bottom:1px solid rgba(0,0,0,.05)}
+.app-icon{width:120px;height:120px;border-radius:24px;margin:0 auto 20px;box-shadow:0 8px 30px rgba(0,0,0,.15);overflow:hidden}
+.app-icon img{width:100%;height:100%;object-fit:cover}
+.app-header h1{color:#333;font-size:32px;margin-bottom:8px}
+.app-header .version{color:#999;font-size:16px;margin-bottom:20px}
+.app-header .description{color:#666;font-size:16px;line-height:1.6;margin-bottom:30px}
+.download-stats{display:flex;justify-content:center;gap:40px;margin-bottom:30px}
+.stat-item{text-align:center}
+.stat-item .number{font-size:28px;font-weight:bold;color:#2196f3}
+.stat-item .label{color:#999;font-size:14px}
+.features{padding:40px;border-bottom:1px solid rgba(0,0,0,.05)}
+.features h2{color:#333;margin-bottom:24px;font-size:24px}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:20px}
+.feature-card{padding:20px;border-radius:8px;background:rgba(33,150,243,.05)}
+.feature-card .icon{width:48px;height:48px;border-radius:12px;background:#2196f3;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px}
+.feature-card h3{color:#333;margin-bottom:8px}
+.feature-card p{color:#666;font-size:14px;line-height:1.5}
+.screenshots{padding:40px;border-bottom:1px solid rgba(0,0,0,.05)}
+.screenshots h2{color:#333;margin-bottom:24px;font-size:24px}
+.screenshot-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px}
+.screenshot-item{border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.screenshot-item img{width:100%;height:auto;display:block}
+.download-section{padding:40px;text-align:center}
+.download-section h2{color:#333;margin-bottom:20px;font-size:24px}
+.download-options{display:flex;justify-content:center;gap:20px;flex-wrap:wrap}
+.download-btn{display:flex;flex-direction:column;align-items:center;padding:20px 30px;border-radius:8px;background:rgba(0,0,0,.02);border:1px solid rgba(0,0,0,.05)}
+.download-btn .platform{font-size:14px;color:#999;margin-top:8px}
+.footer{text-align:center;padding:20px;color:#999;font-size:14px}
+.dropdown{position:relative;display:inline-block}
+.dropbtn{background:none;border:none;color:#333;font-size:14px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px}
+.dropbtn:hover{color:#2196f3}
+.dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.1);z-index:200;border-radius:4px;margin-top:0;padding-top:4px}
+.dropdown-content.show{display:block}
+.dropdown-content a{color:#333;padding:8px 12px;text-decoration:none;display:block;font-size:14px}
+.dropdown-content a:hover{background:rgba(33,150,243,.1)}
+</style>
+</head>
+<body>
+<div class="loader" id="loader"><img src="/mk/kn/uploads/kn.gif" alt="Loading..."></div>
+<header>
+<div class="wrap">
+<div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>{{ markets.get(current_market) if current_market else 'KN插件市场' }}</div>
+<div class="nav-links">
+<a href="/mk/{{ current_market or 'kn' }}">首页</a>
+<a href="/app/kn/d" class="active">应用下载</a>
+<div class="dropdown">
+<button class="dropbtn">{{ (markets.get(current_market) if current_market else 'KN插件市场') }} ▼</button>
+<div class="dropdown-content">
+{% if markets %}
+{% for market_id, market_name in markets.items() %}
+<a href="/mk/{{ market_id }}">{{ market_name }}</a>
+{% endfor %}
+{% endif %}
+</div>
+</div>
+{% if session.user %}
+<a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+<a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+{% if users and users.get(session.user, {}).get('role') == 'admin' %}
+<a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+{% endif %}
+{% endif %}
+</div>
+<div class="head-space"></div>
+<form class="search" action="/mk/{{ current_market or 'kn' }}" method="get">
+<input name="search" placeholder="搜索插件">
+</form>
+<div style="margin-left:16px">
+{% if session.user %}
+<a href="/change_password" class="btn">修改密码</a>
+<a href="/logout" class="btn">退出</a>
+{% else %}
+<a href="/login" class="btn">登录</a>
+<a href="/register" class="btn">注册</a>
+{% endif %}
+</div>
+</div>
+</header>
+<div class="main-box">
+<div class="card">
+<div class="app-header">
+<div class="app-icon">
+<img src="/mk/kn/uploads/kn.png" alt="KN应用图标">
+</div>
+<h1>KN插件市场客户端</h1>
+<div class="version">版本 1.0.0</div>
+<p class="description">KN插件市场官方客户端，让您更便捷地浏览、下载和管理插件。支持一键安装、自动更新、插件管理等功能。</p>
+<div class="download-stats">
+<div class="stat-item">
+<div class="number">10,000+</div>
+<div class="label">下载次数</div>
+</div>
+<div class="stat-item">
+<div class="number">4.9</div>
+<div class="label">用户评分</div>
+</div>
+<div class="stat-item">
+<div class="number">500+</div>
+<div class="label">可用插件</div>
+</div>
+</div>
+<a href="#" class="btn btn-large">
+<span>立即下载</span>
+<span>↓</span>
+</a>
+</div>
+<div class="features">
+<h2>功能特性</h2>
+<div class="feature-grid">
+<div class="feature-card">
+<div class="icon">📦</div>
+<h3>一键安装</h3>
+<p>浏览插件市场，一键下载安装您喜爱的插件，无需手动配置。</p>
+</div>
+<div class="feature-card">
+<div class="icon">🔄</div>
+<h3>自动更新</h3>
+<p>插件更新实时提醒，一键更新所有已安装插件。</p>
+</div>
+<div class="feature-card">
+<div class="icon">⚙️</div>
+<h3>插件管理</h3>
+<p>集中管理所有已安装插件，支持启用、禁用和卸载。</p>
+</div>
+<div class="feature-card">
+<div class="icon">⭐</div>
+<h3>评分评论</h3>
+<p>为喜欢的插件评分，查看其他用户的评价和反馈。</p>
+</div>
+<div class="feature-card">
+<div class="icon">🔍</div>
+<h3>智能搜索</h3>
+<p>支持关键词搜索和标签筛选，快速找到所需插件。</p>
+</div>
+<div class="feature-card">
+<div class="icon">📊</div>
+<h3>使用统计</h3>
+<p>查看插件下载量、评分等统计信息，了解插件热度。</p>
+</div>
+</div>
+</div>
+<div class="screenshots">
+<h2>应用截图</h2>
+<div class="screenshot-grid">
+<div class="screenshot-item">
+<img src="https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco" alt="截图1">
+</div>
+<div class="screenshot-item">
+<img src="https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco" alt="截图2">
+</div>
+<div class="screenshot-item">
+<img src="https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco" alt="截图3">
+</div>
+</div>
+</div>
+<div class="download-section">
+<h2>下载客户端</h2>
+<div class="download-options">
+<a href="#" class="download-btn btn">
+<span>📱 Windows</span>
+<span class="platform">Windows 10/11</span>
+</a>
+<a href="#" class="download-btn btn">
+<span>🍎 macOS</span>
+<span class="platform">macOS 10.15+</span>
+</a>
+<a href="#" class="download-btn btn">
+<span>🐧 Linux</span>
+<span class="platform">Ubuntu/Debian</span>
+</a>
+</div>
+</div>
+</div>
+<div class="footer">
+<p>© 2024 KN插件市场. All rights reserved.</p>
+</div>
+</div>
+<script>window.addEventListener('load',function(){document.getElementById('loader').style.display='none'});</script>
+<script>
+document.querySelector('.dropbtn').addEventListener('click', function() {
+    document.querySelector('.dropdown-content').classList.toggle('show');
+});
+window.addEventListener('click', function(e) {
+    if (!e.target.matches('.dropbtn')) {
+        document.querySelector('.dropdown-content').classList.remove('show');
+    }
+});
+</script>
+</body>
+</html>
