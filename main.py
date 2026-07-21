@@ -239,15 +239,18 @@ with app.app_context():
     
     db.create_all()
     
-    if User.query.count() == 0:
-        admin = User(username='admin', password='admin', role='admin')
-        developer = User(username='dev', password='dev', role='developer')
-        user = User(username='user', password='user', role='user')
+    admin_exists = User.query.filter_by(role='admin').first()
+    if not admin_exists:
+        import random
+        import string
+        admin_password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        admin = User(username='admin', password=admin_password, role='admin')
         db.session.add(admin)
-        db.session.add(developer)
-        db.session.add(user)
         db.session.commit()
-
+        print(f"=== 管理员账号已自动创建 ===")
+        print(f"用户名: admin")
+        print(f"密码: {admin_password}")
+        print(f"=============================")
 def init_market_database(market_id):
     from sqlalchemy import create_engine, text
     
@@ -771,7 +774,6 @@ def register():
         username = request.form['username']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
-        role = request.form.get('role', 'user')
         
         if password != confirm_password:
             return render_root_template('register.html', error='两次输入的密码不一致')
@@ -779,7 +781,7 @@ def register():
         if User.query.get(username):
             return render_root_template('register.html', error='用户名已存在')
         
-        new_user = User(username=username, password=password, role=role)
+        new_user = User(username=username, password=password, role='user')
         db.session.add(new_user)
         db.session.commit()
         
