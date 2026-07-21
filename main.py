@@ -391,8 +391,12 @@ def market_download_plugin(market_id, plugin_id):
     
     update_plugin_download_count(market_id, plugin_id)
     
-    directory = os.path.dirname(plugin['file_path'])
-    filename = os.path.basename(plugin['file_path'])
+    file_path = plugin['file_path']
+    if file_path.startswith('http://') or file_path.startswith('https://'):
+        return redirect(file_path)
+    
+    directory = os.path.dirname(file_path)
+    filename = os.path.basename(file_path)
     return send_from_directory(directory, filename, as_attachment=True)
 
 @app.route('/mk/kn/download/<int:plugin_id>')
@@ -452,14 +456,21 @@ def market_upload_plugin(market_id):
         description = request.form['description']
         version = request.form['version']
         tags = request.form.get('tags', '')
+        external_url = request.form.get('external_url', '').strip()
         
-        plugin_folder = f"{name.replace('/', '_').replace('\\', '_')[:50]}"
-        plugin_folder_path = os.path.join(upload_folder, plugin_folder)
-        if not os.path.exists(plugin_folder_path):
-            os.makedirs(plugin_folder_path)
+        from datetime import datetime
+        created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         file = request.files['file']
-        if file and allowed_file(file.filename):
+        if external_url:
+            file_path = external_url
+            plugin_id = add_plugin(market_id, name, description, session['user'], version, file_path, tags, created_at, created_at)
+        elif file and allowed_file(file.filename):
+            plugin_folder = f"{name.replace('/', '_').replace('\\', '_')[:50]}"
+            plugin_folder_path = os.path.join(upload_folder, plugin_folder)
+            if not os.path.exists(plugin_folder_path):
+                os.makedirs(plugin_folder_path)
+            
             file_content = file.read()
             file_hash = hashlib.md5(file_content).hexdigest()
             ext = file.filename.rsplit('.', 1)[1].lower()
@@ -469,28 +480,34 @@ def market_upload_plugin(market_id):
             with open(file_path, 'wb') as f:
                 f.write(file_content)
             
-            from datetime import datetime
-            created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             plugin_id = add_plugin(market_id, name, description, session['user'], version, file_path, tags, created_at, created_at)
-            
-            images = request.files.getlist('images')
-            max_images = 5
-            for i, image_file in enumerate(images):
-                if i >= max_images:
-                    break
-                if image_file and allowed_image_file(image_file.filename):
-                    img_content = image_file.read()
-                    img_hash = hashlib.md5(img_content).hexdigest()
-                    img_ext = image_file.filename.rsplit('.', 1)[1].lower()
-                    img_filename = f"{img_hash}.{img_ext}"
-                    img_path = os.path.join(plugin_folder_path, img_filename)
-                    
-                    with open(img_path, 'wb') as f:
-                        f.write(img_content)
-                    
-                    add_plugin_image(market_id, plugin_id, img_path)
-            
-            return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id))
+        else:
+            users = {u.username: u.to_dict() for u in User.query.all()}
+            return render_market_template('upload.html', market_id=market_id, users=users, max_images=5, error='请上传插件文件或提供下载链接')
+        
+        images = request.files.getlist('images')
+        max_images = 5
+        for i, image_file in enumerate(images):
+            if i >= max_images:
+                break
+            if image_file and allowed_image_file(image_file.filename):
+                plugin_folder = f"{name.replace('/', '_').replace('\\', '_')[:50]}"
+                plugin_folder_path = os.path.join(upload_folder, plugin_folder)
+                if not os.path.exists(plugin_folder_path):
+                    os.makedirs(plugin_folder_path)
+                
+                img_content = image_file.read()
+                img_hash = hashlib.md5(img_content).hexdigest()
+                img_ext = image_file.filename.rsplit('.', 1)[1].lower()
+                img_filename = f"{img_hash}.{img_ext}"
+                img_path = os.path.join(plugin_folder_path, img_filename)
+                
+                with open(img_path, 'wb') as f:
+                    f.write(img_content)
+                
+                add_plugin_image(market_id, plugin_id, img_path)
+        
+        return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id))
     
     users = {u.username: u.to_dict() for u in User.query.all()}
     return render_market_template('upload.html', market_id=market_id, users=users, max_images=5)
