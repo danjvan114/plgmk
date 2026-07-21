@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>插件市场</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:url('https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
+header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
+.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+.logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
+.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
+.logo-icon img{width:100%;height:100%;object-fit:cover}
+.head-space{flex:1}
+.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
+.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
+.search input::placeholder{color:#999}
+.main-box{max-width:1400px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
+.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);animation:slideDown 0.5s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:20px}
+.page-box{margin-top:40px;text-align:center}
+.plugin-card{padding:16px;cursor:pointer;transition:transform .2s}
+.plugin-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.plugin-card h3{color:#333;margin-bottom:8px}
+.plugin-card p{color:#666;font-size:14px;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.plugin-card .meta{display:flex;align-items:center;gap:12px;font-size:12px;color:#999}
+.rating{color:#ff9800}
+.tag{background:rgba(33,150,243,.1);color:#2196f3;padding:2px 8px;border-radius:4px;font-size:12px}
+.tag-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#333;text-decoration:none}
+.nav-links a:hover{color:#2196f3}
+.btn{background:#2196f3;color:#fff;padding:8px 16px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:14px}
+.btn:hover{background:#1976d2}
+.btn-danger{background:#f44336}
+.btn-danger:hover{background:#d32f2f}
+.dropdown{position:relative;display:inline-block}
+.dropbtn{background:none;border:none;color:#333;font-size:14px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px}
+.dropbtn:hover{color:#2196f3}
+.dropbtn:focus{outline:none}
+.dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.1);z-index:200;border-radius:4px;margin-top:0;padding-top:4px}
+.dropdown-content.show{display:block}
+.dropdown-content a{color:#333;padding:8px 12px;text-decoration:none;display:block;font-size:14px}
+.dropdown-content a:hover{background:rgba(33,150,243,.1)}
+</style>
+</head>
+<body>
+<div class="loader" id="loader"><img src="/mk/kn/uploads/kn.gif" alt="Loading..."></div>
+<header>
+<div class="wrap">
+<div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>{{ markets.get(current_market) if current_market else 'KN插件市场' }}</div>
+<div class="nav-links">
+<a href="/mk/{{ current_market or 'kn' }}">首页</a>
+<div class="dropdown">
+<button class="dropbtn">{{ (markets.get(current_market) if current_market else 'KN插件市场') }} ▼</button>
+<div class="dropdown-content">
+{% if markets %}
+{% for market_id, market_name in markets.items() %}
+<a href="/mk/{{ market_id }}">{{ market_name }}</a>
+{% endfor %}
+{% endif %}
+</div>
+</div>
+{% if session.user %}
+<a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+<a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+{% if users and users.get(session.user, {}).get('role') == 'admin' %}
+<a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+{% endif %}
+{% endif %}
+</div>
+<div class="head-space"></div>
+<form class="search" action="/mk/{{ current_market or 'kn' }}" method="get">
+<input name="search" placeholder="搜索插件名称/标签" value="{{ search_query }}">
+</form>
+<div style="margin-left:16px">
+{% if session.user %}
+<a href="/change_password" class="btn">修改密码</a>
+<a href="/logout" class="btn">退出</a>
+{% else %}
+<a href="/login" class="btn">登录</a>
+{% endif %}
+</div>
+</div>
+</header>
+<div class="main-box">
+<div class="grid">
+{% for plugin in plugins %}
+<div class="card plugin-card" onclick="location.href='/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}'">
+<h3>{{ plugin.name }}</h3>
+<p>{{ plugin.description }}</p>
+<div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
+<div class="meta">
+<span>{{ plugin.author }}</span>
+<span class="rating">★ {{ plugin.rating }}</span>
+<span>{{ plugin.downloads }} 下载</span>
+</div>
+</div>
+{% endfor %}
+</div>
+<div class="page-box">
+{% if plugins|length == 0 %}
+<p>暂无插件</p>
+{% endif %}
+</div>
+</div>
+<script>
+window.addEventListener('load', function(){
+    document.getElementById('loader').style.display='none';
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    var dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(function(dropdown) {
+        var button = dropdown.querySelector('.dropbtn');
+        var content = dropdown.querySelector('.dropdown-content');
+        
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            content.classList.toggle('show');
+        });
+        
+        content.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+    
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.dropdown-content').forEach(function(content) {
+            content.classList.remove('show');
+        });
+    });
+});
+</script>
+</body>
+</html>

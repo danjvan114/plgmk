@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>{{ plugin.name }}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:url('https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
+.loader{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.9);display:flex;justify-content:center;align-items:center;z-index:9999}
+.loader img{width:64px;height:64px;border-radius:50%}
+header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
+.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+.logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
+.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
+.logo-icon img{width:100%;height:100%;object-fit:cover}
+.head-space{flex:1}
+.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
+.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
+.search input::placeholder{color:#999}
+.main-box{max-width:1000px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
+.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);margin-bottom:20px;animation:slideDown 0.5s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#333;text-decoration:none}
+.nav-links a:hover{color:#2196f3}
+.tag{background:rgba(33,150,243,.1);color:#2196f3;padding:4px 12px;border-radius:4px;font-size:14px}
+.tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.detail-header{padding:24px;border-bottom:1px solid rgba(0,0,0,.05)}
+.detail-header h1{color:#333;margin-bottom:8px}
+.detail-header .meta{display:flex;align-items:center;gap:16px;color:#666;font-size:14px;margin-bottom:16px}
+.rating{color:#ff9800;font-size:20px}
+.detail-body{padding:24px}
+.detail-body h2{color:#333;margin-bottom:16px;font-size:18px}
+.detail-body p{color:#666;line-height:1.8}
+.btn{background:#2196f3;color:#fff;padding:12px 24px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:16px;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:#1976d2}
+.download-btn{background:#4caf50}
+.download-btn:hover{background:#388e3c}
+.rate-btn{background:#ff9800}
+.rate-btn:hover{background:#f57c00}
+.update-btn{background:#9c27b0}
+.update-btn:hover{background:#7b1fa2}
+.status-off-btn{background:#f44336}
+.status-off-btn:hover{background:#d32f2f}
+.status-on-btn{background:#4caf50}
+.status-on-btn:hover{background:#388e3c}
+.stats{display:flex;gap:32px;margin-top:24px}
+.stat-item{text-align:center}
+.stat-value{font-size:24px;font-weight:bold;color:#2196f3}
+.stat-label{color:#999;font-size:14px}
+.image-gallery{display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:12px;margin-bottom:24px}
+.gallery-image{width:100%;height:150px;object-fit:cover;border-radius:4px;cursor:pointer}
+.image-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);justify-content:center;align-items:center;z-index:1000}
+.image-modal.active{display:flex}
+.modal-image{max-width:90%;max-height:90%;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="loader" id="loader"><img src="/mk/kn/uploads/kn.gif" alt="Loading..."></div>
+<header>
+<div class="wrap">
+<div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>{{ markets.get(current_market) if current_market else 'KN插件市场' }}</div>
+<div class="nav-links">
+<a href="/mk/{{ current_market or 'kn' }}">首页</a>
+{% if session.user %}
+<a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+<a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+{% if users and users.get(session.user, {}).get('role') == 'admin' %}
+<a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+{% endif %}
+{% endif %}
+</div>
+<div class="head-space"></div>
+<form class="search" action="/mk/{{ current_market or 'kn' }}" method="get">
+<input name="search" placeholder="搜索插件名称/标签">
+</form>
+<div style="margin-left:16px">
+{% if session.user %}
+<a href="/change_password" class="btn">修改密码</a>
+<a href="/logout" class="btn">退出</a>
+{% else %}
+<a href="/login" class="btn">登录</a>
+{% endif %}
+</div>
+</div>
+</header>
+<div class="main-box">
+<div class="card">
+<div class="detail-header">
+<h1>{{ plugin.name }}</h1>
+<div class="meta">
+<span>作者: {{ plugin.author }}</span>
+<span>版本: {{ plugin.version }}</span>
+<span class="rating">★ {{ plugin.rating }}</span>
+<span>评价数: {{ plugin.rating_count }}</span>
+<span>发布于: {{ plugin.created_at }}</span>
+</div>
+<div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
+</div>
+<div class="detail-body">
+{% if plugin.images and plugin.images|length > 0 %}
+<h2>插件预览</h2>
+<div class="image-gallery">
+{% for img in plugin.images %}
+{% if img.url %}
+<img src="{{ img.url }}" class="gallery-image" onclick="openImage('{{ img.url }}')" alt="插件图片">
+{% endif %}
+{% endfor %}
+</div>
+{% endif %}
+<h2>插件描述</h2>
+<p>{{ plugin.description }}</p>
+<div class="stats">
+<div class="stat-item">
+<div class="stat-value">{{ plugin.downloads }}</div>
+<div class="stat-label">下载次数</div>
+</div>
+<div class="stat-item">
+<div class="stat-value">{{ plugin.rating }}</div>
+<div class="stat-label">评分</div>
+</div>
+<div class="stat-item">
+<div class="stat-value">{{ plugin.rating_count }}</div>
+<div class="stat-label">评价数</div>
+</div>
+</div>
+<div style="margin-top:24px">
+{% if plugin.status == 'active' %}
+<a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn download-btn">立即下载</a>
+<a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}" class="btn rate-btn">评分</a>
+{% else %}
+<span style="color:#f44336;font-weight:bold">插件已下架</span>
+{% endif %}
+{% if is_owner %}
+<a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn update-btn">更新插件</a>
+<a href="/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}" class="btn {% if plugin.status == 'active' %}status-off-btn{% else %}status-on-btn{% endif %}">
+{% if plugin.status == 'active' %}下架插件{% else %}上架插件{% endif %}
+</a>
+{% endif %}
+</div>
+</div>
+</div>
+</div>
+<div class="image-modal" id="imageModal">
+<img id="modalImage" class="modal-image" src="" alt="大图预览">
+</div>
+<script>
+window.addEventListener('load', function() {
+    document.getElementById('loader').style.display = 'none';
+});
+function openImage(url) {
+    document.getElementById('modalImage').src = url;
+    document.getElementById('imageModal').classList.add('active');
+}
+document.getElementById('imageModal').addEventListener('click', function() {
+    this.classList.remove('active');
+});
+</script>
+</body>
+</html>

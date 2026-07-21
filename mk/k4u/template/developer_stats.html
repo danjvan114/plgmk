@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>开发者统计</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:url('https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
+.loader{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.9);display:flex;justify-content:center;align-items:center;z-index:9999}
+.loader img{width:64px;height:64px;border-radius:50%}
+header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
+.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+.logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
+.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
+.logo-icon img{width:100%;height:100%;object-fit:cover}
+.head-space{flex:1}
+.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
+.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
+.search input::placeholder{color:#999}
+.main-box{max-width:1000px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
+.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);margin-bottom:20px;animation:slideDown 0.5s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#333;text-decoration:none}
+.nav-links a:hover{color:#2196f3}
+.stats-header{padding:24px;border-bottom:1px solid rgba(0,0,0,.05)}
+.stats-header h1{color:#333;margin-bottom:24px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px}
+.stat-card-a{background:linear-gradient(135deg,rgba(31, 175, 115, 0.9) 0%,rgba(62, 168, 255, 0.9) 100%);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;padding:24px;border-radius:8px;text-align:center}
+.stat-card-b{background:linear-gradient(135deg,rgba(255, 182, 25, 0.9) 0%,rgba(41, 168, 83, 0.9) 100%);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;padding:24px;border-radius:8px;text-align:center}
+.stat-card-c{background:linear-gradient(135deg,rgba(234, 102, 179, 0.9) 0%,rgba(75, 162, 143, 0.9) 100%);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;padding:24px;border-radius:8px;text-align:center}
+.stat-value{font-size:36px;font-weight:bold}
+.stat-label{font-size:14px;opacity:0.9}
+.plugin-list{padding:24px}
+.plugin-list h2{color:#333;margin-bottom:16px}
+.plugin-item{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid rgba(0,0,0,.05)}
+.plugin-item:last-child{border-bottom:none}
+.plugin-info h3{color:#333;margin-bottom:4px}
+.plugin-info p{color:#999;font-size:14px}
+.plugin-stats{text-align:right;margin-right:16px}
+.plugin-stats div{color:#666;font-size:14px}
+.plugin-actions{display:flex;align-items:center}
+.tag{background:rgba(33,150,243,.1);color:#2196f3;padding:2px 8px;border-radius:4px;font-size:12px}
+.btn{background:#2196f3;color:#fff;padding:8px 16px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:14px}
+.btn:hover{background:#1976d2}
+.btn-danger{background:#f44336}
+.btn-danger:hover{background:#d32f2f}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+<div class="logo"><div class="logo-icon"><img src="/mk/k4u/uploads/k4u.png" alt="Logo"></div>{{ markets.get(current_market) if current_market else 'K4U插件市场' }}</div>
+<div class="nav-links">
+<a href="/mk/{{ current_market or 'k4u' }}">首页</a>
+<a href="/mk/{{ current_market or 'k4u' }}/upload">上传插件</a>
+<a href="/mk/{{ current_market or 'k4u' }}/developer/stats" class="active">我的统计</a>
+{% if users and users.get(session.user, {}).get('role') == 'admin' %}
+<a href="/mk/{{ current_market or 'k4u' }}/admin">后台管理</a>
+{% endif %}
+</div>
+<div class="head-space"></div>
+<form class="search" action="/mk/{{ current_market or 'k4u' }}" method="get">
+<input name="search" placeholder="搜索插件名称/标签">
+</form>
+<div style="margin-left:16px">
+<a href="/change_password" class="btn">修改密码</a>
+<a href="/logout" class="btn">退出</a>
+</div>
+</div>
+</header>
+<div class="main-box">
+<div class="card">
+<div class="stats-header">
+<h1>开发者统计 - {{ session.user }}</h1>
+<div class="stats-grid">
+<div class="stat-card-a">
+<div class="stat-value">{{ plugins|length }}</div>
+<div class="stat-label">发布插件数</div>
+</div>
+<div class="stat-card-b">
+<div class="stat-value">{{ total_downloads }}</div>
+<div class="stat-label">总下载次数</div>
+</div>
+<div class="stat-card-c">
+<div class="stat-value">{{ "%.1f"|format(avg_rating) }}</div>
+<div class="stat-label">平均评分</div>
+</div>
+</div>
+<div class="plugin-list">
+<h2>我的插件</h2>
+{% if plugins %}
+{% for plugin in plugins %}
+<div class="plugin-item">
+<div class="plugin-info">
+<h3>{{ plugin.name }}</h3>
+<p>{{ plugin.author }} · {{ plugin.version }}</p>
+</div>
+<div class="plugin-stats">
+<div>{{ plugin.downloads }} 下载</div>
+<div>★ {{ plugin.rating }}</div>
+</div>
+<div class="plugin-actions">
+<a href="/mk/{{ current_market or 'k4u' }}/plugin/{{ plugin.id }}" class="btn" style="margin-right:8px">查看</a>
+<a href="/mk/{{ current_market or 'k4u' }}/update/{{ plugin.id }}" class="btn" style="margin-right:8px">编辑</a>
+<a href="/mk/{{ current_market or 'k4u' }}/toggle_status/{{ plugin.id }}" class="btn {% if plugin.status == 'active' %}btn-danger{% endif %}">
+{{ '下架' if plugin.status == 'active' else '上架' }}
+</a>
+</div>
+</div>
+{% endfor %}
+{% else %}
+<p style="text-align:center;color:#999;padding:20px">暂无插件</p>
+{% endif %}
+</div>
+</div>
+</div>
+<script>window.addEventListener('load',function(){document.getElementById('loader').style.display='none'});</script>
+</body>
+</html>

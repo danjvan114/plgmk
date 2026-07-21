@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>评分 - {{ plugin.name }}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:url('https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco') no-repeat center center fixed;background-size:cover;min-height:100vh}
+.loader{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.9);display:flex;justify-content:center;align-items:center;z-index:9999}
+.loader img{width:64px;height:64px;border-radius:50%}
+header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out}
+.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+.logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
+.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
+.logo-icon img{width:100%;height:100%;object-fit:cover}
+.head-space{flex:1}
+.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
+.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
+.search input::placeholder{color:#999}
+.main-box{max-width:600px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
+.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);padding:24px;animation:slideDown 0.5s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#333;text-decoration:none}
+.nav-links a:hover{color:#2196f3}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;color:#333;margin-bottom:8px;font-weight:500}
+.btn{background:#2196f3;color:#fff;padding:12px 24px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:16px}
+.btn:hover{background:#1976d2}
+h1{color:#333;margin-bottom:8px}
+p{color:#666;margin-bottom:24px}
+.stars{display:flex;gap:8px;margin-bottom:16px}
+.star{font-size:40px;cursor:pointer;color:#ddd;transition:color .2s}
+.star:hover, .star.active{color:#ff9800}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+<div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>插件市场</div>
+<div class="nav-links">
+<a href="/mk/kn">首页</a>
+{% if session.user %}
+<a href="/mk/kn/upload">上传插件</a>
+<a href="/mk/kn/developer/stats">我的统计</a>
+{% if users and users.get(session.user, {}).get('role') == 'admin' %}
+<a href="/mk/kn/admin">后台管理</a>
+{% endif %}
+{% endif %}
+</div>
+<div class="head-space"></div>
+<form class="search" action="/mk/kn" method="get">
+<input name="search" placeholder="搜索插件名称/标签">
+</form>
+<div style="margin-left:16px">
+{% if session.user %}
+<a href="/change_password" class="btn">修改密码</a>
+<a href="/logout" class="btn">退出</a>
+{% else %}
+<a href="/login" class="btn">登录</a>
+{% endif %}
+</div>
+</div>
+</header>
+<div class="main-box">
+<div class="card">
+<h1>为插件评分</h1>
+<p>{{ plugin.name }}</p>
+<form method="post">
+<div class="form-group">
+<label>评分</label>
+<div class="stars">
+<span class="star" data-score="1" onclick="selectStar(1)">★</span>
+<span class="star" data-score="2" onclick="selectStar(2)">★</span>
+<span class="star" data-score="3" onclick="selectStar(3)">★</span>
+<span class="star" data-score="4" onclick="selectStar(4)">★</span>
+<span class="star" data-score="5" onclick="selectStar(5)">★</span>
+</div>
+<input type="hidden" name="score" id="score" value="3">
+</div>
+<button type="submit" class="btn">提交评分</button>
+</form>
+</div>
+</div>
+<script>
+window.addEventListener('load', function() {
+    document.getElementById('loader').style.display = 'none';
+});
+function selectStar(score) {
+    document.getElementById('score').value = score;
+    const stars = document.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+        star.classList.toggle('active', index < score);
+    });
+}
+selectStar(3);
+</script>
+</body>
+</html>
