@@ -102,12 +102,17 @@ function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const mainContent = document.getElementById('mainContent');
-    sidebar.classList.toggle('hidden');
-    mainContent.classList.toggle('full-width');
-    if (sidebar.classList.contains('hidden')) {
+    
+    const isHidden = sidebar.classList.contains('hidden');
+    
+    if (isHidden) {
+        sidebar.classList.remove('hidden');
+        mainContent.classList.remove('full-width');
         overlay.classList.remove('show');
     } else {
-        overlay.classList.add('show');
+        sidebar.classList.add('hidden');
+        mainContent.classList.add('full-width');
+        overlay.classList.remove('show');
     }
 }
 
