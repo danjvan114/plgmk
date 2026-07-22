@@ -376,7 +376,15 @@ def uploaded_file_k4u(filepath):
 
 @app.route('/static/<path:filename>')
 def root_static_files(filename):
-    return send_from_directory('static', filename)
+    static_dir = os.path.join(os.path.dirname(__file__), 'static')
+    return send_from_directory(static_dir, filename)
+
+@app.route('/localcdn/<path:filename>')
+def local_cdn(filename):
+    localcdn_dir = os.path.join(os.path.dirname(__file__), 'localcdn')
+    if not os.path.exists(localcdn_dir):
+        os.makedirs(localcdn_dir)
+    return send_from_directory(localcdn_dir, filename)
 
 @app.route('/mk/<market_id>/download/<int:plugin_id>')
 def market_download_plugin(market_id, plugin_id):
@@ -765,7 +773,6 @@ def admin_delete_user(username):
     
     delete_user = User.query.get(username)
     if delete_user and delete_user.username != session['user']:
-        Rating.query.filter_by(user_id=username).delete()
         db.session.delete(delete_user)
         db.session.commit()
     
