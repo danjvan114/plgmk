@@ -119,7 +119,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div class="app-icon">
 <img src="/mk/kn/uploads/kn.png" alt="图标">
 </div>
-<h1>KN Expanse v1.2.2</h1>
+<h1>KN Expanse</h1>
 
 <p class="description">KN扩展版本，支持扩展积木，性能提升。</p>
 
@@ -245,6 +245,19 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 function scrollToDownload() {
     document.getElementById('download-section').scrollIntoView({ behavior: 'smooth' });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('zh')) {
+        const zhValue = urlParams.get('zh');
+        if (zhValue === '1') {
+            const normalClientBtn = document.querySelector('.dowbt a:last-child span:first-child');
+            if (normalClientBtn) {
+                normalClientBtn.textContent = 'KN客户端';
+            }
+        }
+    }
+});
 </script>
 <script>
 document.querySelector('.dropbtn').addEventListener('click', function() {
