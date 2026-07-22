@@ -23,6 +23,7 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 .progress-container .mdui-progress-indeterminate{height:100%}
 .pdf-container{flex:1;padding:80px 20px 20px;overflow:auto}
 .pdf-viewer{width:100%;height:calc(100vh - 100px);border:none}
+.iframe-viewer{width:100%;height:calc(100vh - 100px);border:none}
 .code-viewer{width:100%;min-height:calc(100vh - 100px);background:#1e1e1e;color:#d4d4d4;font-family:Consolas,'Courier New',monospace;padding:16px;white-space:pre-wrap;overflow-x:auto;border-radius:4px}
 .empty-state{display:flex;flex-direction:column;justify-content:center;align-items:center;height:calc(100vh - 150px);color:#999}
 .empty-state i{font-size:64px;margin-bottom:16px}
@@ -192,7 +193,8 @@ function loadTTMP4(url) {
         .then(response => response.json())
         .then(data => {
             if (data.url) {
-                container.innerHTML = '<iframe src="' + data.url + '" width="100%" height="calc(100vh - 100px)" frameborder="0" allowfullscreen></iframe>';
+                const iframeUrl = data.url.startsWith('http') ? data.url : 'https://' + data.url;
+                container.innerHTML = '<iframe class="iframe-viewer" src="' + iframeUrl + '" frameborder="0" allowfullscreen></iframe>';
             } else {
                 container.innerHTML = '<div class="empty-state"><i class="mdui-icon material-icons">error</i><p>文件格式错误：缺少 url 字段</p></div>';
             }
