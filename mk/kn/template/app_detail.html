@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
 <meta charset="UTF-8">
-<title>KN应用下载</title>
+<title>JN插件市场-下载客户端</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
 body{background:url('https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
@@ -62,6 +65,8 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 .dropdown-content a:hover{background:rgba(33,150,243,.1)}
 </style>
 </head>
+
+
 <body>
 <div class="loader" id="loader"><img src="/mk/kn/uploads/kn.gif" alt="Loading..."></div>
 <header>
@@ -109,60 +114,51 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div class="app-icon">
 <img src="/mk/kn/uploads/kn.png" alt="KN应用图标">
 </div>
-<h1>KN插件市场客户端</h1>
-<div class="version">版本 1.0.0</div>
-<p class="description">KN插件市场官方客户端，让您更便捷地浏览、下载和管理插件。支持一键安装、自动更新、插件管理等功能。</p>
-<div class="download-stats">
-<div class="stat-item">
-<div class="number">10,000+</div>
-<div class="label">下载次数</div>
-</div>
-<div class="stat-item">
-<div class="number">4.9</div>
-<div class="label">用户评分</div>
-</div>
-<div class="stat-item">
-<div class="number">500+</div>
-<div class="label">可用插件</div>
-</div>
+<h1>KN客户端</h1>
+
+<p class="description">KN扩展版本，支持扩展积木，性能提升。</p>
+
 </div>
 <a href="#" class="btn btn-large">
 <span>立即下载</span>
-<span>↓</span>
+<span>
+    <i class="mdui-icon material-icons">arrow_forward</i>
+</span>
 </a>
 </div>
 <div class="features">
 <h2>功能特性</h2>
 <div class="feature-grid">
 <div class="feature-card">
-<div class="icon">📦</div>
+<div class="icon">
+    <i class="mdui-icon material-icons">done</i>
+</div>
 <h3>一键安装</h3>
-<p>浏览插件市场，一键下载安装您喜爱的插件，无需手动配置。</p>
+<p>直接扔插件，自动加载</p>
 </div>
 <div class="feature-card">
-<div class="icon">🔄</div>
-<h3>自动更新</h3>
-<p>插件更新实时提醒，一键更新所有已安装插件。</p>
+<div class="icon">
+    <i class="mdui-icon material-icons">near_me</i>
+</div>
+<h3>更多扩展</h3>
+<p>扩展性能强，可自制插件~</p>
 </div>
 <div class="feature-card">
-<div class="icon">⚙️</div>
+<div class="icon">
+    <i class="mdui-icon material-icons">settings</i>
+</div>
 <h3>插件管理</h3>
 <p>集中管理所有已安装插件，支持启用、禁用和卸载。</p>
 </div>
 <div class="feature-card">
-<div class="icon">⭐</div>
-<h3>评分评论</h3>
-<p>为喜欢的插件评分，查看其他用户的评价和反馈。</p>
+<div class="icon">
+    <i class="mdui-icon material-icons">mood</i>
 </div>
-<div class="feature-card">
-<div class="icon">🔍</div>
-<h3>智能搜索</h3>
-<p>支持关键词搜索和标签筛选，快速找到所需插件。</p>
+<h3>社区支持</h3>
+<p>为喜欢的插件和作品点赞，参与社区讨论。</p>
 </div>
-<div class="feature-card">
-<div class="icon">📊</div>
-<h3>使用统计</h3>
-<p>查看插件下载量、评分等统计信息，了解插件热度。</p>
+
+
 </div>
 </div>
 </div>
@@ -199,7 +195,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </div>
 </div>
 <div class="footer">
-<p>© 2024 KN插件市场. All rights reserved.</p>
+
 </div>
 </div>
 <script>window.addEventListener('load',function(){document.getElementById('loader').style.display='none'});</script>
