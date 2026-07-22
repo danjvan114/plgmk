@@ -446,16 +446,20 @@ def market_rate_plugin(market_id, plugin_id):
     if not plugin:
         return render_root_template('404.html'), 404
     
+    compact_mode = request.args.get('c') == '1'
+    
     if request.method == 'POST':
         score = int(request.form.get('score'))
         from datetime import datetime
         created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         add_rating(market_id, plugin_id, session['user'], score, created_at)
+        if compact_mode:
+            return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id, c='1'))
         return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id))
     
     users = {u.username: u.to_dict() for u in User.query.all()}
     return render_market_template('rate.html', market_id=market_id, 
-                                  plugin=plugin, users=users)
+                                  plugin=plugin, users=users, compact_mode=compact_mode)
 
 @app.route('/mk/kn/rate/<int:plugin_id>', methods=['GET', 'POST'])
 def rate_plugin(plugin_id):

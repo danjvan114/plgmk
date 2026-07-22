@@ -42,7 +42,8 @@ p{color:#666;margin-bottom:24px}
 <div class="wrap">
 <div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>插件市场</div>
 <div class="nav-links">
-<a href="/mk/kn">首页</a>
+<a href="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}">首页</a>
+{% if not compact_mode %}
 {% if session.user %}
 <a href="/mk/kn/upload">上传插件</a>
 <a href="/mk/kn/developer/stats">我的统计</a>
@@ -50,17 +51,22 @@ p{color:#666;margin-bottom:24px}
 <a href="/mk/kn/admin">后台管理</a>
 {% endif %}
 {% endif %}
+{% endif %}
 </div>
 <div class="head-space"></div>
-<form class="search" action="/mk/kn" method="get">
+<form class="search" action="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}" method="get">
 <input name="search" placeholder="搜索插件名称/标签">
 </form>
 <div style="margin-left:16px">
+{% if compact_mode %}
+<button class="btn mdui-ripple" onclick="copyWebUrl()">复制网页版链接</button>
+{% else %}
 {% if session.user %}
 <a href="/change_password" class="btn mdui-ripple">修改密码</a>
 <a href="/logout" class="btn mdui-ripple">退出</a>
 {% else %}
 <a href="/login" class="btn mdui-ripple">登录</a>
+{% endif %}
 {% endif %}
 </div>
 </div>
@@ -97,6 +103,21 @@ function selectStar(score) {
     });
 }
 selectStar(3);
+
+function copyWebUrl() {
+    const url = 'https://code.pgrm.run/mk/{{ current_market or "kn" }}/rate/{{ plugin.id }}';
+    navigator.clipboard.writeText(url).then(function() {
+        alert('链接已复制到剪贴板！');
+    }).catch(function() {
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('链接已复制到剪贴板！');
+    });
+}
 </script>
 </body>
 </html>

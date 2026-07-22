@@ -136,7 +136,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div style="margin-top:24px">
 {% if plugin.status == 'active' %}
 <a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn download-btn mdui-ripple">立即下载</a>
-<a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}" class="btn rate-btn mdui-ripple">评分</a>
+<a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}{% if compact_mode %}?c=1{% endif %}" class="btn rate-btn mdui-ripple">评分</a>
 {% else %}
 <span style="color:#f44336;font-weight:bold">插件已下架</span>
 {% endif %}
