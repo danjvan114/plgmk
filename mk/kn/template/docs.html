@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="icon" type="image/x-icon" href="/localcdn/ico.png">
+    <meta charset="UTF-8">
+<title>开发文档 - KN插件市场</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:#fff;min-height:100vh;display:flex}
+.sidebar{width:280px;background:#f5f5f5;border-right:1px solid #e0e0e0;position:fixed;left:0;top:64px;bottom:0;overflow-y:auto;transition:transform 0.3s}
+.sidebar.collapsed{transform:translateX(-100%)}
+.main-content{flex:1;display:flex;flex-direction:column;margin-left:280px;transition:margin-left 0.3s}
+.main-content.full-width{margin-left:0}
+header{width:100%;height:64px;background:#fff;border-bottom:1px solid #e0e0e0;position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;z-index:100}
+header .menu-btn{background:none;border:none;font-size:24px;color:#333;cursor:pointer;margin-right:16px;padding:8px}
+header .menu-btn:hover{color:#2196f3}
+header .title{font-size:18px;font-weight:bold;color:#333}
+.progress-container{position:fixed;top:64px;left:0;right:0;height:4px;background:#e0e0e0;z-index:99}
+.progress-container.hidden{display:none}
+.progress-container .mdui-progress{margin:0;height:100%}
+.progress-container .mdui-progress-indeterminate{height:100%}
+.pdf-container{flex:1;padding:80px 20px 20px;overflow:auto}
+.pdf-viewer{width:100%;min-height:calc(100vh - 100px);border:none}
+.empty-state{display:flex;flex-direction:column;justify-content:center;align-items:center;height:calc(100vh - 150px);color:#999}
+.empty-state i{font-size:64px;margin-bottom:16px}
+.empty-state p{font-size:16px}
+.doc-tree{padding:16px}
+.doc-tree ul{list-style:none;padding-left:0}
+.doc-tree li{margin-bottom:4px}
+.doc-tree .folder{font-weight:bold;color:#333;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:4px}
+.doc-tree .folder:hover{background:rgba(33,150,243,.1)}
+.doc-tree .file{color:#666;padding:4px 8px 4px 28px;border-radius:4px;cursor:pointer}
+.doc-tree .file:hover{background:rgba(33,150,243,.1);color:#2196f3}
+.doc-tree .file.active{background:rgba(33,150,243,.15);color:#2196f3}
+.doc-tree .toggle-icon{font-size:12px;color:#999}
+.doc-tree .folder.open .toggle-icon{transform:rotate(90deg)}
+.doc-tree .subtree{display:none;padding-left:16px}
+.doc-tree .folder.open + .subtree{display:block}
+.sidebar-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:90}
+.sidebar-overlay.show{display:block}
+@media (max-width:768px){
+    .sidebar{transform:translateX(-100%)}
+    .sidebar.show{transform:translateX(0)}
+    .main-content{margin-left:0}
+    .sidebar-overlay.show{display:block}
+}
+</style>
+</head>
+<body>
+<header>
+<button class="menu-btn mdui-ripple" onclick="toggleSidebar()">
+    <i class="mdui-icon material-icons">menu</i>
+</button>
+<div class="title">开发文档</div>
+</header>
+
+<div class="progress-container" id="progressBar">
+<div class="mdui-progress">
+    <div class="mdui-progress-indeterminate"></div>
+</div>
+</div>
+
+<div class="sidebar" id="sidebar">
+<div class="doc-tree">
+<h3 style="padding:8px;margin-bottom:12px;color:#333;font-size:14px">文档目录</h3>
+<ul>
+{{ tree_html|safe }}
+</ul>
+</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<div class="main-content" id="mainContent">
+<div class="pdf-container" id="pdfContainer">
+<div class="empty-state">
+<i class="mdui-icon material-icons">description</i>
+<p>请从左侧选择一个文档查看</p>
+</div>
+</div>
+</div>
+
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const mainContent = document.getElementById('mainContent');
+    sidebar.classList.toggle('show');
+    overlay.classList.toggle('show');
+    mainContent.classList.toggle('full-width');
+}
+
+const MARKET_ID = '{{ market_id }}';
+
+function loadPDF(filePath) {
+    const container = document.getElementById('pdfContainer');
+    const progress = document.getElementById('progressBar');
+    
+    progress.classList.remove('hidden');
+    
+    container.innerHTML = '<iframe class="pdf-viewer" src="https://docs.google.com/viewer?url=' + encodeURIComponent('/localcdn/doc/' + MARKET_ID + '/' + filePath) + '&embedded=true" onload="hideProgress()"></iframe>';
+}
+
+function hideProgress() {
+    const progress = document.getElementById('progressBar');
+    progress.classList.add('hidden');
+}
+
+function toggleFolder(el) {
+    el.classList.toggle('open');
+}
+
+function selectFile(el, filePath) {
+    document.querySelectorAll('.doc-tree .file').forEach(f => f.classList.remove('active'));
+    el.classList.add('active');
+    loadPDF(filePath);
+}
+</script>
+</body>
+</html>

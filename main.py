@@ -877,6 +877,64 @@ def developer_center_kn():
 def developer_center_k4u():
     return developer_center('k4u')
 
+def build_doc_tree(dir_path, base_path=''):
+    tree = []
+    try:
+        entries = os.listdir(dir_path)
+        entries.sort(key=lambda x: (os.path.isdir(os.path.join(dir_path, x)), x.lower()))
+        for entry in entries:
+            full_path = os.path.join(dir_path, entry)
+            rel_path = os.path.join(base_path, entry) if base_path else entry
+            if os.path.isdir(full_path):
+                children = build_doc_tree(full_path, rel_path)
+                tree.append({'name': entry, 'type': 'folder', 'children': children})
+            elif entry.lower().endswith('.pdf'):
+                tree.append({'name': entry, 'type': 'file', 'path': rel_path})
+    except Exception:
+        pass
+    return tree
+
+def render_tree_html(items, prefix=''):
+    html = ''
+    for item in items:
+        full_path = os.path.join(prefix, item['name']) if prefix else item['name']
+        if item['type'] == 'folder':
+            html += f'''<li>
+                <div class="folder" onclick="toggleFolder(this)">
+                    <span class="toggle-icon">▶</span>
+                    <span>{item['name']}</span>
+                </div>
+                <ul class="subtree">
+                    {render_tree_html(item['children'], full_path)}
+                </ul>
+            </li>'''
+        else:
+            html += f'''<li>
+                <div class="file" onclick="selectFile(this, '{full_path}')">{item['name']}</div>
+            </li>'''
+    return html
+
+@app.route('/dev/kn/docs')
+def docs_kn():
+    doc_dir = os.path.join(os.path.dirname(__file__), 'localcdn', 'doc', 'kn')
+    os.makedirs(doc_dir, exist_ok=True)
+    doc_tree = build_doc_tree(doc_dir)
+    tree_html = render_tree_html(doc_tree)
+    
+    return render_market_template('docs.html', market_id='kn', doc_tree=doc_tree, tree_html=tree_html)
+
+@app.route('/dev/<market_id>/docs')
+def docs(market_id):
+    if market_id not in MARKETS:
+        return render_root_template('404.html'), 404
+    
+    doc_dir = os.path.join(os.path.dirname(__file__), 'localcdn', 'doc', market_id)
+    os.makedirs(doc_dir, exist_ok=True)
+    doc_tree = build_doc_tree(doc_dir)
+    tree_html = render_tree_html(doc_tree)
+    
+    return render_market_template('docs.html', market_id=market_id, doc_tree=doc_tree, tree_html=tree_html)
+
 @app.route('/switch_market/<market_id>')
 def switch_market(market_id):
     if market_id in MARKETS:
