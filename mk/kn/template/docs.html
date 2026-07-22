@@ -120,8 +120,12 @@ document.addEventListener('contextmenu', function(e) {
     }
 });
 
-document.addEventListener('click', function() {
-    document.getElementById('contextMenu').classList.remove('show');
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('contextMenu');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    if (!menu.contains(e.target) && e.target !== sidebarOverlay) {
+        menu.classList.remove('show');
+    }
 });
 
 function downloadFile() {
