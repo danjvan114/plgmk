@@ -38,6 +38,11 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 .doc-tree .pdf-file{color:#e74c3c}
 .doc-tree .js-file{color:#f39c12}
 .doc-tree .toggle-icon{font-size:12px;color:#999}
+.context-menu{display:none;position:absolute;background:#fff;border:1px solid #e0e0e0;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.15);padding:4px 0;min-width:120px;z-index:1000}
+.context-menu.show{display:block}
+.context-menu li{list-style:none;padding:6px 16px;cursor:pointer;color:#333}
+.context-menu li:hover{background:#f5f5f5}
+.context-menu li.separator{border-top:1px solid #e0e0e0;margin:4px 0}
 .doc-tree .folder.open .toggle-icon{transform:rotate(90deg)}
 .doc-tree .subtree{display:none;padding-left:16px}
 .doc-tree .folder.open + .subtree{display:block}
@@ -77,6 +82,10 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+<ul class="context-menu" id="contextMenu">
+    <li onclick="downloadFile()">下载</li>
+</ul>
+
 <div class="main-content" id="mainContent">
 <div class="pdf-container" id="pdfContainer">
 <div class="empty-state">
@@ -87,6 +96,8 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 </div>
 
 <script>
+let currentFileUrl = '';
+
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
@@ -94,6 +105,36 @@ function toggleSidebar() {
     sidebar.classList.toggle('hidden');
     overlay.classList.toggle('show');
     mainContent.classList.toggle('full-width');
+}
+
+document.addEventListener('contextmenu', function(e) {
+    const target = e.target;
+    if (target.classList.contains('pdf-file') || target.classList.contains('js-file')) {
+        e.preventDefault();
+        currentFileUrl = target.getAttribute('data-url') || target.dataset.url;
+        
+        const menu = document.getElementById('contextMenu');
+        menu.style.left = e.clientX + 'px';
+        menu.style.top = e.clientY + 'px';
+        menu.classList.add('show');
+    }
+});
+
+document.addEventListener('click', function() {
+    document.getElementById('contextMenu').classList.remove('show');
+});
+
+function downloadFile() {
+    if (currentFileUrl) {
+        const link = document.createElement('a');
+        link.href = currentFileUrl;
+        link.download = currentFileUrl.split('/').pop();
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    document.getElementById('contextMenu').classList.remove('show');
 }
 
 function loadPDF(url) {

@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from jinja2 import Environment, FileSystemLoader
 import os
 import hashlib
+import urllib
 
 USER_DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'mk', 'userdata')
 MARKETS = {'kn': 'KN插件市场', 'k4u': 'K4U插件市场'}
@@ -900,7 +901,8 @@ def render_tree_html(items, prefix='', market_id=''):
     html = ''
     for item in items:
         full_path = os.path.join(prefix, item['name']) if prefix else item['name']
-        file_url = f'/localcdn/doc/{market_id}/{full_path}'
+        encoded_path = urllib.parse.quote(full_path)
+        file_url = f'/localcdn/doc/{market_id}/{encoded_path}'
         if item['type'] == 'folder':
             html += f'''<li>
                 <div class="folder" onclick="toggleFolder(this)">
@@ -913,11 +915,11 @@ def render_tree_html(items, prefix='', market_id=''):
             </li>'''
         elif item['type'] == 'pdf':
             html += f'''<li>
-                <div class="file pdf-file" onclick="loadPDF('{file_url}')">{item['name']}</div>
+                <div class="file pdf-file" data-url="{file_url}" onclick="loadPDF('{file_url}')">{item['name']}</div>
             </li>'''
         elif item['type'] == 'js':
             html += f'''<li>
-                <div class="file js-file" onclick="loadJS('{file_url}')">{item['name']}</div>
+                <div class="file js-file" data-url="{file_url}" onclick="loadJS('{file_url}')">{item['name']}</div>
             </li>'''
     return html
 
