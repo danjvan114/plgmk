@@ -103,8 +103,12 @@ function toggleSidebar() {
     const overlay = document.getElementById('sidebarOverlay');
     const mainContent = document.getElementById('mainContent');
     sidebar.classList.toggle('hidden');
-    overlay.classList.toggle('show');
     mainContent.classList.toggle('full-width');
+    if (sidebar.classList.contains('hidden')) {
+        overlay.classList.remove('show');
+    } else {
+        overlay.classList.add('show');
+    }
 }
 
 document.addEventListener('contextmenu', function(e) {

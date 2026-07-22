@@ -316,6 +316,9 @@ def market_index(market_id):
     if market_id not in MARKETS:
         return render_root_template('404.html'), 404
     
+    if request.path != f'/mk/{market_id}':
+        return render_root_template('404.html'), 404
+    
     set_market(market_id)
     
     search_query = request.args.get('search', '')
