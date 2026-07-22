@@ -437,22 +437,22 @@ def market_rate_plugin(market_id, plugin_id):
     if market_id not in MARKETS:
         return render_root_template('404.html'), 404
     
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    
     set_market(market_id)
     
     plugin = get_plugin_by_id(market_id, plugin_id)
     if not plugin:
         return render_root_template('404.html'), 404
     
-    compact_mode = request.args.get('c') == '1'
+    # 从 GET 或 POST 参数中获取 c 值
+    compact_mode = request.args.get('c') == '1' or request.form.get('c') == '1'
     
     if request.method == 'POST':
         score = int(request.form.get('score'))
         from datetime import datetime
         created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        add_rating(market_id, plugin_id, session['user'], score, created_at)
+        # 允许未登录用户评分，使用匿名用户标识
+        user_id = session.get('user', 'anonymous_' + str(hash(request.remote_addr)))
+        add_rating(market_id, plugin_id, user_id, score, created_at)
         if compact_mode:
             return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id, c='1'))
         return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id))

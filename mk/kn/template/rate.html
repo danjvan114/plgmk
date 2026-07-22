@@ -86,6 +86,9 @@ p{color:#666;margin-bottom:24px}
 <span class="star" data-score="5" onclick="selectStar(5)">★</span>
 </div>
 <input type="hidden" name="score" id="score" value="3">
+{% if compact_mode %}
+<input type="hidden" name="c" value="1">
+{% endif %}
 </div>
 <button type="submit" class="btn mdui-ripple">提交评分</button>
 </form>
