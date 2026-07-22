@@ -716,6 +716,37 @@ def admin_delete(plugin_id):
 def admin_delete_k4u(plugin_id):
     return market_admin_delete('k4u', plugin_id)
 
+@app.route('/mk/<market_id>/admin/batch_delete', methods=['POST'])
+def market_admin_batch_delete(market_id):
+    if market_id not in MARKETS:
+        return render_root_template('404.html'), 404
+    
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user'])
+    if not user or user.role != 'admin':
+        return redirect(url_for('login'))
+    
+    plugin_ids = request.form.getlist('plugin_ids')
+    if plugin_ids:
+        set_market(market_id)
+        for plugin_id in plugin_ids:
+            try:
+                delete_plugin(market_id, int(plugin_id))
+            except:
+                pass
+    
+    return redirect(url_for('market_admin_panel', market_id=market_id))
+
+@app.route('/mk/kn/admin/batch_delete', methods=['POST'])
+def admin_batch_delete():
+    return market_admin_batch_delete('kn')
+
+@app.route('/mk/k4u/admin/batch_delete', methods=['POST'])
+def admin_batch_delete_k4u():
+    return market_admin_batch_delete('k4u')
+
 @app.route('/op/user')
 def admin_users():
     if 'user' not in session:
