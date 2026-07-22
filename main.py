@@ -52,7 +52,7 @@ def render_root_template(template_name, **kwargs):
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'plugin-market-secret-key')
 app.config['DEBUG'] = False
-app.config['ALLOWED_EXTENSIONS'] = {'zip', 'rar', 'py', 'tar', 'gz'}
+app.config['ALLOWED_EXTENSIONS'] = {'zip', 'rar', 'py', 'tar', 'gz', 'js'}
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 app.config['SQLALCHEMY_BINDS'] = {
     'users': f'sqlite:///{USER_DATA_FOLDER}/users.db'
