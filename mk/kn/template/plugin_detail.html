@@ -56,6 +56,8 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 .image-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);justify-content:center;align-items:center;z-index:1000}
 .image-modal.active{display:flex}
 .modal-image{max-width:90%;max-height:90%;border-radius:8px}
+.ttmp4-container{width:100%;height:500px;border:1px solid rgba(0,0,0,.1);border-radius:4px;overflow:hidden;margin-bottom:20px}
+.ttmp4-iframe{width:100%;height:100%;border:none}
 </style>
 </head>
 <body>
@@ -107,7 +109,12 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
 </div>
 <div class="detail-body">
-{% if plugin.images and plugin.images|length > 0 %}
+{% if plugin.ttmp4_url %}
+<h2>预览</h2>
+<div class="ttmp4-container">
+<iframe class="ttmp4-iframe" src="{{ plugin.ttmp4_url }}" sandbox="allow-scripts allow-same-origin allow-popups" allowfullscreen></iframe>
+</div>
+{% elif plugin.images and plugin.images|length > 0 %}
 <h2>插件预览</h2>
 <div class="image-gallery">
 {% for img in plugin.images %}

@@ -117,12 +117,30 @@ def get_plugin_by_id(market_id, plugin_id):
         result = conn.execute(text("SELECT * FROM plugin WHERE id = :id"), {'id': plugin_id})
         row = result.fetchone()
         if row:
+            ttmp4_path = row[13] if len(row) > 13 else ''
+            ttmp4_url = ''
+            if ttmp4_path:
+                if ttmp4_path.startswith('http'):
+                    ttmp4_url = ttmp4_path
+                else:
+                    # 读取本地 ttmp4 文件获取 URL
+                    try:
+                        with open(ttmp4_path, 'r', encoding='utf-8') as f:
+                            import json
+                            data = json.load(f)
+                            if data.get('url'):
+                                ttmp4_url = data['url']
+                    except Exception:
+                        pass
+            
             return {
                 'id': row[0], 'name': row[1], 'description': row[2],
                 'author': row[3], 'version': row[4], 'download_count': row[5],
                 'rating': row[6], 'rating_count': row[7], 'status': row[8],
                 'file_path': row[9], 'created_at': row[10], 'updated_at': row[11],
-                'tags': row[12], 'images': get_plugin_images(market_id, row[0])
+                'tags': row[12], 'images': get_plugin_images(market_id, row[0]),
+                'ttmp4_path': ttmp4_path,
+                'ttmp4_url': ttmp4_url
             }
         return None
 
@@ -152,6 +170,15 @@ def add_plugin_image(market_id, plugin_id, image_path):
         conn.execute(
             text("INSERT INTO plugin_image (plugin_id, image_path) VALUES (:plugin_id, :image_path)"),
             {'plugin_id': plugin_id, 'image_path': image_path}
+        )
+        conn.commit()
+
+def add_plugin_ttmp4(market_id, plugin_id, ttmp4_path):
+    engine, text = get_market_db_engine(market_id)
+    with engine.connect() as conn:
+        conn.execute(
+            text("UPDATE plugin SET ttmp4_path = :ttmp4_path WHERE id = :plugin_id"),
+            {'plugin_id': plugin_id, 'ttmp4_path': ttmp4_path}
         )
         conn.commit()
 
@@ -272,7 +299,8 @@ def init_market_database(market_id):
         file_path VARCHAR(255) NOT NULL,
         created_at VARCHAR(20) DEFAULT '2024-01-01',
         updated_at VARCHAR(20) DEFAULT '2024-01-01',
-        tags VARCHAR(255) DEFAULT ''
+        tags VARCHAR(255) DEFAULT '',
+        ttmp4_path VARCHAR(500) DEFAULT ''
     )
     """)
     
@@ -514,27 +542,27 @@ def market_upload_plugin(market_id):
             users = {u.username: u.to_dict() for u in User.query.all()}
             return render_market_template('upload.html', market_id=market_id, users=users, max_images=5, error='请上传插件文件或提供下载链接')
         
-        images = request.files.getlist('images')
-        max_images = 5
-        for i, image_file in enumerate(images):
-            if i >= max_images:
-                break
-            if image_file and allowed_image_file(image_file.filename):
-                plugin_folder = f"{name.replace('/', '_').replace('\\', '_')[:50]}"
-                plugin_folder_path = os.path.join(upload_folder, plugin_folder)
-                if not os.path.exists(plugin_folder_path):
-                    os.makedirs(plugin_folder_path)
-                
-                img_content = image_file.read()
-                img_hash = hashlib.md5(img_content).hexdigest()
-                img_ext = image_file.filename.rsplit('.', 1)[1].lower()
-                img_filename = f"{img_hash}.{img_ext}"
-                img_path = os.path.join(plugin_folder_path, img_filename)
-                
-                with open(img_path, 'wb') as f:
-                    f.write(img_content)
-                
-                add_plugin_image(market_id, plugin_id, img_path)
+        # 处理 TTMP4 文件上传
+        ttmp4_file = request.files.get('ttmp4_file')
+        ttmp4_url = request.form.get('ttmp4_url', '').strip()
+        
+        if ttmp4_file and ttmp4_file.filename.endswith('.ttmp4'):
+            plugin_folder = f"{name.replace('/', '_').replace('\\', '_')[:50]}"
+            plugin_folder_path = os.path.join(upload_folder, plugin_folder)
+            if not os.path.exists(plugin_folder_path):
+                os.makedirs(plugin_folder_path)
+            
+            ttmp4_content = ttmp4_file.read()
+            ttmp4_hash = hashlib.md5(ttmp4_content).hexdigest()
+            ttmp4_filename = f"{ttmp4_hash}.ttmp4"
+            ttmp4_path = os.path.join(plugin_folder_path, ttmp4_filename)
+            
+            with open(ttmp4_path, 'wb') as f:
+                f.write(ttmp4_content)
+            
+            add_plugin_ttmp4(market_id, plugin_id, ttmp4_path)
+        elif ttmp4_url:
+            add_plugin_ttmp4(market_id, plugin_id, ttmp4_url)
         
         return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id))
     

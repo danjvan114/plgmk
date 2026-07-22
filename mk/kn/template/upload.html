@@ -20,8 +20,8 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 .search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
 .search input{background:transparent;border:none;outline:none;color:#333;width:100%}
 .search input::placeholder{color:#999}
-.main-box{max-width:800px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
-.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);padding:24px;animation:slideDown 0.5s ease-out}
+.main-box{max-width:1000px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
+.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);padding:24px;animation:slideDown 0.5s ease-out;margin-bottom:20px}
 @keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
 .nav-links{display:flex;gap:16px}
 .nav-links a{color:#333;text-decoration:none}
@@ -35,17 +35,13 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 .btn{background:#2196f3;color:#fff;padding:12px 24px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:16px}
 .btn:hover{background:#1976d2}
 h1{color:#333;margin-bottom:24px}
+h2{color:#333;margin-bottom:16px;font-size:18px}
 .file-info{color:#999;font-size:14px;margin-top:8px}
-.image-section{border-top:1px solid rgba(0,0,0,.05);padding-top:20px;margin-top:20px}
-.image-section h2{color:#333;margin-bottom:16px;font-size:18px}
-.image-row{display:flex;gap:12px;margin-bottom:12px}
-.image-row input[type="file"], .image-row input[type="url"]{flex:1}
-.image-row input[type="url"]{width:200px}
-.image-tab{display:flex;gap:8px;margin-bottom:12px}
-.image-tab button{padding:6px 12px;border:none;border-radius:4px;background:rgba(0,0,0,.05);cursor:pointer;font-size:14px}
-.image-tab button.active{background:#2196f3;color:#fff}
-.image-option{display:flex;gap:12px;align-items:center}
-.image-option .or{color:#999;font-size:14px}
+.ttmp4-section{border-top:1px solid rgba(0,0,0,.05);padding-top:20px;margin-top:20px}
+.ttmp4-preview{border-top:1px solid rgba(0,0,0,.05);padding-top:20px;margin-top:20px}
+.iframe-container{position:relative;width:100%;height:500px;border:1px solid rgba(0,0,0,.1);border-radius:4px;overflow:hidden}
+.iframe-container iframe{width:100%;height:100%;border:none}
+.preview-empty{display:flex;justify-content:center;align-items:center;height:100%;color:#999}
 </style>
 </head>
 <body>
@@ -98,24 +94,52 @@ h1{color:#333;margin-bottom:24px}
 <input type="url" name="external_url" placeholder="或输入外部下载链接（如蓝奏云、GitHub等）" style="margin-top:8px">
 <div class="file-info">支持: 蓝奏云、GitHub、Gitee等直链或网盘分享链接</div>
 </div>
-<div class="image-section">
-<h2>插件展示图片 (最多{{ max_images or 5 }}张)</h2>
-<div class="file-info">前{{ max_images or 5 }}张可直接上传，超过{{ max_images or 5 }}张请使用外链方式</div>
-{% for i in range(max_images or 5) %}
-<div class="image-row">
-<div class="image-option">
-<input type="file" name="image{{ i+1 }}" accept="image/*" placeholder="上传图片{{ i+1 }}">
-<span class="or">或</span>
-<input type="text" name="image_url{{ i+1 }}" placeholder="图片{{ i+1 }}外链地址">
+<div class="ttmp4-section">
+<h2>TTMP4 文件 (可选)</h2>
+<div class="form-group">
+<input type="file" name="ttmp4_file" accept=".ttmp4" id="ttmp4Input">
+<div class="file-info">支持格式: .ttmp4 (JSON格式，包含url字段)</div>
+<input type="url" name="ttmp4_url" placeholder="或输入外部 ttmp4 文件链接" style="margin-top:8px">
 </div>
-</div>
-{% endfor %}
-<div class="file-info">支持图片格式: png, jpg, jpeg, gif, webp</div>
 </div>
 <button type="submit" class="btn mdui-ripple">提交上传</button>
 </form>
 </div>
+
+<div class="card ttmp4-preview">
+<h2>TTMP4 预览</h2>
+<div class="iframe-container" id="previewContainer">
+<div class="preview-empty" id="previewEmpty">
+请上传或选择一个 ttmp4 文件进行预览
 </div>
-<script>window.addEventListener('load',function(){document.getElementById('loader').style.display='none'});</script>
+<iframe id="previewFrame" style="display:none"></iframe>
+</div>
+</div>
+</div>
+<script>
+window.addEventListener('load',function(){document.getElementById('loader').style.display='none'});
+
+document.getElementById('ttmp4Input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const data = JSON.parse(event.target.result);
+                if (data.url) {
+                    document.getElementById('previewEmpty').style.display = 'none';
+                    document.getElementById('previewFrame').style.display = 'block';
+                    document.getElementById('previewFrame').src = data.url;
+                } else {
+                    alert('TTMP4 文件格式错误：缺少 url 字段');
+                }
+            } catch (error) {
+                alert('无法解析 TTMP4 文件：' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+});
+</script>
 </body>
 </html>
