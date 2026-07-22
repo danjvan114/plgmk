@@ -22,7 +22,7 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 .progress-container .mdui-progress{margin:0;height:100%}
 .progress-container .mdui-progress-indeterminate{height:100%}
 .pdf-container{flex:1;padding:80px 20px 20px;overflow:auto}
-.pdf-viewer{width:100%;min-height:calc(100vh - 100px);border:none}
+.pdf-viewer{width:100%;min-height:calc(100vh - 100px)}
 .empty-state{display:flex;flex-direction:column;justify-content:center;align-items:center;height:calc(100vh - 150px);color:#999}
 .empty-state i{font-size:64px;margin-bottom:16px}
 .empty-state p{font-size:16px}
@@ -42,10 +42,16 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 .sidebar-overlay.show{display:block}
 @media (max-width:768px){
     .sidebar{transform:translateX(-100%)}
-    .sidebar.show{transform:translateX(0)}
+    .sidebar.collapsed{transform:translateX(-100%)}
+    .sidebar:not(.collapsed){transform:translateX(0)}
     .main-content{margin-left:0}
     .sidebar-overlay.show{display:block}
 }
+.page-controls{display:flex;justify-content:center;gap:16px;padding:16px;border-top:1px solid #e0e0e0;background:#fafafa}
+.page-controls button{background:#4caf50;color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer}
+.page-controls button:hover{background:#388e3c}
+.page-controls button:disabled{background:#ccc;cursor:not-allowed}
+.page-controls input{width:60px;padding:8px;border:1px solid #e0e0e0;border-radius:4px;text-align:center}
 </style>
 </head>
 <body>
@@ -82,30 +88,95 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
+const MARKET_ID = '{{ market_id }}';
+let pdfDoc = null;
+let currentPage = 1;
+
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const mainContent = document.getElementById('mainContent');
-    sidebar.classList.toggle('show');
+    sidebar.classList.toggle('collapsed');
     overlay.classList.toggle('show');
     mainContent.classList.toggle('full-width');
 }
 
-const MARKET_ID = '{{ market_id }}';
-
-function loadPDF(filePath) {
+async function loadPDF(filePath) {
     const container = document.getElementById('pdfContainer');
     const progress = document.getElementById('progressBar');
     
     progress.classList.remove('hidden');
+    container.innerHTML = '<canvas id="pdfCanvas" class="pdf-viewer"></canvas>';
     
-    container.innerHTML = '<iframe class="pdf-viewer" src="https://docs.google.com/viewer?url=' + encodeURIComponent('/localcdn/doc/' + MARKET_ID + '/' + filePath) + '&embedded=true" onload="hideProgress()"></iframe>';
+    const url = '/localcdn/doc/' + MARKET_ID + '/' + filePath;
+    
+    try {
+        pdfDoc = await pdfjsLib.getDocument(url).promise;
+        currentPage = 1;
+        await renderPage(currentPage);
+        addPageControls();
+    } catch (error) {
+        container.innerHTML = '<div class="empty-state"><i class="mdui-icon material-icons">error</i><p>无法加载PDF文件</p></div>';
+    } finally {
+        progress.classList.add('hidden');
+    }
 }
 
-function hideProgress() {
-    const progress = document.getElementById('progressBar');
-    progress.classList.add('hidden');
+async function renderPage(pageNum) {
+    const canvas = document.getElementById('pdfCanvas');
+    const ctx = canvas.getContext('2d');
+    const page = await pdfDoc.getPage(pageNum);
+    
+    const viewport = page.getViewport({ scale: 1.5 });
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    
+    const renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+    };
+    
+    await page.render(renderContext).promise;
+}
+
+function addPageControls() {
+    const container = document.getElementById('pdfContainer');
+    if (document.querySelector('.page-controls')) return;
+    
+    const controls = document.createElement('div');
+    controls.className = 'page-controls';
+    controls.innerHTML = `
+        <button onclick="prevPage()" id="prevBtn">上一页</button>
+        <input type="number" id="pageInput" value="1" min="1" max="${pdfDoc.numPages}">
+        <span>/ ${pdfDoc.numPages}</span>
+        <button onclick="nextPage()" id="nextBtn">下一页</button>
+    `;
+    container.appendChild(controls);
+    updatePageControls();
+}
+
+function updatePageControls() {
+    document.getElementById('pageInput').value = currentPage;
+    document.getElementById('prevBtn').disabled = currentPage <= 1;
+    document.getElementById('nextBtn').disabled = currentPage >= pdfDoc.numPages;
+}
+
+async function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        await renderPage(currentPage);
+        updatePageControls();
+    }
+}
+
+async function nextPage() {
+    if (currentPage < pdfDoc.numPages) {
+        currentPage++;
+        await renderPage(currentPage);
+        updatePageControls();
+    }
 }
 
 function toggleFolder(el) {
