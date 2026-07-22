@@ -84,8 +84,6 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 </div>
 
 <script>
-const MARKET_ID = '{{ market_id }}';
-
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
@@ -95,13 +93,11 @@ function toggleSidebar() {
     mainContent.classList.toggle('full-width');
 }
 
-function loadPDF(filePath) {
+function loadPDF(url) {
     const container = document.getElementById('pdfContainer');
     const progress = document.getElementById('progressBar');
     
     progress.classList.remove('hidden');
-    
-    const url = '/localcdn/doc/' + MARKET_ID + '/' + filePath;
     container.innerHTML = '<embed class="pdf-viewer" src="' + url + '" type="application/pdf" onload="hideProgress()" onerror="showError()">';
 }
 
@@ -119,10 +115,10 @@ function toggleFolder(el) {
     el.classList.toggle('open');
 }
 
-function selectFile(el, filePath) {
+function selectFile(el, url) {
     document.querySelectorAll('.doc-tree .file').forEach(f => f.classList.remove('active'));
     el.classList.add('active');
-    loadPDF(filePath);
+    loadPDF(url);
 }
 </script>
 </body>

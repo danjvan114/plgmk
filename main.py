@@ -894,10 +894,11 @@ def build_doc_tree(dir_path, base_path=''):
         pass
     return tree
 
-def render_tree_html(items, prefix=''):
+def render_tree_html(items, prefix='', market_id=''):
     html = ''
     for item in items:
         full_path = os.path.join(prefix, item['name']) if prefix else item['name']
+        file_url = f'/localcdn/doc/{market_id}/{full_path}'
         if item['type'] == 'folder':
             html += f'''<li>
                 <div class="folder" onclick="toggleFolder(this)">
@@ -905,12 +906,12 @@ def render_tree_html(items, prefix=''):
                     <span>{item['name']}</span>
                 </div>
                 <ul class="subtree">
-                    {render_tree_html(item['children'], full_path)}
+                    {render_tree_html(item['children'], full_path, market_id)}
                 </ul>
             </li>'''
         else:
             html += f'''<li>
-                <div class="file" onclick="selectFile(this, '{full_path}')">{item['name']}</div>
+                <div class="file" onclick="selectFile(this, '{file_url}')">{item['name']}</div>
             </li>'''
     return html
 
@@ -919,7 +920,7 @@ def docs_kn():
     doc_dir = os.path.join(os.path.dirname(__file__), 'localcdn', 'doc', 'kn')
     os.makedirs(doc_dir, exist_ok=True)
     doc_tree = build_doc_tree(doc_dir)
-    tree_html = render_tree_html(doc_tree)
+    tree_html = render_tree_html(doc_tree, market_id='kn')
     
     return render_market_template('docs.html', market_id='kn', doc_tree=doc_tree, tree_html=tree_html)
 
@@ -931,7 +932,7 @@ def docs(market_id):
     doc_dir = os.path.join(os.path.dirname(__file__), 'localcdn', 'doc', market_id)
     os.makedirs(doc_dir, exist_ok=True)
     doc_tree = build_doc_tree(doc_dir)
-    tree_html = render_tree_html(doc_tree)
+    tree_html = render_tree_html(doc_tree, market_id=market_id)
     
     return render_market_template('docs.html', market_id=market_id, doc_tree=doc_tree, tree_html=tree_html)
 
