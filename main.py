@@ -885,7 +885,7 @@ def build_doc_tree(dir_path, base_path=''):
         entries.sort(key=lambda x: (os.path.isdir(os.path.join(dir_path, x)), x.lower()))
         for entry in entries:
             full_path = os.path.join(dir_path, entry)
-            rel_path = os.path.join(base_path, entry) if base_path else entry
+            rel_path = f"{base_path}/{entry}" if base_path else entry
             if os.path.isdir(full_path):
                 children = build_doc_tree(full_path, rel_path)
                 tree.append({'name': entry, 'type': 'folder', 'children': children})
@@ -900,7 +900,7 @@ def build_doc_tree(dir_path, base_path=''):
 def render_tree_html(items, prefix='', market_id=''):
     html = ''
     for item in items:
-        full_path = os.path.join(prefix, item['name']) if prefix else item['name']
+        full_path = f"{prefix}/{item['name']}" if prefix else item['name']
         encoded_path = urllib.parse.quote(full_path)
         file_url = f'/localcdn/doc/{market_id}/{encoded_path}'
         if item['type'] == 'folder':
