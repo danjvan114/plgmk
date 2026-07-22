@@ -842,6 +842,41 @@ def app_kn_detail():
     users = {u.username: u.to_dict() for u in User.query.all()}
     return render_market_template('app_detail.html', market_id='kn', users=users)
 
+@app.route('/dev/<market_id>')
+def developer_center(market_id):
+    if market_id not in MARKETS:
+        return render_root_template('404.html'), 404
+    
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    set_market(market_id)
+    
+    all_plugins = get_all_plugins(market_id)
+    user_plugins = [p for p in all_plugins if p['author'] == session['user']]
+    total_downloads = sum(p['download_count'] for p in user_plugins)
+    total_ratings = sum(p['rating_count'] for p in user_plugins)
+    avg_rating = sum(p['rating'] * p['rating_count'] for p in user_plugins) / total_ratings if total_ratings > 0 else 0
+    
+    user = User.query.get(session['user'])
+    is_admin = user and user.role == 'admin'
+    
+    return render_market_template('developer_center.html', market_id=market_id,
+                                  plugins_count=len(user_plugins),
+                                  total_downloads=total_downloads,
+                                  total_ratings=total_ratings,
+                                  avg_rating=avg_rating,
+                                  user_plugins=user_plugins,
+                                  is_admin=is_admin)
+
+@app.route('/dev/kn')
+def developer_center_kn():
+    return developer_center('kn')
+
+@app.route('/dev/k4u')
+def developer_center_k4u():
+    return developer_center('k4u')
+
 @app.route('/switch_market/<market_id>')
 def switch_market(market_id):
     if market_id in MARKETS:
