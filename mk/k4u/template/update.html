@@ -65,10 +65,10 @@ h1{color:#333;margin-bottom:24px}
 </form>
 <div style="margin-left:16px">
 {% if session.user %}
-<a href="/change_password" class="btn">修改密码</a>
-<a href="/logout" class="btn">退出</a>
+<a href="/change_password" class="btn mdui-ripple">修改密码</a>
+<a href="/logout" class="btn mdui-ripple">退出</a>
 {% else %}
-<a href="/login" class="btn">登录</a>
+<a href="/login" class="btn mdui-ripple">登录</a>
 {% endif %}
 </div>
 </div>
@@ -119,8 +119,8 @@ h1{color:#333;margin-bottom:24px}
 <div class="file-info">支持图片格式: png, jpg, jpeg, gif, webp</div>
 </div>
 <div style="margin-top:24px">
-<a href="/plugin/{{ plugin.id }}" class="btn back-btn">取消</a>
-<button type="submit" class="btn">更新插件</button>
+<a href="/plugin/{{ plugin.id }}" class="btn back-btn mdui-ripple">取消</a>
+<button type="submit" class="btn mdui-ripple">更新插件</button>
 </div>
 </form>
 </div>

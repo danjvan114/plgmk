@@ -79,10 +79,10 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </form>
 <div style="margin-left:16px">
 {% if session.user %}
-<a href="/change_password" class="btn">修改密码</a>
-<a href="/logout" class="btn">退出</a>
+<a href="/change_password" class="btn mdui-ripple">修改密码</a>
+<a href="/logout" class="btn mdui-ripple">退出</a>
 {% else %}
-<a href="/login" class="btn">登录</a>
+<a href="/login" class="btn mdui-ripple">登录</a>
 {% endif %}
 </div>
 </div>
@@ -129,14 +129,14 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </div>
 <div style="margin-top:24px">
 {% if plugin.status == 'active' %}
-<a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn download-btn">立即下载</a>
-<a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}" class="btn rate-btn">评分</a>
+<a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn download-btn mdui-ripple">立即下载</a>
+<a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}" class="btn rate-btn mdui-ripple">评分</a>
 {% else %}
 <span style="color:#f44336;font-weight:bold">插件已下架</span>
 {% endif %}
 {% if is_owner %}
-<a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn update-btn">更新插件</a>
-<a href="/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}" class="btn {% if plugin.status == 'active' %}status-off-btn{% else %}status-on-btn{% endif %}">
+<a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn update-btn mdui-ripple">更新插件</a>
+<a href="/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}" class="btn mdui-ripple {% if plugin.status == 'active' %}status-off-btn{% else %}status-on-btn{% endif %}">
 {% if plugin.status == 'active' %}下架插件{% else %}上架插件{% endif %}
 </a>
 {% endif %}

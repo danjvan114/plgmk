@@ -67,8 +67,8 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <input name="search" placeholder="搜索插件名称/标签">
 </form>
 <div style="margin-left:16px">
-<a href="/change_password" class="btn">修改密码</a>
-<a href="/logout" class="btn">退出</a>
+<a href="/change_password" class="btn mdui-ripple">修改密码</a>
+<a href="/logout" class="btn mdui-ripple">退出</a>
 </div>
 </div>
 </header>
@@ -104,9 +104,9 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div>★ {{ plugin.rating }}</div>
 </div>
 <div class="plugin-actions">
-<a href="/mk/{{ current_market or 'k4u' }}/plugin/{{ plugin.id }}" class="btn" style="margin-right:8px">查看</a>
-<a href="/mk/{{ current_market or 'k4u' }}/update/{{ plugin.id }}" class="btn" style="margin-right:8px">编辑</a>
-<a href="/mk/{{ current_market or 'k4u' }}/toggle_status/{{ plugin.id }}" class="btn {% if plugin.status == 'active' %}btn-danger{% endif %}">
+<a href="/mk/{{ current_market or 'k4u' }}/plugin/{{ plugin.id }}" class="btn mdui-ripple" style="margin-right:8px">查看</a>
+<a href="/mk/{{ current_market or 'k4u' }}/update/{{ plugin.id }}" class="btn mdui-ripple" style="margin-right:8px">编辑</a>
+<a href="/mk/{{ current_market or 'k4u' }}/toggle_status/{{ plugin.id }}" class="btn mdui-ripple {% if plugin.status == 'active' %}btn-danger{% endif %}">
 {{ '下架' if plugin.status == 'active' else '上架' }}
 </a>
 </div>

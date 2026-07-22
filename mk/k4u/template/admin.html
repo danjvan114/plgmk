@@ -62,8 +62,8 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <input name="search" placeholder="搜索插件名称/标签">
 </form>
 <div style="margin-left:16px">
-<a href="/change_password" class="btn">修改密码</a>
-<a href="/logout" class="btn">退出</a>
+<a href="/change_password" class="btn mdui-ripple">修改密码</a>
+<a href="/logout" class="btn mdui-ripple">退出</a>
 </div>
 </header>
 <div class="main-box">
@@ -74,7 +74,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <form id="batchForm" action="/mk/kn/admin/batch_delete" method="post" onsubmit="return confirm('确定批量删除选中插件？')">
 <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
 <label for="selectAll">全选</label>
-<button type="submit" class="btn btn-danger" style="margin-left:16px">批量删除</button>
+<button type="submit" class="btn btn-danger mdui-ripple" style="margin-left:16px">批量删除</button>
 </form>
 </div>
 <table class="plugin-table">
@@ -105,10 +105,10 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </span>
 </td>
 <td>
-<a href="/mk/{{ current_market or 'k4u' }}/toggle_status/{{ plugin.id }}" class="btn {% if plugin.get('status', 'active') == 'active' %}btn-danger{% else %}btn-success{% endif %}">
+<a href="/mk/{{ current_market or 'k4u' }}/toggle_status/{{ plugin.id }}" class="btn mdui-ripple {% if plugin.get('status', 'active') == 'active' %}btn-danger{% else %}btn-success{% endif %}">
 {{ '禁用' if plugin.get('status', 'active') == 'active' else '启用' }}
 </a>
-<a href="/mk/{{ current_market or 'k4u' }}/admin/delete/{{ plugin.id }}" class="btn btn-danger" onclick="return confirm('确定删除？')">删除</a>
+<a href="/mk/{{ current_market or 'k4u' }}/admin/delete/{{ plugin.id }}" class="btn btn-danger mdui-ripple" onclick="return confirm('确定删除？')">删除</a>
 </td>
 </tr>
 {% endfor %}

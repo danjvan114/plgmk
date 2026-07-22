@@ -62,8 +62,8 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <a href="/logout">退出</a>
 </div>
 <div style="margin-left:16px">
-<a href="/change_password" class="btn">修改密码</a>
-<a href="/logout" class="btn">退出</a>
+<a href="/change_password" class="btn mdui-ripple">修改密码</a>
+<a href="/logout" class="btn mdui-ripple">退出</a>
 </div>
 </div>
 </header>
@@ -89,8 +89,8 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </span>
 </td>
 <td>
-<button class="btn" onclick="showEditModal('{{ username }}', '{{ info.role }}')">编辑</button>
-<a href="/op/user/delete/{{ username }}" class="btn btn-danger" onclick="return confirm('确定删除用户？')">删除</a>
+<button class="btn mdui-ripple" onclick="showEditModal('{{ username }}', '{{ info.role }}')">编辑</button>
+<a href="/op/user/delete/{{ username }}" class="btn btn-danger mdui-ripple" onclick="return confirm('确定删除用户？')">删除</a>
 </td>
 </tr>
 {% endfor %}
@@ -115,7 +115,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <option value="admin">管理员</option>
 </select>
 </div>
-<button type="submit" class="btn btn-success">添加用户</button>
+<button type="submit" class="btn btn-success mdui-ripple">添加用户</button>
 </form>
 </div>
 </div>
@@ -136,8 +136,8 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <option value="admin">管理员</option>
 </select>
 </div>
-<button type="submit" class="btn">保存修改</button>
-<button type="button" class="btn btn-danger" onclick="closeModal()">取消</button>
+<button type="submit" class="btn mdui-ripple">保存修改</button>
+<button type="button" class="btn btn-danger mdui-ripple" onclick="closeModal()">取消</button>
 </form>
 </div>
 </div>
