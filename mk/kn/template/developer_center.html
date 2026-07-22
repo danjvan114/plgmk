@@ -133,7 +133,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div style="display:flex;gap:8px;font-size:12px;color:#999">
 <span>版本: {{ plugin.version }}</span>
 <span>下载: {{ plugin.download_count }}</span>
-<span>评分: ★ {{ plugin.rating }}</span>
+<span>评分: ★ {{ "%.1f"|format(plugin.rating) }}</span>
 </div>
 <div style="display:flex;gap:8px;margin-top:12px">
 <a href="/mk/kn/plugin/{{ plugin.id }}" class="btn mdui-ripple" style="flex:1;text-align:center">查看</a>

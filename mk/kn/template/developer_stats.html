@@ -101,7 +101,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </div>
 <div class="plugin-stats">
 <div>{{ plugin.downloads }} 下载</div>
-<div>★ {{ plugin.rating }}</div>
+<div>★ {{ "%.1f"|format(plugin.rating) }}</div>
 </div>
 <div class="plugin-actions">
 <a href="/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}" class="btn mdui-ripple" style="margin-right:8px">查看</a>

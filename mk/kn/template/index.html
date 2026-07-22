@@ -104,7 +104,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
 <div class="meta">
 <span>{{ plugin.author }}</span>
-<span class="rating">★ {{ plugin.rating }}</span>
+<span class="rating">★ {{ "%.1f"|format(plugin.rating) }}</span>
 <span>{{ plugin.downloads }} 下载</span>
 </div>
 </div>

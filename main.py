@@ -337,7 +337,8 @@ for market_id in MARKETS:
 
 @app.route('/')
 def root():
-    return redirect(url_for('index'))
+    return ("您好，您的页面成功跑路了，详情请见webtunnel，我们找不到页面")
+    #return redirect(url_for('index'))
 
 @app.route('/health')
 def health_check():
