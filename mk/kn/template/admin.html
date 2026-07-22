@@ -53,6 +53,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>{{ markets.get(current_market) if current_market else 'KN插件市场' }}</div>
 <div class="nav-links">
 <a href="/mk/{{ current_market or 'kn' }}">首页</a>
+<a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
 <a href="/mk/{{ current_market or 'kn' }}/admin" class="active">插件管理</a>
 <a href="/op/user">用户管理</a>
 <a href="/logout">退出</a>

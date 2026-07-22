@@ -55,6 +55,8 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div class="logo"><div class="logo-icon"><img src="/mk/k4u/uploads/k4u.png" alt="Logo"></div>{{ markets.get(current_market) if current_market else 'K4U插件市场' }}</div>
 <div class="nav-links">
 <a href="/mk/{{ current_market or 'k4u' }}">首页</a>
+<a href="/dev/{{ current_market or 'k4u' }}">开发者中心</a>
+<a href="/app/k4u/d">应用下载</a>
 <div class="dropdown">
 <button class="dropbtn">{{ (markets.get(current_market) if current_market else 'K4U插件市场') }} ▼</button>
 <div class="dropdown-content">

@@ -927,6 +927,8 @@ def build_doc_tree(dir_path, base_path=''):
                 tree.append({'name': entry, 'type': 'pdf', 'path': rel_path})
             elif entry.lower().endswith('.js'):
                 tree.append({'name': entry, 'type': 'js', 'path': rel_path})
+            elif entry.lower().endswith('.ttmp4'):
+                tree.append({'name': entry, 'type': 'ttmp4', 'path': rel_path})
     except Exception:
         pass
     return tree
@@ -954,6 +956,10 @@ def render_tree_html(items, prefix='', market_id=''):
         elif item['type'] == 'js':
             html += f'''<li>
                 <div class="file js-file" data-url="{file_url}" onclick="loadJS('{file_url}')">{item['name']}</div>
+            </li>'''
+        elif item['type'] == 'ttmp4':
+            html += f'''<li>
+                <div class="file ttmp4-file" data-url="{file_url}" onclick="loadTTMP4('{file_url}')">{item['name']}</div>
             </li>'''
     return html
 
