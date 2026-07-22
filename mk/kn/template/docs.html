@@ -23,6 +23,7 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 .progress-container .mdui-progress-indeterminate{height:100%}
 .pdf-container{flex:1;padding:80px 20px 20px;overflow:auto}
 .pdf-viewer{width:100%;height:calc(100vh - 100px);border:none}
+.code-viewer{width:100%;min-height:calc(100vh - 100px);background:#1e1e1e;color:#d4d4d4;font-family:Consolas,'Courier New',monospace;padding:16px;white-space:pre-wrap;overflow-x:auto;border-radius:4px}
 .empty-state{display:flex;flex-direction:column;justify-content:center;align-items:center;height:calc(100vh - 150px);color:#999}
 .empty-state i{font-size:64px;margin-bottom:16px}
 .empty-state p{font-size:16px}
@@ -32,8 +33,10 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 .doc-tree .folder{font-weight:bold;color:#333;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:4px}
 .doc-tree .folder:hover{background:rgba(33,150,243,.1)}
 .doc-tree .file{color:#666;padding:4px 8px 4px 28px;border-radius:4px;cursor:pointer}
-.doc-tree .file:hover{background:rgba(33,150,243,.1);color:#2196f3}
+.doc-tree .file:hover{background:rgba(33,150,243,.1)}
 .doc-tree .file.active{background:rgba(33,150,243,.15);color:#2196f3}
+.doc-tree .pdf-file{color:#e74c3c}
+.doc-tree .js-file{color:#f39c12}
 .doc-tree .toggle-icon{font-size:12px;color:#999}
 .doc-tree .folder.open .toggle-icon{transform:rotate(90deg)}
 .doc-tree .subtree{display:none;padding-left:16px}
@@ -94,11 +97,38 @@ function toggleSidebar() {
 }
 
 function loadPDF(url) {
+    document.querySelectorAll('.doc-tree .file').forEach(f => f.classList.remove('active'));
+    
     const container = document.getElementById('pdfContainer');
     const progress = document.getElementById('progressBar');
     
     progress.classList.remove('hidden');
     container.innerHTML = '<embed class="pdf-viewer" src="' + url + '" type="application/pdf" onload="hideProgress()" onerror="showError()">';
+}
+
+function loadJS(url) {
+    document.querySelectorAll('.doc-tree .file').forEach(f => f.classList.remove('active'));
+    
+    const container = document.getElementById('pdfContainer');
+    const progress = document.getElementById('progressBar');
+    
+    progress.classList.remove('hidden');
+    
+    fetch(url)
+        .then(response => response.text())
+        .then(code => {
+            container.innerHTML = '<pre class="code-viewer">' + escapeHtml(code) + '</pre>';
+            hideProgress();
+        })
+        .catch(error => {
+            showError();
+        });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function hideProgress() {
@@ -108,17 +138,11 @@ function hideProgress() {
 function showError() {
     document.getElementById('progressBar').classList.add('hidden');
     const container = document.getElementById('pdfContainer');
-    container.innerHTML = '<div class="empty-state"><i class="mdui-icon material-icons">error</i><p>无法加载PDF文件</p></div>';
+    container.innerHTML = '<div class="empty-state"><i class="mdui-icon material-icons">error</i><p>无法加载文件</p></div>';
 }
 
 function toggleFolder(el) {
     el.classList.toggle('open');
-}
-
-function selectFile(el, url) {
-    document.querySelectorAll('.doc-tree .file').forEach(f => f.classList.remove('active'));
-    el.classList.add('active');
-    loadPDF(url);
 }
 </script>
 </body>

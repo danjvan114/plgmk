@@ -889,7 +889,9 @@ def build_doc_tree(dir_path, base_path=''):
                 children = build_doc_tree(full_path, rel_path)
                 tree.append({'name': entry, 'type': 'folder', 'children': children})
             elif entry.lower().endswith('.pdf'):
-                tree.append({'name': entry, 'type': 'file', 'path': rel_path})
+                tree.append({'name': entry, 'type': 'pdf', 'path': rel_path})
+            elif entry.lower().endswith('.js'):
+                tree.append({'name': entry, 'type': 'js', 'path': rel_path})
     except Exception:
         pass
     return tree
@@ -909,9 +911,13 @@ def render_tree_html(items, prefix='', market_id=''):
                     {render_tree_html(item['children'], full_path, market_id)}
                 </ul>
             </li>'''
-        else:
+        elif item['type'] == 'pdf':
             html += f'''<li>
-                <div class="file" onclick="selectFile(this, '{file_url}')">{item['name']}</div>
+                <div class="file pdf-file" onclick="loadPDF('{file_url}')">{item['name']}</div>
+            </li>'''
+        elif item['type'] == 'js':
+            html += f'''<li>
+                <div class="file js-file" onclick="loadJS('{file_url}')">{item['name']}</div>
             </li>'''
     return html
 
