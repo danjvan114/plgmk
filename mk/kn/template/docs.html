@@ -192,7 +192,7 @@ function loadTTMP4(url) {
         .then(response => response.json())
         .then(data => {
             if (data.url) {
-                window.open(data.url, '_blank');
+                container.innerHTML = '<iframe src="' + data.url + '" width="100%" height="calc(100vh - 100px)" frameborder="0" allowfullscreen></iframe>';
             } else {
                 container.innerHTML = '<div class="empty-state"><i class="mdui-icon material-icons">error</i><p>文件格式错误：缺少 url 字段</p></div>';
             }
