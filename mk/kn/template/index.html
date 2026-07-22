@@ -46,6 +46,14 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 .dropdown-content.show{display:block}
 .dropdown-content a{color:#333;padding:8px 12px;text-decoration:none;display:block;font-size:14px}
 .dropdown-content a:hover{background:rgba(33,150,243,.1)}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:8px;width:90%;max-width:800px;max-height:80vh;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.modal-header{padding:16px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{margin:0}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#999}
+.modal-body{padding:16px}
+.modal-body iframe{width:100%;height:500px;border:none}
 </style>
 </head>
 <body>
@@ -53,6 +61,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <header>
 <div class="wrap">
 <div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>{{ markets.get(current_market) if current_market else 'KN插件市场' }}</div>
+{% if not compact_mode %}
 <div class="nav-links">
 <a href="/mk/{{ current_market or 'kn' }}">首页</a>
 <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
@@ -75,16 +84,21 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 {% endif %}
 {% endif %}
 </div>
+{% endif %}
 <div class="head-space"></div>
-<form class="search" action="/mk/{{ current_market or 'kn' }}" method="get">
+<form class="search" action="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}" method="get">
 <input name="search" placeholder="搜索插件名称/标签" value="{{ search_query }}">
 </form>
 <div style="margin-left:16px">
+{% if compact_mode %}
+<button class="btn mdui-ripple" onclick="openWebModal()">打开网页版</button>
+{% else %}
 {% if session.user %}
 <a href="/change_password" class="btn mdui-ripple">修改密码</a>
 <a href="/logout" class="btn mdui-ripple">退出</a>
 {% else %}
 <a href="/login" class="btn mdui-ripple">登录</a>
+{% endif %}
 {% endif %}
 </div>
 </div>
@@ -92,7 +106,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div class="main-box">
 <div class="grid">
 {% for plugin in plugins %}
-<div class="card plugin-card" onclick="location.href='/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}'">
+<div class="card plugin-card" onclick="location.href='/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}{% if compact_mode %}?c=1{% endif %}'">
 <h3>{{ plugin.name }}</h3>
 <p>{{ plugin.description }}</p>
 <div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
@@ -110,11 +124,39 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 {% endif %}
 </div>
 </div>
+
+<div class="modal-overlay" id="webModal">
+<div class="modal">
+<div class="modal-header">
+<h3>网页版</h3>
+<button class="modal-close" onclick="closeWebModal()">&times;</button>
+</div>
+<div class="modal-body">
+<iframe src="https://code.pgrm.run/mk/{{ current_market or 'kn' }}"></iframe>
+</div>
+</div>
+</div>
+
 <script>
 window.addEventListener('load', function(){
     document.getElementById('loader').style.display='none';
 });
 
+function openWebModal() {
+    document.getElementById('webModal').classList.add('show');
+}
+
+function closeWebModal() {
+    document.getElementById('webModal').classList.remove('show');
+}
+
+document.getElementById('webModal').addEventListener('click', function(e) {
+    if (e.target === document.getElementById('webModal')) {
+        closeWebModal();
+    }
+});
+
+{% if not compact_mode %}
 document.addEventListener('DOMContentLoaded', function() {
     var dropdowns = document.querySelectorAll('.dropdown');
     dropdowns.forEach(function(dropdown) {
@@ -137,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+{% endif %}
 </script>
 </body>
 </html>

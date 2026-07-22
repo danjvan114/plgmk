@@ -56,6 +56,14 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 .image-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);justify-content:center;align-items:center;z-index:1000}
 .image-modal.active{display:flex}
 .modal-image{max-width:90%;max-height:90%;border-radius:8px}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:8px;width:90%;max-width:800px;max-height:80vh;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.modal-header{padding:16px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{margin:0}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#999}
+.modal-body{padding:16px}
+.modal-body iframe{width:100%;height:500px;border:none}
 </style>
 </head>
 <body>
@@ -63,6 +71,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <header>
 <div class="wrap">
 <div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>{{ markets.get(current_market) if current_market else 'KN插件市场' }}</div>
+{% if not compact_mode %}
 <div class="nav-links">
 <a href="/mk/{{ current_market or 'kn' }}">首页</a>
 {% if session.user %}
@@ -73,16 +82,21 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 {% endif %}
 {% endif %}
 </div>
+{% endif %}
 <div class="head-space"></div>
-<form class="search" action="/mk/{{ current_market or 'kn' }}" method="get">
+<form class="search" action="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}" method="get">
 <input name="search" placeholder="搜索插件名称/标签">
 </form>
 <div style="margin-left:16px">
+{% if compact_mode %}
+<button class="btn mdui-ripple" onclick="openWebModal()">打开网页版</button>
+{% else %}
 {% if session.user %}
 <a href="/change_password" class="btn mdui-ripple">修改密码</a>
 <a href="/logout" class="btn mdui-ripple">退出</a>
 {% else %}
 <a href="/login" class="btn mdui-ripple">登录</a>
+{% endif %}
 {% endif %}
 </div>
 </div>
@@ -130,11 +144,13 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div style="margin-top:24px">
 {% if plugin.status == 'active' %}
 <a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn download-btn mdui-ripple">立即下载</a>
+{% if not compact_mode %}
 <a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}" class="btn rate-btn mdui-ripple">评分</a>
+{% endif %}
 {% else %}
 <span style="color:#f44336;font-weight:bold">插件已下架</span>
 {% endif %}
-{% if is_owner %}
+{% if is_owner and not compact_mode %}
 <a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn update-btn mdui-ripple">更新插件</a>
 <a href="/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}" class="btn mdui-ripple {% if plugin.status == 'active' %}status-off-btn{% else %}status-on-btn{% endif %}">
 {% if plugin.status == 'active' %}下架插件{% else %}上架插件{% endif %}
@@ -147,6 +163,17 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <div class="image-modal" id="imageModal">
 <img id="modalImage" class="modal-image" src="" alt="大图预览">
 </div>
+<div class="modal-overlay" id="webModal">
+<div class="modal">
+<div class="modal-header">
+<h3>网页版</h3>
+<button class="modal-close" onclick="closeWebModal()">&times;</button>
+</div>
+<div class="modal-body">
+<iframe src="https://code.pgrm.run/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}"></iframe>
+</div>
+</div>
+</div>
 <script>
 window.addEventListener('load', function() {
     document.getElementById('loader').style.display = 'none';
@@ -157,6 +184,17 @@ function openImage(url) {
 }
 document.getElementById('imageModal').addEventListener('click', function() {
     this.classList.remove('active');
+});
+function openWebModal() {
+    document.getElementById('webModal').classList.add('show');
+}
+function closeWebModal() {
+    document.getElementById('webModal').classList.remove('show');
+}
+document.getElementById('webModal').addEventListener('click', function(e) {
+    if (e.target === document.getElementById('webModal')) {
+        closeWebModal();
+    }
 });
 </script>
 </body>

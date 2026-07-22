@@ -311,6 +311,14 @@ for market_id in MARKETS:
 def root():
     return redirect(url_for('index'))
 
+@app.route('/health')
+def health_check():
+    return {'status': 'ok', 'message': 'Server is running'}
+
+@app.route('/ping')
+def ping():
+    return 'pong'
+
 @app.route('/mk/<market_id>')
 def market_index(market_id):
     if market_id not in MARKETS:
@@ -322,6 +330,8 @@ def market_index(market_id):
     set_market(market_id)
     
     search_query = request.args.get('search', '')
+    compact_mode = request.args.get('c') == '1'
+    
     if search_query:
         plugins = search_market_plugins(market_id, search_query)
     else:
@@ -329,7 +339,8 @@ def market_index(market_id):
     
     users = {u.username: u.to_dict() for u in User.query.all()}
     return render_market_template('index.html', market_id=market_id, 
-                                  plugins=plugins, search_query=search_query, users=users)
+                                  plugins=plugins, search_query=search_query, users=users,
+                                  compact_mode=compact_mode)
 
 @app.route('/mk/kn')
 def index():
@@ -350,10 +361,12 @@ def market_plugin_detail(market_id, plugin_id):
     if not plugin:
         return render_root_template('404.html'), 404
     
+    compact_mode = request.args.get('c') == '1'
     users = {u.username: u.to_dict() for u in User.query.all()}
     is_owner = session.get('user') == plugin['author']
     return render_market_template('plugin_detail.html', market_id=market_id, 
-                                  plugin=plugin, users=users, is_owner=is_owner)
+                                  plugin=plugin, users=users, is_owner=is_owner,
+                                  compact_mode=compact_mode)
 
 @app.route('/mk/kn/plugin/<int:plugin_id>')
 def plugin_detail(plugin_id):

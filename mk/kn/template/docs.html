@@ -86,6 +86,8 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 
 <ul class="context-menu" id="contextMenu">
     <li onclick="downloadFile()">下载</li>
+    <li class="separator"></li>
+    <li onclick="openInNewTab()">在新标签页打开</li>
 </ul>
 
 <div class="main-content" id="mainContent">
@@ -120,7 +122,7 @@ function toggleSidebar() {
 
 document.addEventListener('contextmenu', function(e) {
     const target = e.target;
-    if (target.classList.contains('pdf-file') || target.classList.contains('js-file')) {
+    if (target.classList.contains('pdf-file') || target.classList.contains('js-file') || target.classList.contains('ttmp4-file')) {
         e.preventDefault();
         currentFileUrl = target.getAttribute('data-url') || target.dataset.url;
         
@@ -148,6 +150,24 @@ function downloadFile() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+    document.getElementById('contextMenu').classList.remove('show');
+}
+
+function openInNewTab() {
+    if (currentFileUrl) {
+        if (currentFileUrl.endsWith('.ttmp4')) {
+            fetch(currentFileUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.url) {
+                        const iframeUrl = data.url.startsWith('http') ? data.url : 'https://' + data.url;
+                        window.open(iframeUrl, '_blank');
+                    }
+                });
+        } else {
+            window.open(currentFileUrl, '_blank');
+        }
     }
     document.getElementById('contextMenu').classList.remove('show');
 }
