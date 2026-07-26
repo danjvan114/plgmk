@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">       
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hack NET X工作室官网</title>
+    <title>KNHX工作室官网</title>
     <link rel="icon" href="logo.png">
     <style>
         /* 全局重置与基础样式 */
@@ -12,11 +15,46 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             line-height: 1.6;
             color: #333;
-            background-color: #f5f5f7; /* 移除背景图，使用纯色浅灰背景 */
-            padding-top: 60px; /* 为固定导航栏预留空间，解决遮挡问题 */
+            background-color: #f5f5f7;
+            padding-top: 60px;
         }
         a { color: #2196F3; text-decoration: none; }
         a:hover { text-decoration: underline; }
+
+        /* 视频背景 */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        .video-background.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .video-background video {
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+        }
 
         /* 主容器，控制最大宽度并居中 */
         .container {
@@ -30,7 +68,7 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background-color: #1a1a1a;
+            background-color: rgba(26, 26, 26, 0.9);
             color: white;
             padding: 0 20px;
             z-index: 1000;
@@ -71,8 +109,10 @@
         /* 页头区域 */
         .page-header {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
             margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         .logo-main {
             width: 150px;
@@ -82,18 +122,8 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-
-        /* 公告卡片 */
-        .notice-card {
-            background-color: #fff3cd;
-            border-left: 5px solid #ff9800;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        .notice-card h2 { color: #e65100; margin-bottom: 10px; }
 
         /* 下载区域 */
         .section {
@@ -148,7 +178,7 @@
         .project-card img {
             width: 100%;
             height: 180px;
-            object-fit: cover; /* 保证图片不变形 */
+            object-fit: cover;
             display: block;
         }
         .project-card-content {
@@ -176,24 +206,32 @@
         @media (max-width: 768px) {
             .container { padding: 15px; }
             .navbar { padding: 0 15px; }
-            .nav-links { display: none; } /* 简化移动端，可后续扩展汉堡菜单 */
-            .projects-grid { grid-template-columns: 1fr; } /* 移动端单列显示 */
-            .page-header { padding: 30px 15px; }
+            .nav-links { display: none; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .page-header { padding: 40px 15px; }
             .logo-main { width: 120px; height: 120px; }
         }
     </style>
 </head>
 <body>
+    <!-- 视频背景 -->
+    <div class="video-background" id="videoBackground">
+        <video autoplay muted loop playsinline>
+            <source src="/localcdn/loginVideoNew.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
     <!-- 导航栏 -->
-    <nav style="display: flex; justify-content: space-between; align-items: center; background-color: #333; color: white; padding: 10px 20px; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-        <div style="font-size: 1.5rem; text-decoration: none; color: white; display: flex; align-items: center;">
-            <img src="/static/gzs/logo.png" alt="工作室图标" style="width: 40px; height: 40px; margin-right: 10px; border-radius: 50%;">
-            <a href="/" style="color: white; text-decoration: none;">hack NET X</a>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="/localcdn/gzs/logo.png" alt="工作室图标">
+            <a href="/" style="color: white; text-decoration: none;">KNHX</a>
         </div>
-        <ul style="list-style: none; display: flex;">
-            <li style="margin: 0 10px;"><a href="/" style="color: white; text-decoration: none; padding: 5px 10px; transition: background-color 0.3s ease; border-radius: 5px;">首页</a></li>
-            <li style="margin: 0 10px;"><a href="/about" style="color: white; text-decoration: none; padding: 5px 10px; transition: background-color 0.3s ease; border-radius: 5px;">关于</a></li>
-            <li style="margin: 0 10px;"><a href="/contact" style="color: white; text-decoration: none; padding: 5px 10px; transition: background-color 0.3s ease; border-radius: 5px;">联系我们</a></li>
+        <ul class="nav-links">
+            <li class="mdui-ripple"><a style="font-size: 1.4em;" href="/">首页</a></li>
+            <li class="mdui-ripple"><a style="font-size: 1.4em;" href="/about">关于</a></li>
+            <li class="mdui-ripple"><a style="font-size: 1.4em;" href="/contact">联系我们</a></li>
         </ul>
     </nav>
 
@@ -202,69 +240,56 @@
         <!-- 页头与Logo -->
         <header class="page-header">
             <a href="hh.html">
-                <img src="/static/gzs/logo.png" alt="hack NET X 工作室主标志" class="logo-main">
+                <img src="/localcdn/gzs/logo.png" alt="KNHX 工作室主标志" class="logo-main">
             </a>
-            <h1>欢迎来到 hack NET X 工作室</h1>
+            <h1>欢迎来到 KNHX 工作室</h1>
             <p>我们专注于创意设计和创新解决方案</p>
         </header>
-
-        <!-- 公告区域 -->
-        <section class="notice-card">
-            <h2>📢 重要公告</h2>
-            <p>本工作室目前为<strong>半停运状态</strong>，大部分服务暂停，预计于<strong>2026年中考结束后</strong>恢复。感谢您的理解与支持！</p>
-        </section>
-
-        
 
         <!-- 项目展示区域 -->
         <section class="section">
             <h2>🚀 项目展示</h2>
             <div class="projects-grid">
                 <!-- 项目1 -->
-                <a href="/pro/1" class="project-card">
-                    <img src="/static/gzs/portfolio1.jpg" alt="本地数据机房内部实拍图，展示服务器机柜与线缆">
+                <a href="/mk/kn" class="project-card">
+                    <img src="localcdn/gzs/{93D330BB-21E1-46CF-8EDB-262229E1024D}.png" alt="">
                     <div class="project-card-content">
-                        <h3>本地数据机房</h3>
-                        <p>为本工作室提供所有的算力支持，是核心基础设施。(停运)</p>
+                        <h3>文档平台·生态</h3>
+                        <p>可以存储文档/在线视频，也支持云存储（一些小文件）</p>
                     </div>
                 </a>
                 <!-- 项目2 -->
-                <a href="/pro/2" class="project-card">
-                    <img src="/static/gzs/portfolio4.jpg" alt="HNXCS云服务器控制面板示意图">
-                    <div class="project-card-content">
-                        <h3>HNXCS云服务器</h3>
-                        <p>提供稳定、高效的云服务器租赁服务。(停运)</p>
-                    </div>
-                </a>
+                
                 <!-- 项目3 -->
-                <a href="/pro/3" class="project-card">
-                    <img src="/static/gzs/portfolio2.jpg" alt="Minecraft游戏服务器场景截图">
-                    <div class="project-card-content">
-                        <h3>HNXMCS 服务器</h3>
-                        <p>由 hack NET X 运维的 Minecraft 1.20.4 原版生存服。(停运)</p>
-                    </div>
-                </a>
+                
                 <!-- 项目4 -->
-                <a href="/pro/4" class="project-card">
-                    <img src="/static/gzs/portfolio3（2）.jpg" alt="XBJMTR轨道交通系统在游戏中的渲染图">
-                    <div class="project-card-content">
-                        <h3>统一式轨道交通 (XBJMTR)</h3>
-                        <p>服务于 Minecraft 社群的模块化、自动化轨道交通系统。(停运)</p>
-                    </div>
-                </a>
+                
             </div>
         </section>
     </main>
 
     <!-- 页脚 -->
     <footer class="footer">
-        <p>&copy; 2026 hack NET X 工作室. 保留所有权利。</p>
+        <p>&copy; 2026 KNHX 工作室. 保留所有权利。</p>
     </footer>
 
     <script>
-        // 可在此处添加简单的交互，例如移动端菜单的切换（如需）
-        // 当前版本为保持极致简洁，未添加复杂JS
-        console.log('页面加载完成。hack NET X 工作室官网。');
+        // 滚动时视频背景淡出效果
+        const videoBackground = document.getElementById('videoBackground');
+        const pageHeader = document.querySelector('.page-header');
+        
+        window.addEventListener('scroll', function() {
+            const scrollPosition = window.scrollY;
+            const headerHeight = pageHeader.offsetHeight;
+            
+            if (scrollPosition > headerHeight / 2) {
+                videoBackground.classList.add('fade-out');
+            } else {
+                videoBackground.classList.remove('fade-out');
+            }
+        });
+        
+        console.log('你好鸭，想加入的可以投递邮件2690180230@qq.com（注明是控制台来到哦~）');
     </script>
 </body>
 </html>

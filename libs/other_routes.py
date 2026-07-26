@@ -8,6 +8,14 @@ def register_other_routes():
     def root():
         return render_root_template('index.html')
 
+    @app.route('/about')
+    def about():
+        return render_root_template('about.html')
+
+
+
+
+
     @app.route('/health')
     def health_check():
         return {'status': 'ok', 'message': 'Server is running'}

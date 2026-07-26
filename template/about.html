@@ -1,120 +1,214 @@
 ﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">       
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>关于 - hack NET X工作室</title>
-    <link rel="icon" href="/static/gzs/logo.png">
-    <!-- 引入SheetJS库用于解析Excel文件 -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <title>关于 - KNHX工作室</title>
+    <link rel="icon" href="/localcdn/gzs/logo.png">
+    <style>
+        /* 导航栏 - 固定定位，避免布局错位 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(26, 26, 26, 0.9);
+            color: white;
+            padding: 0 20px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+        .nav-brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        .nav-links li { margin-left: 20px; }
+        .nav-links a {
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+        }
+        
+        /* 列表项点击效果 */
+        .mdui-list-item.clickable {
+            cursor: pointer;
+        }
+        .mdui-list-item.clickable:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    </style>
 </head>
 <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; line-height: 1.6; color: #333;">
     
     <!-- 导航栏 -->
-    <nav style="display: flex; justify-content: space-between; align-items: center; background-color: #333; color: white; padding: 10px 20px; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-        <div style="font-size: 1.5rem; text-decoration: none; color: white; display: flex; align-items: center;">
-            <img src="/static/gzs/logo.png" alt="工作室图标" style="width: 40px; height: 40px; margin-right: 10px; border-radius: 50%;">
-            <a href="/" style="color: white; text-decoration: none;">hack NET X</a>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="/localcdn/gzs/logo.png" alt="工作室图标">
+            <a href="/" style="color: white; text-decoration: none;">KNHX</a>
         </div>
-        <ul style="list-style: none; display: flex;">
-            <li style="margin: 0 10px;"><a href="/" style="color: white; text-decoration: none; padding: 5px 10px; transition: background-color 0.3s ease; border-radius: 5px;">首页</a></li>
-            <li style="margin: 0 10px;"><a href="/about" style="color: white; text-decoration: none; padding: 5px 10px; transition: background-color 0.3s ease; border-radius: 5px;">关于</a></li>
-            <li style="margin: 0 10px;"><a href="/contact" style="color: white; text-decoration: none; padding: 5px 10px; transition: background-color 0.3s ease; border-radius: 5px;">联系我们</a></li>
+        <ul class="nav-links">
+            <li class="mdui-ripple"><a style="font-size: 1.4em;" href="/">首页</a></li>
+            <li class="mdui-ripple"><a style="font-size: 1.4em;" href="/about">关于</a></li>
+            <li class="mdui-ripple"><a style="font-size: 1.4em;" href="/contact">联系我们</a></li>
         </ul>
     </nav>
 
-    <!-- 团队内容 -->
-    <div style="padding: 100px 20px; text-align: center;">
-        <h2 style="margin: 0 0 20px;">服务内容</h2>
-        <p style="margin: 0 0 20px;">我们是一个极小的团队，所有成员均不过是学生罢了。我们提供少量服务，仅包括程序设计、图标设计等。我们的团队有人擅长前端和后端开发，能够构建网站和简陋应用程序。</p>
-    </div>
 
-    <!-- 从Excel文件渲染的名单表格 -->
-    <div style="padding: 0 20px; text-align: center;">
-        <h2 style="margin: 0 0 20px;">团队名单</h2>
-        <div id="excel-table-container" style="width: 80%; margin: 0 auto; overflow-x: auto;">
-            <p>正在加载表格数据...</p>
+    <!-- 页面标题区域 -->
+    <div style="max-width: 600px; margin: 80px auto 20px; padding: 0 20px; text-align: center;">
+        <h1>团队成员</h1>
+        <p>主要的请看到 <span style="display: inline-flex; align-items: center; gap: 4px; color: #2196F3; cursor: pointer;" class="mdui-ripple" onclick="window.open('https://hacknetx.pgrm.run/', '_blank')"><span>主网络</span><i class="mdui-icon material-icons" style="font-size: 16px;">open_in_new</i></span></p>
+    </div>
+    <!-- 团队成员列表容器 -->
+    <div style="max-width: 600px; margin: 0 auto; padding: 0 20px;">
+        <ul class="mdui-list">
+            <li class="mdui-list-item mdui-ripple clickable" data-index="0">
+                <div class="mdui-list-item-avatar">
+                    <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3761239249&spec=640&img_type=jpg"/>
+                </div>
+                <div class="mdui-list-item-content">Ubuntu 20.04 LTS</div>
+            </li>
+            <li class="mdui-list-item mdui-ripple clickable" data-index="1">
+                <div class="mdui-list-item-avatar">
+                    <img src="https://q.qlogo.cn/headimg_dl?dst_uin=2690180230&spec=640&img_type=jpg"/>
+                </div>
+                <div class="mdui-list-item-content">danjvan</div>
+            </li>
+            <li class="mdui-list-item mdui-ripple clickable" data-index="2">
+                <div class="mdui-list-item-avatar">
+                    <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3191417481&spec=640&img_type=jpg"/>
+                </div>
+                <div class="mdui-list-item-content">胡桃</div>
+            </li>
+            <li class="mdui-list-item mdui-ripple clickable" data-index="3">     
+                <div class="mdui-list-item-avatar">
+                    <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3597276516&spec=640&img_type=jpg"/>
+                </div>
+                <div class="mdui-list-item-content">甜菜</div>
+            </li>
+            <li class="mdui-list-item mdui-ripple clickable" data-index="4">
+                <div class="mdui-list-item-avatar">
+                    <img src="https://q.qlogo.cn/headimg_dl?dst_uin=1327333544&spec=640&img_type=jpg"/>
+                </div>
+                <div class="mdui-list-item-content">KNLM</div>
+            </li>
+            <li class="mdui-list-item mdui-ripple clickable" data-index="5">
+                <div class="mdui-list-item-avatar">
+                    <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3949515087&spec=640&img_type=jpg"/>
+                </div>
+                <div class="mdui-list-item-content">Deep Stace Echo</div>
+            </li>
+            <li class="mdui-list-item mdui-ripple clickable" data-index="6">
+                <div class="mdui-list-item-avatar">
+                    <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3801716428&spec=640&img_type=jpg"/>
+                </div>
+                <div class="mdui-list-item-content">读书人怎能叫偷呢</div>
+            </li>
+            <li class="mdui-list-item mdui-ripple clickable" data-index="7">
+                <div class="mdui-list-item-avatar">
+                    <img src="https://q.qlogo.cn/headimg_dl?dst_uin=3978338178&spec=640&img_type=jpg"/>
+                </div>
+                <div class="mdui-list-item-content">lrcxzz</div>
+            </li>
+            <li class="mdui-list-item mdui-ripple clickable" data-index="8">
+                <div class="mdui-list-item-avatar">
+                    <img src="https://q.qlogo.cn/headimg_dl?dst_uin=1293681236&spec=640&img_type=jpg"/>
+                </div>
+                <div class="mdui-list-item-content">Copilty</div>
+            </li>
+        </ul>
+    </div>
+   
+    <!-- 弹窗 -->
+    <div class="mdui-dialog" id="member-dialog">
+        <div class="mdui-p-a-4" id="member-content">
+            <p>点击列表项查看内容</p>
         </div>
     </div>
 
     <script>
-        // 从Excel文件加载并渲染表格（第一列直接解析为图片）
-        async function loadExcelTable() {
-            try {
-                // 获取Excel文件的URL
-                const excelUrl = '/static/gzs/cy/cy.xlsx';
-                
-                // 使用fetch获取Excel文件
-                const response = await fetch(excelUrl);
-                if (!response.ok) {
-                    throw new Error(`无法加载Excel文件: ${response.status} ${response.statusText}`);
-                }
-                
-                // 将响应转换为ArrayBuffer
-                const arrayBuffer = await response.arrayBuffer();
-                
-                // 使用SheetJS解析Excel文件
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                
-                // 获取第一个工作表
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
-                // 将工作表转换为JSON数据
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                
-                // 生成HTML表格
-                const container = document.getElementById('excel-table-container');
-                if (jsonData.length === 0) {
-                    container.innerHTML = '<p style="color: #666; padding: 20px;">Excel文件中没有数据</p>';
-                    return;
-                }
-                
-                // 创建表格
-                let tableHTML = '<table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd; margin-top: 20px;">';
-                
-                // 添加表头
+        // 团队成员信息数组
+        var blogs = [
+            {
+                name: 'Ubuntu 20.04 LTS',
+                content: '<h3>Ubuntu 20.04 LTS</h3><p><strong>身份：</strong>创始人</p><p><strong>职位：</strong>工作室室长</p><p><strong>简介：</strong>负责工作室整体规划与管理，带领团队不断前进。</p>'
+            },
+            {
+                name: 'danjvan',
+                content: '<h3>danjvan</h3><p><strong>身份：</strong>核心成员</p><p><strong>职位：</strong>后端/前端开发</p><p><strong>简介：</strong>负责前后端开发工作，全栈能力出众。</p>'
+            },
+            {
+                name: '胡桃',
+                content: '<h3>胡桃</h3><p><strong>身份：</strong>核心成员</p><p><strong>职位：</strong>美术、地铁总管理、工作室副室长</p><p><strong>简介：</strong>负责美术设计、地铁系统管理，协助室长管理工作室。</p>'
+            },
+            {
+                name: '甜菜',
+                content: '<h3>甜菜</h3><p><strong>身份：</strong>核心成员</p><p><strong>职位：</strong>美术、测试、编程</p><p><strong>简介：</strong>多才多艺，参与美术创作、软件测试和编程开发。</p>'
+            },
+            {
+                name: 'KNLM',
+                content: '<h3>KNLM</h3><p><strong>身份：</strong>分工作室负责人</p><p><strong>职位：</strong>分工作室室长</p><p><strong>简介：</strong>负责分工作室的日常运营和管理工作。</p>'
+            },
+            {
+                name: 'Deep Stace Echo',
+                content: '<h3>Deep Stace Echo</h3><p><strong>身份：</strong>核心成员</p><p><strong>职位：</strong>应用开发主管</p><p><strong>简介：</strong>负责应用开发团队的管理和技术指导。</p>'
+            },
+            {
+                name: '读书人怎能叫偷呢',
+                content: '<h3>读书人怎能叫偷呢</h3><p><strong>身份：</strong>成员</p><p><strong>职位：</strong>游戏服务器测试</p><p><strong>简介：</strong>负责游戏服务器的测试工作，确保服务稳定运行。</p>'
+            },
+            {
+                name: 'lrcxzz',
+                content: '<h3>lrcxzz</h3><p><strong>身份：</strong>合作伙伴</p><p><strong>所属：</strong>Kicoso Studios</p><p><strong>简介：</strong>Kicoso Studios 代表，与本工作室保持友好合作关系。</p>'
+            },
+            {
+                name: 'Copilty',
+                content: '<h3>Copilty</h3><p><strong>身份：</strong>成员</p><p><strong>擅长：</strong>C++ 开发</p><p><strong>简介：</strong>专注于 C++ 编程，参与高性能应用开发。</p>'
+            }
+        ];
 
-                
-                // 添加表格内容
-                tableHTML += '<tbody>';
-                for (let i = 1; i < jsonData.length; i++) {
-                    tableHTML += '<tr style="transition: background-color 0.3s;" onmouseenter="this.style.backgroundColor=\'#f5f5f5\'" onmouseleave="this.style.backgroundColor=\'\'">';
-                    
-                    const row = jsonData[i];
-                    
-                    // 遍历每一列
-                    row.forEach((cell, cellIndex) => {
-                        const cellValue = cell || '';
-                        
-                        // 第一列直接作为图片处理
-                        if (cellIndex === 0) {
-                            // 无论内容是什么，都尝试作为图片URL处理
-                            tableHTML += `<td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">
-                                <img src="${cellValue}" alt="头像" style="width: 50px; height: 50px; border-radius: 50%; vertical-align: middle; object-fit: cover;">
-                            </td>`;
-                        } else {
-                            // 其他列正常显示
-                            tableHTML += `<td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${cellValue}</td>`;
-                        }
-                    });
-                    
-                    tableHTML += '</tr>';
-                }
-                tableHTML += '</tbody></table>';
-                
-                // 将生成的HTML表格插入到容器中
-                container.innerHTML = tableHTML;
-                
-            } catch (error) {
-                console.error('加载Excel表格时出错:', error);
-                document.getElementById('excel-table-container').innerHTML = 
-                    `<p style="color: red; padding: 20px;">无法加载团队名单表格: ${error.message}</p>`;
+        // 初始化弹窗
+        var dialog = new mdui.Dialog('#member-dialog');
+
+        // 点击列表项时打开弹窗并加载对应内容
+        document.querySelectorAll('.mdui-list-item.clickable').forEach(function(item, index) {
+            item.addEventListener('click', function() {
+                loadMemberContent(index);
+                dialog.open();
+            });
+        });
+
+        // 加载成员内容到弹窗
+        function loadMemberContent(index) {
+            var member = blogs[index];
+            if (member) {
+                document.getElementById('member-content').innerHTML = member.content;
             }
         }
-        
-        // 页面加载完成后执行
-        document.addEventListener('DOMContentLoaded', loadExcelTable);
     </script>
+    
 </body>
 </html>
