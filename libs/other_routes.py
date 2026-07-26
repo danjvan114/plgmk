@@ -6,7 +6,7 @@ from .utils import set_market, render_root_template, render_market_template
 def register_other_routes():
     @app.route('/')
     def root():
-        return ("您好，您的页面成功跑路了，详情请见webtunnel，我们找不到页面")
+        return render_root_template('index.html')
 
     @app.route('/health')
     def health_check():
