@@ -1,0 +1,129 @@
+from flask import request, redirect, url_for, session
+from .config import app, User, db
+from .utils import render_market_template, render_root_template
+
+def register_user_routes():
+    @app.route('/login', methods=['GET', 'POST'])
+    def login():
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            user = User.query.get(username)
+            
+            if user and user.password == password:
+                session['user'] = username
+                session['market'] = 'kn'
+                return redirect(url_for('index'))
+        
+        return render_market_template('login.html', error=None)
+
+    @app.route('/register', methods=['GET', 'POST'])
+    def register():
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            confirm_password = request.form['confirm_password']
+            
+            if password != confirm_password:
+                return render_root_template('register.html', error='两次输入的密码不一致')
+            
+            if User.query.get(username):
+                return render_root_template('register.html', error='用户名已存在')
+            
+            new_user = User(username=username, password=password, role='user')
+            db.session.add(new_user)
+            db.session.commit()
+            
+            return render_root_template('register.html', success='注册成功！即将跳转到登录页面')
+        
+        return render_root_template('register.html')
+
+    @app.route('/logout')
+    def logout():
+        session.clear()
+        return redirect(url_for('index'))
+
+    @app.route('/change_password', methods=['GET', 'POST'])
+    def change_password():
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        
+        if request.method == 'POST':
+            old_password = request.form['old_password']
+            new_password = request.form['new_password']
+            confirm_password = request.form['confirm_password']
+            
+            user = User.query.get(session['user'])
+            if user and user.password == old_password and new_password == confirm_password:
+                user.password = new_password
+                db.session.commit()
+                return redirect(url_for('index'))
+        
+        users = {u.username: u.to_dict() for u in User.query.all()}
+        return render_market_template('change_password.html', users=users)
+
+    @app.route('/op/user')
+    def admin_users():
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        
+        user = User.query.get(session['user'])
+        if not user or user.role != 'admin':
+            return redirect(url_for('login'))
+        
+        users = {u.username: u.to_dict() for u in User.query.all()}
+        return render_root_template('admin_users.html', users=users)
+
+    @app.route('/op/user/add', methods=['POST'])
+    def admin_add_user():
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        
+        user = User.query.get(session['user'])
+        if not user or user.role != 'admin':
+            return redirect(url_for('login'))
+        
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+        
+        if not User.query.get(username):
+            new_user = User(username=username, password=password, role=role)
+            db.session.add(new_user)
+            db.session.commit()
+        
+        return redirect(url_for('admin_users'))
+
+    @app.route('/op/user/edit/<username>', methods=['POST'])
+    def admin_edit_user(username):
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        
+        user = User.query.get(session['user'])
+        if not user or user.role != 'admin':
+            return redirect(url_for('login'))
+        
+        edit_user = User.query.get(username)
+        if edit_user:
+            edit_user.role = request.form['role']
+            if request.form['password']:
+                edit_user.password = request.form['password']
+            db.session.commit()
+        
+        return redirect(url_for('admin_users'))
+
+    @app.route('/op/user/delete/<username>')
+    def admin_delete_user(username):
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        
+        user = User.query.get(session['user'])
+        if not user or user.role != 'admin':
+            return redirect(url_for('login'))
+        
+        delete_user = User.query.get(username)
+        if delete_user and delete_user.username != session['user']:
+            db.session.delete(delete_user)
+            db.session.commit()
+        
+        return redirect(url_for('admin_users'))
