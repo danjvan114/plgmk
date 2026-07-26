@@ -1,12 +1,270 @@
 <!DOCTYPE html>
-<html lang="cn">
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hack NET X工作室官网</title>
+    <link rel="icon" href="logo.png">
+    <style>
+        /* 全局重置与基础样式 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f7; /* 移除背景图，使用纯色浅灰背景 */
+            padding-top: 60px; /* 为固定导航栏预留空间，解决遮挡问题 */
+        }
+        a { color: #2196F3; text-decoration: none; }
+        a:hover { text-decoration: underline; }
 
+        /* 主容器，控制最大宽度并居中 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-<a href="/">home</a>
+        /* 导航栏 - 固定定位，避免布局错位 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #1a1a1a;
+            color: white;
+            padding: 0 20px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+        .nav-brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        .nav-links li { margin-left: 20px; }
+        .nav-links a {
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+        }
 
+        /* 页头区域 */
+        .page-header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+        .logo-main {
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
 
+        /* 公告卡片 */
+        .notice-card {
+            background-color: #fff3cd;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .notice-card h2 { color: #e65100; margin-bottom: 10px; }
 
+        /* 下载区域 */
+        .section {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        .section h2 { margin-bottom: 20px; color: #1a1a1a; }
+        .btn {
+            display: inline-block;
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 5px 10px 5px 0;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0b7dda;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+        }
+        .btn-secondary {
+            background-color: #666;
+        }
+        .btn-secondary:hover { background-color: #555; }
 
+        /* 项目网格 - 使用CSS Grid，布局更稳健 */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .project-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .project-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover; /* 保证图片不变形 */
+            display: block;
+        }
+        .project-card-content {
+            padding: 20px;
+        }
+        .project-card h3 {
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+        .project-card p {
+            color: #666;
+            font-size: 0.95em;
+        }
 
+        /* 页脚 */
+        .footer {
+            background-color: #1a1a1a;
+            color: #aaa;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
 
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .navbar { padding: 0 15px; }
+            .nav-links { display: none; } /* 简化移动端，可后续扩展汉堡菜单 */
+            .projects-grid { grid-template-columns: 1fr; } /* 移动端单列显示 */
+            .page-header { padding: 30px 15px; }
+            .logo-main { width: 120px; height: 120px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav style="display: flex; justify-content: space-between; align-items: center; background-color: #333; color: white; padding: 10px 20px; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+        <div style="font-size: 1.5rem; text-decoration: none; color: white; display: flex; align-items: center;">
+            <img src="/static/gzs/logo.png" alt="工作室图标" style="width: 40px; height: 40px; margin-right: 10px; border-radius: 50%;">
+            <a href="/" style="color: white; text-decoration: none;">hack NET X</a>
+        </div>
+        <ul style="list-style: none; display: flex;">
+            <li style="margin: 0 10px;"><a href="/" style="color: white; text-decoration: none; padding: 5px 10px; transition: background-color 0.3s ease; border-radius: 5px;">首页</a></li>
+            <li style="margin: 0 10px;"><a href="/about" style="color: white; text-decoration: none; padding: 5px 10px; transition: background-color 0.3s ease; border-radius: 5px;">关于</a></li>
+            <li style="margin: 0 10px;"><a href="/contact" style="color: white; text-decoration: none; padding: 5px 10px; transition: background-color 0.3s ease; border-radius: 5px;">联系我们</a></li>
+        </ul>
+    </nav>
+
+    <!-- 页面主内容 -->
+    <main class="container">
+        <!-- 页头与Logo -->
+        <header class="page-header">
+            <a href="hh.html">
+                <img src="/static/gzs/logo.png" alt="hack NET X 工作室主标志" class="logo-main">
+            </a>
+            <h1>欢迎来到 hack NET X 工作室</h1>
+            <p>我们专注于创意设计和创新解决方案</p>
+        </header>
+
+        <!-- 公告区域 -->
+        <section class="notice-card">
+            <h2>📢 重要公告</h2>
+            <p>本工作室目前为<strong>半停运状态</strong>，大部分服务暂停，预计于<strong>2026年中考结束后</strong>恢复。感谢您的理解与支持！</p>
+        </section>
+
+        
+
+        <!-- 项目展示区域 -->
+        <section class="section">
+            <h2>🚀 项目展示</h2>
+            <div class="projects-grid">
+                <!-- 项目1 -->
+                <a href="/pro/1" class="project-card">
+                    <img src="/static/gzs/portfolio1.jpg" alt="本地数据机房内部实拍图，展示服务器机柜与线缆">
+                    <div class="project-card-content">
+                        <h3>本地数据机房</h3>
+                        <p>为本工作室提供所有的算力支持，是核心基础设施。(停运)</p>
+                    </div>
+                </a>
+                <!-- 项目2 -->
+                <a href="/pro/2" class="project-card">
+                    <img src="/static/gzs/portfolio4.jpg" alt="HNXCS云服务器控制面板示意图">
+                    <div class="project-card-content">
+                        <h3>HNXCS云服务器</h3>
+                        <p>提供稳定、高效的云服务器租赁服务。(停运)</p>
+                    </div>
+                </a>
+                <!-- 项目3 -->
+                <a href="/pro/3" class="project-card">
+                    <img src="/static/gzs/portfolio2.jpg" alt="Minecraft游戏服务器场景截图">
+                    <div class="project-card-content">
+                        <h3>HNXMCS 服务器</h3>
+                        <p>由 hack NET X 运维的 Minecraft 1.20.4 原版生存服。(停运)</p>
+                    </div>
+                </a>
+                <!-- 项目4 -->
+                <a href="/pro/4" class="project-card">
+                    <img src="/static/gzs/portfolio3（2）.jpg" alt="XBJMTR轨道交通系统在游戏中的渲染图">
+                    <div class="project-card-content">
+                        <h3>统一式轨道交通 (XBJMTR)</h3>
+                        <p>服务于 Minecraft 社群的模块化、自动化轨道交通系统。(停运)</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>&copy; 2026 hack NET X 工作室. 保留所有权利。</p>
+    </footer>
+
+    <script>
+        // 可在此处添加简单的交互，例如移动端菜单的切换（如需）
+        // 当前版本为保持极致简洁，未添加复杂JS
+        console.log('页面加载完成。hack NET X 工作室官网。');
+    </script>
+</body>
 </html>
