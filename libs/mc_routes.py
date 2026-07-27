@@ -316,3 +316,27 @@ def register_mc_routes():
     @app.route('/mc/register')
     def mc_register():
         return render_root_template('mcreg.html')
+    
+    @app.route('/mc')
+    def mc_index():
+        return redirect('/localcdn/project/mc.html')
+    
+    @app.route('/api/mc/whitelist/add', methods=['POST'])
+    def mc_whitelist_add_public():
+        return mc_whitelist_add()
+    
+    @app.route('/api/mc/whitelist/remove', methods=['POST'])
+    def mc_whitelist_remove_public():
+        return mc_whitelist_remove()
+    
+    @app.route('/api/mc/whitelist/list', methods=['GET'])
+    def mc_whitelist_list_public():
+        return mc_whitelist_list()
+    
+    @app.route('/api/mc/whitelist/reload', methods=['POST'])
+    def mc_whitelist_reload_public():
+        return mc_whitelist_reload()
+    
+    @app.route('/api/mc/server/info', methods=['GET'])
+    def mc_server_info_public():
+        return mc_server_info()
