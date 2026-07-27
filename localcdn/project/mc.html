@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mcqwq服务器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
+body,html{height:100%;overflow:hidden;}
+/* 背景 */
+.bg-wrap{
+    width:100%;
+    height:100%;
+    background: url("/localcdn/gzs/mc2.png") center center / cover no-repeat;
+    position:relative;
+}
+/* 顶部导航栏 */
+.nav-bar{
+    width:100%;
+    padding:16px 40px;
+    display:flex;
+    align-items:center;
+    gap:32px;
+}
+.nav-bar a{
+    color:#fff;
+    text-decoration:none;
+    font-size:18px;
+    text-shadow: 0 0 4px #000;
+}
+.nav-bar a.logo{
+    color:#63a8ff;
+    font-weight:bold;
+}
+/* 中间文字浮层 */
+.center-text{
+    position:absolute;
+    top:55%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+}
+.domain{
+    font-size:48px;
+    color:#ffffff;
+    text-shadow:0 2px 8px #000;
+}
+.desc{
+    font-size:26px;
+    color:#e0b8ff;
+    margin-top:8px;
+}
+/* 底部向下箭头 */
+.down-arrow{
+    position:absolute;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    color:#fff;
+    font-size:36px;
+    animation: bounce 1.5s infinite;
+}
+@keyframes bounce{
+    0%,100%{transform:translateX(-50%) translateY(0);}
+    50%{transform:translateX(-50%) translateY(8px);}
+}
+/* 右上角搜索图标 */
+.search-icon{
+    position:absolute;
+    top:18px;
+    right:40px;
+    color:#fff;
+    font-size:24px;
+    cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+    <div class="nav-bar">
+        <a href="#" class="logo">Mcqwq服务器</a>
+        <a href="#">游戏规则</a>
+        <a href="#">指令大全</a>
+        <a href="#">风景一览</a>
+        <a href="#">历史事件</a>
+        <a href="#">——非服务器内容分割线——</a>
+        <a href="#">投影下载</a>
+    </div>
+    <div class="search-icon">Q</div>
+
+    <div class="center-text">
+        <div class="domain">Mcqwq.top</div>
+        <div class="desc">正版/皮肤站</div>
+    </div>
+
+    <div class="down-arrow">⌄</div>
+</div>
+</body>
+</html>

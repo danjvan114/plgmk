@@ -12,10 +12,6 @@ def register_other_routes():
     def about():
         return render_root_template('about.html')
 
-
-
-
-
     @app.route('/health')
     def health_check():
         return {'status': 'ok', 'message': 'Server is running'}
@@ -35,6 +31,13 @@ def register_other_routes():
         if not os.path.exists(localcdn_dir):
             os.makedirs(localcdn_dir)
         return send_from_directory(localcdn_dir, filename)
+
+    @app.route('/po/<path:project_name>')
+    def project_cdn(project_name):
+        project_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'localcdn','project')
+        if not os.path.exists(project_dir):
+            os.makedirs(project_dir)
+        return send_from_directory(project_dir, project_name+'.html')
 
     @app.route('/app/kn/d')
     def app_kn_detail():
