@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-cn">
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <meta name="renderer" content="webkit">
+    <title>土豆府注册</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .agreement-box {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+        }
+        .agreement-box h3 {
+            margin-top: 0;
+            color: #63a8ff;
+            font-size: 16px;
+        }
+        .agreement-box h4 {
+            margin: 12px 0 8px;
+            color: #333;
+            font-size: 14px;
+        }
+        .agreement-box p {
+            margin: 6px 0;
+            text-indent: 2em;
+        }
+        .agreement-box li {
+            margin: 4px 0;
+            margin-left: 20px;
+        }
+        .agreement-box h2 {
+            font-size: 18px;
+            color: #63a8ff;
+            margin: 16px 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #63a8ff;
+        }
+        .agreement-box h3 {
+            font-size: 16px;
+            color: #333;
+            margin: 14px 0 10px;
+        }
+        .agreement-box h4 {
+            font-size: 14px;
+            color: #555;
+            margin: 12px 0 8px;
+        }
+        .agreement-box ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        .agreement-box hr {
+            border: none;
+            border-top: 1px dashed #ddd;
+            margin: 20px 0;
+        }
+        .agreement-box code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="mdui-toolbar">
+        <a href="javascript:window.history.back()" class="mdui-btn mdui-btn-icon">
+            <i class="mdui-icon material-icons">arrow_back</i>
+        </a>
+        <span class="mdui-typo-title">土豆府注册</span>
+        <div class="mdui-toolbar-spacer"></div>
+    </div>
+
+    <div class="container">
+        <div class="mdui-card">
+            <div class="mdui-card-content">
+                <div class="agreement-box" id="agreementBox">
+                    <div id="agreementContent">
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <i class="mdui-icon material-icons" style="font-size: 48px; color: #63a8ff;">file_download</i>
+                            <p style="margin-top: 16px; color: #999;">正在加载用户协议...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <label class="mdui-checkbox">
+                    <input type="checkbox" id="agreeCheckbox" disabled />
+                    <i class="mdui-checkbox-icon"></i>
+                    我已阅读并同意上述用户协议
+                </label>
+                <p id="scrollTip" class="mdui-text-color-red-400" style="font-size: 12px; margin-top: 8px; display: none;">请先阅读完整的用户协议</p>
+
+                <div class="mdui-textfield mdui-textfield-floating-label" style="margin-top: 24px;">
+                    <label class="mdui-textfield-label">游戏用户名</label>
+                    <input class="mdui-textfield-input" type="text" id="username" placeholder="请输入您的Minecraft用户名" />
+                </div>
+
+                <button class="mdui-btn mdui-btn-raised mdui-color-blue-500 mdui-center" style="margin-top: 24px; width: 100%;" onclick="submitRegister()">
+                    提交注册
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function markdownToHtml(md) {
+            md = md.replace(/^### (.*$)/gim, '<h4>$1</h4>');
+            md = md.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+            md = md.replace(/^# (.*$)/gim, '<h2>$1</h2>');
+            md = md.replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>');
+            md = md.replace(/\*(.*)\*/gim, '<em>$1</em>');
+            md = md.replace(/`([^`]+)`/gim, '<code>$1</code>');
+            md = md.replace(/^- (.*$)/gim, '<li>$1</li>');
+            md = md.replace(/(<li>[\s\S]*?<\/li>)/gim, '<ul>$1</ul>');
+            md = md.replace(/^\d+\. (.*$)/gim, '<li>$1</li>');
+            md = md.replace(/^---$/gim, '<hr>');
+            md = md.replace(/\n/gim, '<br>');
+            return md;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const agreementBox = document.getElementById('agreementBox');
+            const agreeCheckbox = document.getElementById('agreeCheckbox');
+            const scrollTip = document.getElementById('scrollTip');
+            const agreementContent = document.getElementById('agreementContent');
+            
+            fetch('/localcdn/gzs/用户协议.md')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('加载协议失败');
+                    }
+                    return response.text();
+                })
+                .then(md => {
+                    agreementContent.innerHTML = markdownToHtml(md);
+                })
+                .catch(error => {
+                    agreementContent.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px; color: #f44336;">
+                            <i class="mdui-icon material-icons" style="font-size: 48px;">error</i>
+                            <p style="margin-top: 16px;">无法加载用户协议</p>
+                        </div>
+                    `;
+                });
+            
+            agreementBox.addEventListener('scroll', function() {
+                const isAtBottom = agreementBox.scrollHeight - agreementBox.scrollTop <= agreementBox.clientHeight + 10;
+                
+                if (isAtBottom) {
+                    agreeCheckbox.disabled = false;
+                    scrollTip.style.display = 'none';
+                } else {
+                    if (!agreeCheckbox.checked) {
+                        agreeCheckbox.disabled = true;
+                    }
+                }
+            });
+        });
+        
+        function submitRegister() {
+            const agree = document.getElementById('agreeCheckbox').checked;
+            const username = document.getElementById('username').value.trim();
+            const agreementBox = document.getElementById('agreementBox');
+            const isAtBottom = agreementBox.scrollHeight - agreementBox.scrollTop <= agreementBox.clientHeight + 10;
+            
+            if (!isAtBottom || !agree) {
+                mdui.snackbar({
+                    message: '请先阅读完整的用户协议并勾选同意',
+                    position: 'top'
+                });
+                return;
+            }
+            
+            if (!username) {
+                mdui.snackbar({
+                    message: '请输入游戏用户名',
+                    position: 'top'
+                });
+                return;
+            }
+            
+            fetch('/api/mc/whitelist/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mdui.snackbar({
+                        message: data.message,
+                        position: 'top'
+                    });
+                    setTimeout(() => {
+                        window.history.back();
+                    }, 2000);
+                } else {
+                    mdui.snackbar({
+                        message: data.message,
+                        position: 'top'
+                    });
+                }
+            })
+            .catch(error => {
+                mdui.snackbar({
+                    message: '注册失败，请稍后重试',
+                    position: 'top'
+                });
+            });
+        }
+    </script>
+  </body>
+</html>
