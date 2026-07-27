@@ -112,7 +112,7 @@
         /* 内容区域 */
         .content-section{
             padding:80px 40px;
-            background:linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background:#f5f7fa;
             min-height:100vh;
         }
         
@@ -129,19 +129,18 @@
         
         /* 卡片样式 */
         .feature-card{
-            background:rgba(255,255,255,0.1);
-            backdrop-filter:blur(10px);
+            background:#fff;
             border-radius:20px;
             padding:40px;
-            color:#fff;
+            color:#333;
             text-align:center;
             transition:all 0.3s ease;
-            border:1px solid rgba(255,255,255,0.1);
+            border:1px solid #e0e0e0;
+            box-shadow:0 2px 12px rgba(0,0,0,0.08);
         }
         .feature-card:hover{
             transform:translateY(-10px);
-            background:rgba(255,255,255,0.15);
-            box-shadow:0 20px 40px rgba(0,0,0,0.3);
+            box-shadow:0 20px 40px rgba(0,0,0,0.15);
         }
         .feature-icon{
             font-size:64px;
@@ -152,25 +151,26 @@
             font-size:24px;
             font-weight:bold;
             margin-bottom:16px;
+            color:#333;
         }
         .feature-desc{
             font-size:16px;
             line-height:1.8;
-            color:rgba(255,255,255,0.8);
+            color:#666;
         }
         
         /* 标题样式 */
         .section-title{
             text-align:center;
             font-size:42px;
-            color:#fff;
+            color:#333;
             margin-bottom:16px;
             font-weight:bold;
         }
         .section-subtitle{
             text-align:center;
             font-size:18px;
-            color:rgba(255,255,255,0.6);
+            color:#999;
             margin-bottom:60px;
         }
         
@@ -185,11 +185,12 @@
         
         /* 服务器信息卡片 */
         .server-info{
-            background:rgba(99,168,255,0.1);
+            background:#fff;
             border-left:4px solid #63a8ff;
             padding:30px;
             margin:20px 0;
             border-radius:0 12px 12px 0;
+            border:1px solid #e0e0e0;
         }
         .server-info h3{
             color:#63a8ff;
@@ -197,7 +198,7 @@
             margin-bottom:10px;
         }
         .server-info p{
-            color:#fff;
+            color:#333;
             font-size:16px;
         }
         
@@ -211,13 +212,14 @@
             align-items:flex-start;
             gap:20px;
             padding:20px;
-            background:rgba(255,255,255,0.05);
+            background:#fff;
             margin-bottom:15px;
             border-radius:12px;
             transition:all 0.3s ease;
+            border:1px solid #e0e0e0;
         }
         .rule-item:hover{
-            background:rgba(255,255,255,0.1);
+            box-shadow:0 4px 16px rgba(0,0,0,0.08);
         }
         .rule-number{
             width:36px;
@@ -235,22 +237,23 @@
             flex:1;
         }
         .rule-content h4{
-            color:#fff;
+            color:#333;
             font-size:18px;
             margin-bottom:8px;
         }
         .rule-content p{
-            color:rgba(255,255,255,0.7);
+            color:#666;
             font-size:14px;
         }
         
         /* 底部 */
         .footer{
-            background:#0a0a15;
+            background:#fff;
             padding:40px;
             text-align:center;
-            color:rgba(255,255,255,0.5);
+            color:#999;
             font-size:14px;
+            border-top:1px solid #e0e0e0;
         }
         
         /* 响应式 */
@@ -305,29 +308,29 @@
             <p class="section-subtitle fade-in-section">探索我们为你打造的独特游戏体验</p>
             
             <div class="grid-3">
-                <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">layers</i></div>
+                <div mdui-tooltip="{content: '过低的版本可能会导致你的不良体验,仅作为参考最低,不代表进入可以正常游玩。'}" class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons" style="font-size:48px;">layers</i></div>
                     <div class="feature-title">全版本互通</div>
-                    <div class="feature-desc">支持1.8.x至1.20.x全版本客户端连接，无论你使用哪个版本都能畅玩</div>
+                    <div class="feature-desc">支持远古客户端至全新架构客户端连接，无论你使用哪个版本都能畅玩</div>
                 </div>
                 <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">zap</i></div>
+                    <div class="feature-icon"><i class="mdui-icon material-icons" style="font-size:48px;">broken_image</i></div>
                     <div class="feature-title">高性能插件</div>
                     <div class="feature-desc">精选插件，确保服务器稳定运行，提供流畅的游戏体验</div>
                 </div>
                 <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">globe</i></div>
+                    <div class="feature-icon"><i class="mdui-icon material-icons" style="font-size:48px;">devices_other</i></div>
                     <div class="feature-title">多元生态</div>
                     <div class="feature-desc">生存、创造多种玩法，满足玩家的需求</div>
                 </div>
                 <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">shield</i></div>
+                    <div class="feature-icon"><i class="mdui-icon material-icons" style="font-size:48px;">lock_outline</i></div>
                     <div class="feature-title">安全稳定</div>
                     <div class="feature-desc">专业服务器架构，24GB大运存，热数据盘，确保服务器稳定运行</div>
                 </div>
                 
                 <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">headphones</i></div>
+                    <div class="feature-icon"><i class="mdui-icon material-icons" style="font-size:48px;">access_alarms</i></div>
                     <div class="feature-title">技术处理</div>
                     <div class="feature-desc">出现技术问题时，及时处理。</div>
                 </div>
@@ -358,44 +361,34 @@
         <!-- 游戏规则 -->
         <div id="rules" style="margin-top:80px;">
             <h2 class="section-title fade-in-section">游戏规则</h2>
-            <p class="section-subtitle fade-in-section">了解更多<i class="mdui-icon material-icons">chevron_right</i></p>
+            <p onclick="window.open('/dev/ot')" class="mdui-ripple section-subtitle fade-in-section">了解更多<i class="mdui-icon material-icons">chevron_right</i></p>
             
             <div class="rules-list">
+
+
+                    
                 <div class="rule-item fade-in-section">
                     <div class="rule-number">1</div>
-                    <div class="rule-content">
-                        <h4>禁止作弊行为</h4>
-                        <p>严禁使用任何作弊客户端、模组或外挂，一经发现立即封禁</p>
-                    </div>
-                </div>
-                <div class="rule-item fade-in-section">
-                    <div class="rule-number">2</div>
                     <div class="rule-content">
                         <h4>尊重其他玩家</h4>
                         <p>禁止辱骂、攻击、骚扰其他玩家，保持友好的交流氛围</p>
                     </div>
                 </div>
                 <div class="rule-item fade-in-section">
-                    <div class="rule-number">3</div>
+                    <div class="rule-number">2</div>
                     <div class="rule-content">
                         <h4>保护公共资源</h4>
                         <p>禁止恶意破坏公共设施和其他玩家的建筑作品</p>
                     </div>
                 </div>
                 <div class="rule-item fade-in-section">
-                    <div class="rule-number">4</div>
+                    <div class="rule-number">3</div>
                     <div class="rule-content">
                         <h4>禁止刷屏广告</h4>
                         <p>在公共频道禁止发布无关广告信息和重复刷屏</p>
                     </div>
                 </div>
-                <div class="rule-item fade-in-section">
-                    <div class="rule-number">5</div>
-                    <div class="rule-content">
-                        <h4>合理使用资源</h4>
-                        <p>禁止过度开采资源和破坏游戏平衡的行为</p>
-                    </div>
-                </div>
+                
             </div>
         </div>
 
@@ -403,46 +396,31 @@
         <div id="commands" style="margin-top:80px;">
             <h2 class="section-title fade-in-section">常用指令</h2>
             <p class="section-subtitle fade-in-section">快速掌握游戏指令</p>
+            <p class="mdui-ripple section-subtitle fade-in-section">了解更多<i class="mdui-icon material-icons">chevron_right</i></p>
             
             <div class="grid-3">
                 <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">home</i></div>
+                    <div class="feature-icon"><i class="mdui-icon material-icons" style="font-size:48px;color:rgb(255, 7, 110);">home</i></div>
                     <div class="feature-title">/home</div>
                     <div class="feature-desc">返回自己的家</div>
                 </div>
                 <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">map</i></div>
+                    <div class="feature-icon"><i class="mdui-icon material-icons" style="font-size:48px;color:rgb(7, 164, 255);">map</i></div>
                     <div class="feature-title">/spawn</div>
                     <div class="feature-desc">返回出生点</div>
                 </div>
                 <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">send</i></div>
+                    <div class="feature-icon"><i class="mdui-icon material-icons" style="font-size:48px;color:rgb(255, 139, 7);">send</i></div>
                     <div class="feature-title">/tpa [玩家名]</div>
                     <div class="feature-desc">请求传送到其他玩家位置</div>
                 </div>
-                <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">users</i></div>
-                    <div class="feature-title">/friends</div>
-                    <div class="feature-desc">查看好友列表</div>
-                </div>
-                <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">star</i></div>
-                    <div class="feature-title">/vote</div>
-                    <div class="feature-desc">为服务器投票获取奖励</div>
-                </div>
-                <div class="feature-card fade-in-section">
-                    <div class="feature-icon"><i class="mdui-icon material-icons">help</i></div>
-                    <div class="feature-title">/help</div>
-                    <div class="feature-desc">查看所有可用指令</div>
-                </div>
+                
+    
             </div>
         </div>
     </div>
 
-    <!-- 底部 -->
-    <div class="footer">
-        <p>土豆府 MC服务器 &copy; 2024 | 感谢你的支持</p>
-    </div>
+
 
     <script>
         // 滚动渐现效果
