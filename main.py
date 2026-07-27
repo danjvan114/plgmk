@@ -41,9 +41,19 @@ for market_id in MARKETS:
     init_market_database(market_id)
 
 register_market_routes()
+print("DEBUG: market routes registered")
 register_user_routes()
+print("DEBUG: user routes registered")
 register_developer_routes()
+print("DEBUG: developer routes registered")
 register_other_routes()
+print("DEBUG: other routes registered")
+
+print("\n=== All Registered Routes ===")
+for rule in app.url_map.iter_rules():
+    methods = ','.join(sorted(rule.methods))
+    print(f"  {rule.rule} ({methods}) -> {rule.endpoint}")
+print("=============================\n")
 
 if __name__ == '__main__':
     try:

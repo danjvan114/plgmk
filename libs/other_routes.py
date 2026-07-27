@@ -1,4 +1,4 @@
-from flask import redirect, url_for, send_from_directory, request
+from flask import redirect, url_for, send_from_directory, request, jsonify
 import os
 import urllib
 from .config import app, MARKETS
@@ -16,7 +16,19 @@ def register_other_routes():
 
     @app.route('/health')
     def health_check():
+        print(f"DEBUG: /health endpoint called")
         return {'status': 'ok', 'message': 'Server is running'}
+
+    @app.route('/api/mc/test', methods=['GET', 'POST'])
+    def api_mc_test():
+        print(f"DEBUG: /api/mc/test called")
+        print(f"DEBUG: Request method: {request.method}")
+        print(f"DEBUG: Request path: {request.path}")
+        return jsonify({
+            'success': True,
+            'message': 'MC API test endpoint works',
+            'method': request.method
+        })
 
     @app.route('/ping')
     def ping():
@@ -139,7 +151,13 @@ def register_other_routes():
 
     @app.route('/api/mc/whitelist/add', methods=['POST'])
     def api_mc_whitelist_add():
-        return mc_whitelist_add()
+        print(f"DEBUG: API /api/mc/whitelist/add called")
+        print(f"DEBUG: Request method: {request.method}")
+        print(f"DEBUG: Request path: {request.path}")
+        print(f"DEBUG: Request content type: {request.content_type}")
+        result = mc_whitelist_add()
+        print(f"DEBUG: API /api/mc/whitelist/add result: {result}")
+        return result
 
     @app.route('/api/mc/whitelist/remove', methods=['POST'])
     def api_mc_whitelist_remove():

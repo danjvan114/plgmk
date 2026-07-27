@@ -19,7 +19,7 @@ ROOT_TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'te
 root_jinja_env = Environment(loader=FileSystemLoader(ROOT_TEMPLATE_DIR))
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'plugin-market-secret-key')
-app.config['DEBUG'] = False
+app.config['DEBUG'] = True
 app.config['ALLOWED_EXTENSIONS'] = {'zip', 'rar', 'py', 'tar', 'gz', 'js'}
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 app.config['SQLALCHEMY_BINDS'] = {
