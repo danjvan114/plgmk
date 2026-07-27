@@ -85,8 +85,7 @@
     <button class="menu-btn mdui-ripple" onclick="toggleSidebar()">
         <i class="mdui-icon material-icons">menu</i>
     </button>
-    <div class="title">杂项文档</div>
-    <div class="path-nav" id="pathNav"></div>
+    <div class="title">云·文档</div>
 </header>
 
 <div class="progress-container" id="progressBar">
@@ -144,27 +143,13 @@ function toggleSidebar() {
     }
 }
 
-function updatePathNav(path) {
-    const pathNav = document.getElementById('pathNav');
+function updateBreadcrumb(fileName) {
     const breadcrumb = document.getElementById('breadcrumb');
-    
-    let navHtml = '';
-    let breadcrumbHtml = '<a href="#" onclick="loadEmptyState()">根目录</a>';
-    
-    path.forEach((item, index) => {
-        navHtml += (index > 0 ? ' / ' : '') + item;
-        breadcrumbHtml += ` <span>/</span> <a href="#" onclick="navigateToPath(${index})">${item}</a>`;
-    });
-    
-    pathNav.textContent = path.length > 0 ? '当前路径: ' + navHtml : '';
-    breadcrumb.innerHTML = breadcrumbHtml;
-}
-
-function navigateToPath(index) {
-    const newPath = currentPath.slice(0, index + 1);
-    currentPath = newPath;
-    updatePathNav(currentPath);
-    loadEmptyState();
+    if (fileName) {
+        breadcrumb.innerHTML = `<span>当前文档:</span> <span style="color:#2196f3">${fileName}</span>`;
+    } else {
+        breadcrumb.innerHTML = '';
+    }
 }
 
 document.addEventListener('contextmenu', function(e) {
@@ -226,10 +211,11 @@ function loadPDF(url) {
     
     const container = document.getElementById('pdfContainer');
     const progress = document.getElementById('progressBar');
+    const fileName = url.split('/').pop();
     
     progress.classList.remove('hidden');
     container.innerHTML = '<div class="breadcrumb" id="breadcrumb"></div><embed class="pdf-viewer" src="' + url + '" type="application/pdf" onload="hideProgress()" onerror="showError()">';
-    updatePathNav(currentPath.concat([url.split('/').pop()]));
+    updateBreadcrumb(fileName);
 }
 
 function loadJS(url) {
@@ -238,6 +224,7 @@ function loadJS(url) {
     
     const container = document.getElementById('pdfContainer');
     const progress = document.getElementById('progressBar');
+    const fileName = url.split('/').pop();
     
     progress.classList.remove('hidden');
     
@@ -246,7 +233,7 @@ function loadJS(url) {
         .then(code => {
             container.innerHTML = '<div class="breadcrumb" id="breadcrumb"></div><pre class="code-viewer">' + escapeHtml(code) + '</pre>';
             hideProgress();
-            updatePathNav(currentPath.concat([url.split('/').pop()]));
+            updateBreadcrumb(fileName);
         })
         .catch(error => {
             showError();
@@ -259,6 +246,7 @@ function loadMD(url) {
     
     const container = document.getElementById('pdfContainer');
     const progress = document.getElementById('progressBar');
+    const fileName = url.split('/').pop();
     
     progress.classList.remove('hidden');
     
@@ -268,7 +256,7 @@ function loadMD(url) {
             const html = markdownToHtml(md);
             container.innerHTML = '<div class="breadcrumb" id="breadcrumb"></div><div class="md-viewer">' + html + '</div>';
             hideProgress();
-            updatePathNav(currentPath.concat([url.split('/').pop()]));
+            updateBreadcrumb(fileName);
         })
         .catch(error => {
             showError();
@@ -281,6 +269,7 @@ function loadTTMP4(url) {
     
     const container = document.getElementById('pdfContainer');
     const progress = document.getElementById('progressBar');
+    const fileName = url.split('/').pop();
     
     progress.classList.remove('hidden');
     
@@ -294,7 +283,7 @@ function loadTTMP4(url) {
                 container.innerHTML = '<div class="breadcrumb" id="breadcrumb"></div><div class="empty-state"><i class="mdui-icon material-icons">error</i><p>文件格式错误：缺少 url 字段</p></div>';
             }
             hideProgress();
-            updatePathNav(currentPath.concat([url.split('/').pop()]));
+            updateBreadcrumb(fileName);
         })
         .catch(error => {
             container.innerHTML = '<div class="breadcrumb" id="breadcrumb"></div><div class="empty-state"><i class="mdui-icon material-icons">error</i><p>无法解析文件内容</p></div>';
@@ -305,7 +294,7 @@ function loadTTMP4(url) {
 function loadEmptyState() {
     const container = document.getElementById('pdfContainer');
     container.innerHTML = '<div class="breadcrumb" id="breadcrumb"></div><div class="empty-state"><i class="mdui-icon material-icons">description</i><p>请从左侧选择一个文档查看</p></div>';
-    updatePathNav(currentPath);
+    updateBreadcrumb(null);
 }
 
 function escapeHtml(text) {
@@ -344,20 +333,29 @@ function markdownToHtml(md) {
     return md;
 }
 
-function setCurrentPath(pathArray) {
-    currentPath = pathArray;
-    updatePathNav(currentPath);
-}
-
 function expandFolderByPath(pathArray) {
-    let currentSelector = '.doc-tree';
-    pathArray.forEach((folderName, index) => {
-        const folder = document.querySelector(`${currentSelector} .folder:contains("${folderName}")`);
-        if (folder) {
-            folder.classList.add('open');
-            currentSelector = `${currentSelector} .subtree`;
+    let currentElement = document.querySelector('.doc-tree > ul');
+    
+    for (let i = 0; i < pathArray.length; i++) {
+        const folderName = pathArray[i];
+        const folders = currentElement.querySelectorAll('.folder');
+        let found = false;
+        
+        for (const folder of folders) {
+            const span = folder.querySelector('span:not(.toggle-icon)');
+            if (span && span.textContent.trim() === folderName) {
+                folder.classList.add('open');
+                const nextUl = folder.nextElementSibling;
+                if (nextUl && nextUl.classList.contains('subtree')) {
+                    currentElement = nextUl;
+                    found = true;
+                    break;
+                }
+            }
         }
-    });
+        
+        if (!found) break;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -365,10 +363,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const pParam = urlParams.get('p');
     if (pParam) {
         try {
-            const pathArray = JSON.parse(pParam);
-            const pathValues = Object.values(pathArray);
-            setCurrentPath(pathValues);
-            setTimeout(() => expandFolderByPath(pathValues), 100);
+            const pathObj = JSON.parse(pParam);
+            const pathValues = typeof pathObj === 'object' && !Array.isArray(pathObj) 
+                ? Object.values(pathObj) 
+                : pathObj;
+            
+            if (Array.isArray(pathValues) && pathValues.length > 0) {
+                setTimeout(() => expandFolderByPath(pathValues), 50);
+            }
         } catch (e) {
             console.error('解析 p 参数失败:', e);
         }
