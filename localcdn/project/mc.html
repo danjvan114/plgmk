@@ -3,96 +3,476 @@
 <head>
     <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">       
     <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mcqwq服务器</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
-body,html{height:100%;overflow:hidden;}
-/* 背景 */
-.bg-wrap{
-    width:100%;
-    height:100%;
-    background: url("/localcdn/gzs/mc2.png") center center / cover no-repeat;
-    position:relative;
-}
-/* 顶部导航栏 */
-.nav-bar{
-    width:100%;
-    padding:16px 40px;
-    display:flex;
-    align-items:center;
-    gap:32px;
-}
-.nav-bar a{
-    color:#fff;
-    text-decoration:none;
-    font-size:18px;
-    text-shadow: 0 0 4px #000;
-}
-.nav-bar a.logo{
-    color:#63a8ff;
-    font-weight:bold;
-}
-/* 中间文字浮层 */
-.center-text{
-    position:absolute;
-    top:55%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    text-align:center;
-}
-.domain{
-    font-size:48px;
-    color:#ffffff;
-    text-shadow:0 2px 8px #000;
-}
-.desc{
-    font-size:26px;
-    color:#e0b8ff;
-    margin-top:8px;
-}
-/* 底部向下箭头 */
-.down-arrow{
-    position:absolute;
-    bottom:30px;
-    left:50%;
-    transform:translateX(-50%);
-    color:#fff;
-    font-size:36px;
-    animation: bounce 1.5s infinite;
-}
-@keyframes bounce{
-    0%,100%{transform:translateX(-50%) translateY(0);}
-    50%{transform:translateX(-50%) translateY(8px);}
-}
-/* 右上角搜索图标 */
-.search-icon{
-    position:absolute;
-    top:18px;
-    right:40px;
-    color:#fff;
-    font-size:24px;
-    cursor:pointer;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>土豆府 - MC服务器</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
+        html{scroll-behavior: smooth;}
+        body{height:100%;}
+        
+        /* Hero区域 */
+        .hero-section{
+            width:100%;
+            height:100vh;
+            background: url("/localcdn/gzs/mc2.png") center center / cover no-repeat;
+            position:relative;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .hero-overlay{
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.4);
+        }
+        
+        /* 顶部导航栏 */
+        .nav-bar{
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            padding:16px 40px;
+            display:flex;
+            align-items:center;
+            gap:32px;
+            z-index:100;
+        }
+        .nav-bar a{
+            color:#fff;
+            text-decoration:none;
+            font-size:18px;
+            text-shadow: 0 0 4px #000;
+            transition:all 0.3s ease;
+        }
+        .nav-bar a:hover{
+            color:#63a8ff;
+        }
+        .nav-bar a.logo{
+            color:#63a8ff;
+            font-weight:bold;
+            font-size:24px;
+        }
+        
+        /* 中间文字浮层 */
+        .center-text{
+            position:relative;
+            z-index:10;
+            text-align:center;
+            animation: fadeInUp 1s ease-out;
+        }
+        .domain{
+            font-size:64px;
+            color:#ffffff;
+            text-shadow:0 4px 12px rgba(0,0,0,0.5);
+            margin-bottom:16px;
+        }
+        .desc{
+            font-size:28px;
+            color:#e0b8ff;
+            text-shadow:0 2px 8px rgba(0,0,0,0.5);
+        }
+        
+        /* 底部向下箭头 */
+        .down-arrow{
+            position:absolute;
+            bottom:30px;
+            left:50%;
+            transform:translateX(-50%);
+            color:#fff;
+            font-size:48px;
+            animation: bounce 2s infinite;
+            z-index:10;
+            cursor:pointer;
+        }
+        @keyframes bounce{
+            0%,100%{transform:translateX(-50%) translateY(0);opacity:1;}
+            50%{transform:translateX(-50%) translateY(12px);opacity:0.7;}
+        }
+        @keyframes fadeInUp{
+            from{opacity:0;transform:translateY(30px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+        
+        /* 右上角搜索图标 */
+        .search-icon{
+            position:absolute;
+            top:18px;
+            right:40px;
+            color:#fff;
+            font-size:24px;
+            cursor:pointer;
+            z-index:100;
+        }
+        
+        /* 内容区域 */
+        .content-section{
+            padding:80px 40px;
+            background:linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height:100vh;
+        }
+        
+        /* 渐现动画类 */
+        .fade-in-section{
+            opacity:0;
+            transform:translateY(60px);
+            transition:all 0.8s ease-out;
+        }
+        .fade-in-section.visible{
+            opacity:1;
+            transform:translateY(0);
+        }
+        
+        /* 卡片样式 */
+        .feature-card{
+            background:rgba(255,255,255,0.1);
+            backdrop-filter:blur(10px);
+            border-radius:20px;
+            padding:40px;
+            color:#fff;
+            text-align:center;
+            transition:all 0.3s ease;
+            border:1px solid rgba(255,255,255,0.1);
+        }
+        .feature-card:hover{
+            transform:translateY(-10px);
+            background:rgba(255,255,255,0.15);
+            box-shadow:0 20px 40px rgba(0,0,0,0.3);
+        }
+        .feature-icon{
+            font-size:64px;
+            margin-bottom:20px;
+            color:#63a8ff;
+        }
+        .feature-title{
+            font-size:24px;
+            font-weight:bold;
+            margin-bottom:16px;
+        }
+        .feature-desc{
+            font-size:16px;
+            line-height:1.8;
+            color:rgba(255,255,255,0.8);
+        }
+        
+        /* 标题样式 */
+        .section-title{
+            text-align:center;
+            font-size:42px;
+            color:#fff;
+            margin-bottom:16px;
+            font-weight:bold;
+        }
+        .section-subtitle{
+            text-align:center;
+            font-size:18px;
+            color:rgba(255,255,255,0.6);
+            margin-bottom:60px;
+        }
+        
+        /* 网格布局 */
+        .grid-3{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+            gap:30px;
+            max-width:1200px;
+            margin:0 auto;
+        }
+        
+        /* 服务器信息卡片 */
+        .server-info{
+            background:rgba(99,168,255,0.1);
+            border-left:4px solid #63a8ff;
+            padding:30px;
+            margin:20px 0;
+            border-radius:0 12px 12px 0;
+        }
+        .server-info h3{
+            color:#63a8ff;
+            font-size:20px;
+            margin-bottom:10px;
+        }
+        .server-info p{
+            color:#fff;
+            font-size:16px;
+        }
+        
+        /* 规则列表 */
+        .rules-list{
+            max-width:800px;
+            margin:0 auto;
+        }
+        .rule-item{
+            display:flex;
+            align-items:flex-start;
+            gap:20px;
+            padding:20px;
+            background:rgba(255,255,255,0.05);
+            margin-bottom:15px;
+            border-radius:12px;
+            transition:all 0.3s ease;
+        }
+        .rule-item:hover{
+            background:rgba(255,255,255,0.1);
+        }
+        .rule-number{
+            width:36px;
+            height:36px;
+            background:#63a8ff;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#fff;
+            font-weight:bold;
+            flex-shrink:0;
+        }
+        .rule-content{
+            flex:1;
+        }
+        .rule-content h4{
+            color:#fff;
+            font-size:18px;
+            margin-bottom:8px;
+        }
+        .rule-content p{
+            color:rgba(255,255,255,0.7);
+            font-size:14px;
+        }
+        
+        /* 底部 */
+        .footer{
+            background:#0a0a15;
+            padding:40px;
+            text-align:center;
+            color:rgba(255,255,255,0.5);
+            font-size:14px;
+        }
+        
+        /* 响应式 */
+        @media(max-width:768px){
+            .nav-bar{
+                padding:12px 20px;
+                gap:16px;
+            }
+            .nav-bar a{
+                font-size:14px;
+            }
+            .domain{
+                font-size:42px;
+            }
+            .desc{
+                font-size:20px;
+            }
+            .section-title{
+                font-size:32px;
+            }
+            .content-section{
+                padding:40px 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="bg-wrap">
-    <div class="nav-bar">
-        <a href="#" class="logo">土豆府</a>
-        <a class="mdui-ripple"href="#">游戏规则</a>
-        <a class="mdui-ripple"href="#">指令大全</a>
-        <a class="mdui-ripple"href="#">客户端下载</a>
-    </div>
-    <div class="search-icon"><i class="mdui-icon material-icons">search</i></div>
+    <!-- Hero区域 -->
+    <div class="hero-section" id="hero">
+        <div class="hero-overlay"></div>
+        <div class="nav-bar">
+            <a href="#" class="logo">土豆府</a>
+            <a class="mdui-ripple" href="#features">服务器特色</a>
+            <a class="mdui-ripple" href="#rules">游戏规则</a>
+            <a class="mdui-ripple" href="#commands">指令大全</a>
+        </div>
+        <div class="search-icon"><i class="mdui-icon material-icons">search</i></div>
 
-    <div class="center-text">
-        <div class="domain">土豆府</div>
-        <div class="desc">全版本互通·插件高性能·多元生态</div>
+        <div class="center-text">
+            <div class="domain">土豆府</div>
+            <div class="desc">全版本互通·插件高性能·多元生态</div>
+        </div>
+
+        <div class="down-arrow" onclick="scrollToContent()"><i class="mdui-icon material-icons">keyboard_arrow_down</i></div>
     </div>
 
-    <div class="down-arrow"><i class="mdui-icon material-icons">keyboard_arrow_down</i></div>
-</div>
+    <!-- 内容区域 -->
+    <div class="content-section">
+        <!-- 服务器特色 -->
+        <div id="features">
+            <h2 class="section-title fade-in-section">服务器特色</h2>
+            <p class="section-subtitle fade-in-section">探索我们为你打造的独特游戏体验</p>
+            
+            <div class="grid-3">
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">layers</i></div>
+                    <div class="feature-title">全版本互通</div>
+                    <div class="feature-desc">支持1.8.x至1.20.x全版本客户端连接，无论你使用哪个版本都能畅玩</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">zap</i></div>
+                    <div class="feature-title">高性能插件</div>
+                    <div class="feature-desc">自主开发优化的插件系统，流畅运行无卡顿，带来极致游戏体验</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">globe</i></div>
+                    <div class="feature-title">多元生态</div>
+                    <div class="feature-desc">生存、创造、迷你游戏等多种玩法，满足不同玩家的需求</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">shield</i></div>
+                    <div class="feature-title">安全稳定</div>
+                    <div class="feature-desc">专业服务器架构，多重防护保障，数据定期备份永不丢失</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">users</i></div>
+                    <div class="feature-title">活跃社区</div>
+                    <div class="feature-desc">友好的玩家社区，定期举办活动，与小伙伴一起欢乐玩耍</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">headphones</i></div>
+                    <div class="feature-title">贴心客服</div>
+                    <div class="feature-desc">7x24小时在线客服，有问题随时解答，让你玩得放心</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 服务器信息 -->
+        <div style="margin-top:80px;">
+            <h2 class="section-title fade-in-section">服务器信息</h2>
+            <p class="section-subtitle fade-in-section">快速获取服务器连接信息</p>
+            
+            <div style="max-width:800px;margin:0 auto;">
+                <div class="server-info fade-in-section">
+                    <h3>服务器地址</h3>
+                    <p>mc.tudoufu.com:25565</p>
+                </div>
+                <div class="server-info fade-in-section">
+                    <h3>版本支持</h3>
+                    <p>1.8.x - 1.20.x (全版本互通)</p>
+                </div>
+                <div class="server-info fade-in-section">
+                    <h3>官方QQ群</h3>
+                    <p>123456789</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏规则 -->
+        <div id="rules" style="margin-top:80px;">
+            <h2 class="section-title fade-in-section">游戏规则</h2>
+            <p class="section-subtitle fade-in-section">共同维护良好的游戏环境</p>
+            
+            <div class="rules-list">
+                <div class="rule-item fade-in-section">
+                    <div class="rule-number">1</div>
+                    <div class="rule-content">
+                        <h4>禁止作弊行为</h4>
+                        <p>严禁使用任何作弊客户端、模组或外挂，一经发现立即封禁</p>
+                    </div>
+                </div>
+                <div class="rule-item fade-in-section">
+                    <div class="rule-number">2</div>
+                    <div class="rule-content">
+                        <h4>尊重其他玩家</h4>
+                        <p>禁止辱骂、攻击、骚扰其他玩家，保持友好的交流氛围</p>
+                    </div>
+                </div>
+                <div class="rule-item fade-in-section">
+                    <div class="rule-number">3</div>
+                    <div class="rule-content">
+                        <h4>保护公共资源</h4>
+                        <p>禁止恶意破坏公共设施和其他玩家的建筑作品</p>
+                    </div>
+                </div>
+                <div class="rule-item fade-in-section">
+                    <div class="rule-number">4</div>
+                    <div class="rule-content">
+                        <h4>禁止刷屏广告</h4>
+                        <p>在公共频道禁止发布无关广告信息和重复刷屏</p>
+                    </div>
+                </div>
+                <div class="rule-item fade-in-section">
+                    <div class="rule-number">5</div>
+                    <div class="rule-content">
+                        <h4>合理使用资源</h4>
+                        <p>禁止过度开采资源和破坏游戏平衡的行为</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 指令大全 -->
+        <div id="commands" style="margin-top:80px;">
+            <h2 class="section-title fade-in-section">常用指令</h2>
+            <p class="section-subtitle fade-in-section">快速掌握游戏指令</p>
+            
+            <div class="grid-3">
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">home</i></div>
+                    <div class="feature-title">/home</div>
+                    <div class="feature-desc">返回自己的家</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">map</i></div>
+                    <div class="feature-title">/spawn</div>
+                    <div class="feature-desc">返回出生点</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">send</i></div>
+                    <div class="feature-title">/tpa [玩家名]</div>
+                    <div class="feature-desc">请求传送到其他玩家位置</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">users</i></div>
+                    <div class="feature-title">/friends</div>
+                    <div class="feature-desc">查看好友列表</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">star</i></div>
+                    <div class="feature-title">/vote</div>
+                    <div class="feature-desc">为服务器投票获取奖励</div>
+                </div>
+                <div class="feature-card fade-in-section">
+                    <div class="feature-icon"><i class="mdui-icon material-icons">help</i></div>
+                    <div class="feature-title">/help</div>
+                    <div class="feature-desc">查看所有可用指令</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer">
+        <p>土豆府 MC服务器 &copy; 2024 | 感谢你的支持</p>
+    </div>
+
+    <script>
+        // 滚动渐现效果
+        document.addEventListener('DOMContentLoaded', function(){
+            const fadeElements = document.querySelectorAll('.fade-in-section');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting){
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+            
+            fadeElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+        
+        // 点击箭头滚动到内容
+        function scrollToContent(){
+            document.getElementById('features').scrollIntoView({behavior:'smooth'});
+        }
+    </script>
 </body>
 </html>
