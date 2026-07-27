@@ -3,6 +3,7 @@ import os
 import urllib
 from .config import app, MARKETS
 from .utils import set_market, render_root_template, render_market_template
+from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info
 
 def register_other_routes():
     @app.route('/')
@@ -135,6 +136,34 @@ def register_other_routes():
         doc_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'localcdn', 'doc', 'ot')
         os.makedirs(doc_dir, exist_ok=True)
         return send_from_directory(doc_dir, filepath)
+
+    @app.route('/api/mc/whitelist/add', methods=['POST'])
+    def api_mc_whitelist_add():
+        return mc_whitelist_add()
+
+    @app.route('/api/mc/whitelist/remove', methods=['POST'])
+    def api_mc_whitelist_remove():
+        return mc_whitelist_remove()
+
+    @app.route('/api/mc/whitelist/list', methods=['GET'])
+    def api_mc_whitelist_list():
+        return mc_whitelist_list()
+
+    @app.route('/api/mc/whitelist/reload', methods=['POST'])
+    def api_mc_whitelist_reload():
+        return mc_whitelist_reload()
+
+    @app.route('/api/mc/server/info', methods=['GET'])
+    def api_mc_server_info():
+        return mc_server_info()
+
+    @app.route('/mc/register')
+    def mc_register():
+        return render_root_template('mcreg.html')
+
+    @app.route('/mc')
+    def mc_index():
+        return redirect('/localcdn/project/mc.html')
 
     @app.errorhandler(404)
     def page_not_found(e):

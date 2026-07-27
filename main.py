@@ -8,7 +8,7 @@ from libs.market_routes import register_market_routes
 from libs.user_routes import register_user_routes
 from libs.developer_routes import register_developer_routes
 from libs.other_routes import register_other_routes
-from libs.mc_routes import register_mc_routes
+
 
 with app.app_context():
     if not os.path.exists(USER_DATA_FOLDER):
@@ -44,7 +44,6 @@ register_market_routes()
 register_user_routes()
 register_developer_routes()
 register_other_routes()
-register_mc_routes()
 
 if __name__ == '__main__':
     try:
