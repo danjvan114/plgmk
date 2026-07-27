@@ -21,33 +21,23 @@
         a { color: #2196F3; text-decoration: none; }
         a:hover { text-decoration: underline; }
 
-        /* 视频背景 */
-        .video-background {
+        /* 图片背景 */
+        .background-image {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            overflow: hidden;
+            background: url('/localcdn/gzs/bk.png') center/cover no-repeat;
             opacity: 1;
             transition: opacity 0.5s ease;
         }
-        .video-background.fade-out {
+        .background-image.fade-out {
             opacity: 0;
             pointer-events: none;
         }
-        .video-background video {
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .video-overlay {
+        .background-overlay {
             position: absolute;
             top: 0;
             left: 0;
@@ -214,12 +204,9 @@
     </style>
 </head>
 <body>
-    <!-- 视频背景 -->
-    <div class="video-background" id="videoBackground">
-        <video autoplay muted loop playsinline>
-            <source src="/localcdn/loginVideoNew.mp4" type="video/mp4">
-        </video>
-        <div class="video-overlay"></div>
+    <!-- 图片背景 -->
+    <div class="background-image" id="backgroundImage">
+        <div class="background-overlay"></div>
     </div>
 
     <!-- 导航栏 -->
@@ -274,8 +261,8 @@
     </footer>
 
     <script>
-        // 滚动时视频背景淡出效果
-        const videoBackground = document.getElementById('videoBackground');
+        // 滚动时背景淡出效果
+        const backgroundImage = document.getElementById('backgroundImage');
         const pageHeader = document.querySelector('.page-header');
         
         window.addEventListener('scroll', function() {
@@ -283,9 +270,9 @@
             const headerHeight = pageHeader.offsetHeight;
             
             if (scrollPosition > headerHeight / 2) {
-                videoBackground.classList.add('fade-out');
+                backgroundImage.classList.add('fade-out');
             } else {
-                videoBackground.classList.remove('fade-out');
+                backgroundImage.classList.remove('fade-out');
             }
         });
         
