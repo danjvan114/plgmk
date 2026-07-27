@@ -1,6 +1,7 @@
-from flask import request, jsonify
+from flask import request, jsonify, redirect, url_for
 import socket
 from .config import app
+from .utils import render_root_template
 
 def register_mc_routes():
     class RCONConnection:
@@ -311,3 +312,7 @@ def register_mc_routes():
             }), 500
         finally:
             rcon.close()
+    
+    @app.route('/mc/register')
+    def mc_register():
+        return render_root_template('mcreg.html')
