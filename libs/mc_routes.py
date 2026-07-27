@@ -27,17 +27,17 @@ def mc_whitelist_add():
         print(f"DEBUG mc_whitelist_add: Connecting to RCON...")
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
             print(f"DEBUG mc_whitelist_add: RCON connected successfully")
-            result = rcon.command(f'whitelist add {username}')
+            result = rcon.command(f'comfywl add {username}')
             print(f"DEBUG mc_whitelist_add: Command result: {result}")
             
             if result:
-                if 'added' in result.lower() or '已添加' in result:
+                if 'added' in result.lower() or '已添加' in result or 'success' in result.lower():
                     return jsonify({
                         'success': True,
                         'message': f'玩家 {username} 已成功添加到白名单',
                         'result': result
                     })
-                elif 'already' in result.lower() or '已存在' in result:
+                elif 'already' in result.lower() or '已存在' in result or 'exists' in result.lower():
                     return jsonify({
                         'success': False,
                         'message': f'玩家 {username} 已在白名单中',
@@ -80,7 +80,7 @@ def mc_whitelist_remove():
     
     try:
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-            result = rcon.command(f'whitelist remove {username}')
+            result = rcon.command(f'comfywl remove {username}')
             
             if result:
                 if 'removed' in result.lower() or '已移除' in result:
@@ -115,14 +115,14 @@ def mc_whitelist_remove():
 def mc_whitelist_list():
     try:
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-            result = rcon.command('whitelist list')
+            result = rcon.command('comfywl list')
             
             if result:
                 lines = result.strip().split('\n')
                 players = []
                 for line in lines:
                     line = line.strip()
-                    if line and not line.startswith('There are') and not line.startswith('白名单中有'):
+                    if line and not line.startswith('There are') and not line.startswith('白名单中有') and not line.startswith('Total'):
                         players.append(line.strip())
                 
                 return jsonify({
@@ -145,7 +145,7 @@ def mc_whitelist_list():
 def mc_whitelist_reload():
     try:
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-            result = rcon.command('whitelist reload')
+            result = rcon.command('comfywl reload')
             
             if result:
                 if 'reloaded' in result.lower() or '已重载' in result:

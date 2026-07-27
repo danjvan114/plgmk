@@ -79,7 +79,7 @@
   </head>
   <body>
     <div class="mdui-toolbar">
-        <a href="javascript:window.history.back()" class="mdui-btn mdui-btn-icon">
+        <a class="mdui-ripple mdui-btn-icon" onclick="window.history.back()">
             <i class="mdui-icon material-icons">arrow_back</i>
         </a>
         <span class="mdui-typo-title">土豆府注册</span>
@@ -98,7 +98,7 @@
                     </div>
                 </div>
 
-                <label class="mdui-checkbox">
+                <label class=" mdui-checkbox">
                     <input type="checkbox" id="agreeCheckbox" disabled />
                     <i class="mdui-checkbox-icon"></i>
                     我已阅读并同意上述用户协议
@@ -110,7 +110,7 @@
                     <input class="mdui-textfield-input" type="text" id="username" placeholder="" />
                 </div>
 
-                <button class="mdui-btn mdui-btn-raised mdui-color-blue-500 mdui-center" style="margin-top: 24px; width: 100%;" onclick="submitRegister()">
+                <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-center" style="margin-top: 24px; width: 100%;" onclick="submitRegister()">
                     提交注册
                 </button>
             </div>
@@ -226,5 +226,18 @@
             });
         }
     </script>
+
+
+
+
+    <div class="mdui-dialog" id="back">
+    <div class="mdui-dialog-title">Are you sure?</div>
+    <div class="mdui-dialog-content">You only want to go back?Enter the username and than you can continue to register.</div>
+    <div class="mdui-dialog-actions">
+        
+        <button class="mdui-btn mdui-ripple" onclick="window.history.back()" >close page</button>
+        <button class="mdui-btn mdui-ripple" >continue</button>
+     </div>
+    </div>
   </body>
 </html>
