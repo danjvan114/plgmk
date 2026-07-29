@@ -1,0 +1,204 @@
+<head>
+<link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+<script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+    .md-content { padding: 20px; max-width: 900px; margin: 0 auto; }
+    .md-content h1, .md-content h2, .md-content h3 { margin-top: 24px; margin-bottom: 16px; }
+    .md-content p { line-height: 1.8; margin-bottom: 16px; }
+    .md-content code { background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
+    .md-content pre { background-color: #f5f5f5; padding: 16px; border-radius: 4px; overflow-x: auto; }
+    .md-content img { max-width: 100%; }
+    .md-content table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+    .md-content th, .md-content td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .md-content th { background-color: #f5f5f5; }
+    .search-box { padding: 16px; background-color: #fff; border-bottom: 1px solid #eee; }
+    .search-results { max-height: 300px; overflow-y: auto; }
+    .search-result-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+    .search-result-item:hover { background-color: #f5f5f5; }
+    .search-result-item .title { font-weight: 500; color: #333; }
+    .search-result-item .preview { font-size: 12px; color: #999; margin-top: 4px; }
+    .loading-container { text-align: center; padding: 40px; }
+    .loading-container .mdui-spinner { margin: 0 auto 16px; }
+</style>
+</head>
+<body>
+<div class="mdui-toolbar mdui-color-theme">
+  <a onclick="window.history.back()" href="" class="mdui-btn mdui-btn-icon mdui-ripple">
+    <i class="mdui-icon material-icons">arrow_back</i>
+  </a>
+  <span class="mdui-typo-title">黑莓计划</span>
+  <div class="mdui-toolbar-spacer"></div>
+  <a onclick="openSearchDialog()" href="javascript:;" class="mdui-btn mdui-btn-icon mdui-ripple">
+    <i class="mdui-icon material-icons">search</i>
+  </a>
+  <a onclick="reloadCurrentDoc()" href="javascript:;" class="mdui-btn mdui-btn-icon mdui-ripple">
+    <i class="mdui-icon material-icons">refresh</i>
+  </a>
+</div>
+
+<div id="mdContainer" class="md-content">
+    <div class="loading-container">
+        <div class="mdui-spinner mdui-spinner-colorful"></div>
+        <div>加载中...</div>
+    </div>
+</div>
+
+<script>
+    // 配置MD加载地址 - 修改这里自定义加载逻辑
+    const MD_CONFIG = {
+        // 基础URL，用于拼接MD文件路径
+        baseUrl: '/localcdn/project/',
+        // 默认加载的MD文件
+        defaultDoc: 'hm.md',
+        // 自定义加载函数（可覆盖）
+        loadUrl: function(docName) {
+            return this.baseUrl + docName;
+        }
+    };
+
+    let currentDoc = MD_CONFIG.defaultDoc;
+    let mdCache = {};
+    let allDocs = [];
+
+    function showLoading() {
+        document.getElementById('mdContainer').innerHTML = `
+            <div class="loading-container">
+                <div class="mdui-spinner mdui-spinner-colorful"></div>
+                <div>加载中...</div>
+            </div>`;
+        mdui.updateSpinners();
+    }
+
+    function showError(msg) {
+        document.getElementById('mdContainer').innerHTML = `
+            <div class="mdui-alert" style="background-color: #ffebee; color: #c62828; padding: 16px; border-radius: 4px;">
+                <i class="mdui-icon material-icons">error</i> ${msg}
+            </div>`;
+    }
+
+    async function loadMD(docName) {
+        currentDoc = docName;
+        showLoading();
+        
+        try {
+            const url = MD_CONFIG.loadUrl(docName);
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await response.text();
+            mdCache[docName] = text;
+            renderMD(text);
+        } catch (e) {
+            showError(`加载失败: ${e.message}`);
+        }
+    }
+
+    function renderMD(text) {
+        const html = marked.parse(text);
+        document.getElementById('mdContainer').innerHTML = html;
+    }
+
+    function reloadCurrentDoc() {
+        delete mdCache[currentDoc];
+        loadMD(currentDoc);
+        mdui.snackbar({ message: '已刷新', position: 'bottom' });
+    }
+
+    // 搜索功能
+    async function loadDocList() {
+        if (allDocs.length > 0) return allDocs;
+        try {
+            const response = await fetch(MD_CONFIG.baseUrl + 'index.json');
+            if (response.ok) {
+                const data = await response.json();
+                allDocs = data.docs || [];
+            }
+        } catch (e) {
+            console.error('Failed to load doc list:', e);
+        }
+        return allDocs;
+    }
+
+    async function searchDocs(query) {
+        const docs = await loadDocList();
+        if (!query) return docs;
+        const q = query.toLowerCase();
+        const results = [];
+        for (const doc of docs) {
+            if (doc.name.toLowerCase().includes(q)) {
+                results.push(doc);
+                continue;
+            }
+            if (mdCache[doc.name]) {
+                if (mdCache[doc.name].toLowerCase().includes(q)) {
+                    results.push(doc);
+                }
+            } else {
+                try {
+                    const response = await fetch(MD_CONFIG.loadUrl(doc.name));
+                    if (response.ok) {
+                        const text = await response.text();
+                        mdCache[doc.name] = text;
+                        if (text.toLowerCase().includes(q)) {
+                            results.push(doc);
+                        }
+                    }
+                } catch (e) {}
+            }
+        }
+        return results;
+    }
+
+    function openSearchDialog() {
+        const dialog = mdui.dialog({
+            title: '搜索文档',
+            content: `
+                <div class="mdui-textfield mdui-textfield-floating-label">
+                    <input class="mdui-textfield-input" id="searchInput" type="text" placeholder="输入关键词...">
+                </div>
+                <div id="searchResults" class="search-results" style="margin-top: 16px;"></div>
+            `,
+            buttons: [
+                { text: '取消' },
+                { text: '搜索', onClick: function() { performSearch(); return false; } }
+            ],
+            cssClass: 'search-dialog'
+        });
+
+        document.getElementById('searchInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+    }
+
+    async function performSearch() {
+        const query = document.getElementById('searchInput').value.trim();
+        const resultsDiv = document.getElementById('searchResults');
+        resultsDiv.innerHTML = '<div class="mdui-spinner mdui-spinner-colorful" style="margin: 20px auto;"></div>';
+        mdui.updateSpinners();
+
+        const results = await searchDocs(query);
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding: 16px; text-align: center; color: #999;">未找到相关文档</div>';
+            return;
+        }
+
+        resultsDiv.innerHTML = results.map(doc => `
+            <div class="search-result-item" onclick="selectDoc('${doc.name}')">
+                <div class="title">${doc.name}</div>
+                ${doc.preview ? `<div class="preview">${doc.preview.substring(0, 100)}...</div>` : ''}
+            </div>
+        `).join('');
+    }
+
+    function selectDoc(docName) {
+        mdui.dialog({ content: '加载中...' }).destroy();
+        loadMD(docName);
+        mdui.snackbar({ message: `已加载: ${docName}`, position: 'bottom' });
+    }
+
+    // 页面加载时自动加载默认文档
+    window.addEventListener('load', () => {
+        loadMD(currentDoc);
+    });
+</script>
+</body>

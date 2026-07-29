@@ -1,29 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Map Viewer</title>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background-color: #1a1a1a; color: white; overflow: hidden; }
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; overflow: hidden; }
         .header {
-            background-color: #2c2c2c; padding: 10px 20px; display: flex;
+            background-color: #fff; padding: 10px 20px; display: flex;
             align-items: center; gap: 15px; flex-wrap: wrap;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; z-index: 100;
         }
-        .header h1 { font-size: 18px; font-weight: 600; margin-right: auto; }
-        .header select, .header button {
-            padding: 8px 12px; border: 1px solid #444; border-radius: 4px;
-            background-color: #333; color: white; font-size: 14px; cursor: pointer;
+        .header h1 { font-size: 18px; font-weight: 600; margin-right: auto; color: #333; }
+        .header select {
+            padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;
+            background-color: #fff; color: #333; font-size: 14px; cursor: pointer;
         }
-        .header button:hover { background-color: #555; }
-        #status { font-size: 14px; padding: 8px 12px; border-radius: 4px; }
-        .status-online { background-color: rgba(76, 175, 80, 0.2); color: #4CAF50; }
-        .status-offline { background-color: rgba(244, 67, 54, 0.2); color: #f44336; }
+        .header select:hover { background-color: #f0f0f0; }
+        .header select:focus { outline: none; border-color: #3F51B5; }
         #mapContainer {
-            position: relative; width: 100vw; height: calc(100vh - 60px);
-            overflow: hidden; background-color: #0a0a0a;
+            position: relative; width: 100vw; height: 100vh;
+            overflow: hidden; background-color: #e0e0e0;
         }
         #mapCanvas {
             position: absolute; top: 0; left: 0; cursor: grab;
@@ -32,25 +31,16 @@
         #mapCanvas:active { cursor: grabbing; }
         .coordinates {
             position: absolute; bottom: 15px; left: 15px;
-            background-color: rgba(0,0,0,0.8); padding: 8px 12px;
+            background-color: rgba(255,255,255,0.9); padding: 8px 12px;
             border-radius: 4px; font-size: 13px; pointer-events: none; z-index: 20;
+            color: #333; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
-        .loading-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background-color: rgba(0,0,0,0.8); padding: 20px 30px;
-            border-radius: 8px; text-align: center; z-index: 1000;
+        .loading-dialog {
+            display: flex; align-items: center; padding: 20px 30px;
         }
-        .loading-spinner {
-            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid #4CAF50; border-radius: 50%;
-            animation: spin 1s linear infinite; margin: 0 auto 15px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .hidden { display: none !important; }
-        .data-status {
-            font-size: 12px; padding: 4px 8px; border-radius: 3px;
-            background-color: rgba(33, 150, 243, 0.2); color: #2196F3;
-        }
+        .loading-dialog .mdui-spinner { margin-right: 16px; flex-shrink: 0; }
+        .loading-dialog .loading-text { font-size: 16px; color: #333; }
+        .mdui-dialog { max-width: 300px !important; }
     </style>
 </head>
 <body>
@@ -61,34 +51,16 @@
             <option value="minecraft:the_nether">Nether</option>
             <option value="minecraft:the_end">End</option>
         </select>
-        <select id="mapType">
-            <option value="day">Day</option>
-            <option value="night">Night</option>
-            <option value="underground">Underground</option>
-            <option value="nether">Nether</option>
-            <option value="end">End</option>
-        </select>
-        <select id="zoom">
-            <option value="0">1x</option>
-            <option value="1">2x</option>
-            <option value="2">4x</option>
-            <option value="3">8x</option>
-        </select>
-        <button onclick="reloadMap()">Reload Map</button>
-        <button onclick="loadRoutesAndWaypoints()">Refresh Data</button>
-        <div id="dataStatus" class="data-status">Routes: 0 | Waypoints: 0</div>
-        <div id="status" class="status-offline">Connecting...</div>
+        <div style="border-radius: 10px;background-color: #ffbb00;" class="mdui-btn mdui-ripple" onclick="reloadMap()">刷新地图</div>
+        <div style="border-radius: 10px;background-color: #ffbb00;" class="mdui-btn mdui-ripple" onclick="loadRoutesAndWaypoints()">刷新路标数据</div>
     </div>
     
     <div id="mapContainer">
-        <div class="loading-overlay" id="loadingOverlay">
-            <div class="loading-spinner"></div>
-            <div>Loading Map...</div>
-        </div>
         <canvas id="mapCanvas"></canvas>
         <div class="coordinates" id="coordinates">X: 0, Z: 0</div>
     </div>
 
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
     <script>
         let currentDimension = 'minecraft:overworld';
         let currentMapType = 'day';
@@ -103,13 +75,35 @@
         let mapTiles = new Map();
         let routes = [];
         let waypoints = [];
+        let loadingDialog = null;
 
         const canvas = document.getElementById('mapCanvas');
         const ctx = canvas.getContext('2d');
         const container = document.getElementById('mapContainer');
-        const statusElement = document.getElementById('status');
-        const loadingOverlay = document.getElementById('loadingOverlay');
         const coordinatesElement = document.getElementById('coordinates');
+
+        function showLoading(text) {
+            if (loadingDialog) loadingDialog.destroy();
+            const html = `<div class="loading-dialog">
+                <div class="mdui-spinner mdui-spinner-colorful"></div>
+                <div class="loading-text">${text}</div>
+            </div>`;
+            loadingDialog = mdui.dialog({
+                content: html,
+                closeOnEsc: false,
+                history: false
+            });
+            mdui.updateSpinners();
+        }
+
+        function hideLoading() {
+            if (loadingDialog) {
+                loadingDialog.destroy();
+                loadingDialog = null;
+            }
+            // 清除可能残留的overlay
+            document.querySelectorAll('.mdui-overlay').forEach(el => el.remove());
+        }
 
         function resizeCanvas() {
             canvas.width = container.clientWidth;
@@ -119,20 +113,6 @@
 
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
-
-        async function checkServerStatus() {
-            try {
-                const response = await fetch('/webapp/srvmap/mapdata/1/list');
-                if (response.ok) {
-                    statusElement.textContent = 'Server Online';
-                    statusElement.className = 'status-online';
-                    return true;
-                }
-            } catch (e) {}
-            statusElement.textContent = 'Server Offline';
-            statusElement.className = 'status-offline';
-            return false;
-        }
 
         function getTileUrl(x, z) {
             const dim = currentDimension.replace(':', '_');
@@ -180,7 +160,6 @@
         }
 
         function renderOverlayOnly() {
-            // Re-render everything on single canvas during drag
             const tileSize = 512;
             const minX = Math.floor((-canvasOffsetX) / tileSize) - 1;
             const maxX = Math.floor((-canvasOffsetX + canvas.width) / tileSize) + 1;
@@ -203,21 +182,9 @@
             renderWaypoints();
         }
 
-        function getPixelPerChunk() {
-            const scale = Math.pow(2, currentZoom);
-            return 512 / (32 / scale);
-        }
-
         function worldToScreen(wx, wz) {
-            // Use fixed ppc (zoom 0) - CSS transform handles visual scaling
             const basePpc = 512 / 32;
             return { x: wx * basePpc + canvasOffsetX, y: wz * basePpc + canvasOffsetZ };
-        }
-
-        function renderOverlay() {
-            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-            renderRoutes();
-            renderWaypoints();
         }
 
         function renderRoutes() {
@@ -296,7 +263,7 @@
                 const w = await fetch('/webapp/srvmap/mapdata/1/waypoints');
                 if (w.ok) { const d = await w.json(); if (d.waypoints) waypoints = d.waypoints; }
             } catch (e) { console.error('Failed to load waypoints:', e); }
-            document.getElementById('dataStatus').textContent = `Routes: ${routes.length} | Waypoints: ${waypoints.length}`;
+            mdui.snackbar({ message: `路标: ${routes.length} 路线, ${waypoints.length} 路点`, position: 'bottom' });
             renderOverlayOnly();
         }
 
@@ -310,20 +277,23 @@
         }
 
         async function loadMap() {
-            loadingOverlay.classList.remove('hidden');
+            showLoading('加载地图中...');
+            const startTime = Date.now();
             mapTiles.clear();
             currentDimension = document.getElementById('dimension').value;
-            currentMapType = document.getElementById('mapType').value;
-            currentZoom = parseInt(document.getElementById('zoom').value);
             canvasOffsetX = canvas.width / 2;
             canvasOffsetZ = canvas.height / 2;
             dragDeltaX = 0;
             dragDeltaZ = 0;
             canvas.style.transform = `scale(${Math.pow(2, currentZoom)})`;
             canvas.style.transformOrigin = 'top left';
-            const isOnline = await checkServerStatus();
-            if (isOnline) await renderMap();
-            loadingOverlay.classList.add('hidden');
+            await renderMap();
+            // 确保加载圈至少显示1秒
+            const elapsed = Date.now() - startTime;
+            if (elapsed < 1000) {
+                await new Promise(resolve => setTimeout(resolve, 1000 - elapsed));
+            }
+            hideLoading();
         }
 
         function reloadMap() { loadMap(); }
@@ -372,11 +342,10 @@
 
         canvas.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const zoomDirection = e.deltaY > 0 ? 1 : -1;
+            const zoomDirection = e.deltaY > 0 ? -1 : 1;
             const newZoom = Math.max(0, Math.min(3, currentZoom + zoomDirection));
             if (newZoom !== currentZoom) {
                 currentZoom = newZoom;
-                document.getElementById('zoom').value = currentZoom;
                 const scale = Math.pow(2, currentZoom);
                 canvas.style.transform = `scale(${scale})`;
                 canvas.style.transformOrigin = 'top left';
@@ -386,15 +355,11 @@
         });
 
         document.getElementById('dimension').addEventListener('change', loadMap);
-        document.getElementById('mapType').addEventListener('change', loadMap);
-        document.getElementById('zoom').addEventListener('change', loadMap);
 
         window.addEventListener('load', () => {
-            checkServerStatus();
             loadMap().then(() => { loadRoutesAndWaypoints(); });
         });
 
-        setInterval(checkServerStatus, 10000);
         setInterval(loadRoutesAndWaypoints, 30000);
     </script>
 </body>
