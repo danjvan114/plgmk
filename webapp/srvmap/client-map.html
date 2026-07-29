@@ -263,7 +263,6 @@
                 const w = await fetch('/webapp/srvmap/mapdata/1/waypoints');
                 if (w.ok) { const d = await w.json(); if (d.waypoints) waypoints = d.waypoints; }
             } catch (e) { console.error('Failed to load waypoints:', e); }
-            mdui.snackbar({ message: `路标: ${routes.length} 路线, ${waypoints.length} 路点`, position: 'bottom' });
             renderOverlayOnly();
         }
 
