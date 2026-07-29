@@ -1,5 +1,6 @@
 from flask import redirect, url_for, send_from_directory, request, jsonify
 import os
+import json
 import urllib
 from .config import app, MARKETS
 from .utils import set_market, render_root_template, render_market_template
@@ -182,6 +183,168 @@ def register_other_routes():
     @app.route('/mc')
     def mc_index():
         return redirect('/localcdn/project/mc.html')
+    
+    # Webmap frontend routes
+    @app.route('/app/webmap')
+    def webmap_index():
+        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                              'webapp', 'srvmap'), 
+                                 'thirdparty-map.html')
+    
+    @app.route('/app/clientmap')
+    def clientmap_index():
+        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                              'webapp', 'srvmap'), 
+                                 'client-map.html')
+
+    # Minecraft map tile upload and download routes
+    @app.route('/webapp/srvmap/mapdata/1/upload', methods=['POST'])
+    def upload_map_tile():
+        try:
+            # Get tile parameters
+            x = request.form.get('x')
+            z = request.form.get('z')
+            dimension = request.form.get('dimension')
+            map_type = request.form.get('mapType', 'day')
+            zoom = request.form.get('zoom', '0')
+            
+            if not x or not z or not dimension:
+                return jsonify({'success': False, 'error': 'Missing required parameters'}), 400
+            
+            # Sanitize dimension for Windows paths (replace : with _)
+            safe_dimension = dimension.replace(':', '_')
+            
+            # Get tile file
+            if 'tile' not in request.files:
+                return jsonify({'success': False, 'error': 'No tile file provided'}), 400
+            
+            file = request.files['tile']
+            if file.filename == '':
+                return jsonify({'success': False, 'error': 'No selected file'}), 400
+            
+            # Create directory structure
+            save_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                 'webapp', 'srvmap', 'mapdata', '1', 
+                                 safe_dimension, map_type, zoom)
+            os.makedirs(save_dir, exist_ok=True)
+            
+            # Save file
+            filename = f'tile_{x}_{z}.png'
+            file_path = os.path.join(save_dir, filename)
+            file.save(file_path)
+            
+            print(f"Saved map tile: {safe_dimension}/{map_type}/{zoom}/{x}_{z}.png")
+            return jsonify({
+                'success': True, 
+                'message': 'Tile uploaded successfully',
+                'path': f'/webapp/srvmap/mapdata/1/{safe_dimension}/{map_type}/{zoom}/{x}_{z}.png'
+            })
+            
+        except Exception as e:
+            print(f"Error uploading tile: {str(e)}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/webapp/srvmap/mapdata/1/list', methods=['GET'])
+    def list_saved_tiles():
+        try:
+            base_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                 'webapp', 'srvmap', 'mapdata', '1')
+            os.makedirs(base_dir, exist_ok=True)
+            
+            tiles = []
+            for root, dirs, files in os.walk(base_dir):
+                for file in files:
+                    if file.endswith('.png') and file.startswith('tile_'):
+                        rel_path = os.path.relpath(root, base_dir)
+                        parts = rel_path.split(os.sep)
+                        if len(parts) >= 3:
+                            dimension = parts[0]
+                            map_type = parts[1]
+                            zoom = parts[2]
+                            filename_parts = file.split('_')
+                            if len(filename_parts) >= 4:
+                                x = filename_parts[1]
+                                z = filename_parts[2].replace('.png', '')
+                                tiles.append({
+                                    'x': x,
+                                    'z': z,
+                                    'dimension': dimension,
+                                    'mapType': map_type,
+                                    'zoom': zoom,
+                                    'url': f'/webapp/srvmap/mapdata/1/{rel_path}/{file}'
+                                })
+            
+            return jsonify({'success': True, 'tiles': tiles})
+        except Exception as e:
+            print(f"Error listing tiles: {str(e)}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @app.route('/webapp/srvmap/mapdata/1/<path:filepath>')
+    def serve_map_tile(filepath):
+        try:
+            base_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                 'webapp', 'srvmap', 'mapdata', '1')
+            return send_from_directory(base_dir, filepath)
+        except Exception as e:
+            return jsonify({'success': False, 'error': 'Tile not found'}), 404
+
+    # Routes and waypoints data storage
+    map_data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'webapp', 'srvmap', 'mapdata', '1')
+    os.makedirs(map_data_dir, exist_ok=True)
+    routes_file = os.path.join(map_data_dir, 'routes.json')
+    waypoints_file = os.path.join(map_data_dir, 'waypoints.json')
+
+    def load_json_file(filepath, default):
+        try:
+            if os.path.exists(filepath):
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+        except:
+            pass
+        return default
+
+    def save_json_file(filepath, data):
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            return True
+        except Exception as e:
+            print(f"Error saving {filepath}: {e}")
+            return False
+
+    @app.route('/webapp/srvmap/mapdata/1/routes', methods=['GET'])
+    def get_routes():
+        routes = load_json_file(routes_file, [])
+        return jsonify({'success': True, 'routes': routes})
+
+    @app.route('/webapp/srvmap/mapdata/1/routes', methods=['POST'])
+    def save_routes():
+        try:
+            data = request.json
+            if not data or 'routes' not in data:
+                return jsonify({'success': False, 'error': 'Invalid data'}), 400
+            if save_json_file(routes_file, data['routes']):
+                return jsonify({'success': True, 'message': 'Routes saved'})
+            return jsonify({'success': False, 'error': 'Failed to save'}), 500
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @app.route('/webapp/srvmap/mapdata/1/waypoints', methods=['GET'])
+    def get_waypoints():
+        waypoints = load_json_file(waypoints_file, [])
+        return jsonify({'success': True, 'waypoints': waypoints})
+
+    @app.route('/webapp/srvmap/mapdata/1/waypoints', methods=['POST'])
+    def save_waypoints():
+        try:
+            data = request.json
+            if not data or 'waypoints' not in data:
+                return jsonify({'success': False, 'error': 'Invalid data'}), 400
+            if save_json_file(waypoints_file, data['waypoints']):
+                return jsonify({'success': True, 'message': 'Waypoints saved'})
+            return jsonify({'success': False, 'error': 'Failed to save'}), 500
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
 
     @app.errorhandler(404)
     def page_not_found(e):

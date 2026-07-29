@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Uploader</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #1a1a1a; color: #ccc; }
+        .header {
+            background-color: #2c2c2c; padding: 10px 20px; display: flex;
+            align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .header h1 { font-size: 16px; font-weight: 500; color: #fff; margin-right: 10px; }
+        .header input, .header select, .header button {
+            padding: 6px 10px; border: 1px solid #444; border-radius: 3px;
+            background-color: #333; color: #fff; font-size: 13px;
+        }
+        .header button { cursor: pointer; }
+        .header button:hover { background-color: #444; }
+        .header button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .header button.active { background-color: #4CAF50; border-color: #4CAF50; }
+        #status { margin-left: auto; font-size: 13px; }
+        .status-idle { color: #888; }
+        .status-running { color: #4CAF50; }
+        .status-error { color: #f44336; }
+        .progress-bar { width: 200px; height: 4px; background-color: #333; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background-color: #4CAF50; width: 0%; transition: width 0.3s; }
+        .tool-group { display: flex; gap: 5px; align-items: center; }
+        .tool-group label { font-size: 12px; color: #aaa; }
+        #mapContainer { position: relative; width: 100vw; height: calc(100vh - 50px); overflow: hidden; background-color: #0a0a0a; }
+        #mapCanvas { position: absolute; top: 0; left: 0; cursor: grab; image-rendering: pixelated; }
+        #mapCanvas:active { cursor: grabbing; }
+        #mapCanvas.tool-waypoint { cursor: crosshair; }
+        #mapCanvas.tool-route { cursor: crosshair; }
+        #mapCanvas.tool-delete { cursor: pointer; }
+
+        /* Side panel */
+        .side-panel {
+            position: absolute; top: 10px; right: 10px; width: 260px;
+            background: rgba(30,30,30,0.95); border: 1px solid #444;
+            border-radius: 6px; padding: 12px; max-height: calc(100vh - 80px);
+            overflow-y: auto; z-index: 100;
+        }
+        .side-panel h3 { font-size: 14px; color: #fff; margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 6px; }
+        .side-panel h3:not(:first-child) { margin-top: 12px; }
+        .route-item, .waypoint-item {
+            display: flex; align-items: center; gap: 6px; padding: 4px 6px;
+            margin-bottom: 4px; border-radius: 3px; font-size: 12px; background: #2a2a2a;
+        }
+        .route-item:hover, .waypoint-item:hover { background: #333; }
+        .color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .item-btn {
+            background: none; border: none; color: #f44336; cursor: pointer;
+            font-size: 14px; padding: 2px 4px; line-height: 1;
+        }
+        .item-btn:hover { color: #ff6659; }
+        .item-toggle {
+            background: none; border: none; color: #4CAF50; cursor: pointer;
+            font-size: 12px; padding: 2px 4px; line-height: 1;
+        }
+        .item-toggle.hidden { color: #666; }
+
+        /* Waypoint input popup */
+        .wp-popup {
+            position: absolute; background: #2c2c2c; border: 1px solid #555;
+            border-radius: 6px; padding: 10px; z-index: 200; display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .wp-popup input, .wp-popup select {
+            width: 100%; padding: 5px 8px; margin-bottom: 6px; border: 1px solid #444;
+            border-radius: 3px; background: #333; color: #fff; font-size: 12px;
+        }
+        .wp-popup .btn-row { display: flex; gap: 6px; }
+        .wp-popup button { flex: 1; padding: 5px; border: 1px solid #444; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .wp-popup .btn-ok { background: #4CAF50; color: #fff; border-color: #4CAF50; }
+        .wp-popup .btn-cancel { background: #555; color: #fff; }
+
+        .coords-display {
+            position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.8);
+            padding: 6px 10px; border-radius: 4px; font-size: 12px; color: #aaa; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Map Uploader</h1>
+        <input type="text" id="portInput" placeholder="JM Port" value="8080" style="width: 80px;">
+        <button onclick="reloadMap()" id="reloadBtn">Reload Map</button>
+        <input type="number" id="centerX" placeholder="X" value="0" style="width: 70px;">
+        <input type="number" id="centerZ" placeholder="Z" value="0" style="width: 70px;">
+        <select id="zoom">
+            <option value="0">1x</option>
+            <option value="1">2x</option>
+            <option value="2">4x</option>
+            <option value="3">8x</option>
+        </select>
+        <div class="tool-group">
+            <label>Tool:</label>
+            <button id="toolPan" class="active" onclick="setTool('pan')">Pan</button>
+            <button id="toolRoute" onclick="setTool('route')">Draw Route</button>
+            <button id="toolWaypoint" onclick="setTool('waypoint')">Add Waypoint</button>
+            <button id="toolDelete" onclick="setTool('delete')">Delete</button>
+        </div>
+        <input type="color" id="colorPicker" value="#ff4444" title="Color" style="width:32px;height:28px;padding:2px;border:1px solid #444;border-radius:3px;background:#333;cursor:pointer;">
+        <button onclick="startUpload()" id="uploadBtn">Upload Day Map</button>
+        <button onclick="saveAllData()" id="saveDataBtn">Save All</button>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div id="status" class="status-idle">Ready</div>
+    </div>
+
+    <div id="mapContainer">
+        <canvas id="mapCanvas"></canvas>
+        <div class="coords-display" id="coordsDisplay">X: 0 Z: 0</div>
+        <div class="side-panel" id="sidePanel">
+            <h3>Routes</h3>
+            <div id="routesList"></div>
+            <h3>Waypoints</h3>
+            <div id="waypointsList"></div>
+        </div>
+        <div class="wp-popup" id="wpPopup">
+            <input type="text" id="wpName" placeholder="Name (e.g. Shop)">
+            <select id="wpType">
+                <option value="shop">Shop</option>
+                <option value="area">Area</option>
+                <option value="other">Other</option>
+            </select>
+            <div class="btn-row">
+                <button class="btn-ok" onclick="confirmWaypoint()">OK</button>
+                <button class="btn-cancel" onclick="cancelWaypoint()">Cancel</button>
+            </div>
+        </div>
+        <div class="wp-popup" id="routePopup">
+            <input type="text" id="routeName" placeholder="Road name (e.g. Main Street)">
+            <div class="btn-row">
+                <button class="btn-ok" onclick="confirmRoute()">OK</button>
+                <button class="btn-cancel" onclick="cancelRoute()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let canvasOffsetX = 0, canvasOffsetZ = 0;
+        let isDragging = false, lastMouseX = 0, lastMouseZ = 0;
+        let mapTiles = new Map();
+        let currentTool = 'pan';
+        let routes = [];
+        let waypoints = [];
+        let currentRoute = null;
+        let pendingWaypoint = null;
+        let selectedRouteIndex = -1;
+        let selectedPointIndex = -1;
+        let pendingRoutePoint = null;
+
+        const canvas = document.getElementById('mapCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('mapContainer');
+        const statusEl = document.getElementById('status');
+        const progressFill = document.getElementById('progressFill');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const wpPopup = document.getElementById('wpPopup');
+
+        function resizeCanvas() {
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            renderMap();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function getBaseUrl() { return `http://127.0.0.1:${document.getElementById('portInput').value}`; }
+
+        function reloadMap() {
+            mapTiles.clear();
+            renderMap();
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.tool-group button').forEach(b => b.classList.remove('active'));
+            const btnId = 'tool' + tool.charAt(0).toUpperCase() + tool.slice(1);
+            const btn = document.getElementById(btnId);
+            if (btn) btn.classList.add('active');
+            canvas.className = tool !== 'pan' ? 'tool-' + tool : '';
+            if (tool !== 'route' && currentRoute && currentRoute.points.length < 2) {
+                currentRoute = null;
+            }
+        }
+
+        function getPixelPerChunk() {
+            const scale = Math.pow(2, parseInt(document.getElementById('zoom').value));
+            return 512 / (32 / scale);
+        }
+
+        function worldToScreen(wx, wz) {
+            const ppc = getPixelPerChunk();
+            return { x: wx * ppc + canvasOffsetX, z: wz * ppc + canvasOffsetZ };
+        }
+
+        function screenToWorld(sx, sz) {
+            const ppc = getPixelPerChunk();
+            return { x: (sx - canvasOffsetX) / ppc, z: (sz - canvasOffsetZ) / ppc };
+        }
+
+        async function renderMap() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const tileSize = 512;
+            const minX = Math.floor((-canvasOffsetX) / tileSize) - 1;
+            const maxX = Math.floor((-canvasOffsetX + canvas.width) / tileSize) + 1;
+            const minZ = Math.floor((-canvasOffsetZ) / tileSize) - 1;
+            const maxZ = Math.floor((-canvasOffsetZ + canvas.height) / tileSize) + 1;
+
+            for (let x = minX; x <= maxX; x++) {
+                for (let z = minZ; z <= maxZ; z++) {
+                    const key = `${x},${z}`;
+                    if (!mapTiles.has(key)) {
+                        const url = `${getBaseUrl()}/tiles/tile.png?x=${x}&z=${z}&dimension=minecraft:overworld&mapTypeString=day&zoom=${document.getElementById('zoom').value}`;
+                        const img = await new Promise(resolve => {
+                            const img = new Image();
+                            img.onload = () => resolve(img);
+                            img.onerror = () => resolve(null);
+                            img.src = url;
+                        });
+                        mapTiles.set(key, img);
+                    }
+                    const img = mapTiles.get(key);
+                    if (img) {
+                        ctx.drawImage(img, x * tileSize + canvasOffsetX, z * tileSize + canvasOffsetZ, tileSize, tileSize);
+                    }
+                }
+            }
+            renderRoutes();
+            renderWaypoints();
+        }
+
+        function renderRoutes() {
+            const allRoutes = currentRoute ? [...routes, currentRoute] : routes;
+            allRoutes.forEach((route, idx) => {
+                if (!route.visible && route.visible !== undefined) return;
+                if (route.points.length < 2) return;
+                const isCurrent = route === currentRoute;
+                const isSelected = !isCurrent && routes.indexOf(route) === selectedRouteIndex;
+                ctx.strokeStyle = route.color || '#ff4444';
+                ctx.lineWidth = isSelected ? 5 : 3;
+                ctx.lineJoin = 'round';
+                ctx.setLineDash(isSelected ? [8, 4] : []);
+                ctx.beginPath();
+                route.points.forEach((p, i) => {
+                    const s = worldToScreen(p.x, p.z);
+                    if (i === 0) ctx.moveTo(s.x, s.z);
+                    else ctx.lineTo(s.x, s.z);
+                });
+                ctx.stroke();
+                ctx.setLineDash([]);
+                // Draw points
+                route.points.forEach((p, i) => {
+                    const s = worldToScreen(p.x, p.z);
+                    const isSelPoint = isSelected && i === selectedPointIndex;
+                    ctx.fillStyle = isSelPoint ? '#ffff00' : (route.color || '#ff4444');
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.z, isSelPoint ? 8 : 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                });
+                // Route name label
+                if (route.points.length >= 2 && !isCurrent) {
+                    const mid = route.points[Math.floor(route.points.length / 2)];
+                    const ms = worldToScreen(mid.x, mid.z);
+                    ctx.font = 'bold 12px Arial';
+                    ctx.fillStyle = '#fff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                    ctx.shadowBlur = 4;
+                    ctx.fillText(route.name, ms.x, ms.y - 10);
+                    ctx.shadowBlur = 0;
+                }
+            });
+        }
+
+        function renderWaypoints() {
+            waypoints.forEach(wp => {
+                if (!wp.visible && wp.visible !== undefined) return;
+                const s = worldToScreen(wp.x, wp.z);
+                const colors = { shop: '#ff9800', area: '#2196F3', other: '#9c27b0' };
+                const color = colors[wp.type] || '#fff';
+                // Circle
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(s.x, s.z, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                // Icon
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 10px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const icons = { shop: 'S', area: 'A', other: 'O' };
+                ctx.fillText(icons[wp.type] || '?', s.x, s.z);
+                // Label
+                ctx.font = '11px Arial';
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'bottom';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 3;
+                ctx.fillText(wp.name, s.x + 12, s.z - 4);
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        // Mouse events
+        canvas.addEventListener('mousedown', e => {
+            if (currentTool === 'pan') {
+                isDragging = true;
+                lastMouseX = e.clientX;
+                lastMouseZ = e.clientY;
+            } else if (currentTool === 'route') {
+                const rect = canvas.getBoundingClientRect();
+                const world = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+                if (!currentRoute) {
+                    currentRoute = { id: Date.now(), name: 'Route ' + (routes.length + 1), points: [world], color: document.getElementById('colorPicker').value };
+                } else {
+                    currentRoute.points.push(world);
+                }
+                renderMap();
+            } else if (currentTool === 'waypoint') {
+                const rect = canvas.getBoundingClientRect();
+                const world = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+                pendingWaypoint = { x: world.x, z: world.z };
+                wpPopup.style.display = 'block';
+                wpPopup.style.left = (e.clientX - rect.left + 15) + 'px';
+                wpPopup.style.top = (e.clientY - rect.top - 10) + 'px';
+                document.getElementById('wpName').value = '';
+                document.getElementById('wpName').focus();
+            } else if (currentTool === 'delete') {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const mz = e.clientY - rect.top;
+                // Check waypoints
+                for (let i = waypoints.length - 1; i >= 0; i--) {
+                    const s = worldToScreen(waypoints[i].x, waypoints[i].z);
+                    if (Math.hypot(mx - s.x, mz - s.z) < 15) {
+                        waypoints.splice(i, 1);
+                        renderMap();
+                        updateSidePanel();
+                        return;
+                    }
+                }
+                // Check routes
+                for (let i = routes.length - 1; i >= 0; i--) {
+                    const pts = routes[i].points;
+                    for (const p of pts) {
+                        const s = worldToScreen(p.x, p.z);
+                        if (Math.hypot(mx - s.x, mz - s.z) < 10) {
+                            routes.splice(i, 1);
+                            renderMap();
+                            updateSidePanel();
+                            return;
+                        }
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (isDragging) {
+                const scale = Math.pow(2, parseInt(document.getElementById('zoom').value));
+                const deltaX = (e.clientX - lastMouseX) / scale;
+                const deltaZ = (e.clientY - lastMouseZ) / scale;
+                
+                canvasOffsetX += deltaX;
+                canvasOffsetZ += deltaZ;
+                
+                lastMouseX = e.clientX;
+                lastMouseZ = e.clientY;
+                renderMap();
+            }
+            // Update coords
+            const rect = canvas.getBoundingClientRect();
+            const world = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+            document.getElementById('coordsDisplay').textContent = `X: ${Math.round(world.x)} Z: ${Math.round(world.z)}`;
+        });
+
+        canvas.addEventListener('mouseup', () => { isDragging = false; });
+        canvas.addEventListener('mouseleave', () => { isDragging = false; });
+
+        // Double click to finish route
+        canvas.addEventListener('dblclick', e => {
+            if (currentTool === 'route' && currentRoute && currentRoute.points.length >= 2) {
+                const rect = canvas.getBoundingClientRect();
+                pendingRoutePoint = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+                document.getElementById('routePopup').style.display = 'block';
+                document.getElementById('routePopup').style.left = (e.clientX - rect.left + 15) + 'px';
+                document.getElementById('routePopup').style.top = (e.clientY - rect.top - 10) + 'px';
+                document.getElementById('routeName').value = '';
+                document.getElementById('routeName').focus();
+            }
+        });
+
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            const zoomEl = document.getElementById('zoom');
+            const newZoom = Math.max(0, Math.min(3, parseInt(zoomEl.value) + (e.deltaY > 0 ? 1 : -1)));
+            zoomEl.value = newZoom;
+            mapTiles.clear();
+            renderMap();
+        });
+
+        // Click to select routes/waypoints for deletion
+        canvas.addEventListener('click', e => {
+            if (currentTool === 'delete') {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const mz = e.clientY - rect.top;
+                selectedRouteIndex = -1;
+                selectedPointIndex = -1;
+                selectedWaypointIndex = -1;
+                // Check waypoints first
+                for (let i = waypoints.length - 1; i >= 0; i--) {
+                    const s = worldToScreen(waypoints[i].x, waypoints[i].z);
+                    if (Math.hypot(mx - s.x, mz - s.z) < 15) {
+                        selectedWaypointIndex = i;
+                        renderMap();
+                        updateSidePanel();
+                        return;
+                    }
+                }
+                // Check routes
+                for (let i = routes.length - 1; i >= 0; i--) {
+                    const pts = routes[i].points;
+                    for (let j = 0; j < pts.length; j++) {
+                        const s = worldToScreen(pts[j].x, pts[j].z);
+                        if (Math.hypot(mx - s.x, mz - s.z) < 10) {
+                            selectedRouteIndex = i;
+                            selectedPointIndex = j;
+                            renderMap();
+                            updateSidePanel();
+                            return;
+                        }
+                    }
+                }
+            }
+        });
+
+        // Keyboard delete
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Delete') {
+                if (currentTool === 'route' && currentRoute && currentRoute.points.length > 0) {
+                    currentRoute.points.pop();
+                    if (currentRoute.points.length === 0) currentRoute = null;
+                    renderMap();
+                    updateSidePanel();
+                } else if (selectedRouteIndex >= 0) {
+                    if (selectedPointIndex >= 0) {
+                        routes[selectedRouteIndex].points.splice(selectedPointIndex, 1);
+                        if (routes[selectedRouteIndex].points.length === 0) routes.splice(selectedRouteIndex, 1);
+                    } else {
+                        routes.splice(selectedRouteIndex, 1);
+                    }
+                    selectedRouteIndex = -1;
+                    selectedPointIndex = -1;
+                    renderMap();
+                    updateSidePanel();
+                } else if (selectedWaypointIndex >= 0) {
+                    waypoints.splice(selectedWaypointIndex, 1);
+                    selectedWaypointIndex = -1;
+                    renderMap();
+                    updateSidePanel();
+                }
+            }
+        });
+
+        // Waypoint popup
+        function confirmWaypoint() {
+            if (!pendingWaypoint) return;
+            const name = document.getElementById('wpName').value || 'Waypoint';
+            const type = document.getElementById('wpType').value;
+            waypoints.push({
+                id: Date.now(), name, type,
+                x: pendingWaypoint.x, z: pendingWaypoint.z,
+                color: document.getElementById('colorPicker').value
+            });
+            pendingWaypoint = null;
+            wpPopup.style.display = 'none';
+            renderMap();
+            updateSidePanel();
+        }
+
+        function cancelWaypoint() {
+            pendingWaypoint = null;
+            wpPopup.style.display = 'none';
+        }
+
+        function confirmRoute() {
+            if (!currentRoute) return;
+            const name = document.getElementById('routeName').value || 'Route ' + (routes.length + 1);
+            currentRoute.name = name;
+            routes.push(currentRoute);
+            console.log('Route added:', JSON.stringify(currentRoute));
+            console.log('Total routes:', routes.length);
+            currentRoute = null;
+            pendingRoutePoint = null;
+            document.getElementById('routePopup').style.display = 'none';
+            renderMap();
+            updateSidePanel();
+        }
+
+        function cancelRoute() {
+            currentRoute = null;
+            pendingRoutePoint = null;
+            document.getElementById('routePopup').style.display = 'none';
+            renderMap();
+            updateSidePanel();
+        }
+
+        // Side panel
+        function updateSidePanel() {
+            const rl = document.getElementById('routesList');
+            const wl = document.getElementById('waypointsList');
+            rl.innerHTML = routes.map((r, i) => `
+                <div class="route-item">
+                    <div class="color-dot" style="background:${r.color}"></div>
+                    <span class="item-name">${r.name} (${r.points.length} pts)</span>
+                    <button class="item-toggle ${r.visible===false?'hidden':''}" onclick="toggleRoute(${i})">${r.visible===false?'👁':'👁'}</button>
+                    <button class="item-btn" onclick="deleteRoute(${i})">✕</button>
+                </div>
+            `).join('');
+            wl.innerHTML = waypoints.map((w, i) => `
+                <div class="waypoint-item">
+                    <div class="color-dot" style="background:${w.color}"></div>
+                    <span class="item-name">${w.name} [${w.type}]</span>
+                    <button class="item-toggle ${w.visible===false?'hidden':''}" onclick="toggleWaypoint(${i})">👁</button>
+                    <button class="item-btn" onclick="deleteWaypoint(${i})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function toggleRoute(i) { routes[i].visible = routes[i].visible === false; renderMap(); updateSidePanel(); }
+        function deleteRoute(i) { routes.splice(i, 1); renderMap(); updateSidePanel(); }
+        function toggleWaypoint(i) { waypoints[i].visible = waypoints[i].visible === false; renderMap(); updateSidePanel(); }
+        function deleteWaypoint(i) { waypoints.splice(i, 1); renderMap(); updateSidePanel(); }
+
+        // Upload - prioritize current view, then fill gaps
+        async function startUpload() {
+            uploadBtn.disabled = true;
+            statusEl.className = 'status-running';
+            statusEl.textContent = 'Uploading...';
+            progressFill.style.width = '0%';
+
+            const centerX = parseInt(document.getElementById('centerX').value) || 0;
+            const centerZ = parseInt(document.getElementById('centerZ').value) || 0;
+            const zoom = parseInt(document.getElementById('zoom').value);
+            const scale = Math.pow(2, zoom);
+            const chunkPerTile = 32 / scale;
+            const tilesX = Math.ceil(canvas.width / 512) + 2;
+            const tilesZ = Math.ceil(canvas.height / 512) + 2;
+            const minTileX = Math.floor(centerX / chunkPerTile) - Math.floor(tilesX / 2);
+            const maxTileX = minTileX + tilesX - 1;
+            const minTileZ = Math.floor(centerZ / chunkPerTile) - Math.floor(tilesZ / 2);
+            const maxTileZ = minTileZ + tilesZ - 1;
+
+            // Collect all tiles to upload: current view first, then surrounding area
+            const viewTiles = [];
+            const surroundTiles = [];
+            const radius = 4; // Expand beyond current view
+            for (let x = minTileX - radius; x <= maxTileX + radius; x++) {
+                for (let z = minTileZ - radius; z <= maxTileZ + radius; z++) {
+                    const inView = (x >= minTileX && x <= maxTileX && z >= minTileZ && z <= maxTileZ);
+                    if (inView) viewTiles.push({ x, z });
+                    else surroundTiles.push({ x, z });
+                }
+            }
+            const allTiles = [...viewTiles, ...surroundTiles];
+            const totalTiles = allTiles.length;
+            let uploaded = 0, errors = 0;
+
+            for (const tile of allTiles) {
+                try {
+                    const url = `${getBaseUrl()}/tiles/tile.png?x=${tile.x}&z=${tile.z}&dimension=minecraft:overworld&mapTypeString=day&zoom=${zoom}`;
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const formData = new FormData();
+                        formData.append('tile', blob, `tile_${tile.x}_${tile.z}.png`);
+                        formData.append('x', tile.x);
+                        formData.append('z', tile.z);
+                        formData.append('dimension', 'minecraft:overworld');
+                        formData.append('mapType', 'day');
+                        formData.append('zoom', zoom);
+                        const saveResponse = await fetch('/webapp/srvmap/mapdata/1/upload', { method: 'POST', body: formData });
+                        if (!saveResponse.ok) errors++;
+                    } else { errors++; }
+                } catch (e) { errors++; }
+                uploaded++;
+                progressFill.style.width = `${(uploaded / totalTiles) * 100}%`;
+            }
+            statusEl.textContent = `Done: ${uploaded - errors} uploaded, ${errors} errors`;
+            statusEl.className = errors > 0 ? 'status-error' : 'status-running';
+            uploadBtn.disabled = false;
+        }
+
+        // Save all data (routes + waypoints)
+        async function saveAllData() {
+            const btn = document.getElementById('saveDataBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            try {
+                const r1 = await fetch('/webapp/srvmap/mapdata/1/routes', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ routes })
+                });
+                const result1 = await r1.json();
+                console.log('Routes save result:', result1);
+                const r2 = await fetch('/webapp/srvmap/mapdata/1/waypoints', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ waypoints })
+                });
+                const result2 = await r2.json();
+                console.log('Waypoints save result:', result2);
+                statusEl.textContent = `Saved: ${routes.length} routes, ${waypoints.length} waypoints`;
+                statusEl.className = 'status-running';
+            } catch (e) {
+                console.error('Save error:', e);
+                statusEl.textContent = `Save failed: ${e.message}`;
+                statusEl.className = 'status-error';
+            }
+            btn.disabled = false;
+            btn.textContent = 'Save All';
+        }
+
+        // Load saved data
+        async function loadSavedData() {
+            try {
+                const r = await fetch('/webapp/srvmap/mapdata/1/routes');
+                if (r.ok) { const d = await r.json(); if (d.routes) routes = d.routes; }
+            } catch {}
+            try {
+                const w = await fetch('/webapp/srvmap/mapdata/1/waypoints');
+                if (w.ok) { const d = await w.json(); if (d.waypoints) waypoints = d.waypoints; }
+            } catch {}
+            updateSidePanel();
+            renderMap();
+        }
+
+        window.addEventListener('load', loadSavedData);
+    </script>
+</body>
+</html>
