@@ -629,13 +629,15 @@
         // Simple hash computation for browser (matches server MD5)
         async function computeMD5(buffer) {
             const bytes = new Uint8Array(buffer);
-            // Use a simple hash that's consistent
-            let hash = 0;
+            let h1 = 5381, h2 = 52711;
             for (let i = 0; i < bytes.length; i++) {
-                hash = ((hash << 5) - hash) + bytes[i];
-                hash = hash & hash; // Convert to 32bit integer
+                h1 = ((h1 << 5) + h1 + bytes[i]) | 0;
+                h2 = ((h2 << 5) + h2 + bytes[i ^ 3]) | 0;
             }
-            return Math.abs(hash).toString(16).padStart(8, '0');
+            // Convert to unsigned hex
+            const u1 = h1 >>> 0;
+            const u2 = h2 >>> 0;
+            return u1.toString(16).padStart(8, '0') + u2.toString(16).padStart(8, '0');
         }
 
         // Save all data (routes + waypoints)

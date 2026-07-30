@@ -202,11 +202,12 @@ def register_other_routes():
 
     def compute_simple_hash(data):
         """Compute a simple hash that matches the browser implementation"""
-        h = 0
-        for byte in data:
-            h = ((h << 5) - h) + byte
-            h = h & 0xFFFFFFFF  # Keep as 32-bit
-        return format(abs(h) & 0xFFFFFFFF, '08x')
+        h1 = 5381
+        h2 = 52711
+        for i, byte in enumerate(data):
+            h1 = ((h1 << 5) + h1 + byte) & 0xFFFFFFFF
+            h2 = ((h2 << 5) + h2 + data[i ^ 3]) & 0xFFFFFFFF
+        return format(h1, '08x') + format(h2, '08x')
 
     @app.route('/webapp/srvmap/mapdata/1/hashes', methods=['GET'])
     def get_tile_hashes():
