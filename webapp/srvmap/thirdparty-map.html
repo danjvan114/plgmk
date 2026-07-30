@@ -546,11 +546,11 @@
         function toggleWaypoint(i) { waypoints[i].visible = waypoints[i].visible === false; renderMap(); updateSidePanel(); }
         function deleteWaypoint(i) { waypoints.splice(i, 1); renderMap(); updateSidePanel(); }
 
-        // Upload - prioritize current view, then fill gaps
+        // Upload - prioritize current view, then fill gaps, skip unchanged tiles
         async function startUpload() {
             uploadBtn.disabled = true;
             statusEl.className = 'status-running';
-            statusEl.textContent = 'Uploading...';
+            statusEl.textContent = 'Fetching server hashes...';
             progressFill.style.width = '0%';
 
             const centerX = parseInt(document.getElementById('centerX').value) || 0;
@@ -568,7 +568,7 @@
             // Collect all tiles to upload: current view first, then surrounding area
             const viewTiles = [];
             const surroundTiles = [];
-            const radius = 4; // Expand beyond current view
+            const radius = 4;
             for (let x = minTileX - radius; x <= maxTileX + radius; x++) {
                 for (let z = minTileZ - radius; z <= maxTileZ + radius; z++) {
                     const inView = (x >= minTileX && x <= maxTileX && z >= minTileZ && z <= maxTileZ);
@@ -577,32 +577,65 @@
                 }
             }
             const allTiles = [...viewTiles, ...surroundTiles];
+
+            // Fetch server hashes
+            let serverHashes = {};
+            try {
+                const resp = await fetch(`/webapp/srvmap/mapdata/1/hashes?dimension=minecraft_overworld&mapType=day&zoom=${zoom}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data.success) serverHashes = data.hashes;
+                }
+            } catch (e) { console.warn('Failed to fetch server hashes:', e); }
+
+            statusEl.textContent = 'Uploading...';
             const totalTiles = allTiles.length;
-            let uploaded = 0, errors = 0;
+            let uploaded = 0, skipped = 0, errors = 0;
 
             for (const tile of allTiles) {
+                const key = `${tile.x}_${tile.z}`;
                 try {
                     const url = `${getBaseUrl()}/tiles/tile.png?x=${tile.x}&z=${tile.z}&dimension=minecraft:overworld&mapTypeString=day&zoom=${zoom}`;
                     const response = await fetch(url);
                     if (response.ok) {
                         const blob = await response.blob();
-                        const formData = new FormData();
-                        formData.append('tile', blob, `tile_${tile.x}_${tile.z}.png`);
-                        formData.append('x', tile.x);
-                        formData.append('z', tile.z);
-                        formData.append('dimension', 'minecraft:overworld');
-                        formData.append('mapType', 'day');
-                        formData.append('zoom', zoom);
-                        const saveResponse = await fetch('/webapp/srvmap/mapdata/1/upload', { method: 'POST', body: formData });
-                        if (!saveResponse.ok) errors++;
+                        const buf = await blob.arrayBuffer();
+                        const localHash = await computeMD5(buf);
+                        
+                        // Skip if hash matches server
+                        if (serverHashes[key] === localHash) {
+                            skipped++;
+                        } else {
+                            const formData = new FormData();
+                            formData.append('tile', blob, `tile_${tile.x}_${tile.z}.png`);
+                            formData.append('x', tile.x);
+                            formData.append('z', tile.z);
+                            formData.append('dimension', 'minecraft:overworld');
+                            formData.append('mapType', 'day');
+                            formData.append('zoom', zoom);
+                            const saveResponse = await fetch('/webapp/srvmap/mapdata/1/upload', { method: 'POST', body: formData });
+                            if (!saveResponse.ok) errors++;
+                            else uploaded++;
+                        }
                     } else { errors++; }
                 } catch (e) { errors++; }
-                uploaded++;
-                progressFill.style.width = `${(uploaded / totalTiles) * 100}%`;
+                progressFill.style.width = `${((uploaded + skipped + errors) / totalTiles) * 100}%`;
             }
-            statusEl.textContent = `Done: ${uploaded - errors} uploaded, ${errors} errors`;
+            statusEl.textContent = `Done: ${uploaded} uploaded, ${skipped} skipped, ${errors} errors`;
             statusEl.className = errors > 0 ? 'status-error' : 'status-running';
             uploadBtn.disabled = false;
+        }
+
+        // Simple hash computation for browser (matches server MD5)
+        async function computeMD5(buffer) {
+            const bytes = new Uint8Array(buffer);
+            // Use a simple hash that's consistent
+            let hash = 0;
+            for (let i = 0; i < bytes.length; i++) {
+                hash = ((hash << 5) - hash) + bytes[i];
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash).toString(16).padStart(8, '0');
         }
 
         // Save all data (routes + waypoints)

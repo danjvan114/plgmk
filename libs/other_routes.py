@@ -198,6 +198,46 @@ def register_other_routes():
                                  'client-map.html')
 
     # Minecraft map tile upload and download routes
+    import hashlib
+
+    def compute_simple_hash(data):
+        """Compute a simple hash that matches the browser implementation"""
+        h = 0
+        for byte in data:
+            h = ((h << 5) - h) + byte
+            h = h & 0xFFFFFFFF  # Keep as 32-bit
+        return format(abs(h) & 0xFFFFFFFF, '08x')
+
+    @app.route('/webapp/srvmap/mapdata/1/hashes', methods=['GET'])
+    def get_tile_hashes():
+        """返回所有已保存瓦片的哈希值，用于上传前对比"""
+        try:
+            dimension = request.args.get('dimension', 'minecraft_overworld')
+            map_type = request.args.get('mapType', 'day')
+            zoom = request.args.get('zoom', '0')
+            
+            base_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                 'webapp', 'srvmap', 'mapdata', '1',
+                                 dimension, map_type, zoom)
+            
+            hashes = {}
+            if os.path.exists(base_dir):
+                for file in os.listdir(base_dir):
+                    if file.endswith('.png') and file.startswith('tile_'):
+                        file_path = os.path.join(base_dir, file)
+                        with open(file_path, 'rb') as f:
+                            file_hash = compute_simple_hash(f.read())
+                        parts = file.replace('.png', '').split('_')
+                        if len(parts) >= 4:
+                            x = parts[1]
+                            z = parts[2]
+                            hashes[f"{x}_{z}"] = file_hash
+            
+            return jsonify({'success': True, 'hashes': hashes})
+        except Exception as e:
+            print(f"Error getting tile hashes: {str(e)}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
     @app.route('/webapp/srvmap/mapdata/1/upload', methods=['POST'])
     def upload_map_tile():
         try:
