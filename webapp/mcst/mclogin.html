@@ -138,6 +138,14 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             redirectUrl = getRedirectUrl();
+            fetch('/api/player/check')
+            .then(res => res.json())
+            .then(data => {
+                if (data.logged_in) {
+                    window.location.href = redirectUrl;
+                }
+            })
+            .catch(() => {});
         });
     </script>
   </body>

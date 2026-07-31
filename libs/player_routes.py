@@ -195,10 +195,12 @@ def check_player_login():
     if 'player_name' in session:
         return jsonify({
             'success': True,
+            'logged_in': True,
             'username': session['player_name']
         })
     else:
         return jsonify({
             'success': False,
+            'logged_in': False,
             'message': '未登录'
         }), 401
