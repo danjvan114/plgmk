@@ -1,6 +1,9 @@
-from flask import request, jsonify
+from flask import request, jsonify, session
 import mcrcon
 from .invite_code import get_invite_manager
+from .database import get_player_engine
+from sqlalchemy import text
+import hashlib
 
 def mc_get_invite_code():
     print(f"DEBUG mc_get_invite_code: Function called")
@@ -60,6 +63,23 @@ def mc_whitelist_add():
         }), 403
     
     try:
+        try:
+            engine = get_player_engine()
+            with engine.connect() as conn:
+                result = conn.execute(
+                    text("SELECT id FROM player WHERE username = :username"),
+                    {'username': username}
+                )
+                if not result.fetchone():
+                    conn.execute(
+                        text("INSERT INTO player (username, password) VALUES (:username, :password)"),
+                        {'username': username, 'password': ''}
+                    )
+                    conn.commit()
+                    print(f"DEBUG mc_whitelist_add: Auto-registered player: {username}")
+        except Exception as db_error:
+            print(f"DEBUG mc_whitelist_add: DB error (non-fatal): {str(db_error)}")
+        
         print(f"DEBUG mc_whitelist_add: Connecting to RCON...")
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
             print(f"DEBUG mc_whitelist_add: RCON connected successfully")
