@@ -146,7 +146,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (!data.logged_in) {
-                        window.location.href = '/mc/login?redirect=/mc/profile';
+                        window.location.href = '/mc/login?redirect=/app/user';
                         return;
                     }
                     document.getElementById('displayUsername').value = data.username;
