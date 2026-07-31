@@ -217,7 +217,7 @@ def register_whitelist():
     try:
         import os
         import configparser
-        from .mc_routes import get_rcon_connection
+        import mcrcon
         
         config = configparser.ConfigParser()
         config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.ini')
@@ -260,4 +260,167 @@ def register_whitelist():
         return jsonify({
             'success': False,
             'message': f'注册失败: {str(e)}'
+        }), 500
+
+def change_player_password():
+    if 'player_name' not in session:
+        return jsonify({
+            'success': False,
+            'message': '请先登录'
+        }), 401
+    
+    data = request.get_json()
+    if not data or 'new_password' not in data:
+        return jsonify({
+            'success': False,
+            'message': '缺少新密码'
+        }), 400
+    
+    old_password = data.get('old_password', '').strip() if data.get('old_password') else ''
+    new_password = data['new_password'].strip()
+    
+    if not new_password:
+        return jsonify({
+            'success': False,
+            'message': '新密码不能为空'
+        }), 400
+    
+    if len(new_password) < 6:
+        return jsonify({
+            'success': False,
+            'message': '密码长度不能少于6位'
+        }), 400
+    
+    try:
+        engine = get_player_engine()
+        username = session['player_name']
+        
+        with engine.connect() as conn:
+            result = conn.execute(
+                text("SELECT password FROM player WHERE username = :username"),
+                {'username': username}
+            )
+            row = result.fetchone()
+            
+            if not row:
+                return jsonify({
+                    'success': False,
+                    'message': '用户不存在'
+                }), 404
+            
+            db_password = row[0]
+            
+            if db_password:
+                if not old_password:
+                    return jsonify({
+                        'success': False,
+                        'message': '请输入当前密码'
+                    }), 400
+                
+                hashed_old = hashlib.sha256(old_password.encode()).hexdigest()
+                if hashed_old != db_password:
+                    return jsonify({
+                        'success': False,
+                        'message': '当前密码错误'
+                    }), 401
+            
+            hashed_new = hashlib.sha256(new_password.encode()).hexdigest()
+            conn.execute(
+                text("UPDATE player SET password = :password WHERE username = :username"),
+                {'password': hashed_new, 'username': username}
+            )
+            conn.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': '密码修改成功'
+            })
+    except Exception as e:
+        print(f"DEBUG change_player_password: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'修改密码失败: {str(e)}'
+        }), 500
+
+def remove_player_whitelist():
+    if 'player_name' not in session:
+        return jsonify({
+            'success': False,
+            'message': '请先登录'
+        }), 401
+    
+    username = session['player_name']
+    
+    try:
+        import os
+        import configparser
+        import mcrcon
+        
+        config = configparser.ConfigParser()
+        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.ini')
+        config.read(config_path)
+        
+        rcon_host = config.get('minecraft', 'rcon_host', fallback='localhost')
+        rcon_port = config.getint('minecraft', 'rcon_port', fallback=25575)
+        rcon_password = config.get('minecraft', 'rcon_password', fallback='')
+        
+        with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
+            rcon.command(f'whitelist remove {username}')
+            
+            return jsonify({
+                'success': True,
+                'message': '白名单注销成功'
+            })
+    except Exception as e:
+        print(f"DEBUG remove_player_whitelist: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'注销失败: {str(e)}'
+        }), 500
+
+def delete_player_account():
+    if 'player_name' not in session:
+        return jsonify({
+            'success': False,
+            'message': '请先登录'
+        }), 401
+    
+    username = session['player_name']
+    
+    try:
+        import os
+        import configparser
+        import mcrcon
+        
+        config = configparser.ConfigParser()
+        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.ini')
+        config.read(config_path)
+        
+        rcon_host = config.get('minecraft', 'rcon_host', fallback='localhost')
+        rcon_port = config.getint('minecraft', 'rcon_port', fallback=25575)
+        rcon_password = config.get('minecraft', 'rcon_password', fallback='')
+        
+        with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
+            rcon.command(f'whitelist remove {username}')
+        
+        engine = get_player_engine()
+        with engine.connect() as conn:
+            conn.execute(
+                text("DELETE FROM player WHERE username = :username"),
+                {'username': username}
+            )
+            conn.commit()
+        
+        session.pop('player_id', None)
+        session.pop('player_name', None)
+        
+        return jsonify({
+            'success': True,
+            'message': '账户已完全注销'
+        })
+    except Exception as e:
+        print(f"DEBUG delete_player_account: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'注销失败: {str(e)}'
         }), 500
