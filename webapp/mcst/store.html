@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="zh-cn">
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <meta name="renderer" content="webkit">
+    <title>商品商店</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .product-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .product-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f5f5f5;
+        }
+        .product-info {
+            padding: 16px;
+        }
+        .product-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .product-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .buy-btn {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-content {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 200px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty-state i {
+            font-size: 64px;
+            color: #ddd;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="mdui-toolbar">
+        <a class="mdui-ripple mdui-btn-icon" onclick="window.history.back()">
+            <i class="mdui-icon material-icons">arrow_back</i>
+        </a>
+        <span class="mdui-typo-title">商品商店</span>
+        <div class="mdui-toolbar-spacer"></div>
+        <a class="mdui-ripple mdui-btn-icon" id="logoutBtn" style="display: none;" onclick="handleLogout()">
+            <i class="mdui-icon material-icons">logout</i>
+        </a>
+    </div>
+
+    <div class="container">
+        <div id="storeSection">
+            <div class="mdui-row" id="productList">
+                <div class="mdui-col-xs-12 mdui-col-sm-6 mdui-col-md-4" style="padding: 12px;">
+                    <div class="empty-state">
+                        <i class="mdui-icon material-icons">shopping_cart</i>
+                        <p style="margin-top: 16px;">正在加载商品...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="mdui-spinner mdui-spinner-colorful"></div>
+            <p id="loadingText" style="margin-top: 16px;">处理中...</p>
+        </div>
+    </div>
+
+    <div class="mdui-dialog" id="productDialog">
+        <div class="mdui-dialog-title" id="dialogTitle"></div>
+        <div class="mdui-dialog-content">
+            <img id="dialogImg" src="" style="width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px; margin-bottom: 16px;">
+            <p id="dialogDesc" style="color: #666; line-height: 1.6;"></p>
+            <p style="color: #999; font-size: 12px; margin-top: 12px;">商品将发放给：<strong id="dialogPlayer"></strong></p>
+        </div>
+        <div class="mdui-dialog-actions">
+            <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-text-color-white" onclick="confirmBuy()">
+                <i class="mdui-icon material-icons">shopping_cart</i> 确认购买
+            </button>
+            <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>取消</button>
+        </div>
+    </div>
+
+    <script>
+        let products = [];
+        let selectedProduct = null;
+        let productDialog = null;
+        let currentUsername = '';
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showLogin() {
+            document.getElementById('logoutBtn').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('logoutBtn').style.display = 'none';
+        }
+
+        function showStore() {
+            document.getElementById('logoutBtn').style.display = 'block';
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            if (!username || !password) {
+                mdui.snackbar({ message: '请输入用户名和密码', position: 'top' });
+                return;
+            }
+            
+            showLoading('正在登录...');
+            
+            fetch('/api/player/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    currentUsername = data.username;
+                    showStore();
+                    loadProducts();
+                    mdui.snackbar({ message: '登录成功', position: 'top' });
+                } else {
+                    mdui.snackbar({ message: data.message, position: 'top' });
+                }
+            })
+            .catch(() => {
+                hideLoading();
+                mdui.snackbar({ message: '网络错误', position: 'top' });
+            });
+        }
+
+        function handleRegister() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const password2 = document.getElementById('regPassword2').value.trim();
+            
+            if (!username || !password || !password2) {
+                mdui.snackbar({ message: '请填写所有字段', position: 'top' });
+                return;
+            }
+            
+            if (password !== password2) {
+                mdui.snackbar({ message: '两次密码不一致', position: 'top' });
+                return;
+            }
+            
+            if (password.length < 6) {
+                mdui.snackbar({ message: '密码长度不能少于6位', position: 'top' });
+                return;
+            }
+            
+            showLoading('正在注册...');
+            
+            fetch('/api/player/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    mdui.snackbar({ message: '注册成功，请登录', position: 'top' });
+                    showLogin();
+                } else {
+                    mdui.snackbar({ message: data.message, position: 'top' });
+                }
+            })
+            .catch(() => {
+                hideLoading();
+                mdui.snackbar({ message: '网络错误', position: 'top' });
+            });
+        }
+
+        function handleLogout() {
+            fetch('/api/player/logout', { method: 'POST' })
+            .then(() => {
+                currentUsername = '';
+                showLogin();
+                mdui.snackbar({ message: '已退出登录', position: 'top' });
+            });
+        }
+
+        function checkLoginStatus() {
+            fetch('/api/player/check')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    currentUsername = data.username;
+                    showStore();
+                    loadProducts();
+                } else {
+                    window.location.href = '/mc/register?redirect=/app/mcs';
+                }
+            })
+            .catch(() => {
+                window.location.href = '/mc/register?redirect=/app/mcs';
+            });
+        }
+
+        function loadProducts() {
+            fetch('/localcdn/store/s.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('加载商品失败');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    products = data;
+                    renderProducts();
+                })
+                .catch(error => {
+                    document.getElementById('productList').innerHTML = `
+                        <div class="mdui-col-xs-12">
+                            <div class="empty-state">
+                                <i class="mdui-icon material-icons">error_outline</i>
+                                <p style="margin-top: 16px;">无法加载商品列表</p>
+                                <p style="font-size: 12px; margin-top: 8px;">${error.message}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+        }
+
+        function renderProducts() {
+            if (!products || products.length === 0) {
+                document.getElementById('productList').innerHTML = `
+                    <div class="mdui-col-xs-12">
+                        <div class="empty-state">
+                            <i class="mdui-icon material-icons">shopping_cart</i>
+                            <p style="margin-top: 16px;">暂无商品</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            products.forEach((product, index) => {
+                html += `
+                    <div class="mdui-col-xs-12 mdui-col-sm-6 mdui-col-md-4" style="padding: 12px;">
+                        <div class="product-card" onclick="showProductDialog(${index})">
+                            <img class="product-img" src="${product.pic}" alt="${product.title}" onerror="this.src='/localcdn/gzs/logo.png'">
+                            <div class="product-info">
+                                <div class="product-title">${product.title}</div>
+                                <div class="product-desc">${product.data}</div>
+                                <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-text-color-white buy-btn">
+                                    <i class="mdui-icon material-icons">shopping_cart</i> 立即购买
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('productList').innerHTML = html;
+        }
+
+        function showProductDialog(index) {
+            selectedProduct = products[index];
+            
+            document.getElementById('dialogTitle').textContent = selectedProduct.title;
+            document.getElementById('dialogImg').src = selectedProduct.pic;
+            document.getElementById('dialogDesc').textContent = selectedProduct.data;
+            document.getElementById('dialogPlayer').textContent = currentUsername;
+            
+            if (!productDialog) {
+                productDialog = new mdui.Dialog('#productDialog');
+            }
+            productDialog.open();
+        }
+
+        function confirmBuy() {
+            if (!selectedProduct || !selectedProduct.command) {
+                mdui.snackbar({
+                    message: '商品配置错误',
+                    position: 'top'
+                });
+                return;
+            }
+
+            showLoading('正在处理购买...');
+            
+            const commands = selectedProduct.command.split('&');
+            
+            fetch('/api/mc/store/buy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    player: currentUsername,
+                    commands: commands
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    mdui.snackbar({
+                        message: '购买成功！商品已发放',
+                        position: 'top'
+                    });
+                    productDialog.close();
+                } else {
+                    mdui.snackbar({
+                        message: data.message || '购买失败',
+                        position: 'top'
+                    });
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                mdui.snackbar({
+                    message: '网络错误，请稍后重试',
+                    position: 'top'
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-cn">
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <meta name="renderer" content="webkit">
+    <title>玩家登录</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-content {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .mdui-spinner {
+            margin: 0 auto 16px;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="mdui-toolbar">
+        <a class="mdui-ripple mdui-btn-icon" onclick="window.history.back()">
+            <i class="mdui-icon material-icons">arrow_back</i>
+        </a>
+        <span class="mdui-typo-title">玩家登录</span>
+        <div class="mdui-toolbar-spacer"></div>
+    </div>
+
+    <div class="container">
+        <div id="loginSection">
+            <div class="mdui-textfield mdui-textfield-floating-label">
+                <label class="mdui-textfield-label">游戏用户名</label>
+                <input class="mdui-textfield-input" type="text" id="loginUsername"  />
+            </div>
+
+            <div class="mdui-textfield mdui-textfield-floating-label" style="margin-top: 16px;">
+                <label class="mdui-textfield-label">密码</label>
+                <input class="mdui-textfield-input" type="password" id="loginPassword" />
+            </div>
+
+            <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-center" style="margin-top: 24px; width: 100%;" onclick="handleLogin()">
+                <i class="mdui-icon material-icons">done</i> 登录
+            </button>
+
+            <p style="text-align: center; margin-top: 24px; color: #666;">
+                还没有账号？<a href="/mc/register" style="color: #1e88e5;">立即注册</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="mdui-spinner mdui-spinner-colorful"></div>
+            <p id="loadingText">处理中...</p>
+        </div>
+    </div>
+
+    <script>
+        let redirectUrl = '';
+
+        function getRedirectUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('redirect') || '/app/mcs';
+        }
+
+        function showLogin() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('registerSection').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('registerSection').style.display = 'block';
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            if (!username || !password) {
+                mdui.snackbar({ message: '请输入用户名和密码', position: 'top' });
+                return;
+            }
+            
+            showLoading('正在登录...');
+            
+            fetch('/api/player/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    mdui.snackbar({ message: '登录成功', position: 'top' });
+                    redirectUrl = getRedirectUrl();
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1000);
+                } else {
+                    mdui.snackbar({ message: data.message, position: 'top' });
+                }
+            })
+            .catch(() => {
+                hideLoading();
+                mdui.snackbar({ message: '网络错误', position: 'top' });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            redirectUrl = getRedirectUrl();
+            fetch('/api/player/check')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = redirectUrl;
+                }
+            })
+            .catch(() => {});
+        });
+    </script>
+  </body>
+</html>

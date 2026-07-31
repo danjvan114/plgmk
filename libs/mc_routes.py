@@ -207,6 +207,59 @@ def mc_whitelist_reload():
             'message': f'服务器内部错误: {str(e)}'
         }), 500
 
+def mc_store_buy():
+    data = request.get_json()
+    
+    if not data or 'player' not in data or 'commands' not in data:
+        return jsonify({
+            'success': False,
+            'message': '缺少必要参数（玩家名称和命令）'
+        }), 400
+    
+    player = data['player'].strip()
+    commands = data['commands']
+    
+    if not player:
+        return jsonify({
+            'success': False,
+            'message': '玩家名称不能为空'
+        }), 400
+    
+    if not commands or not isinstance(commands, list):
+        return jsonify({
+            'success': False,
+            'message': '命令列表格式错误'
+        }), 400
+    
+    try:
+        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
+            results = []
+            for cmd in commands:
+                cmd = cmd.strip()
+                if not cmd:
+                    continue
+                
+                final_cmd = cmd.replace('%player%', player)
+                print(f"DEBUG mc_store_buy: Executing: {final_cmd}")
+                
+                result = rcon.command(final_cmd)
+                results.append({
+                    'command': final_cmd,
+                    'result': result.strip() if result else ''
+                })
+            
+            return jsonify({
+                'success': True,
+                'message': f'商品已发放给玩家 {player}',
+                'results': results
+            })
+    except Exception as e:
+        print(f"DEBUG mc_store_buy: RCON error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'执行命令失败: {str(e)}'
+        }), 500
+
 def mc_server_info():
     try:
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:

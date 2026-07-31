@@ -224,3 +224,29 @@ def init_market_database(market_id):
         conn.execute(image_table)
         conn.execute(rating_table)
         conn.commit()
+
+def init_player_database():
+    userdata_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
+    os.makedirs(userdata_dir, exist_ok=True)
+    db_path = os.path.join(userdata_dir, 'players.db')
+    engine = create_engine(f'sqlite:///{db_path}')
+    
+    player_table = text("""
+    CREATE TABLE IF NOT EXISTS player (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        password VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    
+    with engine.connect() as conn:
+        conn.execute(player_table)
+        conn.commit()
+    
+    return engine
+
+def get_player_engine():
+    userdata_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
+    db_path = os.path.join(userdata_dir, 'players.db')
+    return create_engine(f'sqlite:///{db_path}')

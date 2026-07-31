@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="zh-cn">
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <meta name="renderer" content="webkit">
+    <title>服务中心</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .agreement-box {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+        }
+        .agreement-box h3 {
+            margin-top: 0;
+            color: #63a8ff;
+            font-size: 16px;
+        }
+        .agreement-box h4 {
+            margin: 12px 0 8px;
+            color: #333;
+            font-size: 14px;
+        }
+        .agreement-box p {
+            margin: 6px 0;
+            text-indent: 2em;
+        }
+        .agreement-box li {
+            margin: 4px 0;
+            margin-left: 20px;
+        }
+        .agreement-box h2 {
+            font-size: 18px;
+            color: #63a8ff;
+            margin: 16px 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #63a8ff;
+        }
+        .agreement-box h3 {
+            font-size: 16px;
+            color: #333;
+            margin: 14px 0 10px;
+        }
+        .agreement-box h4 {
+            font-size: 14px;
+            color: #555;
+            margin: 12px 0 8px;
+        }
+        .agreement-box ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        .agreement-box hr {
+            border: none;
+            border-top: 1px dashed #ddd;
+            margin: 20px 0;
+        }
+        .agreement-box code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .invite-section {
+            background: linear-gradient(135deg, #4e6eff 0%, #4e6eff 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            color: white;
+            text-align: center;
+        }
+        .invite-section h3 {
+            margin: 0 0 16px 0;
+            font-size: 18px;
+        }
+        .qr-container {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            display: inline-block;
+            margin: 16px 0;
+        }
+        #qrcode {
+            display: flex;
+            justify-content: center;
+        }
+        #qrcode img {
+            max-width: 200px;
+            height: auto;
+        }
+        .countdown {
+            font-size: 14px;
+            margin-top: 12px;
+            opacity: 0.9;
+        }
+        .countdown span {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .refresh-btn {
+            margin-top: 12px;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-content {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .mdui-spinner {
+            margin: 0 auto 16px;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="mdui-toolbar">
+        <a class="mdui-ripple mdui-btn-icon" onclick="window.history.back()">
+            <i class="mdui-icon material-icons">arrow_back</i>
+        </a>
+        <span class="mdui-typo-title">白名单注册</span>
+        <div class="mdui-toolbar-spacer"></div>
+    </div>
+
+    <div class="container">
+        
+                <div class="mdui-textfield mdui-textfield-floating-label">
+                    <label class="mdui-textfield-label">邀请码</label>
+                    <input class="mdui-textfield-input" type="text" id="inviteCode"  />
+                </div>
+
+                <div class="mdui-textfield mdui-textfield-floating-label" style="margin-top: 16px;">
+                    <label class="mdui-textfield-label">游戏用户名</label>
+                    <input class="mdui-textfield-input" type="text" id="username"  />
+                </div>
+
+                <div class="agreement-box" id="agreementBox" style="margin-top: 24px;">
+                    <div id="agreementContent">
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <i class="mdui-icon material-icons" style="font-size: 48px; color: #63a8ff;">file_download</i>
+                            <p style="margin-top: 16px; color: #999;">正在加载用户协议</p>
+                        </div>
+                    </div>
+                </div>
+
+                <label class="mdui-checkbox">
+                    <input type="checkbox" id="agreeCheckbox" disabled />
+                    <i class="mdui-checkbox-icon"></i>
+                    我已阅读并同意上述用户协议
+                </label>
+                <p id="scrollTip" class="mdui-text-color-red-400" style="font-size: 12px; margin-top: 8px; display: none;">请先阅读完整的用户协议</p>
+
+                <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-center" style="margin-top: 24px; width: 100%;" onclick="submitRegister()">
+                    <i class="mdui-icon material-icons">check</i> 提交注册
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="mdui-spinner mdui-spinner-colorful"></div>
+            <p id="loadingText">处理中...</p>
+        </div>
+    </div>
+
+    <script>
+        let qrcode = null;
+        let countdownTimer = null;
+        let expiresAt = 0;
+        let currentEncryptedCode = '';
+
+        function markdownToHtml(md) {
+            md = md.replace(/^### (.*$)/gim, '<h4>$1</h4>');
+            md = md.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+            md = md.replace(/^# (.*$)/gim, '<h2>$1</h2>');
+            md = md.replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>');
+            md = md.replace(/\*(.*)\*/gim, '<em>$1</em>');
+            md = md.replace(/`([^`]+)`/gim, '<code>$1</code>');
+            md = md.replace(/^- (.*$)/gim, '<li>$1</li>');
+            md = md.replace(/(<li>[\s\S]*?<\/li>)/gim, '<ul>$1</ul>');
+            md = md.replace(/^\d+\. (.*$)/gim, '<li>$1</li>');
+            md = md.replace(/^---$/gim, '<hr>');
+            md = md.replace(/\n/gim, '<br>');
+            return md;
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function updateCountdown() {
+            if (!expiresAt) return;
+            
+            const now = Date.now() / 1000;
+            const remaining = expiresAt - now;
+            
+            if (remaining <= 0) {
+                document.getElementById('countdown').textContent = '00:00';
+                refreshInviteCode();
+                return;
+            }
+            
+            const minutes = Math.floor(remaining / 60);
+            const seconds = Math.floor(remaining % 60);
+            document.getElementById('countdown').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function copyInviteCode() {
+            if (!currentEncryptedCode) {
+                mdui.snackbar({
+                    message: '邀请码尚未加载，请稍后再试',
+                    position: 'top'
+                });
+                return;
+            }
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentEncryptedCode).then(() => {
+                    mdui.snackbar({
+                        message: '加密邀请码已复制，可粘贴到手机解密',
+                        position: 'top'
+                    });
+                }).catch(() => {
+                    fallbackCopy(currentEncryptedCode);
+                });
+            } else {
+                fallbackCopy(currentEncryptedCode);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                mdui.snackbar({
+                    message: '加密邀请码已复制',
+                    position: 'top'
+                });
+            } catch (err) {
+                mdui.snackbar({
+                    message: '复制失败，请手动复制',
+                    position: 'top'
+                });
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function refreshInviteCode() {
+            showLoading('正在获取邀请码...');
+            
+            fetch('/api/mc/invite_code')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        expiresAt = data.expires_at;
+                        currentEncryptedCode = data.encrypted_code;
+                        
+                        if (qrcode) {
+                            document.getElementById('qrcode').innerHTML = '';
+                        }
+                        
+                        qrcode = new QRCode(document.getElementById('qrcode'), {
+                            text: data.encrypted_code,
+                            width: 200,
+                            height: 200,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                        
+                        if (countdownTimer) {
+                            clearInterval(countdownTimer);
+                        }
+                        countdownTimer = setInterval(updateCountdown, 1000);
+                        updateCountdown();
+                        
+                        hideLoading();
+                        mdui.snackbar({
+                            message: '成功',
+                            position: 'top'
+                        });
+                    } else {
+                        hideLoading();
+                        mdui.snackbar({
+                            message: data.message || '获取邀请码失败',
+                            position: 'top'
+                        });
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    mdui.snackbar({
+                        message: '网络错误，请稍后重试',
+                        position: 'top'
+                    });
+                });
+        }
+
+        function submitRegister() {
+            const inviteCode = document.getElementById('inviteCode').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const agree = document.getElementById('agreeCheckbox').checked;
+            const agreementBox = document.getElementById('agreementBox');
+            const isAtBottom = agreementBox.scrollHeight - agreementBox.scrollTop <= agreementBox.clientHeight + 10;
+            
+            if (!inviteCode) {
+                mdui.snackbar({
+                    message: '请输入邀请码',
+                    position: 'top'
+                });
+                return;
+            }
+            
+            if (!username) {
+                mdui.snackbar({
+                    message: '请输入游戏用户名',
+                    position: 'top'
+                });
+                return;
+            }
+            
+            if (!isAtBottom || !agree) {
+                mdui.snackbar({
+                    message: '请先阅读完整的用户协议并勾选同意',
+                    position: 'top'
+                });
+                return;
+            }
+            
+            showLoading('正在提交注册...');
+            
+            fetch('/api/mc/whitelist/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    username: username,
+                    invite_code: inviteCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    mdui.snackbar({
+                        message: data.message,
+                        position: 'top'
+                    });
+                    setTimeout(() => {
+                        window.history.back();
+                    }, 2000);
+                } else {
+                    mdui.snackbar({
+                        message: data.message,
+                        position: 'top'
+                    });
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                mdui.snackbar({
+                    message: '注册失败，请稍后重试',
+                    position: 'top'
+                });
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/player/check')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    window.location.href = '/mc/login?redirect=/mc/register';
+                }
+            })
+            .catch(() => {
+                window.location.href = '/mc/login?redirect=/mc/register';
+            });
+            
+            const agreementBox = document.getElementById('agreementBox');
+            const agreeCheckbox = document.getElementById('agreeCheckbox');
+            const scrollTip = document.getElementById('scrollTip');
+            const agreementContent = document.getElementById('agreementContent');
+            
+            fetch('/localcdn/gzs/用户协议.md')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('加载协议失败');
+                    }
+                    return response.text();
+                })
+                .then(md => {
+                    agreementContent.innerHTML = markdownToHtml(md);
+                })
+                .catch(error => {
+                    agreementContent.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px; color: #f44336;">
+                            <i class="mdui-icon material-icons" style="font-size: 48px;">error</i>
+                            <p style="margin-top: 16px;">无法加载用户协议</p>
+                        </div>
+                    `;
+                });
+            
+            agreementBox.addEventListener('scroll', function() {
+                const isAtBottom = agreementBox.scrollHeight - agreementBox.scrollTop <= agreementBox.clientHeight + 10;
+                
+                if (isAtBottom) {
+                    agreeCheckbox.disabled = false;
+                    scrollTip.style.display = 'none';
+                } else {
+                    if (!agreeCheckbox.checked) {
+                        agreeCheckbox.disabled = true;
+                    }
+                }
+            });
+            
+            refreshInviteCode();
+        });
+    </script>
+
+    <div class="mdui-dialog" id="back">
+    <div class="mdui-dialog-title">Are you sure?</div>
+    <div class="mdui-dialog-content">You only want to go back?Enter the username and than you can continue to register.</div>
+    <div class="mdui-dialog-actions">
+        <button class="mdui-btn mdui-ripple" onclick="window.history.back()">close page</button>
+        <button class="mdui-btn mdui-ripple">continue</button>
+    </div>
+    </div>
+  </body>
+</html>

@@ -4,7 +4,8 @@ import json
 import urllib
 from .config import app, MARKETS
 from .utils import set_market, render_root_template, render_market_template
-from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info, mc_get_invite_code
+from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info, mc_get_invite_code, mc_store_buy
+from .player_routes import register_player, login_player, logout_player, check_player_login
 
 def register_other_routes():
     @app.route('/')
@@ -181,9 +182,41 @@ def register_other_routes():
     def api_mc_server_info():
         return mc_server_info()
 
+    @app.route('/api/player/register', methods=['POST'])
+    def api_player_register():
+        return register_player()
+
+    @app.route('/api/player/login', methods=['POST'])
+    def api_player_login():
+        return login_player()
+
+    @app.route('/api/player/logout', methods=['POST'])
+    def api_player_logout():
+        return logout_player()
+
+    @app.route('/api/player/check', methods=['GET'])
+    def api_player_check():
+        return check_player_login()
+
+    @app.route('/api/mc/store/buy', methods=['POST'])
+    def api_mc_store_buy():
+        return mc_store_buy()
+
+    @app.route('/mc/login')
+    def mc_login():
+        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                              'webapp', 'mcst'), 
+                                 'mclogin.html')
+
     @app.route('/mc/register')
     def mc_register():
         return render_root_template('mcreg.html')
+
+    @app.route('/app/mcs')
+    def mc_store():
+        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                              'webapp', 'mcst'), 
+                                 'store.html')
 
     @app.route('/mc')
     def mc_index():

@@ -3,7 +3,7 @@ import random
 import string
 from libs.config import app, db, User, MARKETS, USER_DATA_FOLDER
 from libs.utils import get_market_path
-from libs.database import init_market_database
+from libs.database import init_market_database, init_player_database
 from libs.market_routes import register_market_routes
 from libs.user_routes import register_user_routes
 from libs.developer_routes import register_developer_routes
@@ -39,6 +39,9 @@ for market_id in MARKETS:
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
     init_market_database(market_id)
+
+init_player_database()
+print("DEBUG: player database initialized")
 
 register_market_routes()
 print("DEBUG: market routes registered")
