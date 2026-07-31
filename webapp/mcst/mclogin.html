@@ -103,10 +103,10 @@
 
         function handleLogin() {
             const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
+            const password = document.getElementById('loginPassword').value;
             
-            if (!username || !password) {
-                mdui.snackbar({ message: '请输入用户名和密码', position: 'top' });
+            if (!username) {
+                mdui.snackbar({ message: '请输入用户名', position: 'top' });
                 return;
             }
             

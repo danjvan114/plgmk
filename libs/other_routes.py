@@ -5,7 +5,7 @@ import urllib
 from .config import app, MARKETS
 from .utils import set_market, render_root_template, render_market_template
 from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info, mc_get_invite_code, mc_store_buy
-from .player_routes import register_player, login_player, logout_player, check_player_login
+from .player_routes import register_player, login_player, logout_player, check_player_login, set_player_password
 
 def register_other_routes():
     @app.route('/')
@@ -193,6 +193,10 @@ def register_other_routes():
     @app.route('/api/player/logout', methods=['POST'])
     def api_player_logout():
         return logout_player()
+
+    @app.route('/api/player/set_password', methods=['POST'])
+    def api_player_set_password():
+        return set_player_password()
 
     @app.route('/api/player/check', methods=['GET'])
     def api_player_check():
