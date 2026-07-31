@@ -228,7 +228,7 @@ def register_whitelist():
         rcon_password = config.get('minecraft', 'rcon_password', fallback='')
         
         with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
-            response = rcon.command(f'whitelist list')
+            response = rcon.command(f'comfywl list')
             
             if username.lower() in response.lower():
                 return jsonify({
@@ -236,7 +236,7 @@ def register_whitelist():
                     'message': '已在白名单中'
                 })
             
-            rcon.command(f'whitelist add {username}')
+            rcon.command(f'comfywhitelist add {username}')
             
             engine = get_player_engine()
             with engine.connect() as conn:
@@ -365,7 +365,7 @@ def remove_player_whitelist():
         rcon_password = config.get('minecraft', 'rcon_password', fallback='')
         
         with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
-            rcon.command(f'whitelist remove {username}')
+            rcon.command(f'comfywhitelist remove {username}')
             
             return jsonify({
                 'success': True,
@@ -401,7 +401,7 @@ def delete_player_account():
         rcon_password = config.get('minecraft', 'rcon_password', fallback='')
         
         with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
-            rcon.command(f'whitelist remove {username}')
+            rcon.command(f'comfywhitelist remove {username}')
         
         engine = get_player_engine()
         with engine.connect() as conn:
