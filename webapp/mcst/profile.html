@@ -213,11 +213,6 @@
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             
-            if (!oldPassword) {
-                mdui.snackbar({ message: '请输入当前密码', position: 'top' });
-                return;
-            }
-            
             if (!newPassword || !confirmPassword) {
                 mdui.snackbar({ message: '请输入新密码', position: 'top' });
                 return;
