@@ -1,10 +1,11 @@
 from flask import request, jsonify
 import mcrcon
-from .invite_code import invite_manager
+from .invite_code import get_invite_manager
 
 def mc_get_invite_code():
     print(f"DEBUG mc_get_invite_code: Function called")
     try:
+        invite_manager = get_invite_manager()
         code_info = invite_manager.get_encrypted_code()
         return jsonify({
             'success': True,
@@ -49,6 +50,7 @@ def mc_whitelist_add():
             'message': '邀请码不能为空'
         }), 400
     
+    invite_manager = get_invite_manager()
     is_valid, message = invite_manager.verify_code(invite_code)
     if not is_valid:
         print(f"DEBUG mc_whitelist_add: Invalid invite code: {message}")

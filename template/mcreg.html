@@ -77,7 +77,7 @@
             font-size: 13px;
         }
         .invite-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4e6eff 0%, #4e6eff 100%);
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
@@ -151,26 +151,28 @@
         <div class="mdui-card">
             <div class="mdui-card-content">
                 <div class="invite-section">
-                    <h3><i class="mdui-icon material-icons">qr_code</i> 扫码获取邀请码</h3>
+                    <h3>扫码获取邀请码</h3>
                     <div class="qr-container">
                         <div id="qrcode"></div>
                     </div>
                     <div class="countdown">
                         邀请码将在 <span id="countdown">15:00</span> 后刷新
                     </div>
-                    <button class="mdui-btn mdui-ripple mdui-color-white mdui-text-color-purple-900 refresh-btn" onclick="refreshInviteCode()">
-                        <i class="mdui-icon material-icons">refresh</i> 刷新邀请码
-                    </button>
+                    <div style="margin-top: 12px;">
+                        <button class="mdui-btn mdui-ripple mdui-ripple-black mdui-color-white mdui-text-color-purple-900" onclick="copyInviteCode()">
+                            <i class="mdui-icon material-icons">content_copy</i> 复制邀请码
+                        </button>
+                    </div>
                 </div>
 
                 <div class="mdui-textfield mdui-textfield-floating-label">
                     <label class="mdui-textfield-label">邀请码</label>
-                    <input class="mdui-textfield-input" type="text" id="inviteCode" placeholder="请输入邀请码" />
+                    <input class="mdui-textfield-input" type="text" id="inviteCode"  />
                 </div>
 
                 <div class="mdui-textfield mdui-textfield-floating-label" style="margin-top: 16px;">
                     <label class="mdui-textfield-label">游戏用户名</label>
-                    <input class="mdui-textfield-input" type="text" id="username" placeholder="请输入游戏用户名" />
+                    <input class="mdui-textfield-input" type="text" id="username"  />
                 </div>
 
                 <div class="agreement-box" id="agreementBox" style="margin-top: 24px;">
@@ -207,6 +209,7 @@
         let qrcode = null;
         let countdownTimer = null;
         let expiresAt = 0;
+        let currentEncryptedCode = '';
 
         function markdownToHtml(md) {
             md = md.replace(/^### (.*$)/gim, '<h4>$1</h4>');
@@ -250,6 +253,51 @@
                 `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
+        function copyInviteCode() {
+            if (!currentEncryptedCode) {
+                mdui.snackbar({
+                    message: '邀请码尚未加载，请稍后再试',
+                    position: 'top'
+                });
+                return;
+            }
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentEncryptedCode).then(() => {
+                    mdui.snackbar({
+                        message: '加密邀请码已复制，可粘贴到手机解密',
+                        position: 'top'
+                    });
+                }).catch(() => {
+                    fallbackCopy(currentEncryptedCode);
+                });
+            } else {
+                fallbackCopy(currentEncryptedCode);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                mdui.snackbar({
+                    message: '加密邀请码已复制，可粘贴到手机解密',
+                    position: 'top'
+                });
+            } catch (err) {
+                mdui.snackbar({
+                    message: '复制失败，请手动复制',
+                    position: 'top'
+                });
+            }
+            document.body.removeChild(textarea);
+        }
+
         function refreshInviteCode() {
             showLoading('正在获取邀请码...');
             
@@ -258,6 +306,7 @@
                 .then(data => {
                     if (data.success) {
                         expiresAt = data.expires_at;
+                        currentEncryptedCode = data.encrypted_code;
                         
                         if (qrcode) {
                             document.getElementById('qrcode').innerHTML = '';

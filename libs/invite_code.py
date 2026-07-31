@@ -31,16 +31,24 @@ class InviteCodeManager:
         self._start_auto_refresh()
     
     def _generate_new_code(self):
-        plain_code = secrets.token_urlsafe(8).upper()
-        encrypted_code = self._encrypt_code(plain_code)
-        
-        with self._lock:
+        try:
+            print(f"[邀请码] 开始生成新邀请码...")
+            plain_code = secrets.token_urlsafe(8).upper()
+            print(f"[邀请码] 明文邀请码: {plain_code}")
+            
+            encrypted_code = self._encrypt_code(plain_code)
+            print(f"[邀请码] 加密成功")
+            
             self._current_code = plain_code
             self._encrypted_code = encrypted_code
             self._code_timestamp = time.time()
-        
-        print(f"[邀请码] 新邀请码已生成: {plain_code}")
-        print(f"[邀请码] 加密邀请码: {encrypted_code[:50]}...")
+            
+            print(f"[邀请码] 新邀请码已生成: {plain_code}")
+            print(f"[邀请码] 加密邀请码: {encrypted_code[:50]}...")
+        except Exception as e:
+            print(f"[邀请码] 生成失败: {str(e)}")
+            import traceback
+            traceback.print_exc()
     
     def _encrypt_code(self, plain_code):
         public_key = serialization.load_pem_public_key(
@@ -74,6 +82,7 @@ class InviteCodeManager:
             
             return {
                 'encrypted_code': self._encrypted_code,
+                'plain_code': self._current_code,
                 'expires_at': self._code_timestamp + self._refresh_interval,
                 'refresh_interval': self._refresh_interval
             }
@@ -89,4 +98,10 @@ class InviteCodeManager:
             else:
                 return False, '邀请码错误'
 
-invite_manager = InviteCodeManager()
+_invite_manager = None
+
+def get_invite_manager():
+    global _invite_manager
+    if _invite_manager is None:
+        _invite_manager = InviteCodeManager()
+    return _invite_manager
