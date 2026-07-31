@@ -4,7 +4,7 @@ import json
 import urllib
 from .config import app, MARKETS
 from .utils import set_market, render_root_template, render_market_template
-from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info
+from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info, mc_get_invite_code
 
 def register_other_routes():
     @app.route('/')
@@ -159,6 +159,11 @@ def register_other_routes():
         result = mc_whitelist_add()
         print(f"DEBUG: API /api/mc/whitelist/add result: {result}")
         return result
+
+    @app.route('/api/mc/invite_code', methods=['GET'])
+    def api_mc_invite_code():
+        print(f"DEBUG: API /api/mc/invite_code called")
+        return mc_get_invite_code()
 
     @app.route('/api/mc/whitelist/remove', methods=['POST'])
     def api_mc_whitelist_remove():

@@ -1,20 +1,39 @@
 from flask import request, jsonify
 import mcrcon
+from .invite_code import invite_manager
+
+def mc_get_invite_code():
+    print(f"DEBUG mc_get_invite_code: Function called")
+    try:
+        code_info = invite_manager.get_encrypted_code()
+        return jsonify({
+            'success': True,
+            'encrypted_code': code_info['encrypted_code'],
+            'expires_at': code_info['expires_at'],
+            'refresh_interval': code_info['refresh_interval']
+        })
+    except Exception as e:
+        print(f"DEBUG mc_get_invite_code: Error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'获取邀请码失败: {str(e)}'
+        }), 500
 
 def mc_whitelist_add():
     print(f"DEBUG mc_whitelist_add: Function called")
     data = request.get_json()
     print(f"DEBUG mc_whitelist_add: Received data: {data}")
     
-    if not data or 'username' not in data:
-        print(f"DEBUG mc_whitelist_add: Missing username parameter")
+    if not data or 'username' not in data or 'invite_code' not in data:
+        print(f"DEBUG mc_whitelist_add: Missing parameters")
         return jsonify({
             'success': False,
-            'message': '缺少用户名参数'
+            'message': '缺少必要参数（用户名和邀请码）'
         }), 400
     
     username = data['username'].strip()
-    print(f"DEBUG mc_whitelist_add: Username: {username}")
+    invite_code = data['invite_code'].strip()
+    print(f"DEBUG mc_whitelist_add: Username: {username}, Invite code: {invite_code}")
     
     if not username:
         print(f"DEBUG mc_whitelist_add: Empty username")
@@ -22,6 +41,21 @@ def mc_whitelist_add():
             'success': False,
             'message': '用户名不能为空'
         }), 400
+    
+    if not invite_code:
+        print(f"DEBUG mc_whitelist_add: Empty invite code")
+        return jsonify({
+            'success': False,
+            'message': '邀请码不能为空'
+        }), 400
+    
+    is_valid, message = invite_manager.verify_code(invite_code)
+    if not is_valid:
+        print(f"DEBUG mc_whitelist_add: Invalid invite code: {message}")
+        return jsonify({
+            'success': False,
+            'message': message
+        }), 403
     
     try:
         print(f"DEBUG mc_whitelist_add: Connecting to RCON...")
