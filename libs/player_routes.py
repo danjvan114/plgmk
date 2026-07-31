@@ -2,6 +2,7 @@ from flask import request, jsonify, session
 from .database import get_player_engine
 from sqlalchemy import text
 import hashlib
+import mcrcon
 
 def register_player():
     data = request.get_json()

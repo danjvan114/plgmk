@@ -3,18 +3,21 @@
         "title": "钻石礼包",
         "data": "包含64个钻石，助你快速致富",
         "pic": "/localcdn/gzs/商品.png",
-        "command": "give %player% minecraft:diamond 64"
+        "command": "give %player% minecraft:diamond 64",
+        "price": 100
     },
     {
         "title": "VIP权限",
         "data": "获得服务器VIP权限，享受专属福利",
         "pic": "/localcdn/gzs/商品.png",
-        "command": "lp user %player% parent set vip&kick %player%"
+        "command": "lp user %player% parent set vip&kick %player%",
+        "price": 500
     },
     {
         "title": "金币礼包",
         "data": "10000金币，可以在商店购买各种物品",
         "pic": "/localcdn/gzs/商品.png",
-        "command": "etc.pay.ops 10000"
+        "command": "etc.pay.ops 10000",
+        "price": 50
     }
 ]

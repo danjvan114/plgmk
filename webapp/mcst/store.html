@@ -40,6 +40,12 @@
             line-height: 1.5;
             margin-bottom: 12px;
         }
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f44336;
+            margin-bottom: 12px;
+        }
         .buy-btn {
             width: 100%;
             border-radius: 8px;
@@ -111,6 +117,7 @@
         <div class="mdui-dialog-content">
             <img id="dialogImg" src="" style="width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px; margin-bottom: 16px;">
             <p id="dialogDesc" style="color: #666; line-height: 1.6;"></p>
+            <p id="dialogPrice" style="color: #f44336; font-size: 20px; font-weight: bold; margin: 16px 0;"></p>
             <p style="color: #999; font-size: 12px; margin-top: 12px;">商品将发放给：<strong id="dialogPlayer"></strong></p>
         </div>
         <div class="mdui-dialog-actions">
@@ -298,6 +305,7 @@
                             <div class="product-info">
                                 <div class="product-title">${product.title}</div>
                                 <div class="product-desc">${product.data}</div>
+                                <div class="product-price">$${product.price || 0}</div>
                                 <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-text-color-white buy-btn">
                                     <i class="mdui-icon material-icons">shopping_cart</i> 立即购买
                                 </button>
@@ -316,6 +324,7 @@
             document.getElementById('dialogTitle').textContent = selectedProduct.title;
             document.getElementById('dialogImg').src = selectedProduct.pic;
             document.getElementById('dialogDesc').textContent = selectedProduct.data;
+            document.getElementById('dialogPrice').textContent = `$${selectedProduct.price || 0}`;
             document.getElementById('dialogPlayer').textContent = currentUsername;
             
             if (!productDialog) {
@@ -336,6 +345,7 @@
             showLoading('正在处理购买...');
             
             const commands = selectedProduct.command.split('&');
+            const price = selectedProduct.price || 0;
             
             fetch('/api/mc/store/buy', {
                 method: 'POST',
@@ -344,7 +354,8 @@
                 },
                 body: JSON.stringify({
                     player: currentUsername,
-                    commands: commands
+                    commands: commands,
+                    price: price
                 })
             })
             .then(response => response.json())
@@ -352,7 +363,7 @@
                 hideLoading();
                 if (data.success) {
                     mdui.snackbar({
-                        message: '购买成功！商品已发放',
+                        message: data.message || '购买成功！商品已发放',
                         position: 'top'
                     });
                     productDialog.close();

@@ -238,6 +238,7 @@ def mc_store_buy():
     
     player = data['player'].strip()
     commands = data['commands']
+    price = data.get('price', 0)
     
     if not player:
         return jsonify({
@@ -250,6 +251,27 @@ def mc_store_buy():
             'success': False,
             'message': '命令列表格式错误'
         }), 400
+    
+    if price > 0:
+        success, balance = mc_check_balance(player)
+        if not success:
+            return jsonify({
+                'success': False,
+                'message': '无法获取玩家余额'
+            }), 500
+        
+        if balance < price:
+            return jsonify({
+                'success': False,
+                'message': f'余额不足！当前余额: ${balance:.2f}，需要: ${price:.2f}'
+            }), 400
+        
+        deduct_result = mc_deduct_balance(player, price)
+        if not deduct_result:
+            return jsonify({
+                'success': False,
+                'message': '扣款失败'
+            }), 500
     
     try:
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
@@ -270,7 +292,7 @@ def mc_store_buy():
             
             return jsonify({
                 'success': True,
-                'message': f'商品已发放给玩家 {player}',
+                'message': f'商品已发放给玩家 {player}' + (f'，已扣除 ${price:.2f}' if price > 0 else ''),
                 'results': results
             })
     except Exception as e:
@@ -296,3 +318,32 @@ def mc_server_info():
             'success': False,
             'message': f'服务器内部错误: {str(e)}'
         }), 500
+
+def mc_check_balance(player_name):
+    """检查玩家余额"""
+    try:
+        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
+            result = rcon.command(f'/bal {player_name}')
+            if result and '$' in result:
+                parts = result.split('$')
+                if len(parts) >= 2:
+                    balance_str = parts[-1].strip().replace(',', '')
+                    try:
+                        balance = float(balance_str)
+                        return True, balance
+                    except ValueError:
+                        return False, 0
+            return False, 0
+    except Exception as e:
+        print(f"DEBUG mc_check_balance: Error: {str(e)}")
+        return False, 0
+
+def mc_deduct_balance(player_name, amount):
+    """扣除玩家余额"""
+    try:
+        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
+            result = rcon.command(f'/eco take {player_name} {amount}')
+            return result.strip() if result else ''
+    except Exception as e:
+        print(f"DEBUG mc_deduct_balance: Error: {str(e)}")
+        return None

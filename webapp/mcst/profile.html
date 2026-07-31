@@ -1,0 +1,300 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>用户中心</title>
+    <link rel="stylesheet" href="/localcdn/css/mdui.min.css">
+    <link rel="stylesheet" href="/localcdn/css/material-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .mdui-card {
+            margin-bottom: 16px;
+        }
+        
+        .mdui-card-header {
+            padding: 16px;
+        }
+        
+        .mdui-card-content {
+            padding: 0 16px 16px;
+        }
+        
+        .danger-zone {
+            border-left: 4px solid #f44336;
+        }
+        
+        .warning-zone {
+            border-left: 4px solid #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="mdui-toolbar mdui-color-blue-500">
+        <a href="/mc/register" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons mdui-text-color-white">arrow_back</i></a>
+        <span class="mdui-typo-title mdui-text-color-white">用户中心</span>
+        <div class="mdui-toolbar-spacer"></div>
+        <span id="username" class="mdui-text-color-white"></span>
+        <button class="mdui-btn mdui-btn-icon" onclick="handleLogout()">
+            <i class="mdui-icon material-icons mdui-text-color-white">logout</i>
+        </button>
+    </div>
+    
+    <div class="container">
+        <div class="mdui-card">
+            <div class="mdui-card-header">
+                <div class="mdui-card-header-avatar mdui-icon material-icons">account_circle</div>
+                <div class="mdui-card-header-title">账户信息</div>
+            </div>
+            <div class="mdui-card-content">
+                <div class="mdui-textfield mdui-textfield-floating-label">
+                    <label class="mdui-textfield-label">用户名</label>
+                    <input class="mdui-textfield-input" id="displayUsername" type="text" readonly>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mdui-card">
+            <div class="mdui-card-header">
+                <div class="mdui-card-header-avatar mdui-icon material-icons">lock</div>
+                <div class="mdui-card-header-title">修改密码</div>
+            </div>
+            <div class="mdui-card-content">
+                <div class="mdui-textfield mdui-textfield-floating-label">
+                    <label class="mdui-textfield-label">当前密码</label>
+                    <input class="mdui-textfield-input" id="oldPassword" type="password">
+                </div>
+                <div class="mdui-textfield mdui-textfield-floating-label">
+                    <label class="mdui-textfield-label">新密码</label>
+                    <input class="mdui-textfield-input" id="newPassword" type="password">
+                </div>
+                <div class="mdui-textfield mdui-textfield-floating-label">
+                    <label class="mdui-textfield-label">确认新密码</label>
+                    <input class="mdui-textfield-input" id="confirmPassword" type="password">
+                </div>
+                <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-text-color-white mdui-btn-block" onclick="handleChangePassword()">
+                    <i class="mdui-icon material-icons">lock_outline</i> 修改密码
+                </button>
+            </div>
+        </div>
+        
+        <div class="mdui-card warning-zone">
+            <div class="mdui-card-header">
+                <div class="mdui-card-header-avatar mdui-icon material-icons">warning</div>
+                <div class="mdui-card-header-title">从白名单注销</div>
+            </div>
+            <div class="mdui-card-content">
+                <p class="mdui-text-color-black">从服务器白名单中移除，但保留账户数据</p>
+                <button class="mdui-btn mdui-ripple mdui-color-orange-500 mdui-text-color-white mdui-btn-block" onclick="handleRemoveWhitelist()">
+                    <i class="mdui-icon material-icons">person_remove</i> 注销白名单
+                </button>
+            </div>
+        </div>
+        
+        <div class="mdui-card danger-zone">
+            <div class="mdui-card-header">
+                <div class="mdui-card-header-avatar mdui-icon material-icons">delete_forever</div>
+                <div class="mdui-card-header-title">完全注销</div>
+            </div>
+            <div class="mdui-card-content">
+                <p class="mdui-text-color-red">永久删除账户和白名单数据，此操作不可恢复！</p>
+                <button class="mdui-btn mdui-ripple mdui-color-red-500 mdui-text-color-white mdui-btn-block" onclick="handleDeleteAccount()">
+                    <i class="mdui-icon material-icons">delete</i> 完全注销
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mdui-dialog" id="confirmDialog">
+        <div class="mdui-dialog-title">确认操作</div>
+        <div class="mdui-dialog-content" id="confirmContent"></div>
+        <div class="mdui-dialog-actions">
+            <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-text-color-white" onclick="closeDialog()">取消</button>
+            <button class="mdui-btn mdui-ripple mdui-color-red-500 mdui-text-color-white" id="confirmBtn" onclick="confirmAction()">确认</button>
+        </div>
+    </div>
+    
+    <div class="mdui-dialog" id="loadingDialog">
+        <div class="mdui-dialog-content">
+            <div class="mdui-spinner mdui-spinner-colorful"></div>
+            <div id="loadingText" style="margin-left: 16px;">处理中...</div>
+        </div>
+    </div>
+    
+    <script src="/localcdn/js/mdui.min.js"></script>
+    <script>
+        let currentAction = null;
+        
+        window.onload = function() {
+            fetch('/api/player/check')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.logged_in) {
+                        window.location.href = '/mc/login?redirect=/mc/profile';
+                        return;
+                    }
+                    document.getElementById('displayUsername').value = data.username;
+                    document.getElementById('username').textContent = data.username;
+                });
+        };
+        
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text || '处理中...';
+            new mdui.Dialog('#loadingDialog').open();
+        }
+        
+        function hideLoading() {
+            mdui.Dialog('#loadingDialog').close();
+        }
+        
+        function showConfirm(title, content, action) {
+            document.querySelector('.mdui-dialog-title').textContent = title;
+            document.getElementById('confirmContent').textContent = content;
+            currentAction = action;
+            new mdui.Dialog('#confirmDialog').open();
+        }
+        
+        function closeDialog() {
+            mdui.Dialog('#confirmDialog').close();
+            currentAction = null;
+        }
+        
+        function confirmAction() {
+            if (currentAction) {
+                currentAction();
+            }
+            closeDialog();
+        }
+        
+        function handleLogout() {
+            fetch('/api/player/logout', { method: 'POST' })
+                .then(() => {
+                    mdui.snackbar({ message: '已退出登录', position: 'top' });
+                    setTimeout(() => {
+                        window.location.href = '/mc/login';
+                    }, 500);
+                });
+        }
+        
+        function handleChangePassword() {
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!oldPassword) {
+                mdui.snackbar({ message: '请输入当前密码', position: 'top' });
+                return;
+            }
+            
+            if (!newPassword || !confirmPassword) {
+                mdui.snackbar({ message: '请输入新密码', position: 'top' });
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                mdui.snackbar({ message: '两次密码不一致', position: 'top' });
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                mdui.snackbar({ message: '密码长度不能少于6位', position: 'top' });
+                return;
+            }
+            
+            showLoading('正在修改密码...');
+            
+            fetch('/api/player/change_password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    old_password: oldPassword,
+                    new_password: newPassword
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    mdui.snackbar({ message: '密码修改成功', position: 'top' });
+                    document.getElementById('oldPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    mdui.snackbar({ message: data.message, position: 'top' });
+                }
+            })
+            .catch(() => {
+                hideLoading();
+                mdui.snackbar({ message: '网络错误', position: 'top' });
+            });
+        }
+        
+        function handleRemoveWhitelist() {
+            showConfirm('确认注销白名单', '将从服务器白名单中移除，但保留账户数据。是否继续？', () => {
+                showLoading('正在注销白名单...');
+                
+                fetch('/api/player/remove_whitelist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        mdui.snackbar({ message: '白名单注销成功', position: 'top' });
+                    } else {
+                        mdui.snackbar({ message: data.message, position: 'top' });
+                    }
+                })
+                .catch(() => {
+                    hideLoading();
+                    mdui.snackbar({ message: '网络错误', position: 'top' });
+                });
+            });
+        }
+        
+        function handleDeleteAccount() {
+            showConfirm('确认完全注销', '此操作将永久删除账户和白名单数据，不可恢复！是否继续？', () => {
+                showLoading('正在注销账户...');
+                
+                fetch('/api/player/delete_account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        mdui.snackbar({ message: '账户已注销', position: 'top' });
+                        setTimeout(() => {
+                            window.location.href = '/mc/login';
+                        }, 1500);
+                    } else {
+                        mdui.snackbar({ message: data.message, position: 'top' });
+                    }
+                })
+                .catch(() => {
+                    hideLoading();
+                    mdui.snackbar({ message: '网络错误', position: 'top' });
+                });
+            });
+        }
+    </script>
+</body>
+</html>

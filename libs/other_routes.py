@@ -216,6 +216,12 @@ def register_other_routes():
     def mc_register():
         return render_root_template('mcreg.html')
 
+    @app.route('/mc/profile')
+    def mc_profile():
+        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                              'webapp', 'mcst'), 
+                                 'profile.html')
+
     @app.route('/app/mcs')
     def mc_store():
         return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
