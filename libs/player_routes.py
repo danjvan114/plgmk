@@ -204,3 +204,60 @@ def check_player_login():
             'logged_in': False,
             'message': '未登录'
         }), 401
+
+def register_whitelist():
+    if 'player_name' not in session:
+        return jsonify({
+            'success': False,
+            'message': '请先登录'
+        }), 401
+    
+    username = session['player_name']
+    
+    try:
+        import os
+        import configparser
+        from .mc_routes import get_rcon_connection
+        
+        config = configparser.ConfigParser()
+        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.ini')
+        config.read(config_path)
+        
+        rcon_host = config.get('minecraft', 'rcon_host', fallback='localhost')
+        rcon_port = config.getint('minecraft', 'rcon_port', fallback=25575)
+        rcon_password = config.get('minecraft', 'rcon_password', fallback='')
+        
+        with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
+            response = rcon.command(f'whitelist list')
+            
+            if username.lower() in response.lower():
+                return jsonify({
+                    'success': True,
+                    'message': '已在白名单中'
+                })
+            
+            rcon.command(f'whitelist add {username}')
+            
+            engine = get_player_engine()
+            with engine.connect() as conn:
+                result = conn.execute(
+                    text("SELECT id FROM player WHERE username = :username"),
+                    {'username': username}
+                )
+                if not result.fetchone():
+                    conn.execute(
+                        text("INSERT INTO player (username, password) VALUES (:username, :password)"),
+                        {'username': username, 'password': ''}
+                    )
+                    conn.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': '白名单注册成功'
+            })
+    except Exception as e:
+        print(f"DEBUG register_whitelist: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'注册失败: {str(e)}'
+        }), 500
