@@ -225,19 +225,9 @@ def register_whitelist():
     username = session['player_name']
     
     try:
-        import os
-        import configparser
         import mcrcon
         
-        config = configparser.ConfigParser()
-        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.ini')
-        config.read(config_path)
-        
-        rcon_host = config.get('minecraft', 'rcon_host', fallback='localhost')
-        rcon_port = config.getint('minecraft', 'rcon_port', fallback=25575)
-        rcon_password = config.get('minecraft', 'rcon_password', fallback='')
-        
-        with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
+        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
             response = rcon.command(f'comfywhitelist list')
             
             if username.lower() in response.lower():
@@ -362,19 +352,9 @@ def remove_player_whitelist():
     username = session['player_name']
     
     try:
-        import os
-        import configparser
         import mcrcon
         
-        config = configparser.ConfigParser()
-        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.ini')
-        config.read(config_path)
-        
-        rcon_host = config.get('minecraft', 'rcon_host', fallback='localhost')
-        rcon_port = config.getint('minecraft', 'rcon_port', fallback=25575)
-        rcon_password = config.get('minecraft', 'rcon_password', fallback='')
-        
-        with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
+        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
             rcon.command(f'comfywhitelist remove {username}')
             
             return jsonify({
@@ -383,6 +363,8 @@ def remove_player_whitelist():
             })
     except Exception as e:
         print(f"DEBUG remove_player_whitelist: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'message': f'注销失败: {str(e)}'
@@ -398,19 +380,9 @@ def delete_player_account():
     username = session['player_name']
     
     try:
-        import os
-        import configparser
         import mcrcon
         
-        config = configparser.ConfigParser()
-        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.ini')
-        config.read(config_path)
-        
-        rcon_host = config.get('minecraft', 'rcon_host', fallback='localhost')
-        rcon_port = config.getint('minecraft', 'rcon_port', fallback=25575)
-        rcon_password = config.get('minecraft', 'rcon_password', fallback='')
-        
-        with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
+        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
             rcon.command(f'comfywhitelist remove {username}')
         
         engine = get_player_engine()
@@ -430,6 +402,8 @@ def delete_player_account():
         })
     except Exception as e:
         print(f"DEBUG delete_player_account: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'message': f'注销失败: {str(e)}'
