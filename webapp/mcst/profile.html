@@ -269,6 +269,9 @@
                     hideLoading();
                     if (data.success) {
                         mdui.snackbar({ message: '白名单注销成功', position: 'top' });
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
                     } else {
                         mdui.snackbar({ message: data.message, position: 'top' });
                     }
@@ -293,6 +296,9 @@
                     hideLoading();
                     if (data.success) {
                         mdui.snackbar({ message: '白名单注册成功', position: 'top' });
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
                     } else {
                         mdui.snackbar({ message: data.message, position: 'top' });
                     }
