@@ -239,6 +239,7 @@ def mc_store_buy():
     player = data['player'].strip()
     commands = data['commands']
     price = data.get('price', 0)
+    exec_type = data.get('exec_type', 'console')
     
     if not player:
         return jsonify({
@@ -274,33 +275,62 @@ def mc_store_buy():
             }), 500
     
     try:
-        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-            results = []
-            for cmd in commands:
-                cmd = cmd.strip()
-                if not cmd:
-                    continue
-                
-                final_cmd = cmd.replace('%player%', player)
-                print(f"DEBUG mc_store_buy: Executing: {final_cmd}")
-                
-                result = rcon.command(final_cmd)
-                results.append({
-                    'command': final_cmd,
-                    'result': result.strip() if result else ''
-                })
+        results = []
+        for cmd in commands:
+            cmd = cmd.strip()
+            if not cmd:
+                continue
             
-            return jsonify({
-                'success': True,
-                'message': f'商品已发放给玩家 {player}' + (f'，已扣除 ${price:.2f}' if price > 0 else ''),
-                'results': results
-            })
+            final_cmd = cmd.replace('%player%', player)
+            print(f"DEBUG mc_store_buy: Executing [{exec_type}]: {final_cmd}")
+            
+            if exec_type == 'bot':
+                success, result = mc_bot_command(final_cmd)
+                if success:
+                    results.append({
+                        'command': final_cmd,
+                        'result': result.strip() if result else ''
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'message': f'机器人执行命令失败: {result}'
+                    }), 500
+            else:
+                with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
+                    result = rcon.command(final_cmd)
+                    results.append({
+                        'command': final_cmd,
+                        'result': result.strip() if result else ''
+                    })
+        
+        return jsonify({
+            'success': True,
+            'message': f'商品已发放给玩家 {player}' + (f'，已扣除 ${price:.2f}' if price > 0 else ''),
+            'results': results
+        })
     except Exception as e:
-        print(f"DEBUG mc_store_buy: RCON error: {str(e)}")
+        print(f"DEBUG mc_store_buy: Error: {str(e)}")
         return jsonify({
             'success': False,
             'message': f'执行命令失败: {str(e)}'
         }), 500
+
+def mc_bot_command(command):
+    """通过机器人HTTP API执行命令"""
+    try:
+        import urllib.request
+        import urllib.parse
+        
+        url = f'http://127.0.0.1:5688/command?cmd={urllib.parse.quote(command)}'
+        req = urllib.request.Request(url)
+        
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = response.read().decode('utf-8')
+            return True, data
+    except Exception as e:
+        print(f"DEBUG mc_bot_command: {str(e)}")
+        return False, str(e)
 
 def mc_server_info():
     try:

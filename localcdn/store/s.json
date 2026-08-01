@@ -4,7 +4,9 @@
         "data": "包含10元地铁/高速费用",
         "pic": "/localcdn/store/ad1.png",
         "command": "etc.pay.op %player% 100",
-        "price": 10
+        "price": 10,
+        "exec_type": "bot"
+
     },
     {
         "title": "VIP权限",
