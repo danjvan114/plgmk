@@ -228,7 +228,7 @@ def register_whitelist():
         rcon_password = config.get('minecraft', 'rcon_password', fallback='')
         
         with mcrcon.MCRcon(rcon_host, rcon_password, port=rcon_port) as rcon:
-            response = rcon.command(f'comfywl list')
+            response = rcon.command(f'comfywhitelist list')
             
             if username.lower() in response.lower():
                 return jsonify({
