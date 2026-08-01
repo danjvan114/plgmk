@@ -145,16 +145,24 @@
         }
 
         function showLogin() {
-            document.getElementById('logoutBtn').style.display = 'none';
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) logoutBtn.style.display = 'none';
+            const userBtn = document.getElementById('userBtn');
+            if (userBtn) userBtn.style.display = 'none';
         }
 
         function showRegister() {
-            document.getElementById('logoutBtn').style.display = 'none';
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) logoutBtn.style.display = 'none';
+            const userBtn = document.getElementById('userBtn');
+            if (userBtn) userBtn.style.display = 'none';
         }
 
         function showStore() {
-            document.getElementById('userBtn').style.display = 'block';
-            document.getElementById('logoutBtn').style.display = 'block';
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) logoutBtn.style.display = 'block';
+            const userBtn = document.getElementById('userBtn');
+            if (userBtn) userBtn.style.display = 'block';
         }
 
         function handleLogin() {
@@ -237,9 +245,7 @@
         function handleLogout() {
             fetch('/api/player/logout', { method: 'POST' })
             .then(() => {
-                currentUsername = '';
-                showLogin();
-                mdui.snackbar({ message: '已退出登录', position: 'top' });
+                window.location.href = '/mc/login?redirect=/app/mcs';
             });
         }
 
@@ -247,8 +253,8 @@
             fetch('/api/player/check')
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    currentUsername = data.username;
+                if (data.logged_in) {
+                    currentUsername = data.username || data.player_name;
                     showStore();
                     loadProducts();
                 } else {
