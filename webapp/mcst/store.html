@@ -363,7 +363,8 @@
                 body: JSON.stringify({
                     player: currentUsername,
                     commands: commands,
-                    price: price
+                    price: price,
+                    exec_type: selectedProduct.exec_type || 'console'
                 })
             })
             .then(response => response.json())
