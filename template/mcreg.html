@@ -152,6 +152,7 @@
             <div class="mdui-card-content">
                 <div class="invite-section">
                     <h3>扫码获取邀请码</h3>
+                    <h5>请将二维码/复制的邀请码截图发送给服务器管理员</h5>
                     <div class="qr-container">
                         <div id="qrcode"></div>
                     </div>
@@ -161,6 +162,9 @@
                     <div style="margin-top: 12px;">
                         <button class="mdui-btn mdui-ripple mdui-ripple-black mdui-color-white mdui-text-color-purple-900" onclick="copyInviteCode()">
                             <i class="mdui-icon material-icons">content_copy</i> 复制邀请码
+                        </button>
+                        <button class="mdui-btn mdui-ripple mdui-ripple-black mdui-color-white mdui-text-color-purple-900" onclick="copyQQGroup()">
+                            <i class="mdui-icon material-icons">content_copy</i> 复制QQ群号
                         </button>
                     </div>
                 </div>
@@ -275,7 +279,26 @@
                 fallbackCopy(currentEncryptedCode);
             }
         }
+
+        function copyQQGroup() {
+            
+            qqGroup = '1015463628';
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(qqGroup).then(() => {
+                    mdui.snackbar({
+                        message: 'QQ群号已复制，可粘贴到手机加入群聊',
+                        position: 'top'
+                    });
+                }).catch(() => {
+                    fallbackCopy(qqGroup);
+                });
+            } else {
+                fallbackCopy(qqGroup);
+            }
+        }
         
+
         function fallbackCopy(text) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
