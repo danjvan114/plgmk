@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from jinja2 import Environment, FileSystemLoader
+from datetime import timedelta
 import os
 
 USER_DATA_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
@@ -26,6 +27,7 @@ app.config['SQLALCHEMY_BINDS'] = {
     'users': f'sqlite:///{USER_DATA_FOLDER}/users.db'
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 
 db = SQLAlchemy(app)
 

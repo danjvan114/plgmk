@@ -3,6 +3,7 @@ from .database import get_player_engine
 from sqlalchemy import text
 import hashlib
 import mcrcon
+from datetime import timedelta
 
 def register_player():
     data = request.get_json()
@@ -106,6 +107,7 @@ def login_player():
             print(f"DEBUG login_player: db_password = {db_password}")
             
             if not db_password:
+                session.permanent = True
                 session['player_id'] = user_id
                 session['player_name'] = db_username
                 return jsonify({
@@ -125,6 +127,7 @@ def login_player():
             print(f"DEBUG login_player: hashed = {hashed_password}, match = {hashed_password == db_password}")
             
             if hashed_password == db_password:
+                session.permanent = True
                 session['player_id'] = user_id
                 session['player_name'] = db_username
                 return jsonify({
