@@ -7,12 +7,5 @@
         "price": 10,
         "exec_type": "bot"
 
-    },
-    {
-        "title": "VIP权限",
-        "data": "获得服务器VIP权限，享受专属福利",
-        "pic": "/localcdn/gzs/商品.png",
-        "command": "lp user %player% parent set vip&kick %player%",
-        "price": 114514
     }
 ]
