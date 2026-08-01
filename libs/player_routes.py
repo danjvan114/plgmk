@@ -61,25 +61,29 @@ def register_player():
         }), 500
 
 def login_player():
-    data = request.get_json()
-    
-    if not data or 'username' not in data:
-        return jsonify({
-            'success': False,
-            'message': '缺少用户名'
-        }), 400
-    
-    username = data['username'].strip()
-    password = data.get('password', '').strip() if data.get('password') else ''
-    
-    if not username:
-        return jsonify({
-            'success': False,
-            'message': '用户名不能为空'
-        }), 400
-    
     try:
+        data = request.get_json()
+        print(f"DEBUG login_player: received data = {data}")
+        
+        if not data or 'username' not in data:
+            return jsonify({
+                'success': False,
+                'message': '缺少用户名'
+            }), 400
+        
+        username = data['username'].strip()
+        password = data.get('password', '').strip() if data.get('password') else ''
+        
+        print(f"DEBUG login_player: username = {username}, has_password = {bool(password)}")
+        
+        if not username:
+            return jsonify({
+                'success': False,
+                'message': '用户名不能为空'
+            }), 400
+        
         engine = get_player_engine()
+        print(f"DEBUG login_player: engine = {engine}")
         
         with engine.connect() as conn:
             result = conn.execute(
@@ -87,6 +91,7 @@ def login_player():
                 {'username': username}
             )
             row = result.fetchone()
+            print(f"DEBUG login_player: row = {row}")
             
             if not row:
                 return jsonify({
@@ -97,6 +102,8 @@ def login_player():
             user_id = row[0]
             db_username = row[1]
             db_password = row[2]
+            
+            print(f"DEBUG login_player: db_password = {db_password}")
             
             if not db_password:
                 session['player_id'] = user_id
@@ -115,6 +122,7 @@ def login_player():
                 }), 400
             
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            print(f"DEBUG login_player: hashed = {hashed_password}, match = {hashed_password == db_password}")
             
             if hashed_password == db_password:
                 session['player_id'] = user_id
@@ -132,6 +140,8 @@ def login_player():
                 }), 401
     except Exception as e:
         print(f"DEBUG player_login: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'message': f'登录失败: {str(e)}'
