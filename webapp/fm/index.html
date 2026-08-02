@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <style>
+        body { background: #f5f5f5; }
+        .toolbar { position: sticky; top: 0; z-index: 100; }
+        .file-item {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 8px 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .file-item:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .file-icon { font-size: 32px; margin-right: 12px; }
+        .file-info { flex: 1; }
+        .file-name { font-weight: 500; color: #333; }
+        .file-meta { font-size: 12px; color: #999; margin-top: 4px; }
+        .file-actions { display: flex; gap: 8px; }
+        .breadcrumb { padding: 12px 16px; background: white; margin: 8px 16px; border-radius: 8px; }
+        .breadcrumb a { color: #1976d2; text-decoration: none; cursor: pointer; }
+        .breadcrumb span { color: #666; }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 8px 16px;
+            background: white;
+            cursor: pointer;
+        }
+        .upload-area:hover { border-color: #1976d2; }
+        .search-box { margin: 8px 16px; }
+    </style>
+</head>
+<body>
+    <div class="mdui-toolbar mdui-color-blue-500 toolbar">
+        <a class="mdui-btn mdui-btn-icon" onclick="window.history.back()"><i class="mdui-icon material-icons mdui-text-color-white">arrow_back</i></a>
+        <span class="mdui-typo-title mdui-text-color-white">文件管理器</span>
+        <div class="mdui-toolbar-spacer"></div>
+        <button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '搜索'}" onclick="showSearch()"><i class="mdui-icon material-icons mdui-text-color-white">search</i></button>
+        <button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '新建文件夹'}" onclick="showMkdir()"><i class="mdui-icon material-icons mdui-text-color-white">create_new_folder</i></button>
+        <button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '上传文件'}" onclick="document.getElementById('uploadInput').click()"><i class="mdui-icon material-icons mdui-text-color-white">upload_file</i></button>
+        <input type="file" id="uploadInput" style="display: none;" multiple onchange="uploadFiles(this.files)">
+    </div>
+
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <div class="search-box" id="searchBox" style="display: none;">
+        <div class="mdui-textfield mdui-textfield-floating-label">
+            <input class="mdui-textfield-input" type="text" id="searchInput" placeholder="搜索文件/文件夹" onkeyup="if(event.key==='Enter')searchFiles()">
+        </div>
+    </div>
+
+    <div id="fileList"></div>
+
+    <div id="loadingDialog" class="mdui-dialog">
+        <div class="mdui-dialog-content"><div class="mdui-spinner mdui-spinner-colorful"></div> <span id="loadingText">加载中...</span></div>
+    </div>
+
+    <script>
+        let currentPath = '';
+        const loadingDialog = new mdui.Dialog('#loadingDialog', { history: false });
+
+        function showLoading(text = '加载中...') {
+            document.getElementById('loadingText').textContent = text;
+            loadingDialog.open();
+        }
+        function hideLoading() { loadingDialog.close(); }
+
+        async function loadFiles(path = '') {
+            showLoading();
+            const res = await fetch(`/api/fm/list?path=${encodeURIComponent(path)}`);
+            const data = await res.json();
+            hideLoading();
+            if (!data.success) { mdui.alert(data.message); return; }
+            currentPath = data.current_path;
+            updateBreadcrumb(currentPath);
+            renderFiles(data.items);
+        }
+
+        function updateBreadcrumb(path) {
+            const bc = document.getElementById('breadcrumb');
+            if (!path) { bc.innerHTML = '<span>根目录</span>'; return; }
+            const parts = path.split('/').filter(Boolean);
+            let html = '<a onclick="loadFiles(\'\')">根目录</a>';
+            let buildPath = '';
+            parts.forEach(p => {
+                buildPath += (buildPath ? '/' : '') + p;
+                html += ` / <a onclick="loadFiles('${buildPath}')">${p}</a>`;
+            });
+            bc.innerHTML = html;
+        }
+
+        function renderFiles(items) {
+            const list = document.getElementById('fileList');
+            if (!items.length) { list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">空文件夹</div>'; return; }
+            list.innerHTML = items.map(item => `
+                <div class="file-item">
+                    <div class="file-icon">${item.is_dir ? '📁' : '📄'}</div>
+                    <div class="file-info" onclick="${item.is_dir ? `loadFiles('${item.path}')` : `downloadFile('${item.path}')`}">
+                        <div class="file-name">${item.name}</div>
+                        <div class="file-meta">${item.is_dir ? '文件夹' : formatSize(item.size)} | ${item.modified}</div>
+                    </div>
+                    <div class="file-actions">
+                        ${!item.is_dir ? `<button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content:'下载'}" onclick="downloadFile('${item.path}')"><i class="mdui-icon material-icons">download</i></button>` : ''}
+                        <button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content:'重命名'}" onclick="showRename('${item.path}', '${item.name}')"><i class="mdui-icon material-icons">edit</i></button>
+                        <button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content:'删除'}" onclick="deleteItem('${item.path}', '${item.name}')"><i class="mdui-icon material-icons">delete</i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+            return (bytes / 1073741824).toFixed(1) + ' GB';
+        }
+
+        function downloadFile(path) { window.open(`/api/fm/download?path=${encodeURIComponent(path)}`); }
+
+        async function uploadFiles(files) {
+            if (!files.length) return;
+            showLoading('上传中...');
+            for (const file of files) {
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('path', currentPath);
+                await fetch('/api/fm/upload', { method: 'POST', body: fd });
+            }
+            hideLoading();
+            mdui.alert('上传完成');
+            loadFiles(currentPath);
+        }
+
+        function showRename(path, name) {
+            mdui.prompt('重命名', '请输入新名称', { value: name }, async (val) => {
+                if (!val || val === name) return;
+                showLoading('重命名中...');
+                const res = await fetch('/api/fm/rename', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path, new_name: val })
+                });
+                const data = await res.json();
+                hideLoading();
+                mdui.alert(data.message);
+                if (data.success) loadFiles(currentPath);
+            });
+        }
+
+        function deleteItem(path, name) {
+            mdui.confirm(`确定删除 "${name}" 吗？`, async (confirmed) => {
+                if (!confirmed) return;
+                showLoading('删除中...');
+                const res = await fetch('/api/fm/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path })
+                });
+                const data = await res.json();
+                hideLoading();
+                mdui.alert(data.message);
+                if (data.success) loadFiles(currentPath);
+            });
+        }
+
+        function showMkdir() {
+            mdui.prompt('新建文件夹', '请输入文件夹名称', {}, async (val) => {
+                if (!val) return;
+                showLoading('创建中...');
+                const res = await fetch('/api/fm/mkdir', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: currentPath, dir_name: val })
+                });
+                const data = await res.json();
+                hideLoading();
+                mdui.alert(data.message);
+                if (data.success) loadFiles(currentPath);
+            });
+        }
+
+        function showSearch() {
+            const box = document.getElementById('searchBox');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+            if (box.style.display === 'block') document.getElementById('searchInput').focus();
+        }
+
+        async function searchFiles() {
+            const keyword = document.getElementById('searchInput').value;
+            if (!keyword) return;
+            showLoading('搜索中...');
+            const res = await fetch(`/api/fm/search?keyword=${encodeURIComponent(keyword)}`);
+            const data = await res.json();
+            hideLoading();
+            if (data.success) renderFiles(data.results);
+        }
+
+        loadFiles();
+    </script>
+</body>
+</html>
