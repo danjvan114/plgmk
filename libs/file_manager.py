@@ -10,7 +10,7 @@ from cryptography.hazmat.backends import default_backend
 import base64
 
 PUBLIC_KEY_PEM = """-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAQbExCzbpaLJn8hq1eKhnmfSEkHHrwVbjb2dCcomHrOzbgyyoxkB17C4F5nJOd8FwINlvf3gSWamW0DgbpN70XomC6AOzwRF6w1H+3pLm2EQ0zllJa8mGSqdDVBYxjUfryL0WRs0ulTaT+n+Cv6F5twkaFziVFaYiJmQOZBDzUQIDAQAB
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCXua9AWp5lFNGyZa/zXUkzNEfW1SbKUILtaIjo3+y10EUQstdNfDrnDl+BtlEUuGkNn2RTc/SlvmiPMU6tpNNwv7wn2LX1Mh3D1DpOcL3twAXemv7l7k1XAFNyPYua1kn8T3sXkrg5W89mwIGc81jYukdLduPVpnoUrXXAIVlLrQIDAQAB
 -----END PUBLIC KEY-----"""
 
 file_manager_password = None
