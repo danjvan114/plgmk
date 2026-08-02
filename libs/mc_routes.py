@@ -118,6 +118,12 @@ def mc_whitelist_add():
         }), 500
 
 def mc_whitelist_remove():
+    if 'player_name' not in session:
+        return jsonify({
+            'success': False,
+            'message': '请先登录'
+        }), 401
+    
     data = request.get_json()
     
     if not data or 'username' not in data:
@@ -133,6 +139,12 @@ def mc_whitelist_remove():
             'success': False,
             'message': '用户名不能为空'
         }), 400
+    
+    if username != session['player_name']:
+        return jsonify({
+            'success': False,
+            'message': '只能移除自己的白名单'
+        }), 403
     
     try:
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
@@ -169,6 +181,11 @@ def mc_whitelist_remove():
         }), 500
 
 def mc_whitelist_list():
+    if 'player_name' not in session:
+        return jsonify({
+            'success': False,
+            'message': '请先登录'
+        }), 401
     try:
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
             result = rcon.command('comfywl list')
@@ -199,6 +216,11 @@ def mc_whitelist_list():
         }), 500
 
 def mc_whitelist_reload():
+    if 'player_name' not in session:
+        return jsonify({
+            'success': False,
+            'message': '请先登录'
+        }), 401
     try:
         with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
             result = rcon.command('comfywl reload')
@@ -230,28 +252,50 @@ def mc_whitelist_reload():
 def mc_store_buy():
     data = request.get_json()
     
-    if not data or 'player' not in data or 'commands' not in data:
+    if not data or 'product_title' not in data:
         return jsonify({
             'success': False,
-            'message': '缺少必要参数（玩家名称和命令）'
+            'message': '缺少必要参数'
         }), 400
     
-    player = data['player'].strip()
-    commands = data['commands']
-    price = data.get('price', 0)
-    exec_type = data.get('exec_type', 'console')
-    
+    # 从会话中获取玩家名称，防止伪造身份
+    player = session.get('player_name')
     if not player:
         return jsonify({
             'success': False,
-            'message': '玩家名称不能为空'
-        }), 400
+            'message': '请先登录'
+        }), 401
     
-    if not commands or not isinstance(commands, list):
+    product_title = data.get('product_title', '')
+    
+    # 从商品配置文件读取真实价格和命令，防止客户端伪造
+    price = 0
+    product_commands = []
+    product_exec_type = 'console'
+    try:
+        import json
+        store_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'localcdn', 'store', 's.json')
+        if os.path.exists(store_path):
+            with open(store_path, 'r', encoding='utf-8') as f:
+                products = json.load(f)
+                for product in products:
+                    if product.get('title') == product_title:
+                        price = product.get('price', 0)
+                        product_commands = product.get('command', '').split('&')
+                        product_exec_type = product.get('exec_type', 'console')
+                        break
+    except Exception as e:
+        print(f"DEBUG mc_store_buy: 读取商品配置失败: {str(e)}")
+    
+    if not product_commands or not product_commands[0]:
         return jsonify({
             'success': False,
-            'message': '命令列表格式错误'
-        }), 400
+            'message': '商品配置错误'
+        }), 500
+    
+    # 使用服务器端的命令和执行方式，忽略客户端传来的
+    commands = product_commands
+    exec_type = product_exec_type
     
     if price > 0:
         success, balance = mc_check_balance(player)

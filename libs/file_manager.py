@@ -45,7 +45,7 @@ def register_file_manager_routes(app, localcdn_path):
     @app.route('/fm/login', methods=['GET'])
     def fm_login_page():
         encrypted = encrypt_password_for_frontend(file_manager_password)
-        return send_file(os.path.join(os.path.dirname(__file__), '..', 'webapp', 'fm', 'login.html'))
+        return send_file(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'webapp', 'fm', 'login.html'))
 
     @app.route('/api/fm/encrypted-password', methods=['GET'])
     def fm_get_encrypted_password():
@@ -56,15 +56,14 @@ def register_file_manager_routes(app, localcdn_path):
     def fm_page():
         if not session.get('fm_authenticated'):
             return redirect('/fm/login')
-        return send_file(os.path.join(os.path.dirname(__file__), '..', 'webapp', 'fm', 'index.html'))
+        return send_file(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'webapp', 'fm', 'index.html'))
 
     @app.route('/api/fm/auth', methods=['POST'])
     def fm_auth():
         global file_manager_password
         data = request.get_json()
-        encrypted_password = data.get('password', '')
-        decrypted = decrypt_password(encrypted_password)
-        if decrypted == file_manager_password:
+        password = data.get('password', '')
+        if password == file_manager_password:
             session['fm_authenticated'] = True
             return jsonify({'success': True, 'message': '验证成功'})
         return jsonify({'success': False, 'message': '密码错误'})
@@ -74,27 +73,40 @@ def register_file_manager_routes(app, localcdn_path):
         new_password = generate_password()
         return jsonify({'success': True, 'message': '密码已刷新'})
 
+    def _validate_path(path):
+        """验证路径是否在localcdn目录内，防止路径遍历攻击"""
+        full_path = os.path.normpath(os.path.join(localcdn_path, path))
+        if not full_path.startswith(os.path.normpath(localcdn_path)):
+            return None
+        return full_path
+
+    @app.route('/api/fm/logout', methods=['POST'])
+    def fm_logout():
+        session.pop('fm_authenticated', None)
+        return jsonify({'success': True, 'message': '已退出'})
+
     @app.route('/api/fm/list', methods=['GET'])
     def fm_list():
         if not session.get('fm_authenticated'):
             return jsonify({'success': False, 'message': '未授权'})
         path = request.args.get('path', '')
-        full_path = os.path.join(localcdn_path, path)
-        if not os.path.exists(full_path):
-            return jsonify({'success': False, 'message': '路径不存在'})
+        full_path = _validate_path(path)
+        if not full_path or not os.path.exists(full_path):
+            return jsonify({'success': False, 'message': '路径不存在或非法'})
         items = []
         for item in os.listdir(full_path):
             item_path = os.path.join(full_path, item)
             stat = os.stat(item_path)
+            item_rel_path = os.path.join(path, item) if path else item
             items.append({
                 'name': item,
-                'path': os.path.join(path, item) if path else item,
+                'path': item_rel_path.replace('\\', '/'),
                 'is_dir': os.path.isdir(item_path),
                 'size': stat.st_size if os.path.isfile(item_path) else 0,
                 'modified': datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
             })
         items.sort(key=lambda x: (not x['is_dir'], x['name'].lower()))
-        return jsonify({'success': True, 'items': items, 'current_path': path})
+        return jsonify({'success': True, 'items': items, 'current_path': path.replace('\\', '/')})
 
     @app.route('/api/fm/upload', methods=['POST'])
     def fm_upload():
@@ -104,7 +116,9 @@ def register_file_manager_routes(app, localcdn_path):
         file = request.files.get('file')
         if not file:
             return jsonify({'success': False, 'message': '没有文件'})
-        full_path = os.path.join(localcdn_path, path)
+        full_path = _validate_path(path)
+        if not full_path:
+            return jsonify({'success': False, 'message': '路径非法'})
         os.makedirs(full_path, exist_ok=True)
         file.save(os.path.join(full_path, file.filename))
         return jsonify({'success': True, 'message': f'文件 {file.filename} 上传成功'})
@@ -115,8 +129,8 @@ def register_file_manager_routes(app, localcdn_path):
             return jsonify({'success': False, 'message': '未授权'})
         data = request.get_json()
         path = data.get('path', '')
-        full_path = os.path.join(localcdn_path, path)
-        if not os.path.exists(full_path):
+        full_path = _validate_path(path)
+        if not full_path or not os.path.exists(full_path):
             return jsonify({'success': False, 'message': '文件/文件夹不存在'})
         try:
             if os.path.isdir(full_path):
@@ -136,11 +150,13 @@ def register_file_manager_routes(app, localcdn_path):
         new_name = data.get('new_name', '')
         if not new_name:
             return jsonify({'success': False, 'message': '新名称不能为空'})
-        full_path = os.path.join(localcdn_path, path)
-        if not os.path.exists(full_path):
+        full_path = _validate_path(path)
+        if not full_path or not os.path.exists(full_path):
             return jsonify({'success': False, 'message': '文件/文件夹不存在'})
         parent_dir = os.path.dirname(full_path)
         new_path = os.path.join(parent_dir, new_name)
+        if not new_path.startswith(os.path.normpath(localcdn_path)):
+            return jsonify({'success': False, 'message': '非法路径'})
         if os.path.exists(new_path):
             return jsonify({'success': False, 'message': '目标已存在'})
         try:
@@ -154,8 +170,8 @@ def register_file_manager_routes(app, localcdn_path):
         if not session.get('fm_authenticated'):
             return jsonify({'success': False, 'message': '未授权'})
         path = request.args.get('path', '')
-        full_path = os.path.join(localcdn_path, path)
-        if not os.path.exists(full_path) or os.path.isdir(full_path):
+        full_path = _validate_path(path)
+        if not full_path or not os.path.exists(full_path) or os.path.isdir(full_path):
             return jsonify({'success': False, 'message': '文件不存在'})
         return send_file(full_path, as_attachment=True)
 
@@ -168,7 +184,12 @@ def register_file_manager_routes(app, localcdn_path):
         dir_name = data.get('dir_name', '')
         if not dir_name:
             return jsonify({'success': False, 'message': '文件夹名称不能为空'})
-        full_path = os.path.join(localcdn_path, path, dir_name)
+        base_path = _validate_path(path) if path else localcdn_path
+        if not base_path:
+            return jsonify({'success': False, 'message': '非法路径'})
+        full_path = os.path.join(base_path, dir_name)
+        if not full_path.startswith(os.path.normpath(localcdn_path)):
+            return jsonify({'success': False, 'message': '非法路径'})
         if os.path.exists(full_path):
             return jsonify({'success': False, 'message': '文件夹已存在'})
         try:

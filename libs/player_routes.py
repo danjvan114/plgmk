@@ -225,6 +225,29 @@ def register_whitelist():
             'message': '请先登录'
         }), 401
     
+    data = request.get_json()
+    if not data or 'invite_code' not in data:
+        return jsonify({
+            'success': False,
+            'message': '缺少邀请码'
+        }), 400
+    
+    invite_code = data['invite_code'].strip()
+    if not invite_code:
+        return jsonify({
+            'success': False,
+            'message': '邀请码不能为空'
+        }), 400
+    
+    from .invite_code import get_invite_manager
+    invite_manager = get_invite_manager()
+    is_valid, message = invite_manager.verify_code(invite_code)
+    if not is_valid:
+        return jsonify({
+            'success': False,
+            'message': message
+        }), 403
+    
     username = session['player_name']
     
     try:

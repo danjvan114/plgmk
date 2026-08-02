@@ -352,19 +352,13 @@
 
             showLoading('正在处理购买...');
             
-            const commands = selectedProduct.command.split('&');
-            const price = selectedProduct.price || 0;
-            
             fetch('/api/mc/store/buy', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    player: currentUsername,
-                    commands: commands,
-                    price: price,
-                    exec_type: selectedProduct.exec_type || 'console'
+                    product_title: selectedProduct.title
                 })
             })
             .then(response => response.json())

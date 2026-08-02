@@ -284,12 +284,22 @@
         }
         
         function handleRegisterWhitelist() {
-            showConfirm('确认从白名单注册', '将检查并注册白名单，是否继续？', () => {
+            mdui.prompt('请输入邀请码', '邀请码', {
+                value: '',
+                confirmText: '确定',
+                cancelText: '取消'
+            }, function(inviteCode) {
+                if (!inviteCode || !inviteCode.trim()) {
+                    mdui.snackbar({ message: '邀请码不能为空', position: 'top' });
+                    return;
+                }
+                
                 showLoading('正在注册白名单...');
                 
                 fetch('/api/player/register_whitelist', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ invite_code: inviteCode.trim() })
                 })
                 .then(res => res.json())
                 .then(data => {

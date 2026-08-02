@@ -28,28 +28,43 @@
         .breadcrumb { padding: 12px 16px; background: white; margin: 8px 16px; border-radius: 8px; }
         .breadcrumb a { color: #1976d2; text-decoration: none; cursor: pointer; }
         .breadcrumb span { color: #666; }
-        .upload-area {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            margin: 8px 16px;
-            background: white;
-            cursor: pointer;
-        }
-        .upload-area:hover { border-color: #1976d2; }
         .search-box { margin: 8px 16px; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: white; border-radius: 12px; padding: 24px;
+            width: 90%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .modal-title { font-size: 18px; font-weight: 500; margin-bottom: 16px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="mdui-toolbar mdui-color-blue-500 toolbar">
-        <a class="mdui-btn mdui-btn-icon" onclick="window.history.back()"><i class="mdui-icon material-icons mdui-text-color-white">arrow_back</i></a>
+        <a class="mdui-btn mdui-btn-icon" mdui-menu="{target: '#mainMenu'}"><i class="mdui-icon material-icons mdui-text-color-white">menu</i></a>
         <span class="mdui-typo-title mdui-text-color-white">文件管理器</span>
         <div class="mdui-toolbar-spacer"></div>
         <button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '搜索'}" onclick="showSearch()"><i class="mdui-icon material-icons mdui-text-color-white">search</i></button>
         <button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '新建文件夹'}" onclick="showMkdir()"><i class="mdui-icon material-icons mdui-text-color-white">create_new_folder</i></button>
-        <button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '上传文件'}" onclick="document.getElementById('uploadInput').click()"><i class="mdui-icon material-icons mdui-text-color-white">upload_file</i></button>
+        <button class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: '上传'}" onclick="document.getElementById('uploadInput').click()"><i class="mdui-icon material-icons mdui-text-color-white">backup</i></button>
         <input type="file" id="uploadInput" style="display: none;" multiple onchange="uploadFiles(this.files)">
+        <ul class="mdui-menu" id="mainMenu">
+            <li class="mdui-menu-item">
+                <a  class="mdui-ripple" >
+                    <i class="mdui-icon material-icons">close</i>
+                    关闭菜单
+                </a>
+                <a  class="mdui-ripple" onclick="logout()">
+                    <i class="mdui-icon material-icons">exit_to_app</i>
+                    退出登录
+                </a>
+            </li>
+        </ul>
     </div>
 
     <div class="breadcrumb" id="breadcrumb"></div>
@@ -65,8 +80,47 @@
         <div class="mdui-dialog-content"><div class="mdui-spinner mdui-spinner-colorful"></div> <span id="loadingText">加载中...</span></div>
     </div>
 
+    <div class="modal-overlay" id="mkdirModal">
+        <div class="modal-card">
+            <div class="modal-title">新建文件夹</div>
+            <div class="mdui-textfield mdui-textfield-floating-label">
+                <input class="mdui-textfield-input" type="text" id="mkdirInput" placeholder="请输入文件夹名称">
+            </div>
+            <div class="modal-actions">
+                <button class="mdui-btn mdui-ripple" onclick="closeMkdir()">取消</button>
+                <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-text-color-white" onclick="confirmMkdir()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="renameModal">
+        <div class="modal-card">
+            <div class="modal-title">重命名</div>
+            <div class="mdui-textfield mdui-textfield-floating-label">
+                <input class="mdui-textfield-input" type="text" id="renameInput" placeholder="请输入新名称">
+            </div>
+            <div class="modal-actions">
+                <button class="mdui-btn mdui-ripple" onclick="closeRename()">取消</button>
+                <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-text-color-white" onclick="confirmRename()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-card">
+            <div class="modal-title">确认删除</div>
+            <p id="deleteText" style="color: #666; margin: 10px 0;"></p>
+            <div class="modal-actions">
+                <button class="mdui-btn mdui-ripple" onclick="closeDelete()">取消</button>
+                <button class="mdui-btn mdui-ripple mdui-color-red-500 mdui-text-color-white" onclick="confirmDelete()">删除</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentPath = '';
+        let renameTargetPath = '';
+        let deleteTargetPath = '';
         const loadingDialog = new mdui.Dialog('#loadingDialog', { history: false });
 
         function showLoading(text = '加载中...') {
@@ -104,7 +158,7 @@
             if (!items.length) { list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">空文件夹</div>'; return; }
             list.innerHTML = items.map(item => `
                 <div class="file-item">
-                    <div class="file-icon">${item.is_dir ? '📁' : '📄'}</div>
+                    <div class="file-icon">${item.is_dir ? '📁' : `<img src="https://images.bakstotre.com/assets/images/type/${getFileExt(item.name)}_max.gif" onerror="this.outerHTML='<i class=\\'mdui-icon material-icons\\'>insert_drive_file</i>'" style="width:32px;height:32px;">`}</div>
                     <div class="file-info" onclick="${item.is_dir ? `loadFiles('${item.path}')` : `downloadFile('${item.path}')`}">
                         <div class="file-name">${item.name}</div>
                         <div class="file-meta">${item.is_dir ? '文件夹' : formatSize(item.size)} | ${item.modified}</div>
@@ -118,6 +172,11 @@
             `).join('');
         }
 
+        function getFileExt(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            return ext || 'file';
+        }
+
         function formatSize(bytes) {
             if (bytes < 1024) return bytes + ' B';
             if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
@@ -125,7 +184,7 @@
             return (bytes / 1073741824).toFixed(1) + ' GB';
         }
 
-        function downloadFile(path) { window.open(`/api/fm/download?path=${encodeURIComponent(path)}`); }
+        function downloadFile(path) { window.open(`/localcdn/${path.replace(/\\/g, '/')}`); }
 
         async function uploadFiles(files) {
             if (!files.length) return;
@@ -142,31 +201,58 @@
         }
 
         function showRename(path, name) {
-            mdui.prompt('重命名', '请输入新名称', { value: name }, async (val) => {
-                if (!val || val === name) return;
-                showLoading('重命名中...');
-                const res = await fetch('/api/fm/rename', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ path, new_name: val })
-                });
-                const data = await res.json();
+            renameTargetPath = path;
+            document.getElementById('renameInput').value = name;
+            document.getElementById('renameModal').classList.add('active');
+            setTimeout(() => {
+                const input = document.getElementById('renameInput');
+                input.focus();
+                input.select();
+            }, 100);
+        }
+
+        function closeRename() {
+            document.getElementById('renameModal').classList.remove('active');
+        }
+
+        function confirmRename() {
+            const val = document.getElementById('renameInput').value;
+            if (!val) return;
+            closeRename();
+            showLoading('重命名中...');
+            fetch('/api/fm/rename', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: renameTargetPath, new_name: val })
+            }).then(res => res.json()).then(data => {
                 hideLoading();
                 mdui.alert(data.message);
                 if (data.success) loadFiles(currentPath);
             });
         }
 
+        document.getElementById('renameInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') confirmRename();
+        });
+
         function deleteItem(path, name) {
-            mdui.confirm(`确定删除 "${name}" 吗？`, async (confirmed) => {
-                if (!confirmed) return;
-                showLoading('删除中...');
-                const res = await fetch('/api/fm/delete', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ path })
-                });
-                const data = await res.json();
+            deleteTargetPath = path;
+            document.getElementById('deleteText').textContent = `确定删除 "${name}" 吗？此操作不可恢复。`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDelete() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        function confirmDelete() {
+            closeDelete();
+            showLoading('删除中...');
+            fetch('/api/fm/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: deleteTargetPath })
+            }).then(res => res.json()).then(data => {
                 hideLoading();
                 mdui.alert(data.message);
                 if (data.success) loadFiles(currentPath);
@@ -174,20 +260,42 @@
         }
 
         function showMkdir() {
-            mdui.prompt('新建文件夹', '请输入文件夹名称', {}, async (val) => {
-                if (!val) return;
-                showLoading('创建中...');
-                const res = await fetch('/api/fm/mkdir', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ path: currentPath, dir_name: val })
-                });
-                const data = await res.json();
+            document.getElementById('mkdirInput').value = '';
+            document.getElementById('mkdirModal').classList.add('active');
+            setTimeout(() => document.getElementById('mkdirInput').focus(), 100);
+        }
+
+        function closeMkdir() {
+            document.getElementById('mkdirModal').classList.remove('active');
+        }
+
+        function confirmMkdir() {
+            const val = document.getElementById('mkdirInput').value;
+            if (!val) return;
+            closeMkdir();
+            showLoading('创建中...');
+            fetch('/api/fm/mkdir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: currentPath, dir_name: val })
+            }).then(res => res.json()).then(data => {
                 hideLoading();
                 mdui.alert(data.message);
                 if (data.success) loadFiles(currentPath);
             });
         }
+
+        document.getElementById('mkdirInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') confirmMkdir();
+        });
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
 
         function showSearch() {
             const box = document.getElementById('searchBox');
@@ -206,6 +314,12 @@
         }
 
         loadFiles();
+
+        function logout() {
+            fetch('/api/fm/logout', { method: 'POST' }).then(() => {
+                window.location.href = '/fm/login';
+            });
+        }
     </script>
 </body>
 </html>
