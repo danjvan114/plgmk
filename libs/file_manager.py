@@ -1,4 +1,4 @@
-from flask import request, jsonify, session, send_file
+from flask import request, jsonify, session, send_file, redirect
 import os
 import secrets
 import string
