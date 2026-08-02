@@ -44,3 +44,6 @@ temp/
 localcdn/loginVideoNew.mp4
 localcdn/gzs/cy.xlsx
 localcdn/gzs/~$cy.xlsx
+webapp/mcst/profile.html
+localcdn/test.md
+.gitignore

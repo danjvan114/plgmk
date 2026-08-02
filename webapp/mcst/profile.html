@@ -66,6 +66,9 @@
                                         <div style="font-size: 14px; color: #999;">设备绑定状态</div>
                                         <div id="deviceStatus" style="font-size: 16px; font-weight: 500;">加载中...</div>
                                     </div>
+                                    <button class="mdui-btn mdui-ripple mdui-color-green-500 mdui-text-color-white" id="bindBtn" onclick="handleBindDevice()" style="display: none;">
+                                        <i class="mdui-icon material-icons">phonelink_setup</i> 绑定设备
+                                    </button>
                                     <button class="mdui-btn mdui-ripple mdui-color-red-500 mdui-text-color-white" id="unbindBtn" onclick="handleUnbindDevice()" style="display: none;">
                                         <i class="mdui-icon material-icons">phonelink_erase</i> 解绑设备
                                     </button>
@@ -181,19 +184,23 @@
                 .then(res => res.json())
                 .then(data => {
                     const statusEl = document.getElementById('deviceStatus');
+                    const bindBtn = document.getElementById('bindBtn');
                     const unbindBtn = document.getElementById('unbindBtn');
                     
                     if (data.bound && data.matched) {
                         statusEl.textContent = '已绑定 ✓';
                         statusEl.style.color = '#4caf50';
+                        bindBtn.style.display = 'none';
                         unbindBtn.style.display = 'block';
                     } else if (data.bound && !data.matched) {
                         statusEl.textContent = '设备不匹配 ✗';
                         statusEl.style.color = '#f44336';
+                        bindBtn.style.display = 'block';
                         unbindBtn.style.display = 'none';
                     } else {
                         statusEl.textContent = '未绑定';
                         statusEl.style.color = '#ff9800';
+                        bindBtn.style.display = 'block';
                         unbindBtn.style.display = 'none';
                     }
                 })
@@ -201,6 +208,31 @@
                     document.getElementById('deviceStatus').textContent = '加载失败';
                     document.getElementById('deviceStatus').style.color = '#f44336';
                 });
+        }
+        
+        function handleBindDevice() {
+            showConfirm('绑定当前设备', '绑定后可以使用设备验证快速登录服务器，是否继续？', () => {
+                showLoading('正在绑定设备...');
+                
+                fetch('/api/device/bind', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        mdui.snackbar({ message: '设备绑定成功', position: 'top' });
+                        loadDeviceStatus();
+                    } else {
+                        mdui.snackbar({ message: data.message, position: 'top' });
+                    }
+                })
+                .catch(() => {
+                    hideLoading();
+                    mdui.snackbar({ message: '网络错误', position: 'top' });
+                });
+            });
         }
         
         function handleUnbindDevice() {
