@@ -4,7 +4,7 @@ from .invite_code import get_invite_manager
 from .database import get_player_engine
 from sqlalchemy import text
 import hashlib
-import oss's
+import os
 
 def mc_get_invite_code():
     print(f"DEBUG mc_get_invite_code: Function called")
