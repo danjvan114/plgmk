@@ -6,7 +6,9 @@
     <link href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css" rel="stylesheet">
     <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
     <style>
-        body { background: #f5f5f5; }
+        body { background: #f5f5f5; overflow-y: scroll; }
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
         .toolbar { position: sticky; top: 0; z-index: 100; }
         .file-item {
             background: white;
