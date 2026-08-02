@@ -1,11 +1,13 @@
-from flask import redirect, url_for, send_from_directory, request, jsonify
+from flask import redirect, url_for, send_from_directory, request, jsonify, make_response, session
 import os
 import json
 import urllib
+import uuid
 from .config import app, MARKETS
 from .utils import set_market, render_root_template, render_market_template
 from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info, mc_get_invite_code, mc_store_buy
 from .player_routes import register_player, login_player, logout_player, check_player_login, set_player_password, change_player_password, remove_player_whitelist, register_whitelist, delete_player_account
+from .device_auth import get_device_uuid, set_device_cookie, check_device_bound, bind_device, unbind_device, verify_device_login, execute_rcon_forcelogin
 
 def register_other_routes():
     @app.route('/')
@@ -222,11 +224,112 @@ def register_other_routes():
     def api_mc_store_buy():
         return mc_store_buy()
 
+    @app.route('/api/device/check', methods=['POST'])
+    def api_device_check():
+        data = request.get_json()
+        if not data or 'username' not in data:
+            return jsonify({'success': False, 'message': '缺少用户名'}), 400
+        
+        username = data['username'].strip()
+        device_uuid = get_device_uuid()
+        
+        bound_uuid = check_device_bound(username)
+        
+        if not bound_uuid:
+            return jsonify({
+                'success': True,
+                'status': 'unbound',
+                'message': '该账号未绑定设备'
+            })
+        
+        if device_uuid and bound_uuid == device_uuid:
+            success = execute_rcon_forcelogin(username)
+            if success:
+                session['player_name'] = username
+                return jsonify({
+                    'success': True,
+                    'status': 'verified',
+                    'message': '设备验证成功，已放行'
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'RCON执行失败'
+                }), 500
+        
+        return jsonify({
+            'success': True,
+            'status': 'mismatch',
+            'message': '设备不匹配'
+        })
+
+    @app.route('/api/device/bind', methods=['POST'])
+    def api_device_bind():
+        if 'player_name' not in session:
+            return jsonify({'success': False, 'message': '请先登录'}), 401
+        
+        username = session['player_name']
+        device_uuid = get_device_uuid()
+        
+        if not device_uuid:
+            device_uuid = str(uuid.uuid4())
+        
+        bind_device(username, device_uuid)
+        
+        response = make_response(jsonify({
+            'success': True,
+            'message': '设备绑定成功'
+        }))
+        set_device_cookie(response, device_uuid)
+        return response
+
+    @app.route('/api/device/unbind', methods=['POST'])
+    def api_device_unbind():
+        if 'player_name' not in session:
+            return jsonify({'success': False, 'message': '请先登录'}), 401
+        
+        username = session['player_name']
+        unbind_device(username)
+        
+        response = make_response(jsonify({
+            'success': True,
+            'message': '设备已解绑'
+        }))
+        response.delete_cookie('device_uuid')
+        return response
+
+    @app.route('/api/device/status', methods=['GET'])
+    def api_device_status():
+        if 'player_name' not in session:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        
+        username = session['player_name']
+        device_uuid = get_device_uuid()
+        bound_uuid = check_device_bound(username)
+        
+        return jsonify({
+            'success': True,
+            'bound': bool(bound_uuid),
+            'matched': bool(bound_uuid and device_uuid and bound_uuid == device_uuid)
+        })
+
     @app.route('/mc/login')
     def mc_login():
         return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
                                               'webapp', 'mcst'), 
                                  'mclogin.html')
+
+    @app.route('/app/mclog')
+    def mc_device_login_route():
+        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                              'webapp', 'mcst'), 
+                                 'device_login.html')
+
+    @app.route('/mc/device_login')
+    def mc_device_login():
+        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                              'webapp', 'mcst'), 
+                                 'device_login.html')
 
     @app.route('/mc/register')
     def mc_register():

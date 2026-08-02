@@ -59,6 +59,19 @@
                         <input class="mdui-textfield-input" id="displayUsername" type="text" readonly>
                     </div>
                     <div style="margin-top: 16px;">
+                        <div class="mdui-card" style="margin-bottom: 12px;">
+                            <div class="mdui-card-content" style="padding: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-size: 14px; color: #999;">设备绑定状态</div>
+                                        <div id="deviceStatus" style="font-size: 16px; font-weight: 500;">加载中...</div>
+                                    </div>
+                                    <button class="mdui-btn mdui-ripple mdui-color-red-500 mdui-text-color-white" id="unbindBtn" onclick="handleUnbindDevice()" style="display: none;">
+                                        <i class="mdui-icon material-icons">phonelink_erase</i> 解绑设备
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         <button class="mdui-btn mdui-ripple mdui-color-orange-500 mdui-text-color-white mdui-btn-block" onclick="handleRemoveWhitelist()">
                             <i class="mdui-icon material-icons">person_remove</i> 从白名单注销
                         </button>
@@ -159,8 +172,61 @@
                     }
                     document.getElementById('displayUsername').value = data.username;
                     document.getElementById('username').textContent = data.username;
+                    loadDeviceStatus();
                 });
         };
+        
+        function loadDeviceStatus() {
+            fetch('/api/device/status')
+                .then(res => res.json())
+                .then(data => {
+                    const statusEl = document.getElementById('deviceStatus');
+                    const unbindBtn = document.getElementById('unbindBtn');
+                    
+                    if (data.bound && data.matched) {
+                        statusEl.textContent = '已绑定 ✓';
+                        statusEl.style.color = '#4caf50';
+                        unbindBtn.style.display = 'block';
+                    } else if (data.bound && !data.matched) {
+                        statusEl.textContent = '设备不匹配 ✗';
+                        statusEl.style.color = '#f44336';
+                        unbindBtn.style.display = 'none';
+                    } else {
+                        statusEl.textContent = '未绑定';
+                        statusEl.style.color = '#ff9800';
+                        unbindBtn.style.display = 'none';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('deviceStatus').textContent = '加载失败';
+                    document.getElementById('deviceStatus').style.color = '#f44336';
+                });
+        }
+        
+        function handleUnbindDevice() {
+            showConfirm('确认解绑设备', '解绑后需要使用设备验证登录重新绑定，是否继续？', () => {
+                showLoading('正在解绑设备...');
+                
+                fetch('/api/device/unbind', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        mdui.snackbar({ message: '设备已解绑', position: 'top' });
+                        loadDeviceStatus();
+                    } else {
+                        mdui.snackbar({ message: data.message, position: 'top' });
+                    }
+                })
+                .catch(() => {
+                    hideLoading();
+                    mdui.snackbar({ message: '网络错误', position: 'top' });
+                });
+            });
+        }
         
         function showLoading(text) {
             document.getElementById('loadingText').textContent = text || '处理中...';

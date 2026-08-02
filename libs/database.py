@@ -240,8 +240,18 @@ def init_player_database():
     )
     """)
     
+    device_table = text("""
+    CREATE TABLE IF NOT EXISTS player_device (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        device_uuid VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    
     with engine.connect() as conn:
         conn.execute(player_table)
+        conn.execute(device_table)
         conn.commit()
     
     return engine

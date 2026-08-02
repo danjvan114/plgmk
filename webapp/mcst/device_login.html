@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <title>服务器登录</title>
+    <style>
+        .container { max-width: 500px; margin: 60px auto; padding: 20px; }
+        .status-card { text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="mdui-toolbar mdui-color-blue-500">
+        <a class="mdui-ripple mdui-btn-icon" onclick="window.history.back()">
+            <i class="mdui-icon material-icons mdui-text-color-white">arrow_back</i>
+        </a>
+        <span class="mdui-typo-title mdui-text-color-white">服务器登录</span>
+        <div class="mdui-toolbar-spacer"></div>
+    </div>
+
+    <div class="container">
+        <div class="mdui-card">
+            <div class="mdui-card-content status-card">
+                <div id="statusIcon" style="font-size: 64px; margin-bottom: 16px;"></div>
+                <div id="statusText" style="font-size: 18px; font-weight: 500; margin-bottom: 8px;">正在检查...</div>
+                <div id="statusDesc" style="font-size: 14px; color: #999; margin-bottom: 24px;"></div>
+                <button id="actionBtn" class="mdui-btn mdui-ripple mdui-btn-block" style="display: none;" onclick="handleAction()"></button>
+                <div style="margin-top: 16px;">
+                    <a href="/mc/login?redirect=/app/mclog" class="mdui-text-color-blue-500">使用密码登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var currentAction = null;
+
+        function setStatus(icon, color, text, desc, btnText, btnColor, action) {
+            document.getElementById('statusIcon').innerHTML = '<i class="mdui-icon material-icons" style="font-size: 64px; color: ' + color + ';">' + icon + '</i>';
+            document.getElementById('statusText').textContent = text;
+            document.getElementById('statusDesc').textContent = desc || '';
+            var btn = document.getElementById('actionBtn');
+            if (btnText) {
+                btn.textContent = btnText;
+                btn.className = 'mdui-btn mdui-ripple ' + btnColor + ' mdui-btn-block';
+                btn.style.display = 'block';
+                currentAction = action;
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        function handleAction() {
+            if (currentAction) currentAction();
+        }
+
+        window.onload = function() {
+            fetch('/api/player/check')
+                .then(function(res) {
+                    if (res.status === 401) {
+                        window.location.href = '/mc/login?redirect=/app/mclog';
+                        return null;
+                    }
+                    return res.json();
+                })
+                .then(function(data) {
+                    if (!data) return;
+                    if (!data.logged_in) {
+                        window.location.href = '/mc/login?redirect=/app/mclog';
+                        return;
+                    }
+                    var username = data.username;
+                    fetch('/api/device/check', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: username })
+                    })
+                    .then(function(res) { return res.json(); })
+                    .then(function(deviceData) {
+                        if (deviceData.status === 'verified') {
+                            setStatus('check_circle', '#4caf50', '设备验证成功', '正在放行到服务器...', null, null, null);
+                            setTimeout(function() { window.location.href = '/app/mcs'; }, 1500);
+                        } else if (deviceData.status === 'unbound') {
+                            setStatus('phonelink_erase', '#ff9800', '设备未绑定', '请先使用密码登录，然后在用户中心绑定设备', '去绑定', 'mdui-color-orange-500 mdui-text-color-white', function() { window.location.href = '/app/user'; });
+                        } else {
+                            setStatus('error', '#f44336', '设备不匹配', '当前设备与账号绑定的设备不一致', '使用密码登录', 'mdui-color-red-500 mdui-text-color-white', function() { window.location.href = '/mc/login?redirect=/app/mclog'; });
+                        }
+                    })
+                    .catch(function() {
+                        setStatus('error', '#f44336', '检查失败', '网络错误', '重试', 'mdui-color-blue-500 mdui-text-color-white', function() { window.location.reload(); });
+                    });
+                })
+                .catch(function() {
+                    window.location.href = '/mc/login?redirect=/app/mclog';
+                });
+        };
+    </script>
+</body>
+</html>
