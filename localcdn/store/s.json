@@ -7,15 +7,22 @@
         "price": 10,
         "exec_type": "bot"
 
-    }
+    },
     {
-        "title": "",
-        "data": "包含10元地铁/高速费用",
+        "title": "地铁高速一卡通",
+        "data": "包含5元地铁/高速费用",
         "pic": "/localcdn/store/ad1.png",
-        "command": "/etc.pay.op %player% 10",
-        "price": 2,
+        "command": "/etc.pay.op %player% 5",
+        "price": 5,
+        "exec_type": "bot"
+    },
+    {
+        "title": "曲奇",
+        "data": "包含0元曲奇",
+        "pic": "/localcdn/store/ad1.png",
+        "command": "/give %player% cookie",
+               "price": 0,
         "exec_type": "bot"
     }
     
 ]
-// https://cdn.nlark.com/yuque/0/2026/png/35402759/1783944265640-297c9db1-8ca8-4373-8e9d-4e29178db7b0.png
