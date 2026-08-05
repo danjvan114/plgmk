@@ -33,7 +33,9 @@ def register_market_routes():
         return render_market_template('index.html', market_id=market_id, 
                                       plugins=plugins, search_query=search_query, users=users,
                                       compact_mode=compact_mode)
-
+    @app.route('/kn/about')
+    def knabout():
+        return render_market_template('aboutgr.html', market_id='kn')
     @app.route('/mk/kn')
     def index():
         return market_index('kn')
