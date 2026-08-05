@@ -37,10 +37,6 @@ def register_developer_routes():
     def developer_center_kn():
         return developer_center('kn')
 
-    @app.route('/dev/k4u')
-    def developer_center_k4u():
-        return developer_center('k4u')
-
     def build_doc_tree(dir_path, base_path=''):
         tree = []
         try:

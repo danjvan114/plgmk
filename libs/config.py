@@ -5,7 +5,7 @@ from datetime import timedelta
 import os
 
 USER_DATA_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
-MARKETS = {'kn': 'KN插件市场', 'k4u': 'K4U插件市场'}
+MARKETS = {'kn': 'KN插件市场'}
 
 app = Flask(__name__)
 

@@ -38,10 +38,6 @@ def register_market_routes():
     def index():
         return market_index('kn')
 
-    @app.route('/mk/k4u')
-    def index_k4u():
-        return market_index('k4u')
-
     @app.route('/mk/<market_id>/plugin/<int:plugin_id>')
     def market_plugin_detail(market_id, plugin_id):
         if market_id not in MARKETS:
@@ -64,10 +60,6 @@ def register_market_routes():
     def plugin_detail(plugin_id):
         return market_plugin_detail('kn', plugin_id)
 
-    @app.route('/mk/k4u/plugin/<int:plugin_id>')
-    def plugin_detail_k4u(plugin_id):
-        return market_plugin_detail('k4u', plugin_id)
-
     @app.route('/mk/<market_id>/uploads/<path:filepath>')
     def market_uploaded_file(market_id, filepath):
         if market_id not in MARKETS:
@@ -78,10 +70,6 @@ def register_market_routes():
     @app.route('/mk/kn/uploads/<path:filepath>')
     def uploaded_file(filepath):
         return market_uploaded_file('kn', filepath)
-
-    @app.route('/mk/k4u/uploads/<path:filepath>')
-    def uploaded_file_k4u(filepath):
-        return market_uploaded_file('k4u', filepath)
 
     @app.route('/mk/<market_id>/download/<int:plugin_id>')
     def market_download_plugin(market_id, plugin_id):
@@ -107,10 +95,6 @@ def register_market_routes():
     @app.route('/mk/kn/download/<int:plugin_id>')
     def download_plugin(plugin_id):
         return market_download_plugin('kn', plugin_id)
-
-    @app.route('/mk/k4u/download/<int:plugin_id>')
-    def download_plugin_k4u(plugin_id):
-        return market_download_plugin('k4u', plugin_id)
 
     @app.route('/mk/<market_id>/rate/<int:plugin_id>', methods=['GET', 'POST'])
     def market_rate_plugin(market_id, plugin_id):
@@ -142,10 +126,6 @@ def register_market_routes():
     @app.route('/mk/kn/rate/<int:plugin_id>', methods=['GET', 'POST'])
     def rate_plugin(plugin_id):
         return market_rate_plugin('kn', plugin_id)
-
-    @app.route('/mk/k4u/rate/<int:plugin_id>', methods=['GET', 'POST'])
-    def rate_plugin_k4u(plugin_id):
-        return market_rate_plugin('k4u', plugin_id)
 
     @app.route('/mk/<market_id>/upload', methods=['GET', 'POST'])
     def market_upload_plugin(market_id):
@@ -222,10 +202,6 @@ def register_market_routes():
     def upload_plugin():
         return market_upload_plugin('kn')
 
-    @app.route('/mk/k4u/upload', methods=['GET', 'POST'])
-    def upload_plugin_k4u():
-        return market_upload_plugin('k4u')
-
     @app.route('/mk/<market_id>/update/<int:plugin_id>', methods=['GET', 'POST'])
     def market_update_plugin(market_id, plugin_id):
         if market_id not in MARKETS:
@@ -297,10 +273,6 @@ def register_market_routes():
     def update_plugin(plugin_id):
         return market_update_plugin('kn', plugin_id)
 
-    @app.route('/mk/k4u/update/<int:plugin_id>', methods=['GET', 'POST'])
-    def update_plugin_k4u(plugin_id):
-        return market_update_plugin('k4u', plugin_id)
-
     @app.route('/mk/<market_id>/toggle_status/<int:plugin_id>')
     def market_toggle_status(market_id, plugin_id):
         if market_id not in MARKETS:
@@ -325,10 +297,6 @@ def register_market_routes():
     @app.route('/mk/kn/toggle_status/<int:plugin_id>')
     def toggle_plugin_status_route(plugin_id):
         return market_toggle_status('kn', plugin_id)
-
-    @app.route('/mk/k4u/toggle_status/<int:plugin_id>')
-    def toggle_plugin_status_k4u(plugin_id):
-        return market_toggle_status('k4u', plugin_id)
 
     @app.route('/mk/<market_id>/developer/stats')
     def market_developer_stats(market_id):
@@ -355,10 +323,6 @@ def register_market_routes():
     def developer_stats():
         return market_developer_stats('kn')
 
-    @app.route('/mk/k4u/developer/stats')
-    def developer_stats_k4u():
-        return market_developer_stats('k4u')
-
     @app.route('/mk/<market_id>/admin')
     def market_admin_panel(market_id):
         if market_id not in MARKETS:
@@ -379,10 +343,6 @@ def register_market_routes():
     @app.route('/mk/kn/admin')
     def admin_panel():
         return market_admin_panel('kn')
-
-    @app.route('/mk/k4u/admin')
-    def admin_panel_k4u():
-        return market_admin_panel('k4u')
 
     @app.route('/mk/<market_id>/admin/delete/<int:plugin_id>')
     def market_admin_delete(market_id, plugin_id):
@@ -405,10 +365,6 @@ def register_market_routes():
     @app.route('/mk/kn/admin/delete/<int:plugin_id>')
     def admin_delete(plugin_id):
         return market_admin_delete('kn', plugin_id)
-
-    @app.route('/mk/k4u/admin/delete/<int:plugin_id>')
-    def admin_delete_k4u(plugin_id):
-        return market_admin_delete('k4u', plugin_id)
 
     @app.route('/mk/<market_id>/admin/batch_delete', methods=['POST'])
     def market_admin_batch_delete(market_id):
@@ -436,7 +392,3 @@ def register_market_routes():
     @app.route('/mk/kn/admin/batch_delete', methods=['POST'])
     def admin_batch_delete():
         return market_admin_batch_delete('kn')
-
-    @app.route('/mk/k4u/admin/batch_delete', methods=['POST'])
-    def admin_batch_delete_k4u():
-        return market_admin_batch_delete('k4u')
