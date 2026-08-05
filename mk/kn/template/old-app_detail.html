@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="icon" type="image/x-icon" href="/localcdn/ico.png">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+
+<meta charset="UTF-8">
+<title>插件市场-下载客户端</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
+header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
+.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+.logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
+.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
+.logo-icon img{width:100%;height:100%;object-fit:cover}
+.head-space{flex:1}
+.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
+.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
+.search input::placeholder{color:#999}
+.main-box{max-width:900px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
+.card{background:#ffffff;border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;animation:slideDown 0.5s ease-out}
+.card2{background:#000000;border-radius:6px;box-shadow:0 4px 20px rgba(0, 0, 0, 0.425);overflow:hidden;animation:slideDown 0.5s ease-out}
+
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#333;text-decoration:none}
+.nav-links a:hover{color:#2196f3}
+.nav-links a.active{color:#2196f3;font-weight:500}
+.btn{background:#2196f3;color:#fff;padding:12px 24px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:16px;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:#1976d2}
+.btn-large{padding:16px 32px;font-size:18px}
+.app-header{padding:40px;text-align:center;border-bottom:1px solid rgba(0,0,0,.05)}
+.app-icon{width:120px;height:120px;border-radius:24px;margin:0 auto 20px;box-shadow:0 8px 30px rgba(0,0,0,.15);overflow:hidden}
+.app-icon img{width:100%;height:100%;object-fit:cover}
+.app-header h1{color:#333;font-size:32px;margin-bottom:8px}
+.app-header .version{color:#999;font-size:16px;margin-bottom:20px}
+.app-header .description{color:#666;font-size:16px;line-height:1.6;margin-bottom:30px}
+.download-stats{display:flex;justify-content:center;gap:40px;margin-bottom:30px}
+.stat-item{text-align:center}
+.stat-item .number{font-size:28px;font-weight:bold;color:#2196f3}
+.stat-item .label{color:#999;font-size:14px}
+.features{padding:40px;border-bottom:1px solid rgba(0,0,0,.05)}
+.features h2{color:#333;margin-bottom:24px;font-size:24px}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:20px}
+.feature-card{padding:20px;border-radius:8px;background:rgba(33,150,243,.05)}
+.feature-card .icon{width:48px;height:48px;border-radius:12px;background:#2196f3;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px}
+.feature-card h3{color:#333;margin-bottom:8px}
+.feature-card p{color:#666;font-size:14px;line-height:1.5}
+.screenshots{padding:40px;border-bottom:1px solid rgba(0,0,0,.05)}
+.screenshots h2{color:#333;margin-bottom:24px;font-size:24px}
+.screenshot-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px}
+.screenshot-item{border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.screenshot-item img{width:100%;height:auto;display:block}
+.download-section{padding:40px;text-align:center}
+.download-section h2{color:#333;margin-bottom:20px;font-size:24px}
+.download-options{display:flex;justify-content:center;gap:20px;flex-wrap:wrap}
+.download-btn{display:flex;flex-direction:column;align-items:center;padding:20px 30px;border-radius:8px;background:rgba(0,0,0,.02);border:1px solid rgba(0,0,0,.05)}
+.download-btn .platform{font-size:14px;color:#999;margin-top:8px}
+.footer{text-align:center;padding:20px;color:#999;font-size:14px}
+.dropdown{position:relative;display:inline-block}
+.dropbtn{background:none;border:none;color:#333;font-size:14px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px}
+.dropbtn:hover{color:#2196f3}
+.dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.1);z-index:200;border-radius:4px;margin-top:0;padding-top:4px}
+.dropdown-content.show{display:block}
+.dropdown-content a{color:#333;padding:8px 12px;text-decoration:none;display:block;font-size:14px}
+.dropdown-content a:hover{background:rgba(33,150,243,.1)}
+.dowbt{display:flex;justify-content:center;gap:20px}
+.version-switch{display:flex;justify-content:center;gap:10px;margin-top:20px}
+.version-btn{padding:10px 20px;border:none;border-radius:4px;background:rgba(0,0,0,.05);color:#666;cursor:pointer;font-size:14px;transition:all 0.3s}
+.version-btn:hover{background:rgba(33,150,243,.1);color:#2196f3}
+.version-btn.active{background:#2196f3;color:#fff}
+.v2{background:#21f3b4;color:#000000}
+.v2:hover{background:#148d69}
+#loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
+#loader .mdui-progress{margin:0;border-radius:0}
+</style>
+</head>
+
+
+<body>
+<div class="loader" id="loader">
+<div class="mdui-progress">
+<div class="mdui-progress-indeterminate"></div>
+</div>
+</div>
+<header>
+<div class="wrap">
+<div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>{{ markets.get(current_market) if current_market else 'KN插件市场' }}</div>
+<div class="nav-links">
+<a href="/mk/{{ current_market or 'kn' }}">首页</a>
+<a href="/app/kn/d" class="active" >应用下载</a>
+<div class="dropdown">
+<button class="dropbtn">{{ (markets.get(current_market) if current_market else 'KN插件市场') }} ▼</button>
+<div class="dropdown-content">
+{% if markets %}
+{% for market_id, market_name in markets.items() %}
+<a href="/mk/{{ market_id }}">{{ market_name }}</a>
+{% endfor %}
+{% endif %}
+</div>
+</div>
+{% if session.user %}
+<a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+<a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+{% if users and users.get(session.user, {}).get('role') == 'admin' %}
+<a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+{% endif %}
+{% endif %}
+</div>
+<div class="head-space"></div>
+<form class="search" action="/mk/{{ current_market or 'kn' }}" method="get">
+<input name="search" placeholder="搜索插件">
+</form>
+<div style="margin-left:16px">
+{% if session.user %}
+<a href="/change_password" class="btn mdui-btn mdui-ripple">修改密码</a>
+<a href="/logout" class="btn mdui-btn mdui-ripple">退出</a>
+{% else %}
+<a href="/login" class="btn mdui-btn mdui-ripple">登录</a>
+<a href="/register" class="btn mdui-btn mdui-ripple">注册</a>
+{% endif %}
+</div>
+</div>
+</header>
+<div class="main-box">
+<div class="card">
+<div class="app-header">
+<div class="app-icon">
+<img src="/localcdn/Expanse.png" alt="图标" id="app-icon">
+</div>
+<h1 id="app-title">KN Expanse</h1>
+
+<p class="description" id="app-desc">KN扩展版本，支持扩展积木，性能提升。</p>
+
+<div class="version-switch">
+<button class="version-btn active mdui-ripple mdui-ripple-red"" onclick="switchVersion('expanse')">KN Expanse</button>
+<button class="version-btn mdui-ripple mdui-ripple-red"" onclick="switchVersion('normal')">KN普通版</button>
+</div>
+</div>
+
+<div class="dowbt">
+<a href="#download-section" class="btn btn-large mdui-ripple" onclick="scrollToDownload()">
+<span>KN Expanse</span>
+<span>
+    <i class="mdui-icon material-icons">vertical_align_bottom</i>
+</span>
+</a>
+<a href="https://api.gitproxy.dev/github.com/danjvan114/knu/releases/download/noupdata/kn.2.exe" class="btn btn-large v2 mdui-btn mdui-ripple" style="display:none">
+<span>KN Normal Client</span>
+<span>
+    <i class="mdui-icon material-icons">vertical_align_bottom</i>
+</span>
+</a>
+</div>
+
+
+
+
+
+<div class="features">
+<h2>功能特性</h2>
+<div class="feature-grid">
+<div class="feature-card">
+<div class="icon">
+    <i class="mdui-icon material-icons">done</i>
+</div>
+<h3>一键安装</h3>
+<p>直接扔插件，自动加载</p>
+</div>
+<div class="feature-card">
+<div class="icon">
+    <i class="mdui-icon material-icons">near_me</i>
+</div>
+<h3>更多扩展</h3>
+<p>扩展性能强，可自制插件~</p>
+</div>
+<div class="feature-card">
+<div class="icon">
+    <i class="mdui-icon material-icons">settings</i>
+</div>
+<h3>插件管理</h3>
+<p>集中管理所有已安装插件，支持启用、禁用和卸载。</p>
+</div>
+<div class="feature-card">
+<div class="icon">
+    <i class="mdui-icon material-icons">mood</i>
+</div>
+<h3>社区支持</h3>
+<p>为喜欢的插件和作品点赞，参与社区讨论。</p>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+<div class="screenshots">
+<h2>应用截图</h2>
+<div class="screenshot-grid">
+<div class="screenshot-item">
+<img src="/localcdn/app1.png" alt="截图1">
+</div>
+<div class="screenshot-item">
+<img src="/localcdn/app2.png" alt="截图2">
+</div>
+<div class="screenshot-item">
+<img src="/localcdn/app3.png" alt="截图3">
+</div>
+</div>
+</div>
+
+<div class="download-section" id="download-section">
+<h2>下载KN Expanse v1.2.4</h2>
+<div class="card2">
+<div class="download-options">
+<a href="https://api.gitproxy.dev/github.com/danjvan114/knu/releases/download/1.2.4/KN.Expanse.v1.2.4.exe" class="download-btn btn">
+<span><i class="mdui-icon material-icons">desktop_windows</i></span>
+<span class="platform">Windows 10/11</span>
+</a>
+<a href="#" class="download-btn btn">
+<span><i class="mdui-icon material-icons">desktop_mac</i></span>
+<span class="platform">macOS 10.15+</span>
+</a>
+<a href="#" class="download-btn btn" >
+<span><i class="mdui-icon material-icons">landscape</i></span>
+<span class="platform">Ubuntu/Debian</span>
+
+<a href="https://github.com/danjvan114/knu/releases#release-main" class="download-btn btn">
+<span><i class="mdui-icon material-icons">history</i></span>
+<span class="platform">历史版本仓库</span>
+
+
+
+
+
+</a>
+</div>
+</div>
+
+
+
+
+
+
+
+
+<div class="footer">
+
+</div>
+</div>
+</div>
+<script>window.addEventListener('load',function(){document.getElementById('loader').style.display='none'});</script>
+<script>
+function scrollToDownload() {
+    document.getElementById('download-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function switchVersion(version) {
+    const icon = document.getElementById('app-icon');
+    const title = document.getElementById('app-title');
+    const desc = document.getElementById('app-desc');
+    const buttons = document.querySelectorAll('.version-btn');
+    const downloadBtns = document.querySelectorAll('.dowbt a');
+    const features = document.querySelector('.features');
+    const screenshots = document.querySelector('.screenshots');
+    const downloadSection = document.getElementById('download-section');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    if (version === 'expanse') {
+        icon.src = '/localcdn/Expanse.png';
+        title.textContent = 'KN Expanse';
+        desc.textContent = 'KN扩展版本，支持扩展积木，性能提升。';
+        downloadBtns[0].innerHTML = '<span>KN Expanse</span><span><i class="mdui-icon material-icons">vertical_align_bottom</i></span>';
+        downloadBtns[0].href = '#download-section';
+        downloadBtns[0].onclick = scrollToDownload;
+        downloadBtns[0].style.display = 'inline-flex';
+        downloadBtns[1].style.display = 'none';
+        features.style.display = 'block';
+        screenshots.style.display = 'block';
+        downloadSection.style.display = 'block';
+        buttons[0].classList.add('active');
+    } else {
+        icon.src = '/localcdn/normal.png';
+        title.textContent = 'KN Normal';
+        desc.textContent = '此版本为不包含插件加载器，仅当作普通KN客户端使用。（不再维护）';
+        downloadBtns[0].innerHTML = '<span>KN Normal</span><span><i class="mdui-icon material-icons">vertical_align_bottom</i></span>';
+        downloadBtns[0].href = 'https://api.gitproxy.dev/github.com/danjvan114/knu/releases/download/noupdata/kn.2.exe';
+        downloadBtns[0].onclick = null;
+        downloadBtns[0].style.display = 'inline-flex';
+        downloadBtns[1].style.display = 'none';
+        features.style.display = 'none';
+        screenshots.style.display = 'none';
+        downloadSection.style.display = 'none';
+        buttons[1].classList.add('active');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('zh')) {
+        const zhValue = urlParams.get('zh');
+        if (zhValue === '1') {
+            const normalClientBtn = document.querySelector('.dowbt a:last-child span:first-child');
+            if (normalClientBtn) {
+                normalClientBtn.textContent = 'KN客户端';
+            }
+        }
+    }
+});
+</script>
+<script>
+document.querySelector('.dropbtn').addEventListener('click', function() {
+    document.querySelector('.dropdown-content').classList.toggle('show');
+});
+window.addEventListener('click', function(e) {
+    if (!e.target.matches('.dropbtn')) {
+        document.querySelector('.dropdown-content').classList.remove('show');
+    }
+});
+</script>
+</body>
+</html>
