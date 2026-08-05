@@ -349,6 +349,65 @@
         .delay-4 { transition-delay: 0.4s; }
         .delay-5 { transition-delay: 0.5s; }
         .delay-6 { transition-delay: 0.6s; }
+
+        /* 团队区域 */
+        .team-section {
+            padding: 100px 15%;
+            background: linear-gradient(180deg, #f8fbff 0%, #e8f2ff 100%);
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+        .team-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(54, 136, 255, 0.1);
+        }
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(54, 136, 255, 0.15);
+            border-color: rgba(54, 136, 255, 0.3);
+        }
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            border: 4px solid #3688ff;
+            box-shadow: 0 8px 25px rgba(54, 136, 255, 0.2);
+        }
+        .team-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .team-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .team-role {
+            font-size: 14px;
+            color: #3688ff;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .team-desc {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -368,6 +427,40 @@
     </div>
     
 </header>
+
+<!-- 团队介绍区域 -->
+<section class="team-section">
+    <h2 class="section-title animate-on-scroll from-bottom">
+        认识我们的 <span>团队</span>
+    </h2>
+    <div class="team-grid">
+        <div class="team-card animate-on-scroll from-bottom delay-1">
+            <div class="team-avatar">
+                <img src="http://q.qlogo.cn/headimg_dl?dst_uin=3290109067&spec=640&img_type=jpg" alt="Danjvan">
+            </div>
+            <div class="team-name">Starry</div>
+            <div class="team-role">创始人 & 核心开发</div>
+            <div class="team-desc">KNExpanse 项目发起人，负责整体架构设计与核心功能开发。</div>
+        </div>
+        <div class="team-card animate-on-scroll from-bottom delay-2">
+            <div class="team-avatar">
+                <img src="http://q.qlogo.cn/headimg_dl?dst_uin=2690180230&spec=640&img_type=jpg" alt="Alex">
+            </div>
+            <div class="team-name">danjvan114</div>
+            <div class="team-role">前后端+js开发</div>
+            <div class="team-desc">提供前端、后端、数据库等多方面开发服务，确保KNExpanse私有化云平台的稳定运行。</div>
+        </div>
+        <div class="team-card animate-on-scroll from-bottom delay-3">
+            <div class="team-avatar">
+                <img src="http://q.qlogo.cn/headimg_dl?dst_uin=359148497&spec=640&img_type=jpg" alt="Mike">
+            </div>
+            <div class="team-name">Inventocode</div>
+            <div class="team-role">提供一些扩展加载器资料</div>
+            <div class="team-desc">为加载器提供扩展资料，使KE拥有加载器（感谢）</div>
+        </div>
+        
+    </div>
+</section>
 
 
 
