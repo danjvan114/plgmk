@@ -38,39 +38,15 @@ p{color:#666;margin-bottom:24px}
 </style>
 </head>
 <body>
-<header>
-<div class="wrap">
-<div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>插件市场</div>
-<div class="nav-links">
-<a href="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}">首页</a>
-{% if not compact_mode %}
-{% if session.user %}
-<a href="/mk/kn/upload">上传插件</a>
-<a href="/mk/kn/developer/stats">我的统计</a>
-{% if users and users.get(session.user, {}).get('role') == 'admin' %}
-<a href="/mk/kn/admin">后台管理</a>
-{% endif %}
-{% endif %}
-{% endif %}
+<div class="mdui-toolbar mdui-color-teal" style="position:fixed;top:0;left:0;right:0;z-index:99;">
+        <a class="mdui-ripple mdui-btn-icon" onclick="window.history.back()">
+            <i class="mdui-icon material-icons">arrow_back</i>
+        </a>
+        <span class="mdui-typo-title">为插件评分</span>
+        <div class="mdui-toolbar-spacer"></div>
+        
+      
 </div>
-<div class="head-space"></div>
-<form class="search" action="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}" method="get">
-<input name="search" placeholder="搜索插件名称/标签">
-</form>
-<div style="margin-left:16px">
-{% if compact_mode %}
-<button class="btn mdui-ripple" onclick="copyWebUrl()">复制网页版链接</button>
-{% else %}
-{% if session.user %}
-<a href="/change_password" class="btn mdui-ripple">修改密码</a>
-<a href="/logout" class="btn mdui-ripple">退出</a>
-{% else %}
-<a href="/login" class="btn mdui-ripple">登录</a>
-{% endif %}
-{% endif %}
-</div>
-</div>
-</header>
 <div class="main-box">
 <div class="card">
 <h1>为插件评分</h1>

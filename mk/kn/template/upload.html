@@ -8,40 +8,28 @@
 <title>上传插件</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
-header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
-.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
-.logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
-.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
-.logo-icon img{width:100%;height:100%;object-fit:cover}
-.head-space{flex:1}
-.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
-.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
-.search input::placeholder{color:#999}
-.main-box{max-width:1000px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
-.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);padding:24px;animation:slideDown 0.5s ease-out;margin-bottom:20px}
+body{background:url('') no-repeat center center fixed;background-size:cover;min-height:100vh}
 @keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-.nav-links{display:flex;gap:16px}
-.nav-links a{color:#333;text-decoration:none}
-.nav-links a:hover{color:#2196f3}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;color:#333;margin-bottom:8px;font-weight:500}
-.form-group input, .form-group textarea{width:100%;padding:12px;border:1px solid rgba(0,0,0,.1);border-radius:4px;font-size:14px;outline:none;background:rgba(255,255,255,.6)}
-.form-group input:focus, .form-group textarea:focus{border-color:#2196f3}
+.main-box{max-width:800px;margin:0 auto;padding-top:100px;padding-left:16px;padding-right:16px}
+.card{background:rgba(255,255,255,.95);border-radius:12px;padding:32px;margin-bottom:24px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;color:#333;margin-bottom:8px;font-weight:500;font-size:15px}
 .form-group textarea{height:120px;resize:vertical}
-.form-group input[type="file"]{padding:8px;background:none}
-.btn{background:#2196f3;color:#fff;padding:12px 24px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:16px}
-.btn:hover{background:#1976d2}
-h1{color:#333;margin-bottom:24px}
-h2{color:#333;margin-bottom:16px;font-size:18px}
-.file-info{color:#999;font-size:14px;margin-top:8px}
-.ttmp4-section{border-top:1px solid rgba(0,0,0,.05);padding-top:20px;margin-top:20px}
-.ttmp4-preview{border-top:1px solid rgba(0,0,0,.05);padding-top:20px;margin-top:20px}
-.iframe-container{position:relative;width:100%;height:500px;border:1px solid rgba(0,0,0,.1);border-radius:4px;overflow:hidden}
-.iframe-container iframe{width:100%;height:100%;border:none}
-.preview-empty{display:flex;justify-content:center;align-items:center;height:100%;color:#999}
+.form-group input[type="file"]{padding:12px;background:rgba(0,0,0,.02);border-radius:8px;width:100%}
+.btn{background:#2196f3;color:#fff;padding:14px 32px;border:none;border-radius:8px;cursor:pointer;text-decoration:none;font-size:16px;font-weight:500;transition:all 0.3s}
+.btn:hover{background:#1976d2;transform:translateY(-2px);box-shadow:0 8px 25px rgba(33,150,243,.3)}
+.btn-cancel{background:rgba(0,0,0,.05);color:#333;margin-left:12px}
+.btn-cancel:hover{background:rgba(0,0,0,.1)}
+h1{color:#333;margin-bottom:8px;font-size:28px}
+.subtitle{color:#666;margin-bottom:24px;font-size:14px}
+.file-info{color:#999;font-size:13px;margin-top:6px}
+.divider{height:1px;background:rgba(0,0,0,.05);margin:24px 0}
 #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
 #loader .mdui-progress{margin:0;border-radius:0}
+.form-actions{display:flex;justify-content:flex-end;margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,.05)}
+.mdui-textfield-input{margin-bottom:4px}
+.radio-group{display:flex;gap:20px;margin-bottom:16px}
+.radio-group label{display:flex;align-items:center;gap:8px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -51,88 +39,123 @@ h2{color:#333;margin-bottom:16px;font-size:18px}
 </div>
 </div>
 
-
-<div class="mdui-toolbar">
+<div class="mdui-toolbar mdui-color-teal" style="position:fixed;top:0;left:0;right:0;z-index:99;">
         <a class="mdui-ripple mdui-btn-icon" onclick="window.history.back()">
             <i class="mdui-icon material-icons">arrow_back</i>
         </a>
         <span class="mdui-typo-title">上传插件</span>
         <div class="mdui-toolbar-spacer"></div>
+        
+      
 </div>
-
 
 <div class="main-box">
 <div class="card">
-<h1>上传插件</h1>
-<form method="post" enctype="multipart/form-data">
+<h1>上传新插件</h1>
+<p class="subtitle">填写插件信息并发布到 KN 插件市场</p>
+
+<form method="post" enctype="multipart/form-data" id="uploadForm">
 <div class="form-group">
-<label>插件名称</label>
-<input type="text" name="name" required placeholder="请输入插件名称">
+<div class="mdui-textfield mdui-textfield-floating-label ">
+  <label class="mdui-textfield-label">插件名称 *</label>
+  <input class="mdui-textfield-input " type="text" name="name" required>
 </div>
-<div class="form-group">
-<label>版本号</label>
-<input type="text" name="version" required placeholder="如: 1.0.0">
-</div>
-<div class="form-group">
-<label>插件描述</label>
-<textarea name="description" required placeholder="请描述插件功能"></textarea>
-</div>
-<div class="form-group">
-<label>标签</label>
-<input type="text" name="tags" placeholder="多个标签用逗号分隔">
-</div>
-<div class="form-group">
-<label>插件文件或下载链接</label>
-<input type="file" name="file" accept=".zip,.rar,.py,.tar,.gz,.js" style="margin-bottom:8px">
-<div class="file-info">支持格式: zip, rar, py, tar, gz, js (与下方链接二选一)</div>
-<input type="url" name="external_url" placeholder="或输入外部下载链接（如蓝奏云、GitHub等）" style="margin-top:8px">
-<div class="file-info">支持: 蓝奏云、GitHub、Gitee等直链或网盘分享链接</div>
-</div>
-<div class="ttmp4-section">
-<h2>TTMP4 文件 (可选)</h2>
-<div class="form-group">
-<input type="file" name="ttmp4_file" accept=".ttmp4" id="ttmp4Input">
-<div class="file-info">支持格式: .ttmp4 (JSON格式，包含url字段)</div>
-<input type="url" name="ttmp4_url" placeholder="或输入外部 ttmp4 文件链接" style="margin-top:8px">
-</div>
-</div>
-<button type="submit" class="btn mdui-ripple">提交上传</button>
-</form>
 </div>
 
-<div class="card ttmp4-preview">
-<h2>TTMP4 预览</h2>
-<div class="iframe-container" id="previewContainer">
-<div class="preview-empty" id="previewEmpty">
-请上传或选择一个 ttmp4 文件进行预览
-</div>
-<iframe id="previewFrame" style="display:none"></iframe>
+<div class="form-group">
+<div class="mdui-textfield mdui-textfield-floating-label">
+  <label class="mdui-textfield-label">版本号 *</label>
+  <input class="mdui-textfield-input" type="text" name="version" required>
 </div>
 </div>
+
+<div class="form-group">
+<div class="mdui-textfield mdui-textfield-floating-label">
+  <label class="mdui-textfield-label">插件描述 *</label>
+  <textarea class="mdui-textfield-input" name="description" required></textarea>
 </div>
+<div class="file-info">支持多行描述，简要说明插件功能</div>
+</div>
+
+<div class="form-group">
+<div class="mdui-textfield mdui-textfield-floating-label">
+  <label class="mdui-textfield-label">标签</label>
+  <input class="mdui-textfield-input" type="text" name="tags">
+</div>
+<div class="file-info">多个标签用逗号分隔，例如: 工具, 美化, 效率</div>
+</div>
+
+<div class="divider"></div>
+
+<h2 style="color:#333;margin-bottom:16px;font-size:18px">上传方式</h2>
+
+<div class="radio-group">
+  <label>
+    <input type="radio" name="upload_type" value="file" checked onchange="toggleUploadType()"> 上传文件
+  </label>
+  <label>
+    <input type="radio" name="upload_type" value="link" onchange="toggleUploadType()"> 外部链接
+  </label>
+</div>
+
+<div id="fileUploadSection">
+<div class="form-group">
+  <label>插件文件</label>
+  <input type="file" name="file" accept=".zip,.rar,.js,.exe" id="fileInput">
+  <div class="file-info">支持格式: zip, rar, js, exe</div>
+</div>
+</div>
+
+<div id="linkUploadSection" style="display:none">
+<div class="form-group">
+<div class="mdui-textfield mdui-textfield-floating-label">
+  <label class="mdui-textfield-label">外部下载链接</label>
+  <input class="mdui-textfield-input" type="text" name="download_url">
+</div>
+<div class="file-info">支持: 蓝奏云、GitHub、Gitee等直链或网盘分享链接</div>
+</div>
+</div>
+
+<div class="form-actions">
+  <button type="button" class="btn btn-cancel" onclick="window.history.back()">取消</button>
+  <button type="submit" class="btn mdui-ripple">发布插件</button>
+</div>
+</form>
+</div>
+</div>
+
 <script>
 window.addEventListener('load',function(){document.getElementById('loader').style.display='none'});
 
-document.getElementById('ttmp4Input').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            try {
-                const data = JSON.parse(event.target.result);
-                if (data.url) {
-                    document.getElementById('previewEmpty').style.display = 'none';
-                    document.getElementById('previewFrame').style.display = 'block';
-                    document.getElementById('previewFrame').src = data.url;
-                } else {
-                    alert('TTMP4 文件格式错误：缺少 url 字段');
-                }
-            } catch (error) {
-                alert('无法解析 TTMP4 文件：' + error.message);
-            }
-        };
-        reader.readAsText(file);
+function toggleUploadType() {
+    const uploadType = document.querySelector('input[name="upload_type"]:checked').value;
+    document.getElementById('fileUploadSection').style.display = uploadType === 'file' ? 'block' : 'none';
+    document.getElementById('linkUploadSection').style.display = uploadType === 'link' ? 'block' : 'none';
+}
+
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    const uploadType = document.querySelector('input[name="upload_type"]:checked').value;
+    
+    if (uploadType === 'file') {
+        const fileInput = document.getElementById('fileInput');
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            mdui.alert('请选择要上传的文件', '提示');
+            return false;
+        }
+    } else {
+        const downloadUrl = document.querySelector('input[name="download_url"]');
+        if (!downloadUrl.value.trim()) {
+            e.preventDefault();
+            mdui.alert('请填写外部下载链接', '提示');
+            return false;
+        }
     }
+    
+    mdui.showSnackbar({
+        message: '正在上传插件...',
+        timeout: 2000
+    });
 });
 </script>
 </body>
