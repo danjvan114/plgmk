@@ -13,7 +13,10 @@ def register_other_routes():
     @app.route('/')
     def root():
         return render_root_template('index.html')
-
+     @app.route('/app/ccvue')
+    def root():
+        return render_market_template('catcode.html')
+    
     @app.route('/about')
     def about():
         return render_root_template('about.html')
