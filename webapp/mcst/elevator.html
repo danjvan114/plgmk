@@ -70,9 +70,22 @@
         };
 
         function selectFloor(a) {
-            var cmd1 = 'fill -161 90 -348 -160 262 -347 air';
-            var cmd2 = 'fill -161 90 -348 -160 ' + a + ' -347 water';
-            mdui.snackbar({ message: '执行: ' + cmd2, position: 'top' });
+            fetch('/api/elevator/execute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ a: a })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    mdui.snackbar({ message: '已到达 ' + a + ' 层', position: 'top' });
+                } else {
+                    mdui.snackbar({ message: '执行失败: ' + data.message, position: 'top' });
+                }
+            })
+            .catch(function() {
+                mdui.snackbar({ message: '网络错误', position: 'top' });
+            });
         }
     </script>
 </body>
