@@ -377,7 +377,13 @@ def register_other_routes():
 
     @app.route('/api/elevator/floors', methods=['POST'])
     def api_elevator_floors_save():
+        if 'player_name' not in session:
+            return jsonify({'success': False, 'message': '请先登录'}), 401
+        
         data = request.get_json()
+        if not data or 'floors' not in data:
+            return jsonify({'success': False, 'message': '无效请求'}), 400
+        
         floors_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'elevator_floors.json')
         os.makedirs(os.path.dirname(floors_file), exist_ok=True)
         with open(floors_file, 'w', encoding='utf-8') as f:
@@ -388,15 +394,87 @@ def register_other_routes():
     def api_elevator_execute():
         import mcrcon
         data = request.get_json()
+        elevator_id = data.get('elevator_id', 'elevator1')
         a = data.get('a', 150)
+        
+        if not isinstance(a, (int, float)):
+            try:
+                a = int(a)
+            except (ValueError, TypeError):
+                return jsonify({'success': False, 'message': '无效的楼层参数'}), 400
+        
+        a = int(a)
+        if a < 0 or a > 300:
+            return jsonify({'success': False, 'message': '楼层参数超出范围'}), 400
+        
+        elevators_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'elevators.json')
+        if not os.path.exists(elevators_file):
+            return jsonify({'success': False, 'message': '电梯配置不存在'}), 404
+            
+        with open(elevators_file, 'r', encoding='utf-8') as f:
+            elevators_data = json.load(f)
+        
+        elevator = None
+        for e in elevators_data.get('elevators', []):
+            if e.get('id') == elevator_id:
+                elevator = e
+                break
+        
+        if not elevator:
+            return jsonify({'success': False, 'message': '电梯不存在'}), 404
         
         try:
             with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-                rcon.command('fill -161 90 -348 -160 262 -347 air')
-                result = rcon.command('fill -161 90 -348 -160 ' + str(a) + ' -347 water')
+                cmd1 = elevator['point1']
+                cmd2 = elevator['point2'].replace('{a}', str(a))
+                rcon.command(cmd1)
+                result = rcon.command(cmd2)
                 return jsonify({'success': True, 'result': result})
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/elevator/info', methods=['GET'])
+    def api_elevator_info():
+        elevator_id = request.args.get('id', 'elevator1')
+        
+        elevators_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'elevators.json')
+        if not os.path.exists(elevators_file):
+            return jsonify({'success': False, 'message': '电梯配置不存在'}), 404
+            
+        with open(elevators_file, 'r', encoding='utf-8') as f:
+            elevators_data = json.load(f)
+        
+        elevator = None
+        for e in elevators_data.get('elevators', []):
+            if e.get('id') == elevator_id:
+                elevator = e
+                break
+        
+        if not elevator:
+            return jsonify({'success': False, 'message': '电梯不存在'}), 404
+        
+        floors_filename = elevator.get('floors_file', 'elevator_floors.json')
+        if '..' in floors_filename or floors_filename.startswith('/'):
+            return jsonify({'success': False, 'message': '无效配置'}), 400
+            
+        floors_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', floors_filename)
+        real_path = os.path.realpath(floors_file)
+        data_dir = os.path.realpath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data'))
+        
+        if not real_path.startswith(data_dir):
+            return jsonify({'success': False, 'message': '无效配置'}), 400
+            
+        if os.path.exists(floors_file):
+            with open(floors_file, 'r', encoding='utf-8') as f:
+                floors_data = json.load(f)
+        else:
+            floors_data = {'floors': []}
+        
+        return jsonify({
+            'success': True,
+            'elevator': elevator,
+            'floors': floors_data.get('floors', [])
+        })
 
     @app.route('/mc')
     def mc_index():

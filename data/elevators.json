@@ -1,0 +1,11 @@
+{
+    "elevators": [
+        {
+            "id": "elevator1",
+            "name": "主电梯",
+            "point1": "fill -161 90 -348 -160 262 -347 air",
+            "point2": "fill -161 90 -348 -160 {a} -347 water",
+            "floors_file": "elevator_floors.json"
+        }
+    ]
+}

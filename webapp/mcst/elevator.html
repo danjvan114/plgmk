@@ -44,24 +44,37 @@
 </head>
 <body>
     <div class="mdui-toolbar mdui-color-white">
-        <span class="mdui-typo-title">电梯选层</span>
+        <span class="mdui-typo-title" id="elevatorName">电梯选层</span>
     </div>
 
     <div class="floor-grid" id="floorGrid"></div>
 
     <script>
+        var elevatorId = '';
+        var floors = [];
+
         window.onload = function() {
-            fetch('/api/elevator/floors')
+            var params = new URLSearchParams(window.location.search);
+            elevatorId = params.get('id') || 'elevator1';
+            
+            fetch('/api/elevator/info?id=' + elevatorId)
                 .then(res => res.json())
                 .then(data => {
+                    if (!data.success) {
+                        mdui.snackbar({ message: data.message, position: 'top' });
+                        return;
+                    }
+                    
+                    document.getElementById('elevatorName').textContent = data.elevator.name;
+                    floors = data.floors;
+                    
                     var grid = document.getElementById('floorGrid');
-                    var count = data.floors.length;
                     var cols = Math.floor(document.body.clientWidth / 80);
                     if (cols < 2) cols = 2;
                     if (cols > 6) cols = 6;
                     grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
                     
-                    data.floors.forEach(function(floor) {
+                    floors.forEach(function(floor) {
                         var btn = document.createElement('button');
                         btn.className = 'floor-btn mdui-ripple';
                         btn.textContent = floor.name;
@@ -75,7 +88,7 @@
             fetch('/api/elevator/execute', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ a: a })
+                body: JSON.stringify({ elevator_id: elevatorId, a: a })
             })
             .then(res => res.json())
             .then(data => {
@@ -85,7 +98,7 @@
                     mdui.snackbar({ message: '执行失败: ' + data.message, position: 'top' });
                 }
             })
-            .catch(function() {
+            .catch(function(err) {
                 mdui.snackbar({ message: '网络错误', position: 'top' });
             });
         }
