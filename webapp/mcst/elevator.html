@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <title>电梯选层</title>
+    <style>
+        body { background: #fff; margin: 0; }
+        .floor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 24px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .floor-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 2px solid #e0e0e0;
+            background: #fff;
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .floor-btn:hover {
+            background: #1976d2;
+            color: #fff;
+            border-color: #1976d2;
+        }
+        .floor-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="mdui-toolbar mdui-color-white">
+        <span class="mdui-typo-title">电梯选层</span>
+        <div class="mdui-toolbar-spacer"></div>
+        <a class="mdui-ripple mdui-btn-icon" href="/app/elevator/admin">
+            <i class="mdui-icon material-icons">settings</i>
+        </a>
+    </div>
+
+    <div class="floor-grid" id="floorGrid"></div>
+
+    <script>
+        window.onload = function() {
+            fetch('/api/elevator/floors')
+                .then(res => res.json())
+                .then(data => {
+                    const grid = document.getElementById('floorGrid');
+                    data.floors.forEach(function(floor) {
+                        const btn = document.createElement('button');
+                        btn.className = 'floor-btn mdui-ripple';
+                        btn.textContent = floor.name;
+                        btn.onclick = function() { selectFloor(floor.a); };
+                        grid.appendChild(btn);
+                    });
+                });
+        };
+
+        function selectFloor(a) {
+            var cmd = 'fill -161 ' + a + ' -348 -160 ' + a + ' -347 water';
+            mdui.snackbar({ message: '已执行: ' + cmd, position: 'top' });
+        }
+    </script>
+</body>
+</html>

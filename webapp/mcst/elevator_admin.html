@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <title>电梯管理</title>
+    <style>
+        body { background: #fff; margin: 0; }
+        .container { max-width: 500px; margin: 24px auto; padding: 0 16px; }
+        .floor-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .floor-item .name { flex: 1; font-size: 16px; font-weight: 500; }
+        .floor-item .a-value { color: #999; margin-right: 12px; }
+        .a-input { width: 80px; }
+    </style>
+</head>
+<body>
+    <div class="mdui-toolbar mdui-color-white">
+        <a class="mdui-ripple mdui-btn-icon" href="/app/elevator">
+            <i class="mdui-icon material-icons">arrow_back</i>
+        </a>
+        <span class="mdui-typo-title">电梯管理</span>
+        <div class="mdui-toolbar-spacer"></div>
+    </div>
+
+    <div class="container">
+        <div id="floorList"></div>
+        
+        <button class="mdui-btn mdui-ripple mdui-color-blue-500 mdui-text-color-white mdui-btn-block" style="margin-top: 16px;" onclick="addFloor()">
+            <i class="mdui-icon material-icons">add</i> 添加楼层
+        </button>
+        
+        <button class="mdui-btn mdui-ripple mdui-color-green-500 mdui-text-color-white mdui-btn-block" style="margin-top: 8px;" onclick="saveFloors()">
+            <i class="mdui-icon material-icons">save</i> 保存
+        </button>
+    </div>
+
+    <script>
+        var floors = [];
+
+        window.onload = function() {
+            fetch('/api/elevator/floors')
+                .then(res => res.json())
+                .then(data => {
+                    floors = data.floors || [];
+                    renderFloors();
+                });
+        };
+
+        function renderFloors() {
+            var list = document.getElementById('floorList');
+            list.innerHTML = '';
+            floors.forEach(function(floor, i) {
+                var div = document.createElement('div');
+                div.className = 'floor-item';
+                div.innerHTML = '<span class="name">' + floor.name + '</span>' +
+                    '<span class="a-value">a=' + floor.a + '</span>' +
+                    '<button class="mdui-btn mdui-btn-icon mdui-ripple" onclick="editA(' + i + ')">' +
+                    '<i class="mdui-icon material-icons">edit</i></button>' +
+                    '<button class="mdui-btn mdui-btn-icon mdui-ripple" onclick="removeFloor(' + i + ')">' +
+                    '<i class="mdui-icon material-icons">delete</i></button>';
+                list.appendChild(div);
+            });
+        }
+
+        function addFloor() {
+            mdui.prompt('楼层名称', '名称', function(name) {
+                if (!name) return;
+                mdui.prompt('a 值 (90-262)', '150', function(a) {
+                    a = parseInt(a);
+                    if (isNaN(a) || a < 90 || a > 262) {
+                        mdui.snackbar({ message: 'a 值必须在 90-262 之间', position: 'top' });
+                        return;
+                    }
+                    floors.push({ name: name, a: a });
+                    renderFloors();
+                });
+            });
+        }
+
+        function editA(index) {
+            mdui.prompt('修改 a 值', floors[index].a.toString(), function(a) {
+                a = parseInt(a);
+                if (isNaN(a) || a < 90 || a > 262) {
+                    mdui.snackbar({ message: 'a 值必须在 90-262 之间', position: 'top' });
+                    return;
+                }
+                floors[index].a = a;
+                renderFloors();
+            });
+        }
+
+        function removeFloor(index) {
+            floors.splice(index, 1);
+            renderFloors();
+        }
+
+        function saveFloors() {
+            fetch('/api/elevator/floors', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ floors: floors })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    mdui.snackbar({ message: '保存成功', position: 'top' });
+                } else {
+                    mdui.snackbar({ message: data.message, position: 'top' });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

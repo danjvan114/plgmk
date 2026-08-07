@@ -350,6 +350,35 @@ def register_other_routes():
                                               'webapp', 'mcst'), 
                                  'store.html')
 
+    @app.route('/app/elevator')
+    def elevator():
+        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                              'webapp', 'mcst'), 
+                                 'elevator.html')
+
+    @app.route('/app/elevator/admin')
+    def elevator_admin():
+        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                              'webapp', 'mcst'), 
+                                 'elevator_admin.html')
+
+    @app.route('/api/elevator/floors', methods=['GET'])
+    def api_elevator_floors():
+        floors_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'elevator_floors.json')
+        if os.path.exists(floors_file):
+            with open(floors_file, 'r', encoding='utf-8') as f:
+                return jsonify(json.load(f))
+        return jsonify({'floors': []})
+
+    @app.route('/api/elevator/floors', methods=['POST'])
+    def api_elevator_floors_save():
+        data = request.get_json()
+        floors_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'elevator_floors.json')
+        os.makedirs(os.path.dirname(floors_file), exist_ok=True)
+        with open(floors_file, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False)
+        return jsonify({'success': True})
+
     @app.route('/mc')
     def mc_index():
         return redirect('/localcdn/project/mc.html')
