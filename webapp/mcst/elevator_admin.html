@@ -90,7 +90,7 @@
                 div.innerHTML = '<span class="name">' + floor.name + '</span>' +
                     '<div class="stepper">' +
                         '<button class="stepper-btn" onclick="changeA(' + i + ', -1)">−</button>' +
-                        '<input class="stepper-value" id="a-' + i + '" type="text" value="' + floor.a + '" onchange="inputA(' + i + ', this.value)" />' +
+                        '<input class="stepper-value" id="a-' + i + '" type="text" value="' + floor.a + '" oninput="inputA(' + i + ', this.value)" />' +
                         '<button class="stepper-btn" onclick="changeA(' + i + ', 1)">+</button>' +
                     '</div>' +
                     '<button class="mdui-btn mdui-btn-icon mdui-ripple" onclick="removeFloor(' + i + ')">' +
@@ -107,15 +107,17 @@
             executeFloor(newVal);
         }
 
+        var inputTimer = null;
+
         function inputA(index, value) {
             var val = parseInt(value);
-            if (isNaN(val) || val < 90 || val > 262) {
-                mdui.snackbar({ message: 'a 值必须在 90-262 之间', position: 'top' });
-                document.getElementById('a-' + index).value = floors[index].a;
-                return;
-            }
+            if (isNaN(val) || val < 90 || val > 262) return;
             floors[index].a = val;
-            executeFloor(val);
+            
+            if (inputTimer) clearTimeout(inputTimer);
+            inputTimer = setTimeout(function() {
+                executeFloor(val);
+            }, 300);
         }
 
         function executeFloor(a) {
