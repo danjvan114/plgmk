@@ -351,6 +351,7 @@ def register_other_routes():
                                  'store.html')
 
     @app.route('/app/elevator')
+    @app.route('/app/elevator/')
     def elevator():
         return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
                                               'webapp', 'mcst'), 
