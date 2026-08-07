@@ -353,9 +353,13 @@ def register_other_routes():
     @app.route('/app/elevator')
     @app.route('/app/elevator/')
     def elevator():
-        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+        response = make_response(send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
                                               'webapp', 'mcst'), 
-                                 'elevator.html')
+                                 'elevator.html'))
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
 
     @app.route('/app/elevator/admin')
     def elevator_admin():
