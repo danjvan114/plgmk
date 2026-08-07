@@ -58,9 +58,9 @@
             fetch('/api/elevator/floors')
                 .then(res => res.json())
                 .then(data => {
-                    const grid = document.getElementById('floorGrid');
+                    var grid = document.getElementById('floorGrid');
                     data.floors.forEach(function(floor) {
-                        const btn = document.createElement('button');
+                        var btn = document.createElement('button');
                         btn.className = 'floor-btn mdui-ripple';
                         btn.textContent = floor.name;
                         btn.onclick = function() { selectFloor(floor.a); };
@@ -70,8 +70,9 @@
         };
 
         function selectFloor(a) {
-            var cmd = 'fill -161 ' + a + ' -348 -160 ' + a + ' -347 water';
-            mdui.snackbar({ message: '已执行: ' + cmd, position: 'top' });
+            var cmd1 = 'fill -161 90 -348 -160 262 -347 air';
+            var cmd2 = 'fill -161 90 -348 -160 ' + a + ' -347 water';
+            mdui.snackbar({ message: '执行: ' + cmd2, position: 'top' });
         }
     </script>
 </body>

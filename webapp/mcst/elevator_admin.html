@@ -18,8 +18,34 @@
             border-radius: 8px;
         }
         .floor-item .name { flex: 1; font-size: 16px; font-weight: 500; }
-        .floor-item .a-value { color: #999; margin-right: 12px; }
-        .a-input { width: 80px; }
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .stepper-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #1976d2;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stepper-btn:active { background: #1565c0; }
+        .stepper-value {
+            width: 48px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -62,38 +88,46 @@
                 var div = document.createElement('div');
                 div.className = 'floor-item';
                 div.innerHTML = '<span class="name">' + floor.name + '</span>' +
-                    '<span class="a-value">a=' + floor.a + '</span>' +
-                    '<button class="mdui-btn mdui-btn-icon mdui-ripple" onclick="editA(' + i + ')">' +
-                    '<i class="mdui-icon material-icons">edit</i></button>' +
+                    '<div class="stepper">' +
+                        '<button class="stepper-btn" onclick="changeA(' + i + ', -1)">−</button>' +
+                        '<input class="stepper-value" id="a-' + i + '" type="text" value="' + floor.a + '" onchange="inputA(' + i + ', this.value)" />' +
+                        '<button class="stepper-btn" onclick="changeA(' + i + ', 1)">+</button>' +
+                    '</div>' +
                     '<button class="mdui-btn mdui-btn-icon mdui-ripple" onclick="removeFloor(' + i + ')">' +
                     '<i class="mdui-icon material-icons">delete</i></button>';
                 list.appendChild(div);
             });
         }
 
+        function changeA(index, delta) {
+            var newVal = floors[index].a + delta;
+            if (newVal < 90 || newVal > 262) return;
+            floors[index].a = newVal;
+            document.getElementById('a-' + index).value = newVal;
+            executeFloor(newVal);
+        }
+
+        function inputA(index, value) {
+            var val = parseInt(value);
+            if (isNaN(val) || val < 90 || val > 262) {
+                mdui.snackbar({ message: 'a 值必须在 90-262 之间', position: 'top' });
+                document.getElementById('a-' + index).value = floors[index].a;
+                return;
+            }
+            floors[index].a = val;
+            executeFloor(val);
+        }
+
+        function executeFloor(a) {
+            var cmd1 = 'fill -161 90 -348 -160 262 -347 air';
+            var cmd2 = 'fill -161 90 -348 -160 ' + a + ' -347 water';
+            mdui.snackbar({ message: 'a=' + a + ' 已执行', position: 'top' });
+        }
+
         function addFloor() {
             mdui.prompt('楼层名称', '名称', function(name) {
                 if (!name) return;
-                mdui.prompt('a 值 (90-262)', '150', function(a) {
-                    a = parseInt(a);
-                    if (isNaN(a) || a < 90 || a > 262) {
-                        mdui.snackbar({ message: 'a 值必须在 90-262 之间', position: 'top' });
-                        return;
-                    }
-                    floors.push({ name: name, a: a });
-                    renderFloors();
-                });
-            });
-        }
-
-        function editA(index) {
-            mdui.prompt('修改 a 值', floors[index].a.toString(), function(a) {
-                a = parseInt(a);
-                if (isNaN(a) || a < 90 || a > 262) {
-                    mdui.snackbar({ message: 'a 值必须在 90-262 之间', position: 'top' });
-                    return;
-                }
-                floors[index].a = a;
+                floors.push({ name: name, a: 150 });
                 renderFloors();
             });
         }
