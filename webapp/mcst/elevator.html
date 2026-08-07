@@ -45,10 +45,6 @@
 <body>
     <div class="mdui-toolbar mdui-color-white">
         <span class="mdui-typo-title">电梯选层</span>
-        <div class="mdui-toolbar-spacer"></div>
-        <a class="mdui-ripple mdui-btn-icon" href="/app/elevator/admin">
-            <i class="mdui-icon material-icons">settings</i>
-        </a>
     </div>
 
     <div class="floor-grid" id="floorGrid"></div>
@@ -59,6 +55,12 @@
                 .then(res => res.json())
                 .then(data => {
                     var grid = document.getElementById('floorGrid');
+                    var count = data.floors.length;
+                    var cols = Math.floor(document.body.clientWidth / 80);
+                    if (cols < 2) cols = 2;
+                    if (cols > 6) cols = 6;
+                    grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+                    
                     data.floors.forEach(function(floor) {
                         var btn = document.createElement('button');
                         btn.className = 'floor-btn mdui-ripple';
