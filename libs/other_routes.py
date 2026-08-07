@@ -14,8 +14,8 @@ def register_other_routes():
     def root():
         return render_root_template('index.html')
     @app.route('/app/ccvue')
-    def root():
-        return render_market_template('catcode.html')
+    def ccvue():
+        return render_market_template('catcodeAPP.html')
     
     @app.route('/about')
     def about():
