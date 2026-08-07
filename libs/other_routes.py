@@ -379,6 +379,20 @@ def register_other_routes():
             json.dump(data, f, ensure_ascii=False)
         return jsonify({'success': True})
 
+    @app.route('/api/elevator/execute', methods=['POST'])
+    def api_elevator_execute():
+        import mcrcon
+        data = request.get_json()
+        a = data.get('a', 150)
+        
+        try:
+            with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
+                rcon.command('fill -161 90 -348 -160 262 -347 air')
+                result = rcon.command('fill -161 90 -348 -160 ' + str(a) + ' -347 water')
+                return jsonify({'success': True, 'result': result})
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
     @app.route('/mc')
     def mc_index():
         return redirect('/localcdn/project/mc.html')
