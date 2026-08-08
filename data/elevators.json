@@ -3,21 +3,21 @@
         {
             "id": "21",
             "name": "21：双子塔电梯",
-            "point1": "fill -161 90 -348 -160 262 -347 air",
+            "point1": "fill -161 90 -348 -160 265 -347 air",
             "point2": "fill -161 90 -348 -160 {a} -347 water",
             "floors_file": "elevator_floors.json"
         },
         {
             "id": "22",
             "name": "22：双子塔电梯",
-            "point1": "fill -165 90 -348 -166 262 -347 air",
+            "point1": "fill -165 90 -348 -166 265 -347 air",
             "point2": "fill -165 90 -348 -166 {a} -347 water",
             "floors_file": "elevator_floors.json"
         },
         {
             "id": "23",
             "name": "23：双子塔2电梯",
-            "point1": "fill -221 90 -313 -220 262 -314 air",
+            "point1": "fill -221 90 -313 -220 265 -314 air",
             "point2": "fill -221 90 -313 -220 {a} -314 water",
             "floors_file": "elevator_floors.json"
         }
