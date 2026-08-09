@@ -1,4 +1,4 @@
-from flask import request, redirect, url_for, session, send_from_directory
+from flask import request, redirect, url_for, session, send_from_directory, jsonify
 from .config import app, MARKETS, User, db
 from .utils import set_market, get_market_path, render_market_template, render_root_template
 from .database import (
@@ -394,3 +394,51 @@ def register_market_routes():
     @app.route('/mk/kn/admin/batch_delete', methods=['POST'])
     def admin_batch_delete():
         return market_admin_batch_delete('kn')
+
+    @app.route('/app/api/knmk', methods=['GET'])
+    def api_knmk():
+        set_market('kn')
+        page = request.args.get('page', 1, type=int)
+        per_page = 20
+        
+        all_plugins = get_market_plugins('kn')
+        total = len(all_plugins)
+        start = (page - 1) * per_page
+        end = start + per_page
+        page_plugins = all_plugins[start:end]
+        
+        result = []
+        for p in page_plugins:
+            tags = []
+            if p.get('tags'):
+                tags = [t.strip() for t in p['tags'].split(',') if t.strip()]
+            
+            result.append({
+                'id': p['id'],
+                'name': p['name'],
+                'author': p['author'],
+                'download_url': f'/mk/kn/download/{p["id"]}',
+                'tags': tags,
+                'rating': p['rating']
+            })
+        
+        return jsonify({
+            'page': page,
+            'per_page': per_page,
+            'total': total,
+            'total_pages': (total + per_page - 1) // per_page,
+            'plugins': result
+        })
+
+    @app.route('/app/api/knmk/dt', methods=['GET'])
+    def api_knmk_dt():
+        plugin_id = request.args.get('id', type=int)
+        if not plugin_id:
+            return '缺少插件ID', 400
+        
+        set_market('kn')
+        plugin = get_plugin_by_id('kn', plugin_id)
+        if not plugin:
+            return '插件不存在', 404
+        
+        return plugin.get('description', '')
