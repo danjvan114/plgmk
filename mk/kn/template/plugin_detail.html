@@ -8,7 +8,11 @@
 <title>{{ plugin.name }}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
+body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
+body.page-exit{animation:slideOutToLeft .25s cubic-bezier(.4,0,.2,1)}
+@keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideOutToLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-30px)}}
 header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
 .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
 .logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
@@ -67,7 +71,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </div>
 </div>
 <div class="mdui-toolbar mdui-color-teal" style="position:fixed;top:0;left:0;right:0;z-index:99;">
-        <a class="mdui-ripple mdui-btn-icon" onclick="window.history.back()">
+        <a class="mdui-ripple mdui-btn-icon" onclick="goBack()">
             <i class="mdui-icon material-icons">arrow_back</i>
         </a>
         <span class="mdui-typo-title">{{ plugin.name }}</span>
@@ -144,7 +148,15 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 <script>
 window.addEventListener('load', function() {
     document.getElementById('loader').style.display = 'none';
+    document.body.classList.add('page-enter');
+    setTimeout(()=>document.body.classList.remove('page-enter'),400);
 });
+
+function goBack() {
+    document.body.classList.add('page-exit');
+    setTimeout(()=>window.history.back(),250);
+}
+
 function openImage(url) {
     document.getElementById('modalImage').src = url;
     document.getElementById('imageModal').classList.add('active');
