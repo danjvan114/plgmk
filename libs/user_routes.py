@@ -69,7 +69,7 @@ def register_user_routes():
                 session['market'] = 'kn'
                 return redirect(url_for('index'))
         
-        return render_market_template('login.html', error=None)
+        return render_market_template('login.html', error=None, backurl=request.url_root + 'auth/redirect')
 
     @app.route('/register', methods=['GET', 'POST'])
     def register():
