@@ -260,3 +260,61 @@ def get_player_engine():
     userdata_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
     db_path = os.path.join(userdata_dir, 'players.db')
     return create_engine(f'sqlite:///{db_path}')
+
+def init_auth_callback_database():
+    userdata_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
+    os.makedirs(userdata_dir, exist_ok=True)
+    db_path = os.path.join(userdata_dir, 'auth_callback.db')
+    engine = create_engine(f'sqlite:///{db_path}')
+    
+    auth_table = text("""
+    CREATE TABLE IF NOT EXISTS auth_callback (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uuid VARCHAR(100) NOT NULL UNIQUE,
+        backurl TEXT NOT NULL,
+        user_id VARCHAR(50) DEFAULT '',
+        secret_key VARCHAR(100) DEFAULT '',
+        confirmed INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    
+    with engine.connect() as conn:
+        conn.execute(auth_table)
+        conn.commit()
+    
+    return engine
+
+def create_auth_callback(uuid, backurl):
+    engine = init_auth_callback_database()
+    with engine.connect() as conn:
+        conn.execute(
+            text("INSERT INTO auth_callback (uuid, backurl) VALUES (:uuid, :backurl)"),
+            {'uuid': uuid, 'backurl': backurl}
+        )
+        conn.commit()
+
+def get_auth_callback(uuid):
+    engine = init_auth_callback_database()
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("SELECT * FROM auth_callback WHERE uuid = :uuid"),
+            {'uuid': uuid}
+        )
+        row = result.fetchone()
+        if row:
+            return {
+                'id': row[0], 'uuid': row[1], 'backurl': row[2],
+                'user_id': row[3], 'secret_key': row[4],
+                'confirmed': row[5], 'created_at': row[6]
+            }
+        return None
+
+def update_auth_callback(uuid, user_id, secret_key, confirmed):
+    engine = init_auth_callback_database()
+    with engine.connect() as conn:
+        conn.execute(
+            text("UPDATE auth_callback SET user_id = :user_id, secret_key = :secret_key, confirmed = :confirmed WHERE uuid = :uuid"),
+            {'uuid': uuid, 'user_id': user_id, 'secret_key': secret_key, 'confirmed': confirmed}
+        )
+        conn.commit()

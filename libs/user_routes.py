@@ -1,8 +1,31 @@
 from flask import request, redirect, url_for, session
 from .config import app, User, db
 from .utils import render_market_template, render_root_template
+import requests
 
 def register_user_routes():
+    @app.route('/auth/redirect')
+    def auth_redirect():
+        uuid = request.args.get('uuid', '')
+        if not uuid:
+            return redirect(url_for('login'))
+        
+        try:
+            response = requests.get(f'https://pan1.pgrm.run/api/auth?uuid={uuid}')
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('user_id'):
+                    user_id = data['user_id']
+                    user = User.query.get(user_id)
+                    if user:
+                        session['user'] = user_id
+                        session['market'] = 'kn'
+                        return redirect(url_for('index'))
+        except:
+            pass
+        
+        return redirect(url_for('login'))
+
     @app.route('/login', methods=['GET', 'POST'])
     def login():
         if request.method == 'POST':
@@ -19,24 +42,7 @@ def register_user_routes():
 
     @app.route('/register', methods=['GET', 'POST'])
     def register():
-        if request.method == 'POST':
-            username = request.form['username']
-            password = request.form['password']
-            confirm_password = request.form['confirm_password']
-            
-            if password != confirm_password:
-                return render_root_template('register.html', error='两次输入的密码不一致')
-            
-            if User.query.get(username):
-                return render_root_template('register.html', error='用户名已存在')
-            
-            new_user = User(username=username, password=password, role='user')
-            db.session.add(new_user)
-            db.session.commit()
-            
-            return render_root_template('register.html', success='注册成功！即将跳转到登录页面')
-        
-        return render_root_template('register.html')
+        return redirect(url_for('login'))
 
     @app.route('/logout')
     def logout():

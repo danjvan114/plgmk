@@ -8,40 +8,36 @@
 <title>用户登录</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
-.loader{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.9);display:flex;justify-content:center;align-items:center;z-index:9999}
-.loader img{width:64px;height:64px;border-radius:50%}
-header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
+body{background:url('') no-repeat center center fixed;background-size:cover;min-height:100vh}
+header{width:100%;height:64px;background:rgba(255,255,255,.95);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
 .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
 .logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
-.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
-.logo-icon img{width:100%;height:100%;object-fit:cover}
-.head-space{flex:1}
-.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
-.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
-.search input::placeholder{color:#999}
-.main-box{max-width:400px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
-.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);padding:24px}
 .nav-links{display:flex;gap:16px}
 .nav-links a{color:#333;text-decoration:none}
 .nav-links a:hover{color:#2196f3}
+.main-box{max-width:400px;margin:0 auto;padding-top:100px;padding-left:16px;padding-right:16px}
+.card{background:rgba(255,255,255,.95);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:32px}
 .form-group{margin-bottom:16px}
 .form-group label{display:block;color:#333;margin-bottom:8px;font-weight:500}
-.form-group input{width:100%;padding:12px;border:1px solid rgba(0,0,0,.1);border-radius:4px;font-size:14px;outline:none;background:rgba(255,255,255,.6)}
+.form-group input{width:100%;padding:12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-size:14px;outline:none;background:rgba(0,0,0,.02)}
 .form-group input:focus{border-color:#2196f3}
-.btn{background:#2196f3;color:#fff;padding:12px 24px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:16px;width:100%}
-.btn:hover{background:#1976d2}
-h1{color:#333;margin-bottom:24px;text-align:center}
-.tip{text-align:center;color:#999;font-size:14px;margin-top:16px}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);justify-content:center;align-items:center;z-index:1000}
-.modal.active{display:flex}
-.modal-content{background:rgba(255,255,255,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:24px;border-radius:8px;width:320px;text-align:center;border:1px solid rgba(255,255,255,.5)}
-.modal-content .icon{font-size:48px;color:#f44336;margin-bottom:16px}
-.modal-content p{color:#333;margin-bottom:20px}
-.modal-content button{background:#2196f3;color:#fff;padding:10px 20px;border:none;border-radius:4px;cursor:pointer}
-.modal-content button:hover{background:#1976d2}
+.btn{background:#2196f3;color:#fff;padding:14px 24px;border:none;border-radius:8px;cursor:pointer;text-decoration:none;font-size:16px;width:100%;font-weight:500;transition:all 0.3s}
+.btn:hover{background:#1976d2;transform:translateY(-2px);box-shadow:0 8px 25px rgba(33,150,243,.3)}
+.btn-external{background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);margin-bottom:12px}
+.btn-external:hover{background:linear-gradient(135deg, #5568d3 0%, #65408b 100%)}
+.divider{height:1px;background:rgba(0,0,0,.05);margin:20px 0;position:relative}
+.divider::after{content:'或';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:0 12px;color:#999;font-size:14px}
+h1{color:#333;margin-bottom:8px;text-align:center;font-size:24px}
+.subtitle{color:#666;text-align:center;font-size:14px;margin-bottom:24px}
+.tip{text-align:center;color:#999;font-size:13px;margin-top:16px}
 @keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
 .card{animation:slideDown 0.5s ease-out}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);justify-content:center;align-items:center;z-index:1000}
+.modal.active{display:flex}
+.modal-content{background:#fff;padding:24px;border-radius:12px;width:320px;text-align:center}
+.modal-content .icon{font-size:48px;color:#f44336;margin-bottom:16px}
+.modal-content p{color:#333;margin-bottom:20px}
+.modal-content button{background:#2196f3;color:#fff;padding:10px 20px;border:none;border-radius:8px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -57,6 +53,14 @@ h1{color:#333;margin-bottom:24px;text-align:center}
 <div class="main-box">
 <div class="card">
 <h1>用户登录</h1>
+<p class="subtitle">选择登录方式</p>
+
+<a href="https://pan1.pgrm.run/auth/callback?backurl={{ request.url_root }}auth/redirect" class="btn btn-external mdui-ripple" style="display:block;text-align:center;text-decoration:none">
+通过外部账号登录
+</a>
+
+<div class="divider"></div>
+
 <form method="post">
 <div class="form-group">
 <label>用户名</label>
@@ -66,12 +70,10 @@ h1{color:#333;margin-bottom:24px;text-align:center}
 <label>密码</label>
 <input type="password" name="password" required placeholder="请输入密码">
 </div>
-<button type="submit" class="btn mdui-ripple">登录</button>
+<button type="submit" class="btn mdui-ripple">密码登录</button>
 </form>
 
-<div style="text-align:center;margin-top:12px">
-还没有账号？<a href="/register" style="color:#2196f3;text-decoration:none">立即注册</a>
-</div>
+<div class="tip">注册通道已关闭，老用户可使用密码登录</div>
 </div>
 </div>
 <div class="modal" id="errorModal">
@@ -82,9 +84,6 @@ h1{color:#333;margin-bottom:24px;text-align:center}
 </div>
 </div>
 <script>
-window.addEventListener('load', function() {
-    document.getElementById('loader').style.display = 'none';
-});
 function showError(message) {
     document.getElementById('errorMessage').textContent = message;
     document.getElementById('errorModal').classList.add('active');
