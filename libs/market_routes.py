@@ -9,6 +9,20 @@ from .database import (
 )
 import os
 import hashlib
+import re
+
+def sanitize_description(text):
+    """移除描述中的 JavaScript 代码，防止 XSS 攻击"""
+    if not text:
+        return text
+    # 移除 <script> 标签及其内容
+    text = re.sub(r'<script[^>]*>.*?</script>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    # 移除 javascript: 协议
+    text = re.sub(r'javascript\s*:', '', text, flags=re.IGNORECASE)
+    # 移除 onxxx 事件处理器（如 onclick, onerror, onload 等）
+    text = re.sub(r'\bon\w+\s*=\s*["\'][^"\']*["\']', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'\bon\w+\s*=\s*[^\s>]+', '', text, flags=re.IGNORECASE)
+    return text
 
 def register_market_routes():
     @app.route('/mk/<market_id>')
@@ -142,7 +156,7 @@ def register_market_routes():
         
         if request.method == 'POST':
             name = request.form['name']
-            description = request.form['description']
+            description = sanitize_description(request.form['description'])
             version = request.form['version']
             tags = request.form.get('tags', '')
             external_url = request.form.get('external_url', '').strip()
@@ -224,7 +238,7 @@ def register_market_routes():
         
         if request.method == 'POST':
             name = request.form['name']
-            description = request.form['description']
+            description = sanitize_description(request.form['description'])
             version = request.form['version']
             tags = request.form.get('tags', '')
             
