@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from jinja2 import Environment, FileSystemLoader
 from datetime import timedelta
 import os
@@ -8,6 +9,7 @@ USER_DATA_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk'
 MARKETS = {'kn': 'KN插件市场'}
 
 app = Flask(__name__)
+CORS(app)
 
 market_jinja_envs = {}
 market_template_dirs = {}
