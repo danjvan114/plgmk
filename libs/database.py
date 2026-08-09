@@ -170,6 +170,23 @@ def toggle_plugin_status(market_id, plugin_id):
             return new_status
         return None
 
+def update_plugin_info(market_id, plugin_id, name, description, version, tags, file_path=None):
+    engine, text = get_market_db_engine(market_id)
+    from datetime import datetime
+    updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    with engine.connect() as conn:
+        if file_path:
+            conn.execute(
+                text("UPDATE plugin SET name = :name, description = :desc, version = :version, tags = :tags, file_path = :file_path, updated_at = :updated_at WHERE id = :id"),
+                {'name': name, 'desc': description, 'version': version, 'tags': tags, 'file_path': file_path, 'updated_at': updated_at, 'id': plugin_id}
+            )
+        else:
+            conn.execute(
+                text("UPDATE plugin SET name = :name, description = :desc, version = :version, tags = :tags, updated_at = :updated_at WHERE id = :id"),
+                {'name': name, 'desc': description, 'version': version, 'tags': tags, 'updated_at': updated_at, 'id': plugin_id}
+            )
+        conn.commit()
+
 def delete_plugin(market_id, plugin_id):
     engine, text = get_market_db_engine(market_id)
     with engine.connect() as conn:

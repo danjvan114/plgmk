@@ -5,7 +5,7 @@ from .database import (
     get_market_plugins, search_market_plugins, get_plugin_by_id,
     update_plugin_download_count, add_rating, add_plugin, add_plugin_image,
     add_plugin_ttmp4, get_all_plugins, toggle_plugin_status, delete_plugin,
-    get_plugin_images
+    get_plugin_images, update_plugin_info
 )
 import os
 import hashlib
@@ -241,9 +241,13 @@ def register_market_routes():
             description = sanitize_description(request.form['description'])
             version = request.form['version']
             tags = request.form.get('tags', '')
+            external_url = request.form.get('external_url', '').strip()
             
-            file_path = plugin['file_path']
-            if 'file' in request.files:
+            file_path = None
+            if external_url:
+                # 使用外部链接
+                file_path = external_url
+            elif 'file' in request.files:
                 file = request.files['file']
                 if file and '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']:
                     file_content = file.read()
@@ -256,6 +260,9 @@ def register_market_routes():
                     
                     with open(file_path, 'wb') as f:
                         f.write(file_content)
+            
+            # 更新数据库（保留旧文件）
+            update_plugin_info(market_id, plugin_id, name, description, version, tags, file_path)
             
             images = request.files.getlist('images')
             max_images = 5
@@ -313,6 +320,50 @@ def register_market_routes():
     @app.route('/mk/kn/toggle_status/<int:plugin_id>')
     def toggle_plugin_status_route(plugin_id):
         return market_toggle_status('kn', plugin_id)
+
+    @app.route('/mk/<market_id>/delete/<int:plugin_id>')
+    def market_delete_plugin(market_id, plugin_id):
+        if market_id not in MARKETS:
+            return render_root_template('404.html'), 404
+        
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        
+        set_market(market_id)
+        
+        plugin = get_plugin_by_id(market_id, plugin_id)
+        if not plugin:
+            return render_root_template('404.html'), 404
+        
+        if session['user'] != plugin['author']:
+            return redirect(url_for('market_index', market_id=market_id))
+        
+        # 删除插件文件
+        file_path = plugin['file_path']
+        if file_path and not file_path.startswith('http://') and not file_path.startswith('https://'):
+            try:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            except:
+                pass
+        
+        # 删除插件图片
+        images = get_plugin_images(market_id, plugin_id)
+        for img in images:
+            try:
+                if os.path.exists(img['image_path']):
+                    os.remove(img['image_path'])
+            except:
+                pass
+        
+        # 从数据库永久删除
+        delete_plugin(market_id, plugin_id)
+        
+        return redirect(url_for('market_index', market_id=market_id))
+
+    @app.route('/mk/kn/delete/<int:plugin_id>')
+    def delete_plugin_route(plugin_id):
+        return market_delete_plugin('kn', plugin_id)
 
     @app.route('/mk/<market_id>/developer/stats')
     def market_developer_stats(market_id):

@@ -101,6 +101,11 @@ h1{color:#333;margin-bottom:24px}
 <label>插件文件（可选，仅当需要更新文件时上传）</label>
 <input type="file" name="file">
 <p style="color:#999;font-size:12px;margin-top:4px">支持的格式: zip, rar, py, tar, gz, js</p>
+<div style="margin-top:12px">
+<label>或外部下载链接</label>
+<input type="text" name="external_url" value="{{ plugin.file_path if plugin.file_path.startswith('http') else '' }}" placeholder="https://example.com/plugin.zip">
+<p style="color:#999;font-size:12px;margin-top:4px">如果填写外链，将覆盖上传的文件</p>
+</div>
 </div>
 <div class="image-section">
 <h2>插件展示图片 (最多{{ max_images or 5 }}张)</h2>
