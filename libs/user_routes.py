@@ -15,16 +15,47 @@ def register_user_routes():
             if response.status_code == 200:
                 data = response.json()
                 if data.get('user_id'):
-                    user_id = data['user_id']
-                    user = User.query.get(user_id)
+                    external_id = data['user_id']
+                    user = User.query.filter_by(password=external_id).first()
                     if user:
-                        session['user'] = user_id
+                        session['user'] = user.username
                         session['market'] = 'kn'
                         return redirect(url_for('index'))
+                    else:
+                        return render_market_template('auth_bind.html', uuid=uuid, error=None)
         except:
             pass
         
         return redirect(url_for('login'))
+
+    @app.route('/auth/bind', methods=['POST'])
+    def auth_bind():
+        uuid = request.form.get('uuid', '')
+        username = request.form.get('username', '').strip()
+        
+        if not uuid or not username:
+            return render_market_template('auth_bind.html', uuid=uuid, error='请填写完整信息')
+        
+        if User.query.get(username):
+            return render_market_template('auth_bind.html', uuid=uuid, error='用户名已存在')
+        
+        try:
+            response = requests.get(f'https://pan1.pgrm.run/api/auth?uuid={uuid}')
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('user_id'):
+                    external_id = data['user_id']
+                    new_user = User(username=username, password=external_id, role='user')
+                    db.session.add(new_user)
+                    db.session.commit()
+                    
+                    session['user'] = username
+                    session['market'] = 'kn'
+                    return redirect(url_for('index'))
+        except:
+            pass
+        
+        return render_market_template('auth_bind.html', uuid=uuid, error='绑定失败，请重试')
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
