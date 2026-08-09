@@ -177,17 +177,19 @@ function copyWebUrl() {
 document.addEventListener('DOMContentLoaded', function() {
     var dropdowns = document.querySelectorAll('.dropdown');
     dropdowns.forEach(function(dropdown) {
-        var button = dropdown.querySelector('.dropbtn');
+        var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
         var content = dropdown.querySelector('.dropdown-content');
         
-        button.addEventListener('click', function(e) {
-            e.stopPropagation();
-            content.classList.toggle('show');
-        });
-        
-        content.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
+        if (trigger && content) {
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                content.classList.toggle('show');
+            });
+            
+            content.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
     });
     
     document.addEventListener('click', function() {
