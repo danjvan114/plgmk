@@ -127,6 +127,8 @@ def register_market_routes():
         
         if request.method == 'POST':
             score = int(request.form.get('score'))
+            if score > 5: score = 5
+            if score < 1: score = 1
             from datetime import datetime
             created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             user_id = session.get('user', 'anonymous_' + str(hash(request.remote_addr)))
