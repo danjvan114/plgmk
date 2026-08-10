@@ -133,6 +133,19 @@ def add_rating(market_id, plugin_id, user_id, score, created_at):
         )
         conn.commit()
 
+def update_rating(market_id, plugin_id, user_id, score):
+    engine, text = get_market_db_engine(market_id)
+    with engine.connect() as conn:
+        conn.execute(
+            text("UPDATE rating SET score = :score WHERE plugin_id = :plugin_id AND user_id = :user_id"),
+            {'score': score, 'plugin_id': plugin_id, 'user_id': user_id}
+        )
+        conn.execute(
+            text("UPDATE plugin SET rating = (SELECT AVG(score) FROM rating WHERE plugin_id = :id) WHERE id = :id"),
+            {'id': plugin_id}
+        )
+        conn.commit()
+
 def get_user_ratings(market_id, user_id):
     engine, text = get_market_db_engine(market_id)
     with engine.connect() as conn:

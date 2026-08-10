@@ -144,7 +144,17 @@ def register_market_routes():
             from datetime import datetime
             created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             user_id = session.get('user', 'anonymous_' + str(hash(request.remote_addr)))
-            add_rating(market_id, plugin_id, user_id, score, created_at)
+            
+            # 检查用户是否已评分
+            from .database import get_user_ratings
+            user_ratings = get_user_ratings(market_id, user_id)
+            if plugin_id in user_ratings:
+                # 已评分，更新评分
+                from .database import update_rating
+                update_rating(market_id, plugin_id, user_id, score)
+            else:
+                # 未评分，新增评分
+                add_rating(market_id, plugin_id, user_id, score, created_at)
             if compact_mode:
                 return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id, c='1'))
             return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id))
