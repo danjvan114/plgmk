@@ -11,6 +11,18 @@ import os
 import hashlib
 import re
 
+def sanitize_text(text):
+    """移除文本中的所有 HTML 标签和 JavaScript 代码，用于 name、version、tags 等字段"""
+    if not text:
+        return text
+    # 移除所有 HTML 标签
+    text = re.sub(r'<[^>]+>', '', text)
+    # 移除 javascript: 协议
+    text = re.sub(r'javascript\s*:', '', text, flags=re.IGNORECASE)
+    # 移除 onxxx 事件处理器
+    text = re.sub(r'\bon\w+\s*=', '', text, flags=re.IGNORECASE)
+    return text.strip()
+
 def sanitize_description(text):
     """移除描述中的 JavaScript 代码，防止 XSS 攻击"""
     if not text:
@@ -155,10 +167,10 @@ def register_market_routes():
         upload_folder = os.path.join(get_market_path(market_id), 'uploads')
         
         if request.method == 'POST':
-            name = request.form['name']
+            name = sanitize_text(request.form['name'])
             description = sanitize_description(request.form['description'])
-            version = request.form['version']
-            tags = request.form.get('tags', '')
+            version = sanitize_text(request.form['version'])
+            tags = sanitize_text(request.form.get('tags', ''))
             external_url = request.form.get('external_url', '').strip()
             
             from datetime import datetime
@@ -237,10 +249,10 @@ def register_market_routes():
             return redirect(url_for('market_index', market_id=market_id))
         
         if request.method == 'POST':
-            name = request.form['name']
+            name = sanitize_text(request.form['name'])
             description = sanitize_description(request.form['description'])
-            version = request.form['version']
-            tags = request.form.get('tags', '')
+            version = sanitize_text(request.form['version'])
+            tags = sanitize_text(request.form.get('tags', ''))
             external_url = request.form.get('external_url', '').strip()
             
             file_path = None
