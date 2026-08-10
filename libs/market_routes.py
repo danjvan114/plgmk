@@ -157,7 +157,7 @@ def register_market_routes():
         if request.method == 'POST':
             name = request.form['name']
             description = sanitize_description(request.form['description'])
-            version = request.form['version']
+            version = sanitize_description(request.form['version'])
             tags = request.form.get('tags', '')
             external_url = request.form.get('external_url', '').strip()
             
@@ -239,7 +239,7 @@ def register_market_routes():
         if request.method == 'POST':
             name = request.form['name']
             description = sanitize_description(request.form['description'])
-            version = request.form['version']
+            version = sanitize_description(request.form['version'])
             tags = request.form.get('tags', '')
             external_url = request.form.get('external_url', '').strip()
             
