@@ -683,6 +683,40 @@ def register_other_routes():
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
 
+    # Player routes
+    PLAYER_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'localcdn', 'player')
+    CDN_BASE = "https://creation.bcmcdn.com/neko/web/release/"
+
+    @app.route('/app/player')
+    @app.route('/app/player/')
+    def player_index():
+        return send_from_directory(PLAYER_DIR, 'KittenN.html')
+
+    @app.route('/app/player/<path:filename>')
+    def player_static_files(filename):
+        if filename == "main.b0815b57.js":
+            resp = send_from_directory(PLAYER_DIR, filename)
+            resp.headers["Cache-Control"] = "no-store, must-revalidate"
+            return resp
+        if os.path.exists(os.path.join(PLAYER_DIR, filename)):
+            return send_from_directory(PLAYER_DIR, filename)
+        return proxy_player_cdn(filename)
+
+    def proxy_player_cdn(path):
+        url = CDN_BASE + path
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": request.headers.get("User-Agent", "")})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = resp.read()
+                content_type = resp.headers.get("Content-Type", "application/octet-stream")
+            return data, resp.status, {"Content-Type": content_type}
+        except Exception as e:
+            return {"error": str(e)}, 502
+
+    @app.route('/app/player/api/ping')
+    def player_ping():
+        return {"ok": True}
+
     @app.errorhandler(404)
     def page_not_found(e):
         return render_root_template('404.html'), 404
