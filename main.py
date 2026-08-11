@@ -74,7 +74,7 @@ if __name__ == '__main__':
         # 尝试双栈模式（IPv6 + IPv4）
         
         
-        print(f"Dual-stack failed: {e}")
+        
         print("Falling back to IPv4 only...")
         serve(app, host='0.0.0.0', port=8897, threads=16)
     except ImportError:
