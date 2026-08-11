@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
+    <meta charset="UTF-8">
+    <title>发布作品 - 作品池</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
+        @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+        header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
+        @keyframes headerSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
+        .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+        .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;animation:logoFadeIn .5s .1s both}
+        @keyframes logoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+        .logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
+        .logo-icon img{width:100%;height:100%;object-fit:cover}
+        .head-space{flex:1}
+        .nav-links{display:flex;gap:24px}
+        .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
+        .nav-links a:hover{color:#fff;transform:translateY(-1px)}
+        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
+        .nav-links a:hover::after{width:100%}
+        .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
+        .btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+        .btn:active{transform:scale(.95)}
+        .dropdown{position:relative;display:inline-block}
+        .dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
+        .dropbtn:hover{color:#fff}
+        .dropbtn:focus{outline:none}
+        .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:dropdownFade .2s}
+        @keyframes dropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        .dropdown-content.show{display:block}
+        .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s}
+        .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
+        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
+        @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
+        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both}
+        @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
+        #loader .mdui-progress{margin:0;border-radius:0}
+        .main-box{max-width:700px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
+        .form-card{background:rgba(255,255,255,.95);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:32px;animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
+        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        .form-title{font-size:24px;color:#333;margin-bottom:24px;text-align:center}
+        .form-group{margin-bottom:20px}
+        .form-group label{display:block;margin-bottom:8px;color:#555;font-size:14px;font-weight:500}
+        .form-group input,.form-group textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .2s}
+        .form-group input:focus,.form-group textarea:focus{outline:none;border-color:#4caf50}
+        .form-group textarea{min-height:100px;resize:vertical}
+        .form-group .hint{font-size:12px;color:#999;margin-top:4px}
+        .submit-btn{width:100%;padding:14px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:500;cursor:pointer;transition:all .2s}
+        .submit-btn:hover{background:#43a047;transform:translateY(-2px);box-shadow:0 4px 12px rgba(76,175,80,.3)}
+        .submit-btn:active{transform:scale(.98)}
+        .back-link{display:inline-flex;align-items:center;gap:4px;color:#4caf50;text-decoration:none;margin-bottom:16px;font-size:14px}
+        .back-link:hover{text-decoration:underline}
+        .file-url-display{background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:20px;word-break:break-all;font-size:13px;color:#666}
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="mdui-progress">
+            <div class="mdui-progress-indeterminate"></div>
+        </div>
+    </div>
+    <header>
+        <div class="wrap">
+            <div class="logo">
+                <div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>
+                菠菜面
+            </div>
+            <div class="nav-links">
+                <a href="/mk/{{ current_market or 'kn' }}">插件市场</a>
+                <a href="/workpool">作品池</a>
+                <a href="https://pan1.pgrm.run">我的存储</a>
+                <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
+                <a href="/app/kn/d">应用下载</a>
+                <div class="dropdown">
+                    <button class="dropbtn">插件市场 ▼</button>
+                    <div class="dropdown-content">
+                        {% if markets %}
+                        {% for market_id, market_name in markets.items() %}
+                        <a class="mdui-ripple" href="/mk/{{ market_id }}">{{ market_name }}</a>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if session.player_name %}
+                <a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+                <a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+                {% if users and users.get(session.player_name, {}).get('role') == 'admin' %}
+                <a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="head-space"></div>
+            {% if session.player_name %}
+            <div class="icon-btn" title="通知"><i class="mdui-icon material-icons" style="font-size:22px">notifications</i></div>
+            <div class="dropdown">
+                <div class="user-avatar" title="{{ session.player_name }}">{{ session.player_name[0].upper() }}</div>
+                <div class="dropdown-content">
+                    <a href="/workpool/my">我的作品</a>
+                    <a href="/logout">退出登录</a>
+                </div>
+            </div>
+            {% else %}
+            <a href="/login" class="btn mdui-ripple" style="margin-left:12px">登录</a>
+            {% endif %}
+        </div>
+    </header>
+    <div class="main-box">
+        <a href="/workpool" class="back-link"><i class="mdui-icon material-icons">arrow_back</i>返回作品池</a>
+        <div class="form-card">
+            <h1 class="form-title">发布作品</h1>
+            {% if file_url %}
+            <div class="file-url-display">
+                <strong>作品文件：</strong>{{ file_url }}
+            </div>
+            {% endif %}
+            <form id="publish-form">
+                <div class="form-group">
+                    <label>作品标题 *</label>
+                    <input type="text" id="title" name="title" required placeholder="输入作品标题">
+                </div>
+                <div class="form-group">
+                    <label>作品简介</label>
+                    <textarea id="description" name="description" placeholder="简单介绍一下你的作品"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>标签</label>
+                    <input type="text" id="tags" name="tags" placeholder="用逗号分隔，如：游戏,冒险,像素">
+                    <div class="hint">多个标签用逗号分隔</div>
+                </div>
+                <div class="form-group">
+                    <label>缩略图 URL（可选）</label>
+                    <input type="url" id="thumbnail" name="thumbnail" placeholder="https://example.com/thumbnail.png">
+                </div>
+                <button type="submit" class="submit-btn">发布作品</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function(){
+            document.getElementById('loader').style.display='none';
+            document.body.classList.add('page-enter');
+            setTimeout(()=>document.body.classList.remove('page-enter'),400);
+        });
+
+        document.getElementById('publish-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                tags: formData.get('tags'),
+                thumbnail: formData.get('thumbnail'),
+                file_url: '{{ file_url }}'
+            };
+
+            if (!data.title.trim()) {
+                alert('请输入作品标题');
+                return;
+            }
+
+            fetch('/workpool/publish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('作品发布成功！');
+                    window.location.href = '/workpool/' + data.work_id;
+                } else {
+                    alert(data.message || '发布失败');
+                }
+            })
+            .catch(err => {
+                alert('网络错误，请重试');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(function(dropdown) {
+                var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
+                var content = dropdown.querySelector('.dropdown-content');
+                if (trigger && content) {
+                    trigger.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        content.classList.toggle('show');
+                    });
+                    content.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+            });
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-content').forEach(function(content) {
+                    content.classList.remove('show');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

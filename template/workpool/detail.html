@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
+    <meta charset="UTF-8">
+    <title>{{ work.title }} - 作品池</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
+        @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+        header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
+        @keyframes headerSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
+        .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+        .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;animation:logoFadeIn .5s .1s both}
+        @keyframes logoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+        .logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
+        .logo-icon img{width:100%;height:100%;object-fit:cover}
+        .head-space{flex:1}
+        .nav-links{display:flex;gap:24px}
+        .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
+        .nav-links a:hover{color:#fff;transform:translateY(-1px)}
+        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
+        .nav-links a:hover::after{width:100%}
+        .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
+        .btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+        .btn:active{transform:scale(.95)}
+        .dropdown{position:relative;display:inline-block}
+        .dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
+        .dropbtn:hover{color:#fff}
+        .dropbtn:focus{outline:none}
+        .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:dropdownFade .2s}
+        @keyframes dropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        .dropdown-content.show{display:block}
+        .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s}
+        .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
+        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
+        @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
+        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both}
+        @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
+        #loader .mdui-progress{margin:0;border-radius:0}
+        .main-box{max-width:900px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
+        .detail-card{background:rgba(255,255,255,.95);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:32px;margin-bottom:24px;animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
+        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        .detail-title{font-size:28px;color:#333;margin-bottom:16px}
+        .detail-meta{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px;color:#666;font-size:14px}
+        .detail-meta span{display:flex;align-items:center;gap:4px}
+        .detail-desc{color:#555;line-height:1.8;margin-bottom:24px;font-size:15px}
+        .action-bar{display:flex;gap:12px;margin-bottom:24px}
+        .action-btn{display:flex;align-items:center;gap:6px;padding:10px 20px;border-radius:24px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:14px;transition:all .2s}
+        .action-btn:hover{background:#f5f5f5;transform:translateY(-2px)}
+        .action-btn.active{background:#4caf50;color:#fff;border-color:#4caf50}
+        .action-btn i{font-size:20px}
+        .comments-section{background:rgba(255,255,255,.95);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:24px;animation:cardSlideUp .5s .1s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
+        .comments-title{font-size:20px;color:#333;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+        .comment-input{display:flex;gap:12px;margin-bottom:24px}
+        .comment-input textarea{flex:1;padding:12px;border:1px solid #ddd;border-radius:8px;resize:vertical;min-height:80px;font-size:14px;font-family:inherit}
+        .comment-input textarea:focus{outline:none;border-color:#4caf50}
+        .comment-submit{padding:12px 24px;background:#4caf50;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;transition:all .2s;align-self:flex-end}
+        .comment-submit:hover{background:#43a047}
+        .comment-item{padding:16px 0;border-bottom:1px solid #eee}
+        .comment-item:last-child{border-bottom:none}
+        .comment-header{display:flex;justify-content:space-between;margin-bottom:8px}
+        .comment-user{font-weight:bold;color:#333}
+        .comment-time{color:#999;font-size:12px}
+        .comment-content{color:#555;line-height:1.6}
+        .tag{background:rgba(76,175,80,.1);color:#4caf50;padding:2px 8px;border-radius:4px;font-size:12px}
+        .tag-list{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px}
+        .back-link{display:inline-flex;align-items:center;gap:4px;color:#4caf50;text-decoration:none;margin-bottom:16px;font-size:14px}
+        .back-link:hover{text-decoration:underline}
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="mdui-progress">
+            <div class="mdui-progress-indeterminate"></div>
+        </div>
+    </div>
+    <header>
+        <div class="wrap">
+            <div class="logo">
+                <div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>
+                菠菜面
+            </div>
+            <div class="nav-links">
+                <a href="/mk/{{ current_market or 'kn' }}">插件市场</a>
+                <a href="/workpool" style="color:#fff;font-weight:bold">作品池</a>
+                <a href="https://pan1.pgrm.run">我的存储</a>
+                <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
+                <a href="/app/kn/d">应用下载</a>
+                <div class="dropdown">
+                    <button class="dropbtn">插件市场 ▼</button>
+                    <div class="dropdown-content">
+                        {% if markets %}
+                        {% for market_id, market_name in markets.items() %}
+                        <a class="mdui-ripple" href="/mk/{{ market_id }}">{{ market_name }}</a>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if session.player_name %}
+                <a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+                <a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+                {% if users and users.get(session.player_name, {}).get('role') == 'admin' %}
+                <a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="head-space"></div>
+            {% if session.player_name %}
+            <div class="icon-btn" title="通知"><i class="mdui-icon material-icons" style="font-size:22px">notifications</i></div>
+            <div class="dropdown">
+                <div class="user-avatar" title="{{ session.player_name }}">{{ session.player_name[0].upper() }}</div>
+                <div class="dropdown-content">
+                    <a href="/workpool/my">我的作品</a>
+                    <a href="/logout">退出登录</a>
+                </div>
+            </div>
+            {% else %}
+            <a href="/login" class="btn mdui-ripple" style="margin-left:12px">登录</a>
+            {% endif %}
+        </div>
+    </header>
+    <div class="main-box">
+        <a href="/workpool" class="back-link"><i class="mdui-icon material-icons">arrow_back</i>返回作品池</a>
+        <div class="detail-card">
+            <h1 class="detail-title">{{ work.title|e }}</h1>
+            <div class="detail-meta">
+                <span><i class="mdui-icon material-icons">person</i>{{ work.author|e }}</span>
+                <span><i class="mdui-icon material-icons">thumb_up</i>{{ work.like_count }} 点赞</span>
+                <span><i class="mdui-icon material-icons">favorite</i>{{ work.fav_count }} 收藏</span>
+                <span><i class="mdui-icon material-icons">chat</i>{{ work.comment_count }} 评论</span>
+                <span><i class="mdui-icon material-icons">schedule</i>{{ work.created_at }}</span>
+            </div>
+            {% if work.tags %}
+            <div class="tag-list">
+                {% for tag in work.tags.split(',') %}
+                <span class="tag">{{ tag.strip() }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="detail-desc">{{ work.description|e }}</div>
+            <div class="action-bar">
+                <button class="action-btn {% if user_liked %}active{% endif %}" onclick="toggleLike({{ work.id }})">
+                    <i class="mdui-icon material-icons">{% if user_liked %}thumb_up{% else %}thumb_up_off_alt{% endif %}</i>
+                    <span id="like-count">{{ work.like_count }}</span>
+                </button>
+                <button class="action-btn {% if user_faved %}active{% endif %}" onclick="toggleFav({{ work.id }})">
+                    <i class="mdui-icon material-icons">{% if user_faved %}favorite{% else %}favorite_border{% endif %}</i>
+                    <span id="fav-count">{{ work.fav_count }}</span>
+                </button>
+                {% if work.file_url %}
+                <a href="{{ work.file_url }}" class="action-btn" target="_blank">
+                    <i class="mdui-icon material-icons">play_arrow</i>
+                    运行作品
+                </a>
+                {% endif %}
+                {% if session.player_name and (work.author == session.player_name or work.author_id == session.player_name) %}
+                <button class="action-btn" style="color:#f44336;border-color:#f44336" onclick="deleteWork({{ work.id }})">
+                    <i class="mdui-icon material-icons">delete</i>
+                    擦除作品
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        <div class="comments-section">
+            <h2 class="comments-title"><i class="mdui-icon material-icons">chat</i>评论 ({{ work.comment_count }})</h2>
+            {% if session.player_name %}
+            <div class="comment-input">
+                <textarea id="comment-content" placeholder="写下你的评论..."></textarea>
+                <button class="comment-submit" onclick="submitComment({{ work.id }})">发布</button>
+            </div>
+            {% else %}
+            <p style="color:#999;text-align:center;padding:16px"><a href="/login">登录</a>后参与评论</p>
+            {% endif %}
+            <div id="comments-list">
+                {% for comment in comments %}
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-user">{{ comment.username|e }}</span>
+                        <span class="comment-time">{{ comment.created_at }}</span>
+                    </div>
+                    <div class="comment-content">{{ comment.content|e }}</div>
+                </div>
+                {% endfor %}
+                {% if comments|length == 0 %}
+                <p style="color:#999;text-align:center;padding:16px">暂无评论，快来抢沙发吧！</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function(){
+            document.getElementById('loader').style.display='none';
+            document.body.classList.add('page-enter');
+            setTimeout(()=>document.body.classList.remove('page-enter'),400);
+        });
+
+        function toggleLike(workId) {
+            fetch('/workpool/like/' + workId, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('like-count').textContent = data.like_count;
+                        event.target.closest('.action-btn').classList.toggle('active');
+                        const icon = event.target.closest('.action-btn').querySelector('i');
+                        icon.textContent = data.action === 'liked' ? 'thumb_up' : 'thumb_up_off_alt';
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        function toggleFav(workId) {
+            fetch('/workpool/fav/' + workId, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('fav-count').textContent = data.fav_count;
+                        event.target.closest('.action-btn').classList.toggle('active');
+                        const icon = event.target.closest('.action-btn').querySelector('i');
+                        icon.textContent = data.action === 'faved' ? 'favorite' : 'favorite_border';
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        function submitComment(workId) {
+            const content = document.getElementById('comment-content').value.trim();
+            if (!content) {
+                alert('评论内容不能为空');
+                return;
+            }
+            fetch('/workpool/comment/' + workId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+
+        function deleteWork(workId) {
+            if (!confirm('确定要擦除此作品吗？此操作将删除作品索引和数据库，不可恢复！')) {
+                return;
+            }
+            fetch('/workpool/delete/' + workId, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('作品已擦除');
+                        window.location.href = '/workpool';
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(function(dropdown) {
+                var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
+                var content = dropdown.querySelector('.dropdown-content');
+                if (trigger && content) {
+                    trigger.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        content.classList.toggle('show');
+                    });
+                    content.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+            });
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-content').forEach(function(content) {
+                    content.classList.remove('show');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

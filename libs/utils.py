@@ -31,6 +31,11 @@ def render_market_template(template_name, market_id=None, **kwargs):
 
 def render_root_template(template_name, **kwargs):
     template = root_jinja_env.get_template(template_name)
+    kwargs['session'] = session
+    kwargs['current_market'] = session.get('market', 'kn')
+    kwargs['markets'] = MARKETS
+    from .config import User
+    kwargs['users'] = {u.username: {'role': u.role} for u in User.query.all()}
     return template.render(**kwargs)
 
 def allowed_file(filename, allowed_extensions):

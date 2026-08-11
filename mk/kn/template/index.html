@@ -82,7 +82,7 @@ header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:
 <div class="nav-links">
 <a href="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}">首页</a>
 <a href="https://pan1.pgrm.run">我的存储</a>
-<a onclick="alert('作品池暂未开放')">作品池</a>
+<a href="/workpool">作品池</a>
 {% if not compact_mode %}
 <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
 <a href="/app/kn/d">应用下载</a>

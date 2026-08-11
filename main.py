@@ -9,6 +9,7 @@ from libs.user_routes import register_user_routes
 from libs.developer_routes import register_developer_routes
 from libs.other_routes import register_other_routes
 from libs.file_manager import register_file_manager_routes
+from libs.workpool_routes import register_workpool_routes
 import os
 
 
@@ -53,6 +54,8 @@ register_developer_routes()
 print("DEBUG: developer routes registered")
 register_other_routes()
 print("DEBUG: other routes registered")
+register_workpool_routes()
+print("DEBUG: workpool routes registered")
 
 LOCALCDN_PATH = os.path.join(os.path.dirname(__file__), 'localcdn')
 register_file_manager_routes(app, LOCALCDN_PATH)
@@ -68,6 +71,19 @@ if __name__ == '__main__':
     try:
         from waitress import serve
         print("Running with Waitress production WSGI server...")
-        serve(app, host='0.0.0.0', port=8897, threads=16)
+        # 尝试双栈模式（IPv6 + IPv4）
+        try:
+            print("Attempting dual-stack mode (IPv6 + IPv4)...")
+            serve(app, host='::', port=8897, threads=16)
+        except OSError as e:
+            print(f"Dual-stack failed: {e}")
+            print("Falling back to IPv4 only...")
+            serve(app, host='0.0.0.0', port=8897, threads=16)
     except ImportError:
-        app.run(host='0.0.0.0', port=8897)
+        # 开发模式双栈尝试
+        try:
+            print("Attempting dual-stack mode (development)...")
+            app.run(host='::', port=8897)
+        except OSError:
+            print("Dual-stack failed, falling back to IPv4...")
+            app.run(host='0.0.0.0', port=8897)
