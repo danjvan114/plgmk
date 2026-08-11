@@ -685,7 +685,6 @@ def register_other_routes():
 
     # Player routes
     PLAYER_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'localcdn', 'player')
-    CDN_BASE = "https://creation.bcmcdn.com/neko/web/release/"
 
     @app.route('/app/player')
     @app.route('/app/player/')
@@ -700,18 +699,7 @@ def register_other_routes():
             return resp
         if os.path.exists(os.path.join(PLAYER_DIR, filename)):
             return send_from_directory(PLAYER_DIR, filename)
-        return proxy_player_cdn(filename)
-
-    def proxy_player_cdn(path):
-        url = CDN_BASE + path
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": request.headers.get("User-Agent", "")})
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                data = resp.read()
-                content_type = resp.headers.get("Content-Type", "application/octet-stream")
-            return data, resp.status, {"Content-Type": content_type}
-        except Exception as e:
-            return {"error": str(e)}, 502
+        return jsonify({"error": "File not found"}), 404
 
     @app.route('/app/player/api/ping')
     def player_ping():
