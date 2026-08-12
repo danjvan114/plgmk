@@ -67,6 +67,14 @@
         .action-item b{font-weight:700}
         .action-item.delete-action{color:#f44336}
         .action-item.delete-action:hover{color:#d32f2f}
+        .action-item .material-icons{font-size:20px;line-height:1}
+        .action-item .icon-on{display:none}
+        .action-item.active .icon-off{display:none}
+        .action-item.active .icon-on{display:inline-block}
+        .action-item.active.like-active{color:#e53935}
+        .action-item.active.fav-active{color:#f9a825}
+        .action-item.share-action{color:#43a047}
+        .action-item.share-action:hover{color:#2e7d32}
         .action-spacer{margin-left:auto}
         .detail-desc{color:#555;line-height:1.8;margin:14px 0 0;font-size:14px;background:#fff;padding:14px;border-radius:8px;border:1px solid #eee}
         .side-col{width:280px;flex-shrink:0}
@@ -179,18 +187,28 @@
                     </div>
                     {% endif %}
                     <div class="action-row">
-                        <span class="action-item {% if user_liked %}active{% endif %}" id="like-action" onclick="toggleLike({{ work.id }})">
-                            👍 点赞 <b id="like-count">{{ work.like_count }}</b>
+                        <span class="action-item {% if user_liked %}active like-active{% endif %}" id="like-action" onclick="toggleLike({{ work.id }})">
+                            <i class="mdui-icon material-icons icon-off">thumb_up_off_alt</i>
+                            <i class="mdui-icon material-icons icon-on">thumb_up</i>
+                            点赞 <b id="like-count">{{ work.like_count }}</b>
                         </span>
-                        <span class="action-item {% if user_faved %}active{% endif %}" id="fav-action" onclick="toggleFav({{ work.id }})">
-                            ⭐ 收藏 <b id="fav-count">{{ work.fav_count }}</b>
+                        <span class="action-item {% if user_faved %}active fav-active{% endif %}" id="fav-action" onclick="toggleFav({{ work.id }})">
+                            <i class="mdui-icon material-icons icon-off">star_border</i>
+                            <i class="mdui-icon material-icons icon-on">star</i>
+                            收藏 <b id="fav-count">{{ work.fav_count }}</b>
                         </span>
-                        <span class="action-item" onclick="shareWork()">📤 分享</span>
+                        <span class="action-item share-action" onclick="shareWork()">
+                            <i class="mdui-icon material-icons">share</i>分享
+                        </span>
                         {% if work.file_url %}
-                        <a class="action-item" href="{{ work.file_url }}" target="_blank" style="text-decoration:none">↗ 在新窗口打开</a>
+                        <a class="action-item" href="{{ work.file_url }}" target="_blank" style="text-decoration:none">
+                            <i class="mdui-icon material-icons" style="font-size:20px">open_in_new</i>在新窗口打开
+                        </a>
                         {% endif %}
                         {% if session.user and (work.author == session.user or work.author_id == session.user) %}
-                        <span class="action-item delete-action action-spacer" onclick="deleteWork({{ work.id }})">🗑 擦除作品</span>
+                        <span class="action-item delete-action action-spacer" onclick="deleteWork({{ work.id }})">
+                            <i class="mdui-icon material-icons" style="font-size:20px">delete</i>擦除作品
+                        </span>
                         {% endif %}
                     </div>
                 </div>
