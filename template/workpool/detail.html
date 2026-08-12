@@ -103,19 +103,19 @@
                         {% endif %}
                     </div>
                 </div>
-                {% if session.player_name %}
+                {% if session.user %}
                 <a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
                 <a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
-                {% if users and users.get(session.player_name, {}).get('role') == 'admin' %}
+                {% if users and users.get(session.user, {}).get('role') == 'admin' %}
                 <a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
                 {% endif %}
                 {% endif %}
             </div>
             <div class="head-space"></div>
-            {% if session.player_name %}
+            {% if session.user %}
             <div class="icon-btn" title="通知"><i class="mdui-icon material-icons" style="font-size:22px">notifications</i></div>
             <div class="dropdown">
-                <div class="user-avatar" title="{{ session.player_name }}">{{ session.player_name[0].upper() }}</div>
+                <div class="user-avatar" title="{{ session.user }}">{{ session.user[0].upper() }}</div>
                 <div class="dropdown-content">
                     <a href="/workpool/my">我的作品</a>
                     <a href="/logout">退出登录</a>
@@ -160,7 +160,7 @@
                     运行作品
                 </a>
                 {% endif %}
-                {% if session.player_name and (work.author == session.player_name or work.author_id == session.player_name) %}
+                {% if session.user and (work.author == session.user or work.author_id == session.user) %}
                 <button class="action-btn" style="color:#f44336;border-color:#f44336" onclick="deleteWork({{ work.id }})">
                     <i class="mdui-icon material-icons">delete</i>
                     擦除作品
@@ -170,7 +170,7 @@
         </div>
         <div class="comments-section">
             <h2 class="comments-title"><i class="mdui-icon material-icons">chat</i>评论 ({{ work.comment_count }})</h2>
-            {% if session.player_name %}
+            {% if session.user %}
             <div class="comment-input">
                 <textarea id="comment-content" placeholder="写下你的评论..."></textarea>
                 <button class="comment-submit" onclick="submitComment({{ work.id }})">发布</button>

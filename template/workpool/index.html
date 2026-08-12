@@ -100,10 +100,10 @@
                         {% endif %}
                     </div>
                 </div>
-                {% if session.player_name %}
+                {% if session.user %}
                 <a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
                 <a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
-                {% if users and users.get(session.player_name, {}).get('role') == 'admin' %}
+                {% if users and users.get(session.user, {}).get('role') == 'admin' %}
                 <a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
                 {% endif %}
                 {% endif %}
@@ -112,10 +112,10 @@
             <form class="search" action="/workpool" method="get">
                 <input name="search" placeholder="搜索作品名称/作者/标签" value="{{ search_query }}">
             </form>
-            {% if session.player_name %}
+            {% if session.user %}
             <div class="icon-btn" title="通知"><i class="mdui-icon material-icons" style="font-size:22px">notifications</i></div>
             <div class="dropdown">
-                <div class="user-avatar" title="{{ session.player_name }}">{{ session.player_name[0].upper() }}</div>
+                <div class="user-avatar" title="{{ session.user }}">{{ session.user[0].upper() }}</div>
                 <div class="dropdown-content">
                     <a href="/workpool/my">我的作品</a>
                     <a href="/logout">退出登录</a>
