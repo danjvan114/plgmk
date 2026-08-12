@@ -25,6 +25,30 @@ with app.app_context():
     
     db.create_all()
     
+    # 迁移：为旧版 users.db 补充 qq / reg_time 列
+    from sqlalchemy import inspect as sa_inspect, text as sa_text
+    try:
+        from sqlalchemy import create_engine
+        users_engine = create_engine(app.config['SQLALCHEMY_BINDS']['users'])
+        inspector = sa_inspect(users_engine)
+        user_cols = [c['name'] for c in inspector.get_columns('user')]
+        with users_engine.connect() as conn:
+            if 'qq' not in user_cols:
+                conn.execute(sa_text("ALTER TABLE user ADD COLUMN qq VARCHAR(20) DEFAULT ''"))
+            if 'reg_time' not in user_cols:
+                conn.execute(sa_text("ALTER TABLE user ADD COLUMN reg_time VARCHAR(20) DEFAULT ''"))
+            conn.commit()
+        users_engine.dispose()
+    except Exception as e:
+        print('user table migration skipped:', e)
+    
+    # 回填注册时间
+    from datetime import datetime
+    for u in User.query.all():
+        if not u.reg_time:
+            u.reg_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    db.session.commit()
+    
     admin_exists = User.query.filter_by(role='admin').first()
     if not admin_exists:
         admin_password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))

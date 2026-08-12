@@ -116,8 +116,9 @@
             {% if session.user %}
             <div class="icon-btn" title="通知"><i class="fa-solid fa-bell" style="font-size:22px"></i></div>
             <div class="dropdown">
-                <div class="user-avatar" title="{{ session.user }}">{{ session.user[0].upper() }}</div>
+                <div class="user-avatar" title="{{ session.user }}">{% if users.get(session.user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[session.user]['qq'] }}&s=100" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">{% else %}{{ session.user[0].upper() }}{% endif %}</div>
                 <div class="dropdown-content">
+                    <a href="/u/{{ session.user }}">我的主页</a>
                     <a href="/workpool/my">我的作品</a>
                     <a href="/change_password">修改密码</a>
                     <a href="/logout">退出登录</a>

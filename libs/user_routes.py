@@ -1,7 +1,8 @@
 from flask import request, redirect, url_for, session
 from .config import app, User, db
-from .utils import render_market_template, render_root_template
+from .utils import render_market_template, render_root_template, render_user_profile_template
 import requests
+from datetime import datetime
 
 def register_user_routes():
     @app.route('/auth/redirect')
@@ -45,7 +46,7 @@ def register_user_routes():
                 data = response.json()
                 if data.get('user_id'):
                     external_id = data['user_id']
-                    new_user = User(username=username, password=external_id, role='user')
+                    new_user = User(username=username, password=external_id, role='user', reg_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
                     db.session.add(new_user)
                     db.session.commit()
                     
@@ -73,6 +74,46 @@ def register_user_routes():
 
     @app.route('/register', methods=['GET', 'POST'])
     def register():
+        return redirect(url_for('login'))
+
+    @app.route('/u/<username>')
+    def user_profile(username):
+        user = User.query.get(username)
+        if not user:
+            return render_market_template('404.html', message='用户不存在'), 404
+        from .workpool import MAIN_DB_PATH
+        works_list = []
+        try:
+            import sqlite3
+            conn = sqlite3.connect(MAIN_DB_PATH)
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                "SELECT id, title, author, like_count, fav_count, comment_count, created_at "
+                "FROM works WHERE author = ? ORDER BY id DESC LIMIT 20", (user.username,)
+            ).fetchall()
+            for row in rows:
+                works_list.append({
+                    'id': row['id'], 'title': row['title'], 'author': row['author'],
+                    'like_count': row['like_count'], 'fav_count': row['fav_count'],
+                    'comment_count': row['comment_count'], 'created_at': row['created_at']
+                })
+            conn.close()
+        except Exception:
+            pass
+        return render_user_profile_template('user_profile.html', profile_user=user, workpool_works=works_list)
+
+    @app.route('/user/set_qq', methods=['POST'])
+    def user_set_qq():
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        qq = request.form.get('qq', '').strip()
+        user = User.query.get(session['user'])
+        if user:
+            if qq and not qq.isdigit():
+                return render_market_template('change_password.html', users={u.username: u.to_dict() for u in User.query.all()}, qq_error='QQ号仅支持数字')
+            user.qq = qq if qq.isdigit() else ''
+            db.session.commit()
+            return redirect(url_for('user_profile', username=user.username))
         return redirect(url_for('login'))
 
     @app.route('/logout')

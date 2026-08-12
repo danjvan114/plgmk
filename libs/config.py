@@ -38,6 +38,13 @@ class User(db.Model):
     username = db.Column(db.String(50), primary_key=True)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20), default='user')
+    qq = db.Column(db.String(20), default='')
+    reg_time = db.Column(db.String(20), default='')
     
     def to_dict(self):
-        return {'username': self.username, 'password': self.password, 'role': self.role}
+        return {'username': self.username, 'password': self.password, 'role': self.role, 'qq': self.qq, 'reg_time': self.reg_time}
+
+    @property
+    def qq_avatar_url(self):
+        base = 'https://q1.qlogo.cn/g?b=qq&nk={q}&s=100'
+        return base.format(q=self.qq) if self.qq else ''
