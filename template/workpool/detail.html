@@ -151,7 +151,7 @@
             <div class="detail-main">
                 <div class="player-area">
                     {% if work.file_url %}
-                    <iframe src="{{ work.file_url }}" frameborder="0" allowfullscreen></iframe>
+                    <iframe src="https://code.pgrm.run/app/player/?f={{ work.file_url|urlencode }}" frameborder="0" allowfullscreen></iframe>
                     {% else %}
                     <div class="player-placeholder">
                         <i class="mdui-icon material-icons">play_circle_outline</i>
