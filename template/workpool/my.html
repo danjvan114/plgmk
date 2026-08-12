@@ -3,6 +3,7 @@
 <head>
     <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
     <title>我的作品 - 作品池</title>
@@ -102,7 +103,7 @@
             </div>
             <div class="head-space"></div>
             {% if session.user %}
-            <div class="icon-btn" title="通知"><i class="mdui-icon material-icons" style="font-size:22px">notifications</i></div>
+            <div class="icon-btn" title="通知"><i class="fa-solid fa-bell" style="font-size:22px"></i></div>
             <div class="dropdown">
                 <div class="user-avatar" title="{{ session.user }}">{{ session.user[0].upper() }}</div>
                 <div class="dropdown-content">
@@ -117,7 +118,7 @@
         </div>
     </header>
     <div class="main-box">
-        <h1 class="page-title"><i class="mdui-icon material-icons">folder</i>我的作品</h1>
+        <h1 class="page-title"><i class="fa-solid fa-folder"></i>我的作品</h1>
         {% if works|length > 0 %}
         <div class="grid">
             {% for work in works %}
@@ -132,13 +133,13 @@
                 </div>
                 {% endif %}
                 <div class="meta">
-                    <span class="meta-item"><i class="mdui-icon material-icons" style="font-size:16px">thumb_up</i>{{ work.like_count }}</span>
-                    <span class="meta-item"><i class="mdui-icon material-icons" style="font-size:16px">favorite</i>{{ work.fav_count }}</span>
-                    <span class="meta-item"><i class="mdui-icon material-icons" style="font-size:16px">chat</i>{{ work.comment_count }}</span>
+                    <span class="meta-item"><i class="fa-solid fa-thumbs-up" style="font-size:16px"></i>{{ work.like_count }}</span>
+                    <span class="meta-item"><i class="fa-solid fa-heart" style="font-size:16px"></i>{{ work.fav_count }}</span>
+                    <span class="meta-item"><i class="fa-regular fa-comment" style="font-size:16px"></i>{{ work.comment_count }}</span>
                 </div>
                 <div style="margin-top:12px;text-align:right">
                     <button class="action-btn" style="color:#f44336;border-color:#f44336;font-size:12px;padding:6px 12px" onclick="event.stopPropagation();deleteWork({{ work.id }})">
-                        <i class="mdui-icon material-icons" style="font-size:16px">delete</i>
+                        <i class="fa-solid fa-trash-can" style="font-size:16px"></i>
                         擦除
                     </button>
                 </div>
@@ -147,7 +148,7 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <i class="mdui-icon material-icons">folder_open</i>
+            <i class="fa-regular fa-folder-open"></i>
             <p>你还没有发布任何作品</p>
         </div>
         {% endif %}

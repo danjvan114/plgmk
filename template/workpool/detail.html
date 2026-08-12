@@ -3,6 +3,7 @@
 <head>
     <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
     <title>{{ work.title }} - 作品池</title>
@@ -67,7 +68,7 @@
         .action-item b{font-weight:700}
         .action-item.delete-action{color:#f44336}
         .action-item.delete-action:hover{color:#d32f2f}
-        .action-item .material-icons{font-size:20px;line-height:1}
+        .action-item .fa{font-size:20px;line-height:1}
         .action-item .icon-on{display:none}
         .action-item.active .icon-off{display:none}
         .action-item.active .icon-on{display:inline-block}
@@ -139,7 +140,7 @@
             </div>
             <div class="head-space"></div>
             {% if session.user %}
-            <div class="icon-btn" title="通知"><i class="mdui-icon material-icons" style="font-size:22px">notifications</i></div>
+            <div class="icon-btn" title="通知"><i class="fa-solid fa-bell" style="font-size:22px"></i></div>
             <div class="dropdown">
                 <div class="user-avatar" title="{{ session.user }}">{{ session.user[0].upper() }}</div>
                 <div class="dropdown-content">
@@ -154,7 +155,7 @@
         </div>
     </header>
     <div class="main-box">
-        <a href="/workpool" class="back-link"><i class="mdui-icon material-icons">arrow_back</i>返回作品池</a>
+        <a href="/workpool" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
         <div class="detail-layout">
             <div class="detail-main">
                 <div class="player-area">
@@ -162,7 +163,7 @@
                     <iframe src="https://code.pgrm.run/app/player/?f={{ work.file_url|urlencode }}" frameborder="0" allowfullscreen></iframe>
                     {% else %}
                     <div class="player-placeholder">
-                        <i class="mdui-icon material-icons">play_circle_outline</i>
+                        <i class="fa-regular fa-circle-play"></i>
                         <span>该作品暂无预览</span>
                     </div>
                     {% endif %}
@@ -188,26 +189,26 @@
                     {% endif %}
                     <div class="action-row">
                         <span class="action-item {% if user_liked %}active like-active{% endif %}" id="like-action" onclick="toggleLike({{ work.id }})">
-                            <i class="mdui-icon material-icons icon-off">thumb_up_off_alt</i>
-                            <i class="mdui-icon material-icons icon-on">thumb_up</i>
+                            <i class="fa-regular fa-thumbs-up icon-off"></i>
+                            <i class="fa-solid fa-thumbs-up icon-on"></i>
                             点赞 <b id="like-count">{{ work.like_count }}</b>
                         </span>
                         <span class="action-item {% if user_faved %}active fav-active{% endif %}" id="fav-action" onclick="toggleFav({{ work.id }})">
-                            <i class="mdui-icon material-icons icon-off">star_border</i>
-                            <i class="mdui-icon material-icons icon-on">star</i>
+                            <i class="fa-regular fa-star icon-off"></i>
+                            <i class="fa-solid fa-star icon-on"></i>
                             收藏 <b id="fav-count">{{ work.fav_count }}</b>
                         </span>
                         <span class="action-item share-action" onclick="shareWork()">
-                            <i class="mdui-icon material-icons">share</i>分享
+                            <i class="fa-solid fa-share"></i>分享
                         </span>
                         {% if work.file_url %}
                         <a class="action-item" href="{{ work.file_url }}" target="_blank" style="text-decoration:none">
-                            <i class="mdui-icon material-icons" style="font-size:20px">open_in_new</i>在新窗口打开
+                            <i class="fa-solid fa-up-right-from-square" style="font-size:20px"></i>在新窗口打开
                         </a>
                         {% endif %}
                         {% if session.user and (work.author == session.user or work.author_id == session.user) %}
                         <span class="action-item delete-action action-spacer" onclick="deleteWork({{ work.id }})">
-                            <i class="mdui-icon material-icons" style="font-size:20px">delete</i>擦除作品
+                            <i class="fa-solid fa-trash-can" style="font-size:20px"></i>擦除作品
                         </span>
                         {% endif %}
                     </div>
@@ -216,7 +217,7 @@
                 <div class="detail-desc">{{ work.description|e }}</div>
                 {% endif %}
                 <div class="comments-section">
-                    <h2 class="comments-title"><i class="mdui-icon material-icons">chat</i>评论 ({{ work.comment_count }})</h2>
+                    <h2 class="comments-title"><i class="fa-regular fa-comment"></i>评论 ({{ work.comment_count }})</h2>
                     {% if session.user %}
                     <div class="comment-input">
                         <textarea id="comment-content" placeholder="写下你的评论..."></textarea>
