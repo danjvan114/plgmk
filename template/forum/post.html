@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
+    <meta charset="UTF-8">
+    <title>{{ post.title }} - 论坛</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
+        @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+        header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
+        @keyframes headerSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
+        .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+        .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;animation:logoFadeIn .5s .1s both}
+        @keyframes logoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+        .logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
+        .logo-icon img{width:100%;height:100%;object-fit:cover}
+        .head-space{flex:1}
+        .search{height:36px;width:280px;background:rgba(255,255,255,.2);border-radius:18px;display:flex;align-items:center;padding:0 16px;animation:searchFadeIn .5s .15s both}
+        @keyframes searchFadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+        .search input{background:transparent;border:none;outline:none;color:#fff;width:100%;font-size:14px}
+        .search input::placeholder{color:rgba(255,255,255,.7)}
+        .nav-links{display:flex;gap:24px}
+        .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
+        .nav-links a:hover{color:#fff;transform:translateY(-1px)}
+        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
+        .nav-links a:hover::after{width:100%}
+        .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
+        .btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+        .btn:active{transform:scale(.95)}
+        .dropdown{position:relative;display:inline-block}
+        .dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
+        .dropbtn:hover{color:#fff}
+        .dropbtn:focus{outline:none}
+        .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:dropdownFade .2s}
+        @keyframes dropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        .dropdown-content.show{display:block}
+        .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s}
+        .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
+        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
+        @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
+        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both;position:relative}
+        @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
+        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
+        #loader .mdui-progress{margin:0;border-radius:0}
+        .main-box{max-width:1000px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
+        .breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:14px;flex-wrap:wrap}
+        .breadcrumb a{color:rgba(255,255,255,.95);text-decoration:none;text-shadow:0 2px 6px rgba(0,0,0,.3)}
+        .breadcrumb a:hover{text-decoration:underline}
+        .breadcrumb span{color:rgba(255,255,255,.8);text-shadow:0 2px 6px rgba(0,0,0,.3)}
+        .post-card{background:rgba(255,255,255,.95);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;margin-bottom:18px;animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
+        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        .post-head{padding:20px 24px 12px;border-bottom:1px solid #f0f0f0}
+        .post-title{font-size:22px;color:#222;font-weight:bold;margin-bottom:10px;line-height:1.5;word-break:break-all}
+        .post-title .pin-badge{display:inline-block;background:#fff8e1;color:#f57f17;border:1px solid #ffe082;border-radius:12px;font-size:12px;padding:2px 10px;margin-left:8px;vertical-align:middle}
+        .post-info{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:13px;color:#999}
+        .post-info a{color:#2196f3;text-decoration:none;font-weight:500}
+        .post-info a:hover{text-decoration:underline}
+        .post-info span{display:inline-flex;align-items:center;gap:5px}
+        .post-op-row{display:flex;gap:10px;padding:10px 24px;border-top:1px solid #f5f5f5;flex-wrap:wrap;background:#fafcff}
+        .op-link{font-size:13px;color:#666;cursor:pointer;transition:color .2s;border:none;background:none;font-family:inherit;padding:4px 0}
+        .op-link:hover{color:#2196f3}
+        .op-link.danger:hover{color:#e53935}
+        .op-link.warn:hover{color:#f57f17}
+        .post-content{padding:20px 24px 10px}
+        .post-content div{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:16px 20px;line-height:1.8;color:#444;font-size:14px;word-break:break-word;overflow-wrap:break-word}
+        .post-content div img{max-width:100%;border-radius:6px}
+        .post-content div pre{background:#263238;color:#eceff1;padding:14px;border-radius:8px;overflow-x:auto;font-size:13px}
+        .post-content div code{font-family:Consolas,Menlo,monospace;background:rgba(33,150,243,.08);color:#1565c0;padding:2px 6px;border-radius:4px;font-size:13px}
+        .post-content div pre code{background:transparent;color:inherit;padding:0}
+        .post-content div blockquote{border-left:4px solid #90caf9;background:#f5f9ff;margin:10px 0;padding:10px 14px;color:#555;border-radius:0 6px 6px 0}
+        .post-content div table{border-collapse:collapse;margin:10px 0}
+        .post-content div table th,.post-content div table td{border:1px solid #e0e0e0;padding:6px 12px}
+        .post-content div a{color:#1565c0}
+        .floor{background:rgba(255,255,255,.95);border-radius:10px;padding:18px 24px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
+        .floor-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+        .floor-user{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .floor-no{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;background:#2196f3;color:#fff;border-radius:8px;font-size:13px;font-weight:bold}
+        .floor-user a{color:#2196f3;text-decoration:none;font-size:14px;font-weight:600}
+        .floor-user a:hover{text-decoration:underline}
+        .floor-pin{display:inline-block;background:#fff8e1;color:#f57f17;border:1px solid #ffe082;border-radius:10px;font-size:11px;padding:1px 8px}
+        .floor-time{font-size:12px;color:#bbb}
+        .floor-ops{display:flex;gap:12px;font-size:12px}
+        .floor-ops a{color:#999;cursor:pointer;border:none;background:none;font-family:inherit;font-size:12px}
+        .floor-ops a:hover{color:#2196f3}
+        .floor-ops a.danger:hover{color:#e53935}
+        .floor-content{font-size:14px;color:#444;line-height:1.7;word-break:break-all;white-space:pre-wrap}
+        .reply-item{margin:10px 0 0 40px;background:#f5f7fa;border-radius:8px;padding:12px 16px;border-left:3px solid #bbdefb}
+        .reply-item .floor-head{margin-bottom:6px}
+        .reply-item .reply-content{font-size:13px;color:#555;line-height:1.6;word-break:break-all;white-space:pre-wrap}
+        .login-tip{text-align:center;color:#999;padding:16px;font-size:14px}
+        .login-tip a{color:#2196f3}
+        .reply-box{background:rgba(255,255,255,.95);border-radius:10px;padding:20px 24px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-bottom:30px;animation:cardSlideUp .5s .1s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
+        .reply-box h3{font-size:16px;color:#333;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .reply-box textarea{width:100%;min-height:110px;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:14px;font-family:inherit;resize:vertical;transition:border-color .2s}
+        .reply-box textarea:focus{outline:none;border-color:#2196f3}
+        .reply-box .submit-row{display:flex;justify-content:flex-end;margin-top:10px}
+        .submit-btn{background:#2196f3;color:#fff;border:none;padding:10px 26px;border-radius:18px;font-size:14px;cursor:pointer;transition:all .2s}
+        .submit-btn:hover{background:#1976d2;box-shadow:0 4px 12px rgba(33,150,243,.3)}
+        .submit-btn:active{transform:scale(.95)}
+        .empty{text-align:center;color:#999;padding:30px 0;font-size:14px}
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="mdui-progress">
+            <div class="mdui-progress-indeterminate"></div>
+        </div>
+    </div>
+    <header>
+        <div class="wrap">
+            <div class="logo">
+                <div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>
+                菠菜面
+            </div>
+            <div class="nav-links">
+                <a href="/mk/{{ current_market or 'kn' }}">首页</a>
+                <a href="https://pan1.pgrm.run">我的存储</a>
+                <a href="/workpool">作品池</a>
+                <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
+                <a href="/app/kn/d">应用下载</a>
+                <div class="dropdown">
+                    <button class="dropbtn">插件市场 ▼</button>
+                    <div class="dropdown-content">
+                        {% if markets %}
+                        {% for market_id, market_name in markets.items() %}
+                        <a class="mdui-ripple" href="/mk/{{ market_id }}">{{ market_name }}</a>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if session.user %}
+                <a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+                <a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+                {% if users and users.get(session.user, {}).get('role') == 'admin' %}
+                <a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="head-space"></div>
+            {% if session.user %}
+            <div class="icon-btn" title="通知" onclick="location.href='/messages'" style="position:relative"><i class="fa-solid fa-bell" style="font-size:22px"></i><span class="notify-badge" id="unread-badge" style="display:none">0</span></div>
+            <div class="dropdown">
+                <div class="user-avatar" title="{{ session.user }}">{% if users.get(session.user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[session.user]['qq'] }}&s=100" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">{% else %}{{ session.user[0].upper() }}{% endif %}</div>
+                <div class="dropdown-content">
+                    <a href="/u/{{ session.user }}">我的主页</a>
+                    <a href="/workpool/my">我的作品</a>
+                    <a href="/change_password">修改密码</a>
+                    <a href="/logout">退出登录</a>
+                </div>
+            </div>
+            {% else %}
+            <a href="/login" class="btn mdui-ripple" style="margin-left:12px">登录</a>
+            {% endif %}
+        </div>
+    </header>
+    <div class="main-box">
+        <div class="breadcrumb">
+            <a href="/forum"><i class="fa-solid fa-comments"></i> 论坛</a>
+            <span><i class="fa-solid fa-chevron-right" style="font-size:10px"></i></span>
+            {% if forum %}
+            <a href="/forum/{{ forum.id }}">{{ forum.name|e }}</a>
+            <span><i class="fa-solid fa-chevron-right" style="font-size:10px"></i></span>
+            {% endif %}
+            <span>{{ post.title|e }}</span>
+        </div>
+        <div class="post-card">
+            <div class="post-head">
+                <h1 class="post-title">{% if post.is_pinned %}📌{% endif %}{{ post.title|e }}{% if post.is_pinned %}<span class="pin-badge"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}</h1>
+                <div class="post-info">
+                    <a href="/u/{{ post.author|e }}"><i class="fa-solid fa-user"></i> {{ post.author|e }}</a>
+                    <span><i class="fa-regular fa-clock"></i>{{ post.created_at }}</span>
+                    <span><i class="fa-regular fa-eye"></i>{{ post.view_count }} 浏览</span>
+                    <span><i class="fa-regular fa-comment"></i>{{ post.comment_count }} 回帖</span>
+                </div>
+            </div>
+            <div class="post-content">
+                <div>{{ post.content_html|safe }}</div>
+            </div>
+            <div class="post-op-row">
+                {% if session.user and (post.author == session.user or post.author_id == session.user or (users and users.get(session.user, {}).get('role') == 'admin')) %}
+                <button class="op-link danger" onclick="deletePost({{ post.id }})"><i class="fa-solid fa-trash-can"></i> 删帖</button>
+                {% endif %}
+                {% if session.user and users and users.get(session.user, {}).get('role') == 'admin' %}
+                <button class="op-link warn" onclick="pinPost({{ post.id }})"><i class="fa-solid fa-thumbtack"></i> {% if post.is_pinned %}取消置顶{% else %}置顶{% endif %}</button>
+                {% endif %}
+                {% if session.user %}
+                <button class="op-link warn" onclick="reportPost({{ post.id }})"><i class="fa-regular fa-flag"></i> 举报</button>
+                {% endif %}
+            </div>
+        </div>
+        {% for r in top_responses %}
+        <div class="floor" id="floor-{{ r.id }}">
+            <div class="floor-head">
+                <div class="floor-user">
+                    <span class="floor-no">{{ loop.index }}楼</span>
+                    <a href="/u/{{ r.username|e }}">{{ r.username|e }}</a>
+                    {% if r.is_pinned %}<span class="floor-pin"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}
+                </div>
+                <div class="floor-ops">
+                    <span class="floor-time">{{ r.created_at }}</span>
+                    {% if session.user %}
+                    <a onclick="replyPrompt({{ r.id }})"><i class="fa-solid fa-reply"></i> 回复</a>
+                    {% if r.username == session.user or post.author == session.user or (users and users.get(session.user, {}).get('role') == 'admin') %}
+                    <a class="danger" onclick="deleteReply({{ r.id }})"><i class="fa-solid fa-trash-can"></i> 删除</a>
+                    {% endif %}
+                    {% if session.user == post.author or (users and users.get(session.user, {}).get('role') == 'admin') %}
+                    <a onclick="pinReply({{ r.id }})"><i class="fa-solid fa-thumbtack"></i> {% if r.is_pinned %}取消置顶{% else %}置顶{% endif %}</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="floor-content">{{ r.content|e }}</div>
+            {% for rep in replies_map.get(r.id, []) %}
+            <div class="reply-item">
+                <div class="floor-head">
+                    <div class="floor-user">
+                        <a href="/u/{{ rep.username|e }}" style="font-size:13px;font-weight:500">{{ rep.username|e }}</a>
+                        {% if rep.is_pinned %}<span class="floor-pin"><i class="fa-solid fa-thumbtack"></i></span>{% endif %}
+                    </div>
+                    <div class="floor-ops">
+                        <span class="floor-time">{{ rep.created_at }}</span>
+                        {% if session.user %}
+                        <a onclick="replyPrompt({{ r.id }})"><i class="fa-solid fa-reply"></i> 回复</a>
+                        {% if rep.username == session.user or post.author == session.user or (users and users.get(session.user, {}).get('role') == 'admin') %}
+                        <a class="danger" onclick="deleteReply({{ rep.id }})"><i class="fa-solid fa-trash-can"></i> 删除</a>
+                        {% endif %}
+                        {% if session.user == post.author or (users and users.get(session.user, {}).get('role') == 'admin') %}
+                        <a onclick="pinReply({{ rep.id }})"><i class="fa-solid fa-thumbtack"></i> {% if rep.is_pinned %}取消置顶{% else %}置顶{% endif %}</a>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="reply-content">{{ rep.content|e }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        {% if top_responses|length == 0 %}
+        <div class="floor"><p class="empty">暂无跟帖，来抢沙发！</p></div>
+        {% endif %}
+        {% if session.user %}
+        <div class="reply-box">
+            <h3><i class="fa-solid fa-pen-to-square" style="color:#2196f3"></i>参与讨论</h3>
+            <textarea id="reply-content" placeholder="写下你的跟帖内容..."></textarea>
+            <div class="submit-row">
+                <button class="submit-btn" onclick="submitReply({{ post.id }})"><i class="fa-solid fa-paper-plane"></i> 发布回复</button>
+            </div>
+        </div>
+        {% else %}
+        <div class="floor"><p class="login-tip"><a href="/login">登录</a>后参与讨论</p></div>
+        {% endif %}
+    </div>
+
+    <script>
+        window.addEventListener('load', function(){
+            document.getElementById('loader').style.display='none';
+            document.body.classList.add('page-enter');
+            setTimeout(function(){document.body.classList.remove('page-enter');},400);
+        });
+
+        function submitReply(postId) {
+            var content = document.getElementById('reply-content').value.trim();
+            if (!content) { alert('回复内容不能为空'); return; }
+            fetch('/forum/reply/' + postId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content, parent_id: 0 })
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+                if (data.success) { location.reload(); } else { alert(data.message); }
+            });
+        }
+
+        function replyPrompt(floorId) {
+            var content = prompt('回复内容：');
+            if (content === null) return;
+            if (!content.trim()) { alert('回复内容不能为空'); return; }
+            fetch('/forum/reply/{{ post.id }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content, parent_id: floorId })
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+                if (data.success) { location.reload(); } else { alert(data.message); }
+            });
+        }
+
+        function deleteReply(replyId) {
+            if (!confirm('确定删除该楼层？')) return;
+            fetch('/forum/reply/delete/' + replyId, { method: 'POST' })
+                .then(function(r){ return r.json(); })
+                .then(function(data){ alert(data.message); if (data.success) location.reload(); });
+        }
+
+        function pinReply(replyId) {
+            fetch('/forum/reply/pin/' + replyId, { method: 'POST' })
+                .then(function(r){ return r.json(); })
+                .then(function(data){ if (data.success) location.reload(); else alert(data.message); });
+        }
+
+        function deletePost(postId) {
+            if (!confirm('确定删除该帖子？此操作不可恢复！')) return;
+            fetch('/forum/post/delete/' + postId, { method: 'POST' })
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    alert(data.message);
+                    if (data.success) window.location.href = '/forum';
+                });
+        }
+
+        function pinPost(postId) {
+            fetch('/forum/post/pin/' + postId, { method: 'POST' })
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    if (data.success) location.reload(); else alert(data.message);
+                });
+        }
+
+        function reportPost(postId) {
+            var reason = prompt('请填写举报原因：');
+            if (reason === null) return;
+            if (!reason.trim()) { alert('举报原因不能为空'); return; }
+            fetch('/forum/post/report/' + postId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason: reason })
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(data){ alert(data.message); });
+        }
+
+        function loadUnread() {
+            fetch('/messages/unread')
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    var badge = document.getElementById('unread-badge');
+                    if (badge && data.count > 0) {
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                        badge.style.display = 'block';
+                    }
+                });
+        }
+        loadUnread();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(function(dropdown) {
+                var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
+                var content = dropdown.querySelector('.dropdown-content');
+                if (trigger && content) {
+                    trigger.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        content.classList.toggle('show');
+                    });
+                    content.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+            });
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-content').forEach(function(content) {
+                    content.classList.remove('show');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

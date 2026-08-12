@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
+    <meta charset="UTF-8">
+    <title>论坛审核台</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
+        @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+        header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
+        @keyframes headerSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
+        .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+        .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;animation:logoFadeIn .5s .1s both}
+        @keyframes logoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+        .logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
+        .logo-icon img{width:100%;height:100%;object-fit:cover}
+        .head-space{flex:1}
+        .search{height:36px;width:280px;background:rgba(255,255,255,.2);border-radius:18px;display:flex;align-items:center;padding:0 16px;animation:searchFadeIn .5s .15s both}
+        @keyframes searchFadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+        .search input{background:transparent;border:none;outline:none;color:#fff;width:100%;font-size:14px}
+        .search input::placeholder{color:rgba(255,255,255,.7)}
+        .nav-links{display:flex;gap:24px}
+        .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
+        .nav-links a:hover{color:#fff;transform:translateY(-1px)}
+        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
+        .nav-links a:hover::after{width:100%}
+        .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
+        .btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+        .btn:active{transform:scale(.95)}
+        .dropdown{position:relative;display:inline-block}
+        .dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
+        .dropbtn:hover{color:#fff}
+        .dropbtn:focus{outline:none}
+        .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:dropdownFade .2s}
+        @keyframes dropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        .dropdown-content.show{display:block}
+        .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s}
+        .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
+        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
+        @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
+        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both;position:relative}
+        @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
+        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
+        #loader .mdui-progress{margin:0;border-radius:0}
+        .main-box{max-width:1200px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
+        .back-link{display:inline-flex;align-items:center;gap:4px;color:rgba(255,255,255,.95);text-decoration:none;margin-bottom:16px;font-size:14px;text-shadow:0 2px 6px rgba(0,0,0,.3)}
+        .back-link:hover{text-decoration:underline}
+        .card{background:rgba(255,255,255,.95);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(0,0,0,.05);animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0;margin-bottom:20px}
+        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        .card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #eee;flex-wrap:wrap;gap:10px}
+        .card-head h2{font-size:17px;color:#333;display:flex;align-items:center;gap:8px}
+        .card-body{padding:20px}
+        .pending-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid #eee;border-radius:8px;margin-bottom:10px;flex-wrap:wrap;transition:all .2s}
+        .pending-item:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+        .pending-main{flex:1;min-width:220px}
+        .pending-title{font-size:14px;color:#333;font-weight:600;margin-bottom:4px;word-break:break-all}
+        .pending-meta{font-size:12px;color:#999}
+        .status-tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:500;margin-right:8px}
+        .status-pending{background:#fff8e1;color:#f57f17;border:1px solid #ffe082}
+        .status-blocked{background:#ffebee;color:#e53935;border:1px solid #ffcdd2}
+        .pending-actions{display:flex;gap:8px;flex-wrap:wrap}
+        .mini-btn{padding:6px 14px;border-radius:14px;font-size:13px;text-decoration:none;border:1px solid #2196f3;color:#2196f3;background:#fff;cursor:pointer;transition:all .2s}
+        .mini-btn:hover{background:#2196f3;color:#fff}
+        .mini-btn.approve{border-color:#4caf50;color:#4caf50}
+        .mini-btn.approve:hover{background:#4caf50;color:#fff}
+        .mini-btn.reject{border-color:#e53935;color:#e53935}
+        .mini-btn.reject:hover{background:#e53935;color:#fff}
+        .report-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid #e3f2fd;background:#f8fcff;border-radius:8px;margin-bottom:10px;flex-wrap:wrap}
+        .report-type{display:inline-flex;align-items:center;gap:6px;background:rgba(33,150,243,.1);color:#1565c0;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:600;white-space:nowrap}
+        .report-info{flex:1;min-width:200px;font-size:13px;color:#888;line-height:1.7}
+        .report-reason{color:#555;font-size:13px;background:#fff8e1;border-radius:6px;padding:6px 12px;margin:4px 0}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+        .sample-card{background:#fff;border:1px solid #eee;border-radius:8px;padding:16px;transition:all .2s}
+        .sample-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+        .sample-card h3{font-size:15px;color:#333;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .sample-card .sample-author{font-size:12px;color:#999;margin-bottom:8px}
+        .sample-card .sample-meta{font-size:12px;color:#888;margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap}
+        .sample-card .sample-status{display:inline-flex;gap:6px;align-items:center}
+        .sample-card .sample-actions{display:flex;gap:8px;flex-wrap:wrap}
+        .empty{text-align:center;color:#999;padding:40px 0;font-size:14px}
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="mdui-progress">
+            <div class="mdui-progress-indeterminate"></div>
+        </div>
+    </div>
+    <header>
+        <div class="wrap">
+            <div class="logo">
+                <div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>
+                菠菜面
+            </div>
+            <div class="nav-links">
+                <a href="/mk/{{ current_market or 'kn' }}">首页</a>
+                <a href="https://pan1.pgrm.run">我的存储</a>
+                <a href="/workpool">作品池</a>
+                <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
+                <a href="/app/kn/d">应用下载</a>
+                <div class="dropdown">
+                    <button class="dropbtn">插件市场 ▼</button>
+                    <div class="dropdown-content">
+                        {% if markets %}
+                        {% for market_id, market_name in markets.items() %}
+                        <a class="mdui-ripple" href="/mk/{{ market_id }}">{{ market_name }}</a>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if session.user %}
+                <a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+                <a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+                {% if users and users.get(session.user, {}).get('role') == 'admin' %}
+                <a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="head-space"></div>
+            {% if session.user %}
+            <div class="icon-btn" title="通知" onclick="location.href='/messages'" style="position:relative"><i class="fa-solid fa-bell" style="font-size:22px"></i><span class="notify-badge" id="unread-badge" style="display:none">0</span></div>
+            <div class="dropdown">
+                <div class="user-avatar" title="{{ session.user }}">{% if users.get(session.user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[session.user]['qq'] }}&s=100" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">{% else %}{{ session.user[0].upper() }}{% endif %}</div>
+                <div class="dropdown-content">
+                    <a href="/u/{{ session.user }}">我的主页</a>
+                    <a href="/workpool/my">我的作品</a>
+                    <a href="/change_password">修改密码</a>
+                    <a href="/logout">退出登录</a>
+                </div>
+            </div>
+            {% else %}
+            <a href="/login" class="btn mdui-ripple" style="margin-left:12px">登录</a>
+            {% endif %}
+        </div>
+    </header>
+    <div class="main-box">
+        <a href="/forum" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回论坛</a>
+        <div class="card">
+            <div class="card-head">
+                <h2><i class="fa-solid fa-hourglass-half" style="color:#f57f17"></i>待审核 / 已屏蔽帖子</h2>
+            </div>
+            <div class="card-body">
+                {% for p in pending %}
+                <div class="pending-item">
+                    <div class="pending-main">
+                        <div class="pending-title">{{ p.title|e }}</div>
+                        <div class="pending-meta">
+                            作者：{{ p.author|e }} &nbsp;|&nbsp; 时间：{{ p.created_at }}
+                            {% if p.status == 'blocked' %}<span class="status-tag status-blocked">已屏蔽</span>{% else %}<span class="status-tag status-pending">待审核</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="pending-actions">
+                        <button class="mini-btn approve" onclick="reviewPost({{ p.id }}, 'approve')"><i class="fa-solid fa-check"></i> 通过</button>
+                        <button class="mini-btn reject" onclick="reviewPost({{ p.id }}, 'reject')"><i class="fa-solid fa-ban"></i> 屏蔽</button>
+                        <a class="mini-btn" href="/forum/post/{{ p.id }}"><i class="fa-solid fa-eye"></i> 查看</a>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if pending|length == 0 %}
+                <p class="empty"><i class="fa-regular fa-circle-check"></i> 暂无待审核帖子</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-head">
+                <h2><i class="fa-solid fa-flag" style="color:#e53935"></i>帖子举报</h2>
+            </div>
+            <div class="card-body">
+                {% for r in reports %}
+                <div class="report-item">
+                    <span class="report-type"><i class="fa-solid fa-file-lines"></i>{{ r.target_type|e }} #{{ r.target_id }}</span>
+                    <div class="report-info">
+                        <div>举报人：{{ r.user_id|e }} &nbsp;|&nbsp; 时间：{{ r.created_at }}</div>
+                        <div class="report-reason"><i class="fa-regular fa-comment-dots"></i> 原因：{{ r.reason|e }}</div>
+                    </div>
+                    {% if r.target_type == 'post' %}
+                    <a class="mini-btn" href="/forum/post/{{ r.target_id }}"><i class="fa-solid fa-eye"></i> 查看</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% if reports|length == 0 %}
+                <p class="empty"><i class="fa-regular fa-circle-check"></i> 暂无举报</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-head">
+                <h2><i class="fa-solid fa-shuffle" style="color:#ff9800"></i>随机抽查</h2>
+                <button class="mini-btn" onclick="location.reload()"><i class="fa-solid fa-rotate"></i> 刷新抽查</button>
+            </div>
+            <div class="card-body">
+                <div class="grid">
+                    {% for p in samples %}
+                    <div class="sample-card">
+                        <h3>{{ p.title|e }}</h3>
+                        <div class="sample-author">作者：{{ p.author|e }}</div>
+                        <div class="sample-meta">
+                            <span><i class="fa-regular fa-comment"></i> {{ p.comment_count }}</span>
+                            <span><i class="fa-regular fa-eye"></i> {{ p.view_count }}</span>
+                            <span class="sample-status">{% if p.status == 'blocked' %}<span class="status-tag status-blocked">已屏蔽</span>{% elif p.status == 'pending' %}<span class="status-tag status-pending">待审核</span>{% endif %}</span>
+                        </div>
+                        <div class="sample-actions">
+                            <button class="mini-btn approve" onclick="reviewPost({{ p.id }}, 'approve')"><i class="fa-solid fa-check"></i> 通过</button>
+                            <button class="mini-btn reject" onclick="reviewPost({{ p.id }}, 'reject')"><i class="fa-solid fa-ban"></i> 屏蔽</button>
+                            <a class="mini-btn" href="/forum/post/{{ p.id }}"><i class="fa-solid fa-eye"></i> 查看</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if samples|length == 0 %}
+                    <p class="empty" style="grid-column:1/-1">暂无可抽查帖子</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function(){
+            document.getElementById('loader').style.display='none';
+            document.body.classList.add('page-enter');
+            setTimeout(function(){document.body.classList.remove('page-enter');},400);
+        });
+
+        function reviewPost(postId, action) {
+            var tip = action === 'approve' ? '确定通过该帖的审核？' : '确定屏蔽该帖？';
+            if (!confirm(tip)) return;
+            fetch('/forum/post/review/' + postId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action })
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+                alert(data.message);
+                if (data.success) location.reload();
+            });
+        }
+
+        function loadUnread() {
+            fetch('/messages/unread')
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    var badge = document.getElementById('unread-badge');
+                    if (badge && data.count > 0) {
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                        badge.style.display = 'block';
+                    }
+                });
+        }
+        loadUnread();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(function(dropdown) {
+                var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
+                var content = dropdown.querySelector('.dropdown-content');
+                if (trigger && content) {
+                    trigger.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        content.classList.toggle('show');
+                    });
+                    content.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+            });
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-content').forEach(function(content) {
+                    content.classList.remove('show');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

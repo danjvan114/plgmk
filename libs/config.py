@@ -40,9 +40,11 @@ class User(db.Model):
     role = db.Column(db.String(20), default='user')
     qq = db.Column(db.String(20), default='')
     reg_time = db.Column(db.String(20), default='')
+    bio = db.Column(db.String(500), default='')
+    banner = db.Column(db.String(500), default='')
     
     def to_dict(self):
-        return {'username': self.username, 'password': self.password, 'role': self.role, 'qq': self.qq, 'reg_time': self.reg_time}
+        return {'username': self.username, 'password': self.password, 'role': self.role, 'qq': self.qq, 'reg_time': self.reg_time, 'bio': self.bio, 'banner': self.banner}
 
     @property
     def qq_avatar_url(self):

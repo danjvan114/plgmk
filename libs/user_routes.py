@@ -81,26 +81,107 @@ def register_user_routes():
         user = User.query.get(username)
         if not user:
             return render_market_template('404.html', message='用户不存在'), 404
-        from .workpool import MAIN_DB_PATH
+
+        tab = request.args.get('tab', 'works')
+        sort = request.args.get('sort', 'new')
+        q = request.args.get('q', '').strip()
+        page = max(int(request.args.get('page', 1)), 1)
+        per_page = 12
+
+        from .workpool import MAIN_DB_PATH, get_main_db
+        import sqlite3
+
         works_list = []
+        followers = []
+        following = []
+        favorites = []
+        total_works = 0
+        is_following = False
         try:
-            import sqlite3
-            conn = sqlite3.connect(MAIN_DB_PATH)
-            conn.row_factory = sqlite3.Row
-            rows = conn.execute(
-                "SELECT id, title, author, like_count, fav_count, comment_count, created_at "
-                "FROM works WHERE author = ? ORDER BY id DESC LIMIT 20", (user.username,)
-            ).fetchall()
-            for row in rows:
-                works_list.append({
-                    'id': row['id'], 'title': row['title'], 'author': row['author'],
-                    'like_count': row['like_count'], 'fav_count': row['fav_count'],
-                    'comment_count': row['comment_count'], 'created_at': row['created_at']
-                })
+            conn = get_main_db()
+            if tab == 'followers':
+                rows = conn.execute(
+                    "SELECT user_id FROM follows WHERE follow_user = ? ORDER BY created_at DESC", (user.username,)
+                ).fetchall()
+                followers = [{'username': r['user_id']} for r in rows]
+            elif tab == 'following':
+                rows = conn.execute(
+                    "SELECT follow_user AS username FROM follows WHERE user_id = ? ORDER BY created_at DESC", (user.username,)
+                ).fetchall()
+                following = [dict(r) for r in rows]
+            elif tab == 'favorites':
+                # 收藏列表：扫描各作品 db 的 favorites 表，找出该用户收藏的作品
+                from .workpool import WORKPOOL_DIR
+                import os as _os
+                favs = []
+                cursor = conn.execute(
+                    "SELECT id, title, author, db_path, like_count, fav_count, comment_count, coin_count, created_at "
+                    "FROM works WHERE status = 'active' AND is_hidden = 0 ORDER BY id DESC LIMIT 100")
+                for row in cursor.fetchall():
+                    fpath = _os.path.join(WORKPOOL_DIR, row['db_path'])
+                    if not _os.path.exists(fpath):
+                        continue
+                    try:
+                        wc = sqlite3.connect(fpath)
+                        hit = wc.execute("SELECT id FROM favorites WHERE user_id = ?", (user.username,)).fetchone()
+                        wc.close()
+                        if hit:
+                            favs.append(dict(row))
+                    except Exception:
+                        pass
+                favorites = favs
+            else:
+                order_sql = {'hot': 'like_count DESC', 'like': 'like_count DESC',
+                             'fav': 'fav_count DESC', 'coin': 'coin_count DESC'}.get(sort, 'created_at DESC')
+                where_sql = "author = ? AND status = 'active' AND is_hidden = 0"
+                params = [user.username]
+                if q:
+                    where_sql += " AND (title LIKE ? OR tags LIKE ? OR description LIKE ?)"
+                    params += [f'%{q}%', f'%{q}%', f'%{q}%']
+                total_works = conn.execute(f"SELECT COUNT(*) FROM works WHERE {where_sql}", params).fetchone()[0]
+                rows = conn.execute(
+                    f"SELECT id, title, author, like_count, fav_count, comment_count, coin_count, created_at "
+                    f"FROM works WHERE {where_sql} ORDER BY {order_sql} LIMIT ? OFFSET ?",
+                    params + [per_page, (page - 1) * per_page]
+                ).fetchall()
+                works_list = [dict(r) for r in rows]
+            if 'user' in session:
+                row = conn.execute("SELECT id FROM follows WHERE user_id = ? AND follow_user = ?",
+                                   (session['user'], user.username)).fetchone()
+                is_following = row is not None
             conn.close()
         except Exception:
             pass
-        return render_user_profile_template('user_profile.html', profile_user=user, workpool_works=works_list)
+
+        return render_user_profile_template('user_profile.html', profile_user=user, workpool_works=works_list,
+                                            tab=tab, sort=sort, q=q, page=page, per_page=per_page,
+                                            total_works=total_works, total_pages=(total_works + per_page - 1) // per_page,
+                                            followers=followers, following=following, favorites=favorites,
+                                            is_following=is_following)
+
+    @app.route('/user/set_bio', methods=['POST'])
+    def user_set_bio():
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        bio = request.form.get('bio', '').strip()[:500]
+        user = User.query.get(session['user'])
+        if user:
+            user.bio = bio
+            db.session.commit()
+            return redirect(url_for('user_profile', username=user.username))
+        return redirect(url_for('login'))
+
+    @app.route('/user/set_banner', methods=['POST'])
+    def user_set_banner():
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        banner = request.form.get('banner', '').strip()[:500]
+        user = User.query.get(session['user'])
+        if user:
+            user.banner = banner
+            db.session.commit()
+            return redirect(url_for('user_profile', username=user.username))
+        return redirect(url_for('login'))
 
     @app.route('/user/set_qq', methods=['POST'])
     def user_set_qq():

@@ -24,6 +24,8 @@
         .user-avatar:hover{transform:scale(1.1)}
         .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
         .btn:hover{background:rgba(255,255,255,.9)}
+        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
+        .icon-btn{position:relative}
         .dropdown{position:relative;display:inline-block}
         .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0}
         .dropdown-content.show{display:block}
@@ -31,22 +33,39 @@
         .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50}
         .main-box{max-width:1100px;margin:0 auto;padding-top:76px;padding-left:16px;padding-right:16px}
         .back-link{display:inline-flex;align-items:center;gap:4px;color:#4caf50;text-decoration:none;margin-bottom:16px;font-size:14px}
-        .profile-card{background:#fff;border-radius:12px;border:1px solid #eee;padding:28px;display:flex;gap:24px;align-items:center;box-shadow:0 4px 16px rgba(0,0,0,.06)}
-        .profile-avatar{width:110px;height:110px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:bold;color:#4caf50;border:4px solid #c8e6c9}
+        .banner{width:100%;height:220px;border-radius:12px 12px 0 0;background:linear-gradient(135deg,#a5d6a7,#4caf50);overflow:hidden;position:relative}
+        .banner img{width:100%;height:100%;object-fit:cover}
+        .banner .banner-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:48px}
+        .profile-card{background:#fff;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none;padding:0 28px 28px;display:flex;gap:24px;align-items:center;margin-top:-44px;position:relative;z-index:2}
+        .profile-avatar{width:110px;height:110px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:bold;color:#4caf50;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.15);margin-top:-55px}
         .profile-avatar img{width:100%;height:100%;object-fit:cover}
-        .profile-info{flex:1;min-width:0}
+        .profile-info{flex:1;min-width:0;padding-top:8px}
         .profile-name{font-size:24px;color:#333;font-weight:bold;display:flex;align-items:center;gap:10px}
         .role-tag{font-size:12px;background:#e8f5e9;color:#2e7d32;padding:2px 10px;border-radius:10px;font-weight:normal}
         .role-tag.admin{background:#fce4ec;color:#c62828}
         .profile-meta{color:#777;font-size:14px;margin-top:8px;display:flex;gap:20px;flex-wrap:wrap}
         .profile-meta span{display:flex;align-items:center;gap:5px}
+        .profile-bio{color:#555;font-size:14px;margin-top:10px;line-height:1.7;background:#f5f5f5;border-radius:8px;padding:10px 14px}
         .profile-qq{font-size:13px;color:#999;margin-top:10px}
         .qq-form{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
-        .qq-form input{border:1px solid #ddd;border-radius:8px;padding:8px 12px;font-size:14px;outline:none;width:180px}
-        .qq-form input:focus{border-color:#4caf50}
-        .qq-form button{background:#4caf50;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px}
-        .qq-form button:hover{background:#43a047}
-        .qq-form .qq-tip{font-size:12px;color:#999}
+        .qq-form input,.bio-form input,.banner-form input{border:1px solid #ddd;border-radius:8px;padding:8px 12px;font-size:14px;outline:none;width:180px}
+        .qq-form input:focus,.bio-form input:focus,.banner-form input:focus{border-color:#4caf50}
+        .qq-form button,.bio-form button,.banner-form button{background:#4caf50;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px}
+        .qq-form button:hover,.bio-form button:hover,.banner-form button:hover{background:#43a047}
+        .qq-form .qq-tip,.bio-form .qq-tip,.banner-form .qq-tip{font-size:12px;color:#999}
+        .bio-form input,.banner-form input{width:260px}
+        .follow-btn{background:#4caf50;color:#fff;border:none;border-radius:16px;padding:8px 20px;cursor:pointer;font-size:14px;font-weight:500;transition:all .2s}
+        .follow-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(76,175,80,.3)}
+        .follow-btn.following{background:#ef5350}
+        .tabs{display:flex;gap:8px;margin:24px 0 14px;flex-wrap:wrap}
+        .tabs a{background:rgba(255,255,255,.9);color:#4caf50;padding:8px 20px;border-radius:20px;text-decoration:none;font-size:14px;transition:all .2s}
+        .tabs a:hover{transform:translateY(-1px)}
+        .tabs a.active{background:#4caf50;color:#fff;font-weight:600}
+        .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+        .toolbar input{border:1px solid #ddd;border-radius:8px;padding:8px 14px;font-size:14px;outline:none;flex:1;max-width:300px}
+        .toolbar input:focus{border-color:#4caf50}
+        .toolbar select{border:1px solid #ddd;border-radius:8px;padding:8px 14px;font-size:14px;outline:none;background:#fff}
+        .toolbar button{background:#4caf50;color:#fff;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:14px}
         .section-title{font-size:18px;color:#333;margin:24px 0 14px;display:flex;align-items:center;gap:8px}
         .work-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
         .work-card{background:#fff;border-radius:10px;border:1px solid #eee;padding:16px;cursor:pointer;transition:all .25s;animation:cardUp .4s ease both}
@@ -55,6 +74,16 @@
         .work-card p{font-size:13px;color:#777;display:flex;gap:14px}
         .work-card p span{display:flex;align-items:center;gap:4px}
         .empty-tip{background:#fff;border:1px dashed #ddd;border-radius:10px;text-align:center;color:#999;padding:40px;font-size:14px}
+        .user-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+        .user-item{background:#fff;border:1px solid #eee;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
+        .user-item:hover{box-shadow:0 6px 16px rgba(0,0,0,.08);transform:translateY(-2px)}
+        .user-item-avatar{width:44px;height:44px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#4caf50;overflow:hidden;flex-shrink:0}
+        .user-item-avatar img{width:100%;height:100%;object-fit:cover}
+        .pagination{display:flex;justify-content:center;gap:8px;margin-top:24px}
+        .pagination a,.pagination span{padding:8px 16px;border-radius:4px;text-decoration:none;font-size:14px;transition:all .2s}
+        .pagination a{background:rgba(255,255,255,.9);color:#4caf50}
+        .pagination a:hover{background:#4caf50;color:#fff}
+        .pagination .current{background:#4caf50;color:#fff}
         @keyframes cardUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
     </style>
 </head>
@@ -68,10 +97,12 @@
             <div class="nav-links">
                 <a href="/mk/{{ current_market or 'kn' }}">首页</a>
                 <a href="/workpool" style="color:#fff;font-weight:bold">作品池</a>
+                <a href="/forum">论坛</a>
                 <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
             </div>
             <div class="head-space"></div>
             {% if session.user %}
+            <div class="icon-btn" title="通知" onclick="location.href='/messages'" style="position:relative"><i class="fa-solid fa-bell" style="font-size:22px"></i><span class="notify-badge" id="unread-badge" style="display:none">0</span></div>
             <div class="dropdown">
                 <div class="user-avatar" title="{{ session.user }}">
                     {% set su = users.get(session.user, {}) %}
@@ -84,6 +115,7 @@
                 <div class="dropdown-content">
                     <a href="/u/{{ session.user }}">我的主页</a>
                     <a href="/workpool/my">我的作品</a>
+                    <a href="/messages">消息中心</a>
                     <a href="/change_password">修改密码</a>
                     <a href="/logout">退出登录</a>
                 </div>
@@ -95,6 +127,9 @@
     </header>
     <div class="main-box">
         <a href="javascript:history.back()" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回</a>
+        <div class="banner">
+            {% if profile_user.banner %}<img src="{{ profile_user.banner|e }}" alt="头图">{% else %}<div class="banner-placeholder"><i class="fa-regular fa-image"></i></div>{% endif %}
+        </div>
         <div class="profile-card">
             <div class="profile-avatar">
                 {% if profile_user.qq %}
@@ -111,23 +146,62 @@
                     {% else %}
                     <span class="role-tag">用户</span>
                     {% endif %}
+                    {% if session.user and session.user != profile_user.username %}
+                    <button class="follow-btn {% if is_following %}following{% endif %}" id="follow-btn" onclick="toggleFollow('{{ profile_user.username|e }}')">
+                        {% if is_following %}<i class="fa-solid fa-check"></i> 已关注{% else %}<i class="fa-solid fa-plus"></i> 关注{% endif %}
+                    </button>
+                    {% endif %}
                 </div>
                 <div class="profile-meta">
                     <span><i class="fa-regular fa-calendar"></i>注册时间：{{ profile_user.reg_time or '未知' }}</span>
+                    <span><i class="fa-solid fa-box-open"></i>作品：{{ total_works }}</span>
+                    <span><i class="fa-solid fa-users"></i>粉丝：{{ followers|length }}</span>
+                    <span><i class="fa-solid fa-user-plus"></i>关注：{{ following|length }}</span>
                 </div>
+                {% if profile_user.bio %}
+                <div class="profile-bio"><i class="fa-solid fa-quote-left"></i> {{ profile_user.bio|e }}</div>
+                {% endif %}
                 {% if profile_user.qq %}
                 <div class="profile-qq"><i class="fa-brands fa-qq"></i>已绑定 QQ：{{ profile_user.qq }}</div>
                 {% endif %}
                 {% if session.user and session.user == profile_user.username %}
-                <form class="qq-form" method="post" action="/user/set_qq">
-                    <input type="text" name="qq" placeholder="输入QQ号设置头像" value="{{ profile_user.qq }}" maxlength="20">
-                    <button type="submit">保存头像</button>
-                    <span class="qq-tip">使用 QQ 头像 API 自动获取</span>
-                </form>
+                <div class="qq-form" style="gap:8px">
+                    <form class="qq-form" method="post" action="/user/set_qq" style="margin:0">
+                        <input type="text" name="qq" placeholder="输入QQ号设置头像/头图" value="{{ profile_user.qq }}" maxlength="20">
+                        <button type="submit">保存头像</button>
+                    </form>
+                    <form class="bio-form" method="post" action="/user/set_bio" style="margin:0">
+                        <input type="text" name="bio" placeholder="个人简介" value="{{ profile_user.bio }}" maxlength="500">
+                        <button type="submit">保存简介</button>
+                    </form>
+                    <form class="banner-form" method="post" action="/user/set_banner" style="margin:0">
+                        <input type="text" name="banner" placeholder="头图 URL（图片直链）" value="{{ profile_user.banner }}" maxlength="500">
+                        <button type="submit">保存头图</button>
+                    </form>
+                </div>
                 {% endif %}
             </div>
         </div>
-        <h2 class="section-title"><i class="fa-solid fa-box-open"></i>TA 的作品 ({{ workpool_works|length }})</h2>
+        <div class="tabs">
+            <a href="/u/{{ profile_user.username }}?tab=works{% if q %}&q={{ q }}{% endif %}" class="{% if tab == 'works' %}active{% endif %}"><i class="fa-solid fa-box-open"></i> 作品 ({{ total_works }})</a>
+            <a href="/u/{{ profile_user.username }}?tab=followers" class="{% if tab == 'followers' %}active{% endif %}"><i class="fa-solid fa-users"></i> 粉丝 ({{ followers|length }})</a>
+            <a href="/u/{{ profile_user.username }}?tab=following" class="{% if tab == 'following' %}active{% endif %}"><i class="fa-solid fa-user-plus"></i> 关注 ({{ following|length }})</a>
+            <a href="/u/{{ profile_user.username }}?tab=favorites" class="{% if tab == 'favorites' %}active{% endif %}"><i class="fa-solid fa-heart"></i> 收藏 ({{ favorites|length }})</a>
+        </div>
+
+        {% if tab == 'works' %}
+        <form class="toolbar" method="get" action="/u/{{ profile_user.username }}">
+            <input type="hidden" name="tab" value="works">
+            <input type="text" name="q" placeholder="搜索作品名称/标签" value="{{ q }}">
+            <select name="sort">
+                <option value="new" {% if sort == 'new' %}selected{% endif %}>最新发布</option>
+                <option value="hot" {% if sort == 'hot' %}selected{% endif %}>最热</option>
+                <option value="like" {% if sort == 'like' %}selected{% endif %}>最多赞</option>
+                <option value="fav" {% if sort == 'fav' %}selected{% endif %}>最多藏</option>
+                <option value="coin" {% if sort == 'coin' %}selected{% endif %}>最多币</option>
+            </select>
+            <button type="submit">筛选</button>
+        </form>
         {% if workpool_works %}
         <div class="work-grid">
             {% for w in workpool_works %}
@@ -136,16 +210,114 @@
                 <p>
                     <span><i class="fa-solid fa-thumbs-up"></i>{{ w.like_count }}</span>
                     <span><i class="fa-solid fa-heart"></i>{{ w.fav_count }}</span>
+                    <span><i class="fa-solid fa-coins"></i>{{ w.coin_count if w.coin_count is defined else 0 }}</span>
+                    <span><i class="fa-regular fa-comment"></i>{{ w.comment_count }}</span>
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="/u/{{ profile_user.username }}?tab=works&page={{ page - 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">上一页</a>
+            {% endif %}
+            {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+            <span class="current">{{ p }}</span>
+            {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+            <a href="/u/{{ profile_user.username }}?tab=works&page={{ p }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">{{ p }}</a>
+            {% endif %}
+            {% endfor %}
+            {% if page < total_pages %}
+            <a href="/u/{{ profile_user.username }}?tab=works&page={{ page + 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">下一页</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty-tip">还没有发布作品</div>
+        {% endif %}
+
+        {% elif tab == 'followers' %}
+        {% if followers %}
+        <div class="user-list">
+            {% for f in followers %}
+            <div class="user-item" onclick="location.href='/u/{{ f.username|e }}'">
+                <div class="user-item-avatar">{% if users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
+                <div style="font-weight:600">{{ f.username|e }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-tip">还没有粉丝</div>
+        {% endif %}
+
+        {% elif tab == 'following' %}
+        {% if following %}
+        <div class="user-list">
+            {% for f in following %}
+            <div class="user-item" onclick="location.href='/u/{{ f.username|e }}'">
+                <div class="user-item-avatar">{% if users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
+                <div style="font-weight:600">{{ f.username|e }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-tip">还没有关注任何人</div>
+        {% endif %}
+
+        {% elif tab == 'favorites' %}
+        {% if favorites %}
+        <div class="work-grid">
+            {% for w in favorites %}
+            <div class="work-card" onclick="location.href='/workpool/{{ w.id }}'">
+                <h3>{{ w.title|e }}</h3>
+                <p>
+                    <span><i class="fa-solid fa-thumbs-up"></i>{{ w.like_count }}</span>
+                    <span><i class="fa-solid fa-heart"></i>{{ w.fav_count }}</span>
+                    <span><i class="fa-solid fa-coins"></i>{{ w.coin_count if w.coin_count is defined else 0 }}</span>
                     <span><i class="fa-regular fa-comment"></i>{{ w.comment_count }}</span>
                 </p>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="empty-tip">还没有发布作品</div>
+        <div class="empty-tip">还没有收藏任何作品</div>
+        {% endif %}
         {% endif %}
     </div>
     <script>
+        function toggleFollow(username) {
+            fetch('/workpool/follow/' + encodeURIComponent(username), { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        const btn = document.getElementById('follow-btn');
+                        if (data.action === 'followed') {
+                            btn.classList.add('following');
+                            btn.innerHTML = '<i class="fa-solid fa-check"></i> 已关注';
+                        } else {
+                            btn.classList.remove('following');
+                            btn.innerHTML = '<i class="fa-solid fa-plus"></i> 关注';
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        function loadUnread() {
+            fetch('/messages/unread')
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('unread-badge');
+                    if (badge && data.count > 0) {
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                        badge.style.display = 'block';
+                    }
+                });
+        }
+        loadUnread();
+
         document.addEventListener('DOMContentLoaded', function() {
             var dropdowns = document.querySelectorAll('.dropdown');
             dropdowns.forEach(function(dropdown) {

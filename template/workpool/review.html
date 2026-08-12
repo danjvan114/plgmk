@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
-    <title>作品池</title>
+    <title>作品审核台</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
         body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
@@ -24,22 +24,6 @@
         @keyframes searchFadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
         .search input{background:transparent;border:none;outline:none;color:#fff;width:100%;font-size:14px}
         .search input::placeholder{color:rgba(255,255,255,.7)}
-        .main-box{max-width:1400px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
-        .card{background:rgba(255,255,255,.95);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(0,0,0,.05);opacity:0;animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards}
-        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-        .grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:20px}
-        .page-box{margin-top:40px;text-align:center;animation:fadeIn .6s .5s both}
-        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        .work-card{padding:16px;cursor:pointer;transition:transform .2s,box-shadow .2s}
-        .work-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 12px 40px rgba(0,0,0,.2)}
-        .work-card:active{transform:scale(.98)}
-        .work-card h3{color:#333;margin-bottom:8px}
-        .work-card p{color:#666;font-size:14px;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-        .work-card .meta{display:flex;align-items:center;gap:12px;font-size:12px;color:#999}
-        .meta-item{display:flex;align-items:center;gap:4px}
-        .tag{background:rgba(76,175,80,.1);color:#4caf50;padding:2px 8px;border-radius:4px;font-size:12px;transition:all .2s}
-        .tag:hover{background:rgba(76,175,80,.2);transform:scale(1.05)}
-        .tag-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
         .nav-links{display:flex;gap:24px}
         .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
         .nav-links a:hover{color:#fff;transform:translateY(-1px)}
@@ -48,6 +32,8 @@
         .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
         .btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
         .btn:active{transform:scale(.95)}
+        .btn-danger{background:#fff;color:#e53935;border:1px solid #e53935}
+        .btn-danger:hover{background:#e53935;color:#fff}
         .dropdown{position:relative;display:inline-block}
         .dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
         .dropbtn:hover{color:#fff}
@@ -60,26 +46,44 @@
         .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
         @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
         .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both}
+        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both;position:relative}
         @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
         .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
         #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
         #loader .mdui-progress{margin:0;border-radius:0}
-        .pagination{display:flex;justify-content:center;gap:8px;margin-top:24px}
-        .pagination a,.pagination span{padding:8px 16px;border-radius:4px;text-decoration:none;font-size:14px;transition:all .2s}
-        .pagination a{background:rgba(255,255,255,.9);color:#4caf50}
-        .pagination a:hover{background:#4caf50;color:#fff}
-        .pagination .current{background:#4caf50;color:#fff}
-        .pagination .disabled{background:rgba(255,255,255,.5);color:#999;cursor:not-allowed}
-        .sort-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-        .sort-bar a{background:rgba(255,255,255,.9);color:#4caf50;padding:6px 16px;border-radius:16px;text-decoration:none;font-size:13px;transition:all .2s}
-        .sort-bar a:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
-        .sort-bar a.active{background:#4caf50;color:#fff;font-weight:600}
-        .tag-chip{display:inline-block;background:rgba(255,255,255,.85);color:#f57f17;border:1px solid #ffe0b2;padding:4px 12px;border-radius:14px;font-size:12px;margin:0 6px 0 0;text-decoration:none;transition:all .2s}
-        .tag-chip:hover{background:#fff3e0}
-        .tag-chip.active{background:#f57f17;color:#fff;border-color:#f57f17}
-        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
-        .icon-btn{position:relative}
+        .main-box{max-width:1200px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
+        .back-link{display:inline-flex;align-items:center;gap:4px;color:#4caf50;text-decoration:none;margin-bottom:16px;font-size:14px}
+        .back-link:hover{text-decoration:underline}
+        .card{background:rgba(255,255,255,.95);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(0,0,0,.05);animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0;margin-bottom:20px}
+        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        .card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #eee;flex-wrap:wrap;gap:10px}
+        .card-head h2{font-size:17px;color:#333;display:flex;align-items:center;gap:8px}
+        .card-body{padding:20px}
+        .stats-row{display:flex;gap:16px;flex-wrap:wrap}
+        .stat-card{flex:1;min-width:220px;background:linear-gradient(135deg,#4caf50,#2e7d32);border-radius:10px;padding:22px;color:#fff;text-align:center;box-shadow:0 6px 18px rgba(76,175,80,.3);transition:transform .2s}
+        .stat-card:hover{transform:translateY(-3px)}
+        .stat-card .num{font-size:34px;font-weight:bold;margin-bottom:4px}
+        .stat-card .label{font-size:13px;opacity:.9}
+        .report-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid #eee;border-radius:8px;margin-bottom:10px;flex-wrap:wrap;transition:all .2s}
+        .report-item:hover{border-color:#ef9a9a;background:#fff8f8}
+        .report-work{display:inline-flex;align-items:center;gap:6px;background:rgba(76,175,80,.1);color:#2e7d32;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:600;white-space:nowrap}
+        .report-info{flex:1;min-width:200px;font-size:13px;color:#888;line-height:1.7}
+        .report-reason{color:#555;font-size:13px;background:#fff8e1;border-radius:6px;padding:6px 12px;margin:4px 0}
+        .report-actions{display:flex;gap:8px;flex-wrap:wrap}
+        .mini-btn{padding:6px 14px;border-radius:14px;font-size:13px;text-decoration:none;border:1px solid #4caf50;color:#4caf50;background:#fff;cursor:pointer;transition:all .2s}
+        .mini-btn:hover{background:#4caf50;color:#fff}
+        .mini-btn.danger{border-color:#e53935;color:#e53935}
+        .mini-btn.danger:hover{background:#e53935;color:#fff}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+        .sample-card{background:#fff;border:1px solid #eee;border-radius:8px;padding:16px;transition:all .2s}
+        .sample-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+        .sample-card h3{font-size:15px;color:#333;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .sample-card p{font-size:12px;color:#999;margin-bottom:10px}
+        .sample-card .sample-meta{font-size:12px;color:#888;margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap}
+        .sample-card .sample-actions{display:flex;gap:8px;flex-wrap:wrap}
+        .note{font-size:12px;color:#999;margin-top:14px;text-align:center}
+        .empty{text-align:center;color:#999;padding:40px 0;font-size:14px}
     </style>
 </head>
 <body>
@@ -119,9 +123,6 @@
                 {% endif %}
             </div>
             <div class="head-space"></div>
-            <form class="search" action="/workpool" method="get">
-                <input name="search" placeholder="搜索作品名称/作者/标签" value="{{ search_query }}">
-            </form>
             {% if session.user %}
             <div class="icon-btn" title="通知" onclick="location.href='/messages'" style="position:relative"><i class="fa-solid fa-bell" style="font-size:22px"></i><span class="notify-badge" id="unread-badge" style="display:none">0</span></div>
             <div class="dropdown">
@@ -139,72 +140,65 @@
         </div>
     </header>
     <div class="main-box">
-        <div class="sort-bar">
-            <a href="/workpool?sort=new{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'new' %}active{% endif %}">最新</a>
-            <a href="/workpool?sort=hot{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'hot' %}active{% endif %}">最热</a>
-            <a href="/workpool?sort=like{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'like' %}active{% endif %}">最多赞</a>
-            <a href="/workpool?sort=fav{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'fav' %}active{% endif %}">最多藏</a>
-            <a href="/workpool?sort=coin{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'coin' %}active{% endif %}">最多币</a>
-            <a href="/workpool?sort=comment{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'comment' %}active{% endif %}">最多评</a>
-            <a href="/forum" style="background:#ffb300;color:#fff">论坛 <i class="fa-solid fa-comments"></i></a>
+        <a href="/workpool" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
+        <div class="card">
+            <div class="card-body">
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="num">{{ total_works }}</div>
+                        <div class="label"><i class="fa-solid fa-layer-group"></i> 全站作品数</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        {% if all_tags %}
-        <div class="sort-bar" style="margin-top:-8px">
-            <a href="/workpool?sort={{ sort }}" class="tag-chip {% if not tag %}active{% endif %}">全部</a>
-            {% for t in all_tags %}
-            <a href="/workpool?sort={{ sort }}&tag={{ t|urlencode }}" class="tag-chip {% if tag == t %}active{% endif %}">{{ t }}</a>
-            {% endfor %}
+        <div class="card">
+            <div class="card-head">
+                <h2><i class="fa-solid fa-flag" style="color:#e53935"></i>待处理举报</h2>
+            </div>
+            <div class="card-body">
+                {% for r in reports %}
+                <div class="report-item">
+                    <span class="report-work">作品 #{{ r.work_id }}</span>
+                    <div class="report-info">
+                        <div>举报人：{{ r.user_id|e }} &nbsp;|&nbsp; 时间：{{ r.created_at }}</div>
+                        <div class="report-reason"><i class="fa-regular fa-comment-dots"></i> 原因：{{ r.reason|e }}</div>
+                    </div>
+                    <div class="report-actions">
+                        <a class="mini-btn" href="/workpool/{{ r.work_id }}"><i class="fa-solid fa-eye"></i> 查看作品</a>
+                        <button class="mini-btn danger" onclick="hideWork({{ r.work_id }})"><i class="fa-solid fa-eye-slash"></i> 隐藏作品</button>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if reports|length == 0 %}
+                <p class="empty"><i class="fa-regular fa-circle-check"></i> 暂无待处理举报</p>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
-        <div class="grid">
-            {% for work in works %}
-            <div class="card work-card" onclick="location.href='/workpool/{{ work.id }}'">
-                <h3>{{ work.title|e }}</h3>
-                <p>{{ work.description|e }}</p>
-                {% if work.tags %}
-                <div class="tag-list">
-                    {% for tag in work.tags.split(',') %}
-                    <span class="tag">{{ tag.strip() }}</span>
+        <div class="card">
+            <div class="card-head">
+                <h2><i class="fa-solid fa-shuffle" style="color:#ff9800"></i>随机抽查</h2>
+                <button class="mini-btn" onclick="location.reload()"><i class="fa-solid fa-rotate"></i> 刷新抽查</button>
+            </div>
+            <div class="card-body">
+                <div class="grid">
+                    {% for w in samples %}
+                    <div class="sample-card">
+                        <h3>{{ w.title|e }}</h3>
+                        <p>作者：{{ w.author|e }}</p>
+                        <div class="sample-meta">
+                            <span title="点赞"><i class="fa-solid fa-thumbs-up"></i> {{ w.like_count if w.like_count is defined else 0 }}</span>
+                            <span title="收藏"><i class="fa-solid fa-heart"></i> {{ w.fav_count if w.fav_count is defined else 0 }}</span>
+                            <span title="投币"><i class="fa-solid fa-coins"></i> {{ w.coin_count if w.coin_count is defined else 0 }}</span>
+                        </div>
+                        <div class="sample-actions">
+                            <a class="mini-btn" href="/workpool/{{ w.id }}"><i class="fa-solid fa-eye"></i> 查看</a>
+                            <button class="mini-btn danger" onclick="hideWork({{ w.id }})"><i class="fa-solid fa-eye-slash"></i> 隐藏</button>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
-                {% endif %}
-                <div class="meta">
-                    <span class="meta-item"><i class="fa-solid fa-user" style="font-size:16px"></i>{{ work.author|e }}</span>
-                    <span class="meta-item"><i class="fa-solid fa-thumbs-up" style="font-size:16px"></i>{{ work.like_count }}</span>
-                    <span class="meta-item"><i class="fa-solid fa-heart" style="font-size:16px"></i>{{ work.fav_count }}</span>
-                    <span class="meta-item"><i class="fa-solid fa-coins" style="font-size:16px"></i>{{ work.coin_count if work.coin_count is defined else 0 }}</span>
-                    <span class="meta-item"><i class="fa-regular fa-comment" style="font-size:16px"></i>{{ work.comment_count }}</span>
-                </div>
+                <p class="note"><i class="fa-regular fa-circle-info"></i> 抽查为随机抽取，用于审核违规内容</p>
             </div>
-            {% endfor %}
-        </div>
-        <div class="page-box">
-            {% if works|length == 0 %}
-            <p>暂无作品</p>
-            {% endif %}
-            {% if total_pages > 1 %}
-            <div class="pagination">
-                {% if page > 1 %}
-                <a href="/workpool?page={{ page - 1 }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort != 'new' %}&sort={{ sort }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}">上一页</a>
-                {% else %}
-                <span class="disabled">上一页</span>
-                {% endif %}
-                {% for p in range(1, total_pages + 1) %}
-                {% if p == page %}
-                <span class="current">{{ p }}</span>
-                {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
-                <a href="/workpool?page={{ p }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort != 'new' %}&sort={{ sort }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}">{{ p }}</a>
-                {% elif p == page - 3 or p == page + 3 %}
-                <span>...</span>
-                {% endif %}
-                {% endfor %}
-                {% if page < total_pages %}
-                <a href="/workpool?page={{ page + 1 }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort != 'new' %}&sort={{ sort }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}">下一页</a>
-                {% else %}
-                <span class="disabled">下一页</span>
-                {% endif %}
-            </div>
-            {% endif %}
         </div>
     </div>
 
@@ -212,18 +206,24 @@
         window.addEventListener('load', function(){
             document.getElementById('loader').style.display='none';
             document.body.classList.add('page-enter');
-            setTimeout(()=>document.body.classList.remove('page-enter'),400);
+            setTimeout(function(){document.body.classList.remove('page-enter');},400);
         });
 
-        document.querySelectorAll('.work-card').forEach((card,i)=>{
-            card.style.animationDelay=(0.05*i)+'s';
-        });
+        function hideWork(workId) {
+            if (!confirm('确定隐藏该作品？隐藏后用户将无法看到')) return;
+            fetch('/workpool/review/hide/' + workId, { method: 'POST' })
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    alert(data.message);
+                    if (data.success) location.reload();
+                });
+        }
 
         function loadUnread() {
             fetch('/messages/unread')
-                .then(r => r.json())
-                .then(data => {
-                    const badge = document.getElementById('unread-badge');
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    var badge = document.getElementById('unread-badge');
                     if (badge && data.count > 0) {
                         badge.textContent = data.count > 99 ? '99+' : data.count;
                         badge.style.display = 'block';
@@ -237,19 +237,16 @@
             dropdowns.forEach(function(dropdown) {
                 var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
                 var content = dropdown.querySelector('.dropdown-content');
-                
                 if (trigger && content) {
                     trigger.addEventListener('click', function(e) {
                         e.stopPropagation();
                         content.classList.toggle('show');
                     });
-                    
                     content.addEventListener('click', function(e) {
                         e.stopPropagation();
                     });
                 }
             });
-            
             document.addEventListener('click', function() {
                 document.querySelectorAll('.dropdown-content').forEach(function(content) {
                     content.classList.remove('show');

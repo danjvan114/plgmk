@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
-    <title>发布作品 - 作品池</title>
+    <title>发布新帖 - 论坛</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
         body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
@@ -40,27 +40,28 @@
         .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
         @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
         .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both}
+        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both;position:relative}
         @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
         .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
         #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
         #loader .mdui-progress{margin:0;border-radius:0}
-        .main-box{max-width:700px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
+        .main-box{max-width:800px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
+        .back-link{display:inline-flex;align-items:center;gap:4px;color:rgba(255,255,255,.95);text-decoration:none;margin-bottom:14px;font-size:14px;text-shadow:0 2px 6px rgba(0,0,0,.3)}
+        .back-link:hover{text-decoration:underline}
         .form-card{background:rgba(255,255,255,.95);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:32px;animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
         @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-        .form-title{font-size:24px;color:#333;margin-bottom:24px;text-align:center}
+        .form-title{font-size:22px;color:#333;margin-bottom:24px;display:flex;align-items:center;gap:10px}
         .form-group{margin-bottom:20px}
         .form-group label{display:block;margin-bottom:8px;color:#555;font-size:14px;font-weight:500}
-        .form-group input,.form-group textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .2s}
-        .form-group input:focus,.form-group textarea:focus{outline:none;border-color:#4caf50}
-        .form-group textarea{min-height:100px;resize:vertical}
-        .form-group .hint{font-size:12px;color:#999;margin-top:4px}
-        .submit-btn{width:100%;padding:14px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:500;cursor:pointer;transition:all .2s}
-        .submit-btn:hover{background:#43a047;transform:translateY(-2px);box-shadow:0 4px 12px rgba(76,175,80,.3)}
+        .form-group select,.form-group input,.form-group textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;transition:border-color .2s}
+        .form-group select:focus,.form-group input:focus,.form-group textarea:focus{outline:none;border-color:#2196f3}
+        .form-group textarea{min-height:220px;resize:vertical;line-height:1.7}
+        .submit-btn{width:100%;padding:14px;background:#2196f3;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:500;cursor:pointer;transition:all .2s}
+        .submit-btn:hover{background:#1976d2;transform:translateY(-2px);box-shadow:0 4px 12px rgba(33,150,243,.3)}
         .submit-btn:active{transform:scale(.98)}
-        .back-link{display:inline-flex;align-items:center;gap:4px;color:#4caf50;text-decoration:none;margin-bottom:16px;font-size:14px}
-        .back-link:hover{text-decoration:underline}
-        .file-url-display{background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:20px;word-break:break-all;font-size:13px;color:#666}
+        .md-hint{background:#f5f9ff;border:1px solid #bbdefb;border-radius:8px;padding:12px 16px;margin-top:14px;font-size:12px;color:#666;line-height:1.9}
+        .md-hint code{background:rgba(33,150,243,.08);color:#1565c0;padding:1px 6px;border-radius:4px;font-family:Consolas,Menlo,monospace}
     </style>
 </head>
 <body>
@@ -78,7 +79,7 @@
             <div class="nav-links">
                 <a href="/mk/{{ current_market or 'kn' }}">首页</a>
                 <a href="https://pan1.pgrm.run">我的存储</a>
-                <a href="/workpool" style="color:#fff;font-weight:bold">作品池</a>
+                <a href="/workpool">作品池</a>
                 <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
                 <a href="/app/kn/d">应用下载</a>
                 <div class="dropdown">
@@ -101,7 +102,7 @@
             </div>
             <div class="head-space"></div>
             {% if session.user %}
-            <div class="icon-btn" title="通知"><i class="fa-solid fa-bell" style="font-size:22px"></i></div>
+            <div class="icon-btn" title="通知" onclick="location.href='/messages'" style="position:relative"><i class="fa-solid fa-bell" style="font-size:22px"></i><span class="notify-badge" id="unread-badge" style="display:none">0</span></div>
             <div class="dropdown">
                 <div class="user-avatar" title="{{ session.user }}">{% if users.get(session.user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[session.user]['qq'] }}&s=100" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">{% else %}{{ session.user[0].upper() }}{% endif %}</div>
                 <div class="dropdown-content">
@@ -117,44 +118,36 @@
         </div>
     </header>
     <div class="main-box">
-        <a href="/workpool" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
+        <a href="/forum" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回论坛</a>
         <div class="form-card">
-            <h1 class="form-title">发布作品</h1>
-            {% if file_url %}
-            <div class="file-url-display">
-                <strong>作品文件：</strong>{{ file_url }}
-            </div>
-            {% endif %}
-            <form id="publish-form">
+            <h1 class="form-title"><i class="fa-solid fa-pen-nib" style="color:#2196f3"></i>发布新帖</h1>
+            <form id="new-post-form">
                 <div class="form-group">
-                    <label>作品标题 *</label>
-                    <input type="text" id="title" name="title" required placeholder="输入作品标题">
-                </div>
-                <div class="form-group">
-                    <label>作品简介</label>
-                    <textarea id="description" name="description" placeholder="简单介绍一下你的作品"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>标签</label>
-                    <input type="text" id="tags" name="tags" placeholder="用逗号分隔，如：游戏,冒险,像素">
-                    <div class="hint">多个标签用逗号分隔</div>
-                </div>
-                <div class="form-group">
-                    <label>缩略图 URL（可选）</label>
-                    <input type="url" id="thumbnail" name="thumbnail" placeholder="https://example.com/thumbnail.png">
-                </div>
-                <div class="form-group">
-                    <label>作品类型</label>
-                    <select id="file_type" name="file_type" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;background:#fff">
-                        <option value="player" selected>播放器（默认）</option>
-                        <option value="img">图片</option>
-                        <option value="html">网页</option>
-                        <option value="redirect">重定向</option>
+                    <label>选择分区 *</label>
+                    <select id="forum_id" name="forum_id" required>
+                        <option value="">请选择分区</option>
+                        {% for f in forums %}
+                        <option value="{{ f.id }}">{{ f.name|e }}</option>
+                        {% endfor %}
                     </select>
-                    <div class="hint">图片/网页/重定向类型将直接展示或跳转，不再经过播放器</div>
                 </div>
-                <button type="submit" class="submit-btn">发布作品</button>
+                <div class="form-group">
+                    <label>帖子标题 *（80 字以内）</label>
+                    <input type="text" id="title" name="title" required maxlength="80" placeholder="输入帖子标题">
+                </div>
+                <div class="form-group">
+                    <label>帖子内容 *（支持 Markdown）</label>
+                    <textarea id="content" name="content" required placeholder="# 标题&#10;**加粗**&#10;```代码块```"></textarea>
+                </div>
+                <button type="submit" class="submit-btn"><i class="fa-solid fa-paper-plane"></i> 发布</button>
             </form>
+            <div class="md-hint">
+                <strong><i class="fa-solid fa-circle-info" style="color:#2196f3"></i> Markdown 语法说明：</strong><br>
+                <code># 标题</code> 一级标题 &nbsp; <code>## 二级标题</code> &nbsp; <code>**加粗**</code> 加粗 &nbsp;
+                <code>*斜体*</code> 斜体<br>
+                <code>- 列表项</code> 无序列表 &nbsp; <code>> 引用</code> 引用块 &nbsp;
+                <code>```代码```</code> 代码块 &nbsp; <code>[文字](链接)</code> 超链接 &nbsp; <code>![图片](链接)</code> 图片
+            </div>
         </div>
     </div>
 
@@ -162,45 +155,47 @@
         window.addEventListener('load', function(){
             document.getElementById('loader').style.display='none';
             document.body.classList.add('page-enter');
-            setTimeout(()=>document.body.classList.remove('page-enter'),400);
+            setTimeout(function(){document.body.classList.remove('page-enter');},400);
         });
 
-        document.getElementById('publish-form').addEventListener('submit', function(e) {
+        document.getElementById('new-post-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const formData = new FormData(this);
             const data = {
+                forum_id: parseInt(formData.get('forum_id')) || 0,
                 title: formData.get('title'),
-                description: formData.get('description'),
-                tags: formData.get('tags'),
-                thumbnail: formData.get('thumbnail'),
-                file_url: '{{ file_url }}',
-                file_type: formData.get('file_type') || 'player'
+                content: formData.get('content')
             };
-
-            if (!data.title.trim()) {
-                alert('请输入作品标题');
-                return;
-            }
-
-            fetch('/workpool/publish', {
+            if (!data.title.trim()) { alert('请输入帖子标题'); return; }
+            if (!data.content.trim()) { alert('请输入帖子内容'); return; }
+            fetch('/forum/new', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
-            .then(r => r.json())
-            .then(data => {
+            .then(function(r){ return r.json(); })
+            .then(function(data){
                 if (data.success) {
-                    alert('作品发布成功！');
-                    window.location.href = '/workpool/' + data.work_id;
+                    window.location.href = '/forum/post/' + data.post_id;
                 } else {
                     alert(data.message || '发布失败');
                 }
             })
-            .catch(err => {
-                alert('网络错误，请重试');
-            });
+            .catch(function(){ alert('网络错误，请重试'); });
         });
+
+        function loadUnread() {
+            fetch('/messages/unread')
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    var badge = document.getElementById('unread-badge');
+                    if (badge && data.count > 0) {
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                        badge.style.display = 'block';
+                    }
+                });
+        }
+        loadUnread();
 
         document.addEventListener('DOMContentLoaded', function() {
             var dropdowns = document.querySelectorAll('.dropdown');

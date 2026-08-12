@@ -37,6 +37,10 @@ with app.app_context():
                 conn.execute(sa_text("ALTER TABLE user ADD COLUMN qq VARCHAR(20) DEFAULT ''"))
             if 'reg_time' not in user_cols:
                 conn.execute(sa_text("ALTER TABLE user ADD COLUMN reg_time VARCHAR(20) DEFAULT ''"))
+            if 'bio' not in user_cols:
+                conn.execute(sa_text("ALTER TABLE user ADD COLUMN bio VARCHAR(500) DEFAULT ''"))
+            if 'banner' not in user_cols:
+                conn.execute(sa_text("ALTER TABLE user ADD COLUMN banner VARCHAR(500) DEFAULT ''"))
             conn.commit()
         users_engine.dispose()
     except Exception as e:
