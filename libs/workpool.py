@@ -421,6 +421,29 @@ def register_workpool_routes():
             conn.close()
             return jsonify({'success': False, 'message': '该作品已发布，请勿重复发布'}), 409
 
+        # 磁盘上可能残留上次发布失败留下的 db 文件（main.db 未登记）：
+        # 若已有作品数据则视为已发布；若是空壳残留则删除后重新创建
+        full_db_path = os.path.join(WORKPOOL_DIR, db_path)
+        if os.path.exists(full_db_path):
+            orphan_has_data = False
+            orphan_conn = None
+            try:
+                orphan_conn = sqlite3.connect(full_db_path)
+                orphan_row = orphan_conn.execute("SELECT id FROM work_info WHERE id = 1").fetchone()
+                orphan_has_data = orphan_row is not None
+            except Exception:
+                orphan_has_data = False
+            finally:
+                if orphan_conn is not None:
+                    try:
+                        orphan_conn.close()
+                    except Exception:
+                        pass
+            if orphan_has_data:
+                conn.close()
+                return jsonify({'success': False, 'message': '该作品已发布，请勿重复发布'}), 409
+            os.remove(full_db_path)
+
         # 初始化作品数据库
         init_work_db(db_path)
 
