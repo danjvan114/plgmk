@@ -198,8 +198,8 @@ def register_workpool_routes():
         # 检查用户是否已点赞/收藏
         user_liked = False
         user_faved = False
-        if 'player_name' in session:
-            user_id = session['player_name']
+        if 'user' in session:
+            user_id = session['user']
             if work_conn:
                 work_conn = get_work_db(work['db_path'])
                 if work_conn:
@@ -219,7 +219,7 @@ def register_workpool_routes():
     @app.route('/workpool/like/<int:work_id>', methods=['POST'])
     def workpool_like(work_id):
         """点赞作品"""
-        if 'player_name' not in session:
+        if 'user' not in session:
             return jsonify({'success': False, 'message': '请先登录'}), 401
         
         conn = get_main_db()
@@ -231,7 +231,7 @@ def register_workpool_routes():
         if not work:
             return jsonify({'success': False, 'message': '作品不存在'}), 404
         
-        user_id = session['player_name']
+        user_id = session['user']
         work_conn = get_work_db(work['db_path'])
         
         if work_conn:
@@ -270,7 +270,7 @@ def register_workpool_routes():
     @app.route('/workpool/fav/<int:work_id>', methods=['POST'])
     def workpool_fav(work_id):
         """收藏作品"""
-        if 'player_name' not in session:
+        if 'user' not in session:
             return jsonify({'success': False, 'message': '请先登录'}), 401
         
         conn = get_main_db()
@@ -282,7 +282,7 @@ def register_workpool_routes():
         if not work:
             return jsonify({'success': False, 'message': '作品不存在'}), 404
         
-        user_id = session['player_name']
+        user_id = session['user']
         work_conn = get_work_db(work['db_path'])
         
         if work_conn:
@@ -317,7 +317,7 @@ def register_workpool_routes():
     @app.route('/workpool/comment/<int:work_id>', methods=['POST'])
     def workpool_comment(work_id):
         """评论作品"""
-        if 'player_name' not in session:
+        if 'user' not in session:
             return jsonify({'success': False, 'message': '请先登录'}), 401
         
         data = request.get_json()
@@ -335,7 +335,7 @@ def register_workpool_routes():
         if not work:
             return jsonify({'success': False, 'message': '作品不存在'}), 404
         
-        user_id = session['player_name']
+        user_id = session['user']
         work_conn = get_work_db(work['db_path'])
         
         if work_conn:
@@ -361,13 +361,13 @@ def register_workpool_routes():
     @app.route('/workpool/my')
     def workpool_my():
         """我的作品"""
-        if 'player_name' not in session:
+        if 'user' not in session:
             return redirect('/login')
         
         conn = get_main_db()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM works WHERE author_id = ? OR author = ? ORDER BY created_at DESC",
-                      (session['player_name'], session['player_name']))
+                      (session['user'], session['user']))
         works = [dict(row) for row in cursor.fetchall()]
         conn.close()
         
@@ -376,7 +376,7 @@ def register_workpool_routes():
     @app.route('/workpool/publish')
     def workpool_publish_page():
         """发布作品页面（通过 ?f=文件直链 访问）"""
-        if 'player_name' not in session:
+        if 'user' not in session:
             return redirect('/login')
         
         file_url = request.args.get('f', '')
@@ -388,7 +388,7 @@ def register_workpool_routes():
     @app.route('/workpool/publish', methods=['POST'])
     def workpool_publish():
         """发布作品（API）"""
-        if 'player_name' not in session:
+        if 'user' not in session:
             return jsonify({'success': False, 'message': '请先登录'}), 401
         
         data = request.get_json()
@@ -418,7 +418,7 @@ def register_workpool_routes():
             w_cursor.execute("""
                 INSERT INTO work_info (id, title, author, author_id, description, file_url, thumbnail, tags)
                 VALUES (1, ?, ?, ?, ?, ?, ?, ?)
-            """, (title, session['player_name'], session['player_name'], description, file_url, thumbnail, tags))
+            """, (title, session['user'], session['user'], description, file_url, thumbnail, tags))
             work_conn.commit()
             work_conn.close()
         
@@ -428,7 +428,7 @@ def register_workpool_routes():
         cursor.execute("""
             INSERT INTO works (db_path, title, author, author_id, description, thumbnail, tags, file_url)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (db_path, title, session['player_name'], session['player_name'], description, thumbnail, tags, file_url))
+        """, (db_path, title, session['user'], session['user'], description, thumbnail, tags, file_url))
         conn.commit()
         work_id = cursor.lastrowid
         conn.close()
@@ -438,7 +438,7 @@ def register_workpool_routes():
     @app.route('/workpool/delete/<int:work_id>', methods=['POST'])
     def workpool_delete(work_id):
         """擦除作品（仅作者或管理员）"""
-        if 'player_name' not in session:
+        if 'user' not in session:
             return jsonify({'success': False, 'message': '请先登录'}), 401
         
         conn = get_main_db()
@@ -454,8 +454,8 @@ def register_workpool_routes():
         db_path = work['db_path']
         
         # 检查权限
-        is_admin = User.query.filter_by(username=session['player_name'], role='admin').first()
-        if author_id != session['player_name'] and not is_admin:
+        is_admin = User.query.filter_by(username=session['user'], role='admin').first()
+        if author_id != session['user'] and not is_admin:
             conn.close()
             return jsonify({'success': False, 'message': '无权删除此作品'}), 403
         
