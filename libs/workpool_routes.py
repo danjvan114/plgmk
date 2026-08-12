@@ -426,9 +426,9 @@ def register_workpool_routes():
         conn = get_main_db()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO works (db_path, title, author, author_id, description, thumbnail, tags, file_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (db_path, title, session['user'], session['user'], description, thumbnail, tags, file_url))
+            INSERT INTO works (db_path, title, author, author_id, description, thumbnail, tags)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (db_path, title, session['user'], session['user'], description, thumbnail, tags))
         conn.commit()
         work_id = cursor.lastrowid
         conn.close()
