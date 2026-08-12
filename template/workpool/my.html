@@ -77,9 +77,9 @@
                 菠菜面
             </div>
             <div class="nav-links">
-                <a href="/mk/{{ current_market or 'kn' }}">插件市场</a>
-                <a href="/workpool">作品池</a>
+                <a href="/mk/{{ current_market or 'kn' }}">首页</a>
                 <a href="https://pan1.pgrm.run">我的存储</a>
+                <a href="/workpool" style="color:#fff;font-weight:bold">作品池</a>
                 <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
                 <a href="/app/kn/d">应用下载</a>
                 <div class="dropdown">
@@ -107,6 +107,7 @@
                 <div class="user-avatar" title="{{ session.user }}">{{ session.user[0].upper() }}</div>
                 <div class="dropdown-content">
                     <a href="/workpool/my" style="background:rgba(76,175,80,.1);color:#4caf50">我的作品</a>
+                    <a href="/change_password">修改密码</a>
                     <a href="/logout">退出登录</a>
                 </div>
             </div>

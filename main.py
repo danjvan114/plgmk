@@ -9,7 +9,7 @@ from libs.user_routes import register_user_routes
 from libs.developer_routes import register_developer_routes
 from libs.other_routes import register_other_routes
 from libs.file_manager import register_file_manager_routes
-from libs.workpool_routes import register_workpool_routes
+from libs.workpool import register_workpool_routes
 import os
 
 
