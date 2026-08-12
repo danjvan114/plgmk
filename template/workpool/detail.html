@@ -172,7 +172,7 @@
                         </div>
                         <span>作品加载中...</span>
                     </div>
-                    <iframe id="player-frame" src="https://code.pgrm.run/app/player/?f={{ work.file_url|urlencode }}" frameborder="0" allowfullscreen onload="playerLoaded()"></iframe>
+                    <iframe id="player-frame" src="/app/player/?f={{ work.file_url|urlencode }}&mode=github" frameborder="0" allowfullscreen onload="playerLoaded()"></iframe>
                     {% else %}
                     <div class="player-placeholder">
                         <i class="fa-regular fa-circle-play"></i>
@@ -183,6 +183,7 @@
                 <div class="player-bar">
                     <button onclick="replay()">⟳</button>
                     <div>
+                        <button id="mode-btn" title="切换加载模式" onclick="togglePlayerMode()" style="font-size:15px">🐙</button>
                         <button title="手机模式">📱</button>
                         <button onclick="fullscreenPlayer()">⛶</button>
                     </div>
@@ -271,7 +272,54 @@
             document.getElementById('loader').style.display='none';
             document.body.classList.add('page-enter');
             setTimeout(()=>document.body.classList.remove('page-enter'),400);
+            const mode = currentPlayerMode();
+            updateModeBtn(mode);
+            const frame = document.getElementById('player-frame');
+            if (mode === 'server' && frame && frame.src.indexOf('mode=server') < 0) {
+                loadPlayer('server');
+            }
         });
+
+        const WORK_FILE_URL = {{ work.file_url|tojson or 'null' }};
+        const PLAYER_MODE_KEY = 'wp_player_mode';
+        const PLAYER_GITHUB_BASE = '/app/player/';
+
+        function currentPlayerMode() {
+            try { return localStorage.getItem(PLAYER_MODE_KEY) || 'github'; }
+            catch(e) { return 'github'; }
+        }
+
+        function buildPlayerUrl(mode) {
+            if (!WORK_FILE_URL) return '';
+            const f = encodeURIComponent(WORK_FILE_URL);
+            return PLAYER_GITHUB_BASE + '?f=' + f + '&mode=' + (mode === 'server' ? 'server' : 'github');
+        }
+
+        function loadPlayer(mode) {
+            const frame = document.getElementById('player-frame');
+            if (!frame) return;
+            showPlayerLoading();
+            frame.src = buildPlayerUrl(mode);
+            updateModeBtn(mode);
+        }
+
+        function updateModeBtn(mode) {
+            const btn = document.getElementById('mode-btn');
+            if (!btn) return;
+            if (mode === 'server') {
+                btn.textContent = '🖥';
+                btn.title = '加载模式：服务器（js/css 从本站加载）';
+            } else {
+                btn.textContent = '🐙';
+                btn.title = '加载模式：GitHub（js/css 从 GitHub 加载）';
+            }
+        }
+
+        function togglePlayerMode() {
+            const next = currentPlayerMode() === 'github' ? 'server' : 'github';
+            try { localStorage.setItem(PLAYER_MODE_KEY, next); } catch(e) {}
+            loadPlayer(next);
+        }
 
         function playerLoaded() {
             const el = document.getElementById('player-loading');
@@ -284,11 +332,7 @@
         }
 
         function replay() {
-            const frame = document.getElementById('player-frame');
-            if (frame) {
-                showPlayerLoading();
-                frame.src = frame.src;
-            }
+            loadPlayer(currentPlayerMode());
         }
 
         function fullscreenPlayer() {
