@@ -1,4 +1,5 @@
 from flask import request, redirect, url_for, session, jsonify
+from sqlalchemy import text
 from .config import app, db, User, root_jinja_env, market_jinja_envs
 from .utils import render_root_template
 from datetime import datetime
@@ -69,7 +70,7 @@ def register_team_routes():
         teams = Team.query.order_by(Team.created_at.desc(), Team.id.desc()).all()
         # 统计成员数
         rows = db.session.execute(
-            "SELECT team_id, COUNT(*) c FROM team_member GROUP BY team_id"
+            text("SELECT team_id, COUNT(*) c FROM team_member GROUP BY team_id")
         ).fetchall()
         counts = {r[0]: r[1] for r in rows}
         team_list = []
