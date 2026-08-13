@@ -74,7 +74,9 @@
     <div class="main-box">
         <a href="/forum" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回论坛</a>
         <div class="form-card">
-            <h1 class="form-title"><i class="fa-solid fa-pen-nib" style="color:#2196f3"></i>发布新帖</h1>
+            <h1 class="form-title"><i class="fa-solid fa-pen-nib" style="color:#2196f3"></i>发布新帖
+                {% set _t = user_team(session.user) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:12px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}
+            </h1>
             <form id="new-post-form">
                 <div class="form-group">
                     <label>选择分区 *</label>

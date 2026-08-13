@@ -107,7 +107,7 @@
                     <li class="post-item" onclick="location.href='/forum/post/{{ p.id }}'">
                         {% if p.is_pinned %}<span class="pin-tag">📌</span>{% endif %}
                         <span class="post-title">{{ p.title|e }}</span>
-                        <a class="post-author" href="/u/{{ p.author|e }}" onclick="event.stopPropagation()">{{ p.author|e }}</a>
+                        <a class="post-author" href="/u/{{ p.author|e }}" onclick="event.stopPropagation()">{{ p.author|e }}{% set _t = user_team(p.author) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</a>
                         <span class="post-meta">
                             <span><i class="fa-regular fa-comment"></i>{{ p.comment_count }}</span>
                             <span><i class="fa-regular fa-eye"></i>{{ p.view_count }}</span>

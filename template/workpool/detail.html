@@ -242,7 +242,7 @@
                         <div class="comment-item" id="comment-{{ comment.id }}">
                             <div class="comment-header">
                                 <span class="comment-user">
-                                    <a href="/u/{{ comment.username|e }}" style="color:#333;text-decoration:none">{{ comment.username|e }}</a>
+                                     <a href="/u/{{ comment.username|e }}" style="color:#333;text-decoration:none">{{ comment.username|e }}{% set _t = user_team(comment.username) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:1px 6px;margin-left:4px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</a>
                                     {% if comment.is_pinned %}<span class="comment-pinned"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}
                                 </span>
                                 <span class="comment-time">{{ comment.created_at }}
@@ -309,7 +309,7 @@
             <div class="side-col">
                 <div class="author-card">
                     <div class="author-head">
-                        <span class="author-name" style="cursor:pointer" onclick="location.href='/u/{{ work.author|e }}'">{{ work.author|e }}</span>
+                        <span class="author-name" style="cursor:pointer" onclick="location.href='/u/{{ work.author|e }}'">{{ work.author|e }}{% set _t = user_team(work.author) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</span>
                         <div class="author-avatar" onclick="location.href='/u/{{ work.author|e }}'" style="cursor:pointer;overflow:hidden">{% if users.get(work.author, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[work.author]['qq'] }}&s=100" style="width:100%;height:100%;object-fit:cover" alt="头像">{% else %}{{ work.author[:1].upper() }}{% endif %}</div>
                     </div>
                     <p class="author-sign">{% if users.get(work.author, {}).get('bio') %}{{ users[work.author]['bio'] }}{% else %}作者 ID：{{ work.author_id|e or work.author|e }}{% endif %}</p>

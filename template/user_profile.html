@@ -116,6 +116,7 @@
             <div class="profile-info">
                 <div class="profile-name">
                     {{ profile_user.username|e }}
+                    {% set _t = user_team(profile_user.username) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}
                     {% if profile_user.role == 'admin' %}
                     <span class="role-tag admin">管理员</span>
                     {% else %}

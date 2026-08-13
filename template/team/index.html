@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
+    <meta charset="UTF-8">
+    <title>团队 - 菠菜面</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999;background:#fff}
+        #loader .mdui-progress{margin:0;border-radius:0}
+        .wrap{max-width:1100px;margin:0 auto;padding-top:72px;padding:72px 16px 40px}
+        .page-title{font-size:22px;color:#fff;font-weight:bold;margin-bottom:18px;display:flex;align-items:center;gap:10px;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+        .team-card.mdui-card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden;margin-bottom:16px}
+        .team-cover{height:140px;background:rgba(76,175,80,.12);display:flex;align-items:center;justify-content:center}
+        .team-cover img{max-width:100%;max-height:100%;object-fit-cover}
+        .team-cover-blank{width:80px;height:80px;border-radius:50%;background:rgba(76,175,80,.15);display:flex;align-items:center;justify-content:center;font-size:28px;color:#4caf50}
+        .team-body{padding:16px}
+        .team-name{font-size:18px;font-weight:600;color:#1565c0;margin-bottom:6px}
+        .team-desc{font-size:13px;color:#777;line-height:1.6}
+        .team-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+        .tea-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px}
+        .mdui-btn-raised{background:#2196f3;color:#fff}
+        .mdui-btn-raised:hover{background:#1976d2}
+        .create-card .mdui-textfield-input,.create-card textarea{border:1px solid #ddd !important}
+        .empty{text-align:center;color:#999;padding:40px;font-size:14px}
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader"><div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div></div>
+    <header id="hz5kl"></header>
+    <div class="wrap">
+        <div class="page-title"><i class="fa-solid fa-users-rectangle"></i> 团队中心</div>
+
+        {% if session.user %}
+        {% set my_team = current_user_team() %}
+        {% if my_team %}
+        <div class="mdui-card" style="margin-bottom:18px">
+            <div class="mdui-card-primary">
+                <div class="mdui-card-header-title">隶属团队：{{ my_team.name }}</div>
+                <div class="mdui-card-header-text">
+                    <a href="/team/{{ my_team.id }}" class="mdui-text-color-blue">前往 {{ my_team.name }} 主页</a>
+                    <form action="/team/{{ my_team.id }}/leave" method="post" style="display:inline">
+                        <button class="mdui-btn mdui-btn-raised mdui-btn-dense" style="background:#ff9800;width:auto;padding:4px 10px;font-size:12px">退出团队</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="mdui-card" style="margin-bottom:18px">
+            <div class="mdui-card-header">
+                <div class="mdui-card-header-text">
+                    <div class="mdui-card-title">创建你的团队</div>
+                    <div class="mdui-card-text">团队可用于组织成员、在作品与帖子上显示团队标识。</div>
+                </div>
+            </div>
+            <div class="mdui-card-content create-card">
+                <form id="team-create-form">
+                    <div class="mdui-textfield mdui-textfield-floating">
+                        <input type="text" name="name" class="mdui-textfield-input" required>
+                        <label class="mdui-textfield-label">团队名称</label>
+                    </div>
+                    <div class="mdui-textfield mdui-textfield-floating" style="margin-top:10px">
+                        <textarea name="description" class="mdui-textfield-input" rows="2"></textarea>
+                        <label class="mdui-textfield-label">团队介绍</label>
+                    </div>
+                    <div class="mdui-textfield mdui-textfield-floating" style="margin-top:10px">
+                        <input type="text" name="cover" class="mdui-textfield-input" placeholder="https://...">
+                        <label class="mdui-textfield-label">头图 URL</label>
+                    </div>
+                    <div class="mdui-textfield mdui-textfield-floating" style="margin-top:10px">
+                        <input type="text" name="qq" class="mdui-textfield-input" placeholder="QQ 号（用于团队图标）">
+                        <label class="mdui-textfield-label">QQ 号</label>
+                    </div>
+                    <div style="margin-top:14px">
+                        <button type="submit" class="mdui-btn mdui-btn-raised">创建团队</button>
+                    </div>
+                </form>
+                <div id="create-tip" class="mdui-text-color-red" style="margin-top:10px;font-size:13px"></div>
+            </div>
+        </div>
+        <script>
+            (function(){
+                var f = document.getElementById('team-create-form');
+                if (!f) return;
+                f.addEventListener('submit', function(e){
+                    e.preventDefault();
+                    var tip = document.getElementById('create-tip');
+                    var formData = new FormData(f);
+                    fetch('/team/create', {method:'POST', body: formData})
+                        .then(function(r){ return r.json(); })
+                        .then(function(d){
+                            tip.textContent = d.message || '';
+                            if (d.success) { setTimeout(function(){ location.href = '/team/' + d.team_id; }, 400); }
+                        });
+                });
+            })();
+        </script>
+        {% endif %}
+        {% else %}
+        <p class="mdui-text-color-white" style="margin-bottom:14px">登录后可创建与加入团队。</p>
+        {% endif %}
+
+        <div class="mdui-divider" style="margin:18px 0;border-color:rgba(255,255,255,.2)"></div>
+        <div style="color:#fff;font-size:16px;margin-bottom:12px"><i class="fa-solid fa-grip"></i> 现有团队</div>
+
+        {% if teams|length == 0 %}
+        <p class="empty">暂无团队，成为第一个团队的创始人吧！</p>
+        {% else %}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+            {% for t in teams %}
+            <div class="team-card mdui-card">
+                <div class="team-cover">
+                    {% if t.cover %}<img src="{{ t.cover }}" alt="cover">{% else %}<div class="team-cover-blank"><i class="fa-solid fa-building"></i></div>{% endif %}
+                </div>
+                <div class="team-body">
+                    <div class="team-name">{{ t.name|e }} <span class="tea-badge"><i class="fa-solid fa-user-group"></i> {{ t.member_count }} 人</span></div>
+                    {% if t.description %}<div class="team-desc">{{ t.description|e }}</div>{% endif %}
+                    <div class="team-foot">
+                        <span class="mdui-text-color-blue" style="font-size:13px"><i class="fa-solid fa-clock"></i> {{ t.created_at }}</span>
+                        <a href="/team/{{ t.id }}" class="mdui-btn mdui-btn-raised mdui-btn-dense" style="padding:4px 14px;font-size:12px">进入团队主页</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <script src="/localcdn/gzs/mkh.js"></script>
+    <script>window.addEventListener('load', function(){ document.getElementById('loader').style.display='none'; });</script>
+</body>
+</html>

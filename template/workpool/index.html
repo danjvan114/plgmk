@@ -115,7 +115,7 @@
                 </div>
                 {% endif %}
                 <div class="meta">
-                    <span class="meta-item"><i class="fa-solid fa-user" style="font-size:16px"></i>{{ work.author|e }}</span>
+                    <span class="meta-item"><i class="fa-solid fa-user" style="font-size:16px"></i>{{ work.author|e }}{% set _t = user_team(work.author) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</span>
                     <span class="meta-item"><i class="fa-solid fa-thumbs-up" style="font-size:16px"></i>{{ work.like_count }}</span>
                     <span class="meta-item"><i class="fa-solid fa-heart" style="font-size:16px"></i>{{ work.fav_count }}</span>
                     <span class="meta-item"><i class="fa-solid fa-coins" style="font-size:16px"></i>{{ work.coin_count if work.coin_count is defined else 0 }}</span>
