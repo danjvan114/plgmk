@@ -8,6 +8,13 @@ from datetime import datetime
 # 团队数据独立存放到 team.db（不与 users.db 等集中混放）
 TEAM_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'localcdn', 'shequ', 'team.db')
 
+TEAMS_PER_PAGE = 12
+MEMBERS_PER_PAGE = 20
+WORKS_PER_PAGE = 24
+POSTS_PER_PAGE = 10
+INVITES_PER_PAGE = 10
+MY_WORKS_MAX = 50
+
 
 def get_team_db():
     os.makedirs(os.path.dirname(TEAM_DB_PATH), exist_ok=True)
@@ -136,35 +143,48 @@ def current_user_team():
     return user_team(session.get('user'))
 
 
+def _fragment(name, **ctx):
+    """渲染 team 分页片段（独立 Jinja 环境，无 Flask 全局，需显式传参）"""
+    return root_jinja_env.get_template('team/' + name).render(**ctx)
+
+
 def register_team_routes():
 
     @app.route('/team')
     def team_index():
+        page = max(request.args.get('page', 1, type=int), 1)
         conn = get_team_db()
-        teams = conn.execute("SELECT * FROM team ORDER BY created_at DESC, id DESC").fetchall()
-        rows = conn.execute(
-            "SELECT team_id, COUNT(*) c FROM team_member GROUP BY team_id").fetchall()
+        total = conn.execute("SELECT COUNT(*) c FROM team").fetchone()['c']
+        rows = conn.execute("SELECT team_id, COUNT(*) c FROM team_member GROUP BY team_id").fetchall()
+        counts = {r['team_id']: r['c'] for r in rows}
+        teams = conn.execute(
+            "SELECT * FROM team ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+            (TEAMS_PER_PAGE + 1, (page - 1) * TEAMS_PER_PAGE)).fetchall()
+        has_more = len(teams) > TEAMS_PER_PAGE
         team_list = []
-        for t in teams:
+        for t in teams[:TEAMS_PER_PAGE]:
             d = {'id': t['id'], 'name': t['name'], 'description': t['description'],
                  'cover': t['cover'], 'qq': t['qq'], 'bulletin': t['bulletin'],
                  'created_by': t['created_by'], 'created_at': t['created_at'],
-                 'member_count': next((r['c'] for r in rows if r['team_id'] == t['id']), 0),
+                 'member_count': counts.get(t['id'], 0),
                  'avatar_url': ('https://q1.qlogo.cn/g?b=qq&nk=%s&s=100' % t['qq']) if t['qq'] else ''}
             team_list.append(d)
-        # 收到的待处理邀请
-        invites = []
+        # 收到的待处理邀请（分页）
+        invites, inv_has_more = [], False
         if session.get('user'):
             rows = conn.execute(
                 "SELECT i.id, i.team_id, i.from_user, i.created_at, t.name AS team_name "
                 "FROM team_invite i JOIN team t ON t.id = i.team_id "
                 "WHERE i.username = ? AND i.status = 'pending' "
-                "ORDER BY i.created_at DESC, i.id DESC",
-                (session['user'],)).fetchall()
-            invites = [dict(r) for r in rows]
+                "ORDER BY i.created_at DESC, i.id DESC LIMIT ?",
+                (session['user'], INVITES_PER_PAGE + 1)).fetchall()
+            inv_has_more = len(rows) > INVITES_PER_PAGE
+            invites = [dict(r) for r in rows[:INVITES_PER_PAGE]]
         conn.close()
+        total_pages = max((total + TEAMS_PER_PAGE - 1) // TEAMS_PER_PAGE, 1)
         return render_root_template('team/index.html', teams=team_list, my_team=current_user_team(),
-                                    invites=invites)
+                                    invites=invites, inv_has_more=inv_has_more,
+                                    page=page, total_pages=total_pages, has_more=has_more)
 
     @app.route('/team/create', methods=['POST'])
     def team_create():
@@ -204,24 +224,22 @@ def register_team_routes():
         is_member = bool(me)
         is_admin = bool(me) and me['role'] in ('owner', 'admin')
         is_owner = bool(me) and me['role'] == 'owner'
+        me_username = session.get('user', '')
         role_name = {'owner': '团长', 'admin': '管理员', 'member': '成员'}
         conn = get_team_db()
+        # 成员（分页）
+        members_total = conn.execute("SELECT COUNT(*) c FROM team_member WHERE team_id = ?",
+                                     (team_id,)).fetchone()['c']
         members_db = conn.execute(
-            "SELECT * FROM team_member WHERE team_id = ? ORDER BY joined_at DESC, id", (team_id,)).fetchall()
+            "SELECT * FROM team_member WHERE team_id = ? ORDER BY joined_at DESC, id LIMIT ?",
+            (team_id, MEMBERS_PER_PAGE + 1)).fetchall()
+        m_has_more = len(members_db) > MEMBERS_PER_PAGE
         cnt_rows = conn.execute(
-            "SELECT added_by, COUNT(*) c FROM team_work WHERE team_id = ? GROUP BY added_by", (team_id,)).fetchall()
-        cnt_map = {r['added_by']: r['c'] for r in cnt_rows}
-        tws = conn.execute(
-            "SELECT * FROM team_work WHERE team_id = ? ORDER BY created_at DESC, id DESC", (team_id,)).fetchall()
-        posts = conn.execute(
-            "SELECT * FROM team_post WHERE team_id = ? ORDER BY is_pin DESC, created_at DESC, id DESC LIMIT 30",
+            "SELECT added_by, COUNT(*) c FROM team_work WHERE team_id = ? GROUP BY added_by",
             (team_id,)).fetchall()
-        invites_sent = conn.execute(
-            "SELECT * FROM team_invite WHERE team_id = ? AND status = 'pending' "
-            "ORDER BY created_at DESC, id DESC", (team_id,)).fetchall()
-        conn.close()
+        cnt_map = {r['added_by']: r['c'] for r in cnt_rows}
         member_rows = []
-        for m in members_db:
+        for m in members_db[:MEMBERS_PER_PAGE]:
             u = User.query.get(m['username'])
             member_rows.append({'username': m['username'], 'role': m['role'],
                                 'role_name': role_name.get(m['role'], m['role']),
@@ -229,12 +247,20 @@ def register_team_routes():
                                 'qq': (u.qq if u else '') or '',
                                 'avatar_url': (u.qq_avatar_url if u else ''),
                                 'joined_at': m['joined_at']})
-        # 共有作品（按添加顺序取，保持 team_work 的排序）
+        members_html = _fragment('_members.html', members=member_rows,
+                                 is_admin=is_admin, created_by=t['created_by'])
+        # 共有作品（分页）
+        works_total = conn.execute("SELECT COUNT(*) c FROM team_work WHERE team_id = ?",
+                                   (team_id,)).fetchone()['c']
+        tws = conn.execute(
+            "SELECT * FROM team_work WHERE team_id = ? ORDER BY created_at DESC, id DESC LIMIT ?",
+            (team_id, WORKS_PER_PAGE + 1)).fetchall()
+        w_has_more = len(tws) > WORKS_PER_PAGE
         works = []
         if tws:
             from .workpool import get_main_db
             wconn = get_main_db()
-            wids = [tw['work_id'] for tw in tws]
+            wids = [tw['work_id'] for tw in tws[:WORKS_PER_PAGE]]
             ph = ','.join('?' for _ in wids)
             rows = wconn.execute(
                 "SELECT id, title, author, thumbnail, view_count, like_count, comment_count, created_at "
@@ -242,7 +268,25 @@ def register_team_routes():
             wconn.close()
             workmap = {r['id']: dict(r) for r in rows}
             works = [dict(workmap[wid]) for wid in wids if wid in workmap]
-        # 我的可添加作品（排除已在共有列表中的）
+        works_html = _fragment('_works.html', works=works, is_admin=is_admin, me_username=me_username)
+        # 团队帖子（分页）
+        posts_total = conn.execute("SELECT COUNT(*) c FROM team_post WHERE team_id = ?",
+                                   (team_id,)).fetchone()['c']
+        posts = conn.execute(
+            "SELECT * FROM team_post WHERE team_id = ? ORDER BY is_pin DESC, created_at DESC, id DESC LIMIT ?",
+            (team_id, POSTS_PER_PAGE + 1)).fetchall()
+        p_has_more = len(posts) > POSTS_PER_PAGE
+        posts_html = _fragment('_posts.html', posts=[dict(p) for p in posts[:POSTS_PER_PAGE]],
+                               is_admin=is_admin, me_username=me_username)
+        # 已发邀请（分页）
+        invites = conn.execute(
+            "SELECT * FROM team_invite WHERE team_id = ? AND status = 'pending' "
+            "ORDER BY created_at DESC, id DESC LIMIT ?",
+            (team_id, INVITES_PER_PAGE + 1)).fetchall()
+        i_has_more = len(invites) > INVITES_PER_PAGE
+        invites_html = _fragment('_invites_sent.html', invites=[dict(v) for v in invites[:INVITES_PER_PAGE]])
+        conn.close()
+        # 我的可添加作品（封顶，不无限拉取）
         my_works = []
         if is_member:
             from .workpool import get_main_db
@@ -250,18 +294,21 @@ def register_team_routes():
             rows = mconn.execute(
                 "SELECT id, title, author, thumbnail FROM works "
                 "WHERE author = ? AND status = 'active' AND is_hidden = 0 "
-                "ORDER BY created_at DESC LIMIT 200", (session['user'],)).fetchall()
+                "ORDER BY created_at DESC LIMIT ?", (session['user'], MY_WORKS_MAX)).fetchall()
             mconn.close()
-            added_ids = {tw['work_id'] for tw in tws}
+            added_ids = {tw['work_id'] for tw in tws[:WORKS_PER_PAGE]}
             my_works = [dict(r) for r in rows if r['id'] not in added_ids]
         return render_root_template('team/detail.html', team={'id': t['id'], 'name': t['name'],
                                        'description': t['description'], 'cover': t['cover'],
                                        'qq': t['qq'], 'bulletin': t['bulletin'],
                                        'avatar_url': ('https://q1.qlogo.cn/g?b=qq&nk=%s&s=200' % t['qq']) if t['qq'] else '',
                                        'created_by': t['created_by'], 'created_at': t['created_at']},
-                                    members=member_rows, works=works, my_works=my_works,
-                                    posts=[dict(p) for p in posts], invites=[dict(v) for v in invites_sent],
-                                    me=me, is_member=is_member, is_owner=is_owner, is_admin=is_admin)
+                                    members_html=members_html, m_has_more=m_has_more, members_total=members_total,
+                                    works_html=works_html, w_has_more=w_has_more, works_total=works_total,
+                                    posts_html=posts_html, p_has_more=p_has_more, posts_total=posts_total,
+                                    invites_html=invites_html, i_has_more=i_has_more,
+                                    my_works=my_works, me=me, me_username=me_username,
+                                    is_member=is_member, is_owner=is_owner, is_admin=is_admin)
 
     @app.route('/team/<int:team_id>/edit', methods=['POST'])
     def team_edit(team_id):
@@ -564,3 +611,123 @@ def register_team_routes():
         conn.commit()
         conn.close()
         return jsonify({'success': True, 'message': '已取消置顶' if p['is_pin'] else '已置顶'})
+
+    @app.route('/team/invites/ajax')
+    def team_invites_ajax():
+        """我收到的邀请分页"""
+        if 'user' not in session:
+            return jsonify({'html': '', 'has_more': False})
+        page = max(request.args.get('page', 1, type=int), 1)
+        conn = get_team_db()
+        rows = conn.execute(
+            "SELECT i.id, i.team_id, i.from_user, i.created_at, t.name AS team_name "
+            "FROM team_invite i JOIN team t ON t.id = i.team_id "
+            "WHERE i.username = ? AND i.status = 'pending' "
+            "ORDER BY i.created_at DESC, i.id DESC LIMIT ? OFFSET ?",
+            (session['user'], INVITES_PER_PAGE + 1, (page - 1) * INVITES_PER_PAGE)).fetchall()
+        conn.close()
+        has_more = len(rows) > INVITES_PER_PAGE
+        html = _fragment('_invites_received.html', invites=[dict(r) for r in rows[:INVITES_PER_PAGE]])
+        return jsonify({'html': html, 'has_more': has_more})
+
+    @app.route('/team/<int:team_id>/members/ajax')
+    def team_members_ajax(team_id):
+        """团队详情：成员分页"""
+        if 'user' not in session:
+            return jsonify({'html': '', 'has_more': False}), 401
+        page = max(request.args.get('page', 1, type=int), 1)
+        t = get_team(team_id)
+        if not t:
+            return jsonify({'html': '', 'has_more': False}), 404
+        me = team_member(team_id, session['user'])
+        is_admin = bool(me) and me['role'] in ('owner', 'admin')
+        role_name = {'owner': '团长', 'admin': '管理员', 'member': '成员'}
+        conn = get_team_db()
+        rows = conn.execute(
+            "SELECT * FROM team_member WHERE team_id = ? ORDER BY joined_at DESC, id LIMIT ? OFFSET ?",
+            (team_id, MEMBERS_PER_PAGE + 1, (page - 1) * MEMBERS_PER_PAGE)).fetchall()
+        has_more = len(rows) > MEMBERS_PER_PAGE
+        cnt_rows = conn.execute(
+            "SELECT added_by, COUNT(*) c FROM team_work WHERE team_id = ? GROUP BY added_by",
+            (team_id,)).fetchall()
+        cnt_map = {r['added_by']: r['c'] for r in cnt_rows}
+        conn.close()
+        member_rows = []
+        for m in rows[:MEMBERS_PER_PAGE]:
+            u = User.query.get(m['username'])
+            member_rows.append({'username': m['username'], 'role': m['role'],
+                                'role_name': role_name.get(m['role'], m['role']),
+                                'work_count': cnt_map.get(m['username'], 0),
+                                'qq': (u.qq if u else '') or '',
+                                'avatar_url': (u.qq_avatar_url if u else ''),
+                                'joined_at': m['joined_at']})
+        html = _fragment('_members.html', members=member_rows, is_admin=is_admin,
+                         created_by=t['created_by'])
+        return jsonify({'html': html, 'has_more': has_more})
+
+    @app.route('/team/<int:team_id>/works/ajax')
+    def team_works_ajax(team_id):
+        """团队详情：共有作品分页"""
+        if 'user' not in session:
+            return jsonify({'html': '', 'has_more': False}), 401
+        page = max(request.args.get('page', 1, type=int), 1)
+        me = team_member(team_id, session['user'])
+        is_admin = bool(me) and me['role'] in ('owner', 'admin')
+        conn = get_team_db()
+        tws = conn.execute(
+            "SELECT * FROM team_work WHERE team_id = ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+            (team_id, WORKS_PER_PAGE + 1, (page - 1) * WORKS_PER_PAGE)).fetchall()
+        conn.close()
+        has_more = len(tws) > WORKS_PER_PAGE
+        works = []
+        if tws:
+            from .workpool import get_main_db
+            wconn = get_main_db()
+            wids = [tw['work_id'] for tw in tws[:WORKS_PER_PAGE]]
+            ph = ','.join('?' for _ in wids)
+            rows = wconn.execute(
+                "SELECT id, title, author, thumbnail, view_count, like_count, comment_count, created_at "
+                "FROM works WHERE id IN (%s) AND status = 'active' AND is_hidden = 0" % ph, wids).fetchall()
+            wconn.close()
+            workmap = {r['id']: dict(r) for r in rows}
+            works = [dict(workmap[wid]) for wid in wids if wid in workmap]
+        html = _fragment('_works.html', works=works, is_admin=is_admin,
+                         me_username=session['user'])
+        return jsonify({'html': html, 'has_more': has_more})
+
+    @app.route('/team/<int:team_id>/posts/ajax')
+    def team_posts_ajax(team_id):
+        """团队详情：帖子分页"""
+        if 'user' not in session:
+            return jsonify({'html': '', 'has_more': False}), 401
+        page = max(request.args.get('page', 1, type=int), 1)
+        me = team_member(team_id, session['user'])
+        is_admin = bool(me) and me['role'] in ('owner', 'admin')
+        conn = get_team_db()
+        rows = conn.execute(
+            "SELECT * FROM team_post WHERE team_id = ? ORDER BY is_pin DESC, created_at DESC, id DESC LIMIT ? OFFSET ?",
+            (team_id, POSTS_PER_PAGE + 1, (page - 1) * POSTS_PER_PAGE)).fetchall()
+        conn.close()
+        has_more = len(rows) > POSTS_PER_PAGE
+        html = _fragment('_posts.html', posts=[dict(r) for r in rows[:POSTS_PER_PAGE]],
+                         is_admin=is_admin, me_username=session['user'])
+        return jsonify({'html': html, 'has_more': has_more})
+
+    @app.route('/team/<int:team_id>/invites/ajax')
+    def team_invites_sent_ajax(team_id):
+        """团队详情：已发邀请分页（管理员）"""
+        if 'user' not in session:
+            return jsonify({'html': '', 'has_more': False}), 401
+        page = max(request.args.get('page', 1, type=int), 1)
+        me = team_member(team_id, session['user'])
+        if not me or me['role'] not in ('owner', 'admin'):
+            return jsonify({'html': '', 'has_more': False}), 403
+        conn = get_team_db()
+        rows = conn.execute(
+            "SELECT * FROM team_invite WHERE team_id = ? AND status = 'pending' "
+            "ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+            (team_id, INVITES_PER_PAGE + 1, (page - 1) * INVITES_PER_PAGE)).fetchall()
+        conn.close()
+        has_more = len(rows) > INVITES_PER_PAGE
+        html = _fragment('_invites_sent.html', invites=[dict(r) for r in rows[:INVITES_PER_PAGE]])
+        return jsonify({'html': html, 'has_more': has_more})

@@ -1,0 +1,8 @@
+{% for iv in invites %}
+<div class="invite-item">
+    <span><i class="fa-solid fa-user"></i> <b>{{ iv.from_user }}</b></span>
+    <span class="mdui-text-color-blue-grey" style="font-size:12px">→ {{ iv.username }}</span>
+    <span style="font-size:12px;color:#999">{{ iv.created_at }}</span>
+    <span style="margin-left:auto"><a class="mdui-text-color-red" style="cursor:pointer;font-size:12px" onclick="cancelInvite({{ iv.id }})">撤销</a></span>
+</div>
+{% endfor %}

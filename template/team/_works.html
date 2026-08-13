@@ -1,0 +1,14 @@
+{% for w in works %}
+<div class="work-card" onclick="location.href='/workpool/{{ w.id }}'">
+    {% if is_admin or w.author == me_username %}
+    <button class="work-remove" title="移除" onclick="event.stopPropagation();removeWork({{ w.id }})"><i class="fa-solid fa-xmark"></i></button>
+    {% endif %}
+    <div class="work-thumb">
+        {% if w.thumbnail %}<img src="/mk/kn/uploads/{{ w.thumbnail }}" alt="thumb">{% else %}<div class="placeholder"><i class="fa-solid fa-image"></i></div>{% endif %}
+    </div>
+    <div class="work-info">
+        <div class="work-title">{{ w.title|e }}</div>
+        <div class="work-meta">{{ w.author|e }} · {{ w.view_count }} 浏览</div>
+    </div>
+</div>
+{% endfor %}

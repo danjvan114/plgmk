@@ -1,0 +1,11 @@
+{% for iv in invites %}
+<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0">
+    <div class="mdui-avatar" style="background:#fff3e0;color:#e65100;width:36px;height:36px;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-building"></i></div>
+    <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:600;color:#333"><a href="/team/{{ iv.team_id }}" class="mdui-text-color-blue">{{ iv.team_name }}</a></div>
+        <div style="font-size:12px;color:#999">来自 {{ iv.from_user }} · {{ iv.created_at }}</div>
+    </div>
+    <button class="mdui-btn mdui-btn-raised mdui-btn-dense" style="padding:4px 14px;font-size:12px" onclick="acceptInvite({{ iv.id }})">接受</button>
+    <button class="mdui-btn mdui-btn-dense" style="background:#eee;color:#666;font-size:12px" onclick="rejectInvite({{ iv.id }})">拒绝</button>
+</div>
+{% endfor %}
