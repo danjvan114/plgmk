@@ -259,8 +259,40 @@
             })
             .then(function(r){ return r.json(); })
             .then(function(data){
-                if (data.success) { location.reload(); } else { alert(data.message); }
+                if (data.success) {
+                    document.getElementById('reply-content').value = '';
+                    var mainBox = document.querySelector('.main-box');
+                    var pagination = mainBox.querySelector('.pagination');
+                    var replyBox = document.querySelector('.reply-box');
+                    var floorHTML = '<div class="floor" id="floor-' + data.reply.id + '" style="animation:cardSlideUp .3s ease">' +
+                        '<div class="floor-head">' +
+                        '<div class="floor-user">' +
+                        '<span class="floor-no">' + data.floor_no + '楼</span>' +
+                        '<a href="/u/' + data.reply.username + '">' + data.reply.username + '</a>' +
+                        '</div>' +
+                        '<div class="floor-ops">' +
+                        '<span class="floor-time">' + data.reply.created_at + '</span>' +
+                        '<a onclick="replyPrompt(' + data.reply.id + ')"><i class="fa-solid fa-reply"></i> 回复</a>' +
+                        '<a class="danger" onclick="deleteReply(' + data.reply.id + ')"><i class="fa-solid fa-trash-can"></i> 删除</a>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="floor-content">' + data.reply.content + '</div>' +
+                        '</div>';
+                    if (pagination) {
+                        mainBox.insertBefore(createElementFromHTML(floorHTML), pagination);
+                    } else if (replyBox) {
+                        mainBox.insertBefore(createElementFromHTML(floorHTML), replyBox);
+                    } else {
+                        mainBox.insertAdjacentHTML('beforeend', floorHTML);
+                    }
+                } else { alert(data.message); }
             });
+        }
+
+        function createElementFromHTML(html) {
+            var div = document.createElement('div');
+            div.innerHTML = html.trim();
+            return div.firstChild;
         }
 
         function replyPrompt(floorId) {
@@ -274,7 +306,25 @@
             })
             .then(function(r){ return r.json(); })
             .then(function(data){
-                if (data.success) { location.reload(); } else { alert(data.message); }
+                if (data.success) {
+                    var floorEl = document.getElementById('floor-' + floorId);
+                    if (floorEl) {
+                        var replyHTML = '<div class="reply-item" style="animation:cardSlideUp .3s ease">' +
+                            '<div class="floor-head">' +
+                            '<div class="floor-user">' +
+                            '<a href="/u/' + data.reply.username + '" style="font-size:13px;font-weight:500">' + data.reply.username + '</a>' +
+                            '</div>' +
+                            '<div class="floor-ops">' +
+                            '<span class="floor-time">' + data.reply.created_at + '</span>' +
+                            '<a onclick="replyPrompt(' + floorId + ')"><i class="fa-solid fa-reply"></i> 回复</a>' +
+                            '<a class="danger" onclick="deleteReply(' + data.reply.id + ')"><i class="fa-solid fa-trash-can"></i> 删除</a>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="reply-content">' + data.reply.content + '</div>' +
+                            '</div>';
+                        floorEl.insertAdjacentHTML('beforeend', replyHTML);
+                    }
+                } else { alert(data.message); }
             });
         }
 
@@ -282,7 +332,14 @@
             if (!confirm('确定删除该楼层？')) return;
             fetch('/forum/reply/delete/' + replyId, { method: 'POST' })
                 .then(function(r){ return r.json(); })
-                .then(function(data){ alert(data.message); if (data.success) location.reload(); });
+                .then(function(data){
+                    if (data.success) {
+                        var el = document.getElementById('floor-' + replyId);
+                        if (el) el.remove();
+                    } else {
+                        alert(data.message);
+                    }
+                });
         }
 
         function pinReply(replyId) {

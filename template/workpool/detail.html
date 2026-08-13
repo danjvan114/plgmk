@@ -410,7 +410,31 @@
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    document.getElementById('comment-content').value = '';
+                    const commentCount = document.querySelector('.comments-title b, .comments-title');
+                    if (commentCount) {
+                        const text = commentCount.textContent;
+                        const match = text.match(/\d+/);
+                        if (match) commentCount.textContent = text.replace(match[0], parseInt(match[0]) + 1);
+                    }
+                    const commentsList = document.getElementById('comments-list');
+                    const noComment = commentsList.querySelector('p[style*="text-align:center"]');
+                    if (noComment) noComment.remove();
+                    const commentHTML = `
+                        <div class="comment-item" id="comment-${data.comment.id}" style="animation:commentSlideIn .3s ease">
+                            <div class="comment-header">
+                                <span class="comment-user">
+                                    <a href="/u/${data.comment.username}" style="color:#333;text-decoration:none">${data.comment.username}</a>
+                                </span>
+                                <span class="comment-time">${data.comment.created_at}
+                                    <a href="javascript:void(0)" class="comment-reply" onclick="replyComment(${workId}, ${data.comment.id})">回复</a>
+                                    <a href="javascript:void(0)" class="comment-op" onclick="deleteComment(${workId}, ${data.comment.id})">删除</a>
+                                    <a href="javascript:void(0)" class="comment-op" onclick="reportComment(${workId}, ${data.comment.id})">举报</a>
+                                </span>
+                            </div>
+                            <div class="comment-content">${data.comment.content}</div>
+                        </div>`;
+                    commentsList.insertAdjacentHTML('beforeend', commentHTML);
                 } else {
                     alert(data.message);
                 }
@@ -490,7 +514,26 @@
             })
             .then(r => r.json())
             .then(data => {
-                if (data.success) { location.reload(); } else { alert(data.message); }
+                if (data.success) {
+                    const commentItem = document.getElementById('comment-' + commentId);
+                    if (commentItem) {
+                        const replyHTML = `
+                            <div class="reply-item" style="animation:commentSlideIn .3s ease">
+                                <div class="comment-header">
+                                    <span class="comment-user"><a href="/u/${data.comment.username}" style="color:#666;text-decoration:none">${data.comment.username}</a></span>
+                                    <span class="comment-time">${data.comment.created_at}
+                                        <a href="javascript:void(0)" class="comment-reply" onclick="replyComment(${workId}, ${commentId})">回复</a>
+                                        <a href="javascript:void(0)" class="comment-op" onclick="deleteComment(${workId}, ${data.comment.id})">删除</a>
+                                        <a href="javascript:void(0)" class="comment-op" onclick="reportComment(${workId}, ${data.comment.id})">举报</a>
+                                    </span>
+                                </div>
+                                <div class="comment-content">${data.comment.content}</div>
+                            </div>`;
+                        commentItem.insertAdjacentHTML('beforeend', replyHTML);
+                    }
+                } else {
+                    alert(data.message);
+                }
             });
         }
 
@@ -499,7 +542,12 @@
             fetch('/workpool/comment/delete/' + workId + '/' + commentId, { method: 'POST' })
                 .then(r => r.json())
                 .then(data => {
-                    if (data.success) { location.reload(); } else { alert(data.message); }
+                    if (data.success) {
+                        const el = document.getElementById('comment-' + commentId);
+                        if (el) el.remove();
+                    } else {
+                        alert(data.message);
+                    }
                 });
         }
 
@@ -507,7 +555,11 @@
             fetch('/workpool/comment/pin/' + workId + '/' + commentId, { method: 'POST' })
                 .then(r => r.json())
                 .then(data => {
-                    if (data.success) { location.reload(); } else { alert(data.message); }
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
                 });
         }
 
