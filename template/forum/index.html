@@ -252,6 +252,17 @@
                     </div>
                 </div>
             </div>
+            {% if users and users.get(session.user, {}).get('role') == 'admin' %}
+            <div class="right-card">
+                <div class="hd">管理</div>
+                <div class="bd">
+                    <div class="my-opt">
+                        <a href="/forum/admin/boards" style="flex:1">板块管理</a>
+                        <a href="/forum/review" style="flex:1">审核工作台</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             {% endif %}
         </div>
     </div>

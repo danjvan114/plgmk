@@ -41,7 +41,8 @@ def init_forum_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name VARCHAR(100) NOT NULL,
         description TEXT DEFAULT '',
-        sort INTEGER DEFAULT 0
+        sort INTEGER DEFAULT 0,
+        admin_only INTEGER DEFAULT 0
     )
     """)
     cursor.execute("""
@@ -84,6 +85,10 @@ def init_forum_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+    try:
+        cursor.execute("ALTER TABLE forums ADD COLUMN admin_only INTEGER DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
     cursor.execute("SELECT COUNT(*) FROM forums")
     if cursor.fetchone()[0] == 0:
         default_forums = [('公告区', '官方公告与站务通知', 0),
@@ -1285,7 +1290,10 @@ def register_workpool_routes():
         if 'user' not in session:
             return redirect('/login')
         conn = get_forum_db()
-        forums = [dict(r) for r in conn.execute("SELECT * FROM forums ORDER BY sort ASC").fetchall()]
+        if is_admin_user(session.get('user', '')):
+            forums = [dict(r) for r in conn.execute("SELECT * FROM forums ORDER BY sort ASC").fetchall()]
+        else:
+            forums = [dict(r) for r in conn.execute("SELECT * FROM forums WHERE admin_only = 0 ORDER BY sort ASC").fetchall()]
         if request.method == 'POST':
             data = request.get_json() or {}
             forum_id = int(data.get('forum_id') or 0)
@@ -1297,6 +1305,13 @@ def register_workpool_routes():
             if len(title) > 80:
                 conn.close()
                 return jsonify({'success': False, 'message': '标题过长'}), 400
+            forum = conn.execute("SELECT admin_only FROM forums WHERE id = ?", (forum_id,)).fetchone()
+            if not forum:
+                conn.close()
+                return jsonify({'success': False, 'message': '目标板块不存在'}), 404
+            if forum['admin_only'] and not is_admin_user(session['user']):
+                conn.close()
+                return jsonify({'success': False, 'message': '本板块仅管理员发帖'}), 403
             conn.execute(
                 "INSERT INTO posts (forum_id, title, content, author, author_id) VALUES (?, ?, ?, ?, ?)",
                 (forum_id, title, content, session['user'], session['user']))
@@ -1466,3 +1481,71 @@ def register_workpool_routes():
         samples = [dict(r) for r in conn.execute("SELECT * FROM posts ORDER BY RANDOM() LIMIT 10").fetchall()]
         conn.close()
         return render_root_template('forum/review.html', reports=reports, pending=pending, samples=samples)
+
+    @app.route('/forum/admin/boards', methods=['GET', 'POST'])
+    def forum_admin_boards():
+        """版块管理：列表 + 新增（管理员）"""
+        if not is_admin_user(session.get('user', '')):
+            return redirect('/login')
+        conn = get_forum_db()
+        if request.method == 'POST':
+            name = (request.form.get('name') or '').strip()
+            desc = (request.form.get('description') or '').strip()
+            try:
+                sort = int(request.form.get('sort') or 0)
+            except ValueError:
+                sort = 0
+            admin_only = 1 if request.form.get('admin_only') else 0
+            if not name:
+                conn.close()
+                return render_root_template('forum/admin_boards.html', boards=[dict(r) for r in conn.execute("SELECT * FROM forums ORDER BY sort ASC, id ASC").fetchall()], error='请输入版块名称')
+            conn.execute("INSERT INTO forums (name, description, sort, admin_only) VALUES (?, ?, ?, ?)",
+                         (name, desc, sort, admin_only))
+            conn.commit()
+            conn.close()
+            return redirect('/forum/admin/boards')
+        boards = [dict(r) for r in conn.execute("SELECT * FROM forums ORDER BY sort ASC, id ASC").fetchall()]
+        conn.close()
+        return render_root_template('forum/admin_boards.html', boards=boards)
+
+    @app.route('/forum/admin/boards/edit/<int:board_id>', methods=['POST'])
+    def forum_admin_board_edit(board_id):
+        """编辑版块（管理员）"""
+        if not is_admin_user(session.get('user', '')):
+            return jsonify({'success': False, 'message': '无权限'}), 403
+        conn = get_forum_db()
+        forum = conn.execute("SELECT id FROM forums WHERE id = ?", (board_id,)).fetchone()
+        if not forum:
+            conn.close()
+            return jsonify({'success': False, 'message': '版块不存在'}), 404
+        name = (request.form.get('name') or '').strip()
+        desc = request.form.get('description') or ''
+        try:
+            sort = int(request.form.get('sort') or 0)
+        except ValueError:
+            sort = 0
+        admin_only = 1 if request.form.get('admin_only') else 0
+        conn.execute("UPDATE forums SET name = ?, description = ?, sort = ?, admin_only = ? WHERE id = ?",
+                     (name, desc, sort, admin_only, board_id))
+        conn.commit()
+        conn.close()
+        return redirect('/forum/admin/boards')
+
+    @app.route('/forum/admin/boards/delete/<int:board_id>', methods=['POST'])
+    def forum_admin_board_delete(board_id):
+        """删除版块：有帖子时禁止（管理员）"""
+        if not is_admin_user(session.get('user', '')):
+            return jsonify({'success': False, 'message': '无权限'}), 403
+        conn = get_forum_db()
+        forum = conn.execute("SELECT id FROM forums WHERE id = ?", (board_id,)).fetchone()
+        if not forum:
+            conn.close()
+            return jsonify({'success': False, 'message': '版块不存在'}), 404
+        cnt = conn.execute("SELECT COUNT(*) FROM posts WHERE forum_id = ?", (board_id,)).fetchone()[0]
+        if cnt:
+            conn.close()
+            return jsonify({'success': False, 'message': '该版块下面还有帖子，无法删除'}), 400
+        conn.execute("DELETE FROM forums WHERE id = ?", (board_id,))
+        conn.commit()
+        conn.close()
+        return redirect('/forum/admin/boards')
