@@ -1204,13 +1204,41 @@ def register_workpool_routes():
     # ---------- 论坛 ----------
     @app.route('/forum')
     def forum_index():
-        """论坛首页：分区 + 最新/最热帖子"""
+        """论坛首页：分区 + 帖子列表（支持 tab 筛选、搜索、分页）"""
         conn = get_forum_db()
         forums = [dict(r) for r in conn.execute("SELECT * FROM forums ORDER BY sort ASC").fetchall()]
-        posts = [dict(r) for r in conn.execute(
-            "SELECT * FROM posts WHERE status = 'active' ORDER BY is_pinned DESC, created_at DESC LIMIT 30").fetchall()]
+        tab = request.args.get('tab', 'new')
+        q = request.args.get('q', '').strip()
+        page = max(int(request.args.get('page', 1)), 1)
+        per_page = 20
+        offset = (page - 1) * per_page
+        like = f'%{q}%'
+        base, qparams = "status = 'active'", []
+        order = 'is_pinned DESC, updated_at DESC'
+        if tab == 'pin':
+            base += ' AND is_pinned = 1'
+            order = 'is_pinned DESC, view_count DESC'
+        elif tab == 'help':
+            base += " AND (title LIKE ? OR content LIKE ?)"
+            qparams += [like, like]
+        if q and tab != 'help':
+            base += " AND (title LIKE ? OR content LIKE ?)"
+            qparams += [like, like]
+        total_posts = conn.execute(f"SELECT COUNT(*) FROM posts WHERE {base}", qparams).fetchone()[0]
+        rows = conn.execute(
+            f"SELECT * FROM posts WHERE {base} ORDER BY {order} LIMIT ? OFFSET ?",
+            qparams + [per_page, offset]).fetchall()
+        posts = []
+        for r in rows:
+            d = dict(r)
+            txt = re.sub(r'(!?\[[^\]]*\]\([^)]*\))|([#>`*\-]\s?)|(\n+)', '', d.get('content') or '').strip()
+            d['preview'] = (txt[:120] + '…') if len(txt) > 120 else txt
+            posts.append(d)
         conn.close()
-        return render_root_template('forum/index.html', forums=forums, posts=posts)
+        total_pages = (total_posts + per_page - 1) // per_page or 1
+        return render_root_template('forum/index.html', forums=forums, posts=posts,
+                                    tab=tab, q=q, page=page, per_page=per_page,
+                                    total_posts=total_posts, total_pages=total_pages)
 
     @app.route('/forum/<int:forum_id>')
     def forum_section(forum_id):
