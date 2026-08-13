@@ -100,12 +100,7 @@
             <a href="/forum" style="background:#ffb300;color:#fff">论坛 <i class="fa-solid fa-comments"></i></a>
         </div>
         {% if all_tags %}
-        <div class="sort-bar" style="margin-top:-8px">
-            <a href="/workpool?sort={{ sort }}" class="tag-chip {% if not tag %}active{% endif %}">全部</a>
-            {% for t in all_tags %}
-            <a href="/workpool?sort={{ sort }}&tag={{ t|urlencode }}" class="tag-chip {% if tag == t %}active{% endif %}">{{ t }}</a>
-            {% endfor %}
-        </div>
+        
         {% endif %}
         <div class="grid">
             {% for work in works %}

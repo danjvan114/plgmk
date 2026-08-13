@@ -121,6 +121,12 @@
         .author-follow.following{background:#ef5350}
         .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
         .icon-btn{position:relative}
+        .pagination{display:flex;justify-content:center;gap:8px;margin-top:24px}
+        .pagination a,.pagination span{padding:8px 16px;border-radius:4px;text-decoration:none;font-size:14px;transition:all .2s}
+        .pagination a{background:rgba(255,255,255,.9);color:#4caf50}
+        .pagination a:hover{background:#4caf50;color:#fff}
+        .pagination .current{background:#4caf50;color:#fff}
+        .pagination .disabled{background:rgba(255,255,255,.5);color:#999;cursor:not-allowed}
     </style>
 </head>
 <body>
@@ -276,6 +282,29 @@
                         {% endif %}
                     </div>
                 </div>
+                {% if total_comment_pages and total_comment_pages > 1 %}
+                <div class="pagination">
+                    {% if c_page > 1 %}
+                    <a href="/workpool/{{ work.id }}?page={{ c_page - 1 }}">上一页</a>
+                    {% else %}
+                    <span class="disabled">上一页</span>
+                    {% endif %}
+                    {% for pg in range(1, total_comment_pages + 1) %}
+                    {% if pg == c_page %}
+                    <span class="current">{{ pg }}</span>
+                    {% elif pg == 1 or pg == total_comment_pages or (pg >= c_page - 2 and pg <= c_page + 2) %}
+                    <a href="/workpool/{{ work.id }}?page={{ pg }}">{{ pg }}</a>
+                    {% elif pg == c_page - 3 or pg == c_page + 3 %}
+                    <span>...</span>
+                    {% endif %}
+                    {% endfor %}
+                    {% if c_page < total_comment_pages %}
+                    <a href="/workpool/{{ work.id }}?page={{ c_page + 1 }}">下一页</a>
+                    {% else %}
+                    <span class="disabled">下一页</span>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
             <div class="side-col">
                 <div class="author-card">

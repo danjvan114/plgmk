@@ -521,15 +521,25 @@ def register_workpool_routes():
                 work['file_type'] = work_info['file_type'] if 'file_type' in work_info.keys() else 'player'
                 work['coin_count'] = work_info['coin_count'] if 'coin_count' in work_info.keys() else 0
 
-            # 获取评论（置顶在前，按时间倒序），并组织成树
-            w_cursor.execute("SELECT * FROM comments ORDER BY is_pinned DESC, created_at DESC LIMIT 200")
-            comment_rows = [dict(row) for row in w_cursor.fetchall()]
-            comments = [c for c in comment_rows if not c.get('parent_id')]
+            # 获取评论（置顶在前，分页加载），仅加载当前页主评论的二级回复
+            c_page = max(int(request.args.get('page', 1)), 1)
+            c_per_page = 20
+            c_offset = (c_page - 1) * c_per_page
+            c_total = w_cursor.execute("SELECT COUNT(*) FROM comments WHERE parent_id = 0 AND is_deleted = 0").fetchone()[0]
+            w_cursor.execute(
+                "SELECT * FROM comments WHERE parent_id = 0 AND is_deleted = 0 ORDER BY is_pinned DESC, created_at DESC LIMIT ? OFFSET ?",
+                (c_per_page, c_offset))
+            comments = [dict(row) for row in w_cursor.fetchall()]
+            comment_rows = []
+            if comments:
+                ids = ",".join("?" for _ in comments)
+                w_cursor.execute(
+                    f"SELECT * FROM comments WHERE parent_id IN ({ids}) AND is_deleted = 0 ORDER BY created_at ASC",
+                    [c['id'] for c in comments])
+                comment_rows = [dict(row) for row in w_cursor.fetchall()]
             replies_map = {}
             for c in comment_rows:
-                pid = c.get('parent_id')
-                if pid:
-                    replies_map.setdefault(pid, []).append(c)
+                replies_map.setdefault(c.get('parent_id'), []).append(c)
 
             # 检查用户是否已点赞/收藏/投币/关注作者
             user_liked = False
@@ -551,6 +561,9 @@ def register_workpool_routes():
             user_liked = False
             user_faved = False
             user_coined = False
+            c_page = 1
+            c_per_page = 20
+            c_total = 0
 
         if 'user' in session and session['user'] != work['author']:
             fconn = get_main_db()
@@ -566,7 +579,11 @@ def register_workpool_routes():
                                     user_liked=user_liked,
                                     user_faved=user_faved,
                                     user_coined=user_coined,
-                                    user_follows_author=user_follows_author)
+                                    user_follows_author=user_follows_author,
+                                    c_page=c_page,
+                                    c_per_page=c_per_page,
+                                    total_comments=c_total,
+                                    total_comment_pages=(c_total + c_per_page - 1) // c_per_page or 1)
 
     @app.route('/workpool/like/<int:work_id>', methods=['POST'])
     def workpool_like(work_id):
@@ -1279,18 +1296,30 @@ def register_workpool_routes():
         post['content_html'] = render_markdown_safe(post['content'])
         conn.execute("UPDATE posts SET view_count = view_count + 1 WHERE id = ?", (post_id,))
         conn.commit()
-        responses = [dict(r) for r in conn.execute(
-            "SELECT * FROM responses WHERE post_id = ? AND status = 'active' ORDER BY is_pinned DESC, created_at ASC",
-            (post_id,)).fetchall()]
+        r_page = max(int(request.args.get('page', 1)), 1)
+        r_per_page = 20
+        r_offset = (r_page - 1) * r_per_page
+        r_total = conn.execute(
+            "SELECT COUNT(*) FROM responses WHERE post_id = ? AND parent_id = 0 AND status = 'active'",
+            (post_id,)).fetchone()[0]
+        top = [dict(r) for r in conn.execute(
+            "SELECT * FROM responses WHERE post_id = ? AND parent_id = 0 AND status = 'active' ORDER BY is_pinned DESC, created_at ASC LIMIT ? OFFSET ?",
+            (post_id, r_per_page, r_offset)).fetchall()]
+        replies_map = {}
+        if top:
+            ids = ",".join("?" for _ in top)
+            children = conn.execute(
+                f"SELECT * FROM responses WHERE post_id = ? AND parent_id IN ({ids}) AND status = 'active' ORDER BY created_at ASC",
+                [post_id] + [t['id'] for t in top]).fetchall()
+            for r in children:
+                replies_map.setdefault(dict(r).get('parent_id'), []).append(dict(r))
         forum = conn.execute("SELECT * FROM forums WHERE id = ?", (post['forum_id'],)).fetchone()
         conn.close()
-        replies_map = {}
-        for r in responses:
-            if r.get('parent_id'):
-                replies_map.setdefault(r['parent_id'], []).append(r)
-        top = [r for r in responses if not r.get('parent_id')]
+        r_total_pages = (r_total + r_per_page - 1) // r_per_page or 1
         return render_root_template('forum/post.html', post=post, forum=dict(forum) if forum else None,
-                                     top_responses=top, replies_map=replies_map)
+                                     top_responses=top, replies_map=replies_map,
+                                     page=r_page, per_page=r_per_page,
+                                     total_replies=r_total, total_reply_pages=r_total_pages)
 
     @app.route('/forum/new', methods=['GET', 'POST'])
     def forum_new():

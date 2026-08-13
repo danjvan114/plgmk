@@ -106,6 +106,12 @@
         .submit-btn:hover{background:#1976d2;box-shadow:0 4px 12px rgba(33,150,243,.3)}
         .submit-btn:active{transform:scale(.95)}
         .empty{text-align:center;color:#999;padding:30px 0;font-size:14px}
+        .pagination{display:flex;justify-content:center;gap:6px;margin-top:18px;flex-wrap:wrap}
+        .pagination a,.pagination span{padding:7px 14px;border-radius:4px;text-decoration:none;font-size:13px;transition:all .2s}
+        .pagination a{background:#fff;color:#2196f3;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+        .pagination a:hover{background:#2196f3;color:#fff}
+        .pagination .current{background:#2196f3;color:#fff}
+        .pagination .disabled{color:#bbb;cursor:not-allowed}
     </style>
 </head>
 <body>
@@ -154,7 +160,7 @@
         <div class="floor" id="floor-{{ r.id }}">
             <div class="floor-head">
                 <div class="floor-user">
-                    <span class="floor-no">{{ loop.index }}楼</span>
+                    <span class="floor-no">{{ loop.index + (page - 1) * per_page }}楼</span>
                     <a href="/u/{{ r.username|e }}">{{ r.username|e }}</a>
                     {% if r.is_pinned %}<span class="floor-pin"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}
                 </div>
@@ -199,6 +205,29 @@
         {% endfor %}
         {% if top_responses|length == 0 %}
         <div class="floor"><p class="empty">暂无跟帖，来抢沙发！</p></div>
+        {% endif %}
+        {% if total_reply_pages and total_reply_pages > 1 %}
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="?page={{ page - 1 }}#comments">上一页</a>
+            {% else %}
+            <span class="disabled">上一页</span>
+            {% endif %}
+            {% for pg in range(1, total_reply_pages + 1) %}
+            {% if pg == page %}
+            <span class="current">{{ pg }}</span>
+            {% elif pg == 1 or pg == total_reply_pages or (pg >= page - 2 and pg <= page + 2) %}
+            <a href="?page={{ pg }}#comments">{{ pg }}</a>
+            {% elif pg == page - 3 or pg == page + 3 %}
+            <span>...</span>
+            {% endif %}
+            {% endfor %}
+            {% if page < total_reply_pages %}
+            <a href="?page={{ page + 1 }}#comments">下一页</a>
+            {% else %}
+            <span class="disabled">下一页</span>
+            {% endif %}
+        </div>
         {% endif %}
         {% if session.user %}
         <div class="reply-box">
