@@ -185,6 +185,25 @@ body.dark-mode .lang-pop { background:rgba(22,26,45,.86); }
 .lang-item.cur::after { content:"\2713"; float:right; font-weight:800; }
 .lang-item.popped { animation:langPop .32s cubic-bezier(.34,1.56,.64,1); }
 @keyframes langPop { 0% { transform:scale(1); } 45% { transform:scale(1.08); } 70% { transform:scale(.96); } 100% { transform:scale(1); } }
+.look-pop, .qr-pop { position:fixed; top:0; right:0; z-index:1300; padding:10px; border-radius:20px; background:rgba(255,255,255,.46); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(10px) scale(.95); pointer-events:none; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1); transform-origin:top right; }
+.look-pop { min-width:214px; }
+.look-pop.show, .qr-pop.show { opacity:1; transform:none; pointer-events:auto; }
+body.dark-mode .look-pop, body.dark-mode .qr-pop { background:rgba(22,26,45,.86); }
+.look-sep { height:1px; background:var(--glass-hi-bot); margin:6px 4px; }
+.look-perf { display:flex; align-items:center; gap:8px; width:100%; padding:9px 12px; border:none; background:transparent; color:var(--text-2); font-size:13.5px; font-weight:600; font-family:inherit; cursor:pointer; border-radius:14px; transition:background .25s,color .25s; }
+.look-perf-main { display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left; }
+.look-perf-main small { font-size:10.5px; font-weight:500; color:var(--text-3); }
+.look-perf:hover { background:var(--glass-tint); color:var(--accent-1); }
+.look-perf.on { color:var(--accent-1); }
+.qr-pop { width:204px; padding:12px; }
+.qr-tabs { display:flex; gap:6px; margin-bottom:10px; }
+.qr-tab { flex:1; padding:6px 4px; border:none; border-radius:10px; background:var(--glass-tint); color:var(--text-2); font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; transition:background .25s,color .25s; }
+.qr-tab.active { background:var(--glass-tint-2); color:var(--accent-1); }
+.qr-tab:hover { transform:translateY(-1px); }
+.qr-tab { transition:background .25s,color .25s,transform .4s cubic-bezier(.34,1.56,.64,1); }
+.qr-imgs { position:relative; height:172px; margin-top:4px; }
+.qr-img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; border-radius:12px; opacity:0; transform:scale(.88); transition:opacity .35s ease,transform .5s cubic-bezier(.34,1.56,.64,1); background:rgba(255,255,255,.4); }
+.qr-img.show { opacity:1; transform:scale(1); }
 .m-pop { position:fixed; top:0; right:0; width:188px; z-index:1300; padding:12px; border-radius:18px; background:rgba(255,255,255,.46); backdrop-filter:blur(36px) saturate(200%); -webkit-backdrop-filter:blur(36px) saturate(200%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:0; transform:translateY(8px) scale(.92); pointer-events:none; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1); z-index:50; text-align:center; }
 body.dark-mode .m-pop { background:rgba(22,26,45,.86); }
 .m-pop.show { opacity:1; transform:none; pointer-events:auto; }
@@ -213,7 +232,7 @@ body.lite-mode header, body.lite-mode .card, body.lite-mode .term, body.lite-mod
 body.lite-mode .badge-btn, body.lite-mode .ft-tab, body.lite-mode .stack-card, body.lite-mode .feat-panel,
 body.lite-mode .ext-inner, body.lite-mode .stats-card, body.lite-mode .download-card, body.lite-mode .theme-pop,
 body.lite-mode .qq-pop, body.lite-mode .perf-pop, body.lite-mode .lang-pop, body.lite-mode .perf-tip, body.lite-mode .carousel-nav,
-body.lite-mode .chip, body.lite-mode .m-chip, body.lite-mode .toast, body.lite-mode .st-clock, body.lite-mode .nav-links a {
+body.lite-mode .chip, body.lite-mode .m-chip, body.lite-mode .toast, body.lite-mode .st-clock, body.lite-mode .nav-links a, body.lite-mode .look-pop, body.lite-mode .qr-pop, body.lite-mode .look-perf, body.lite-mode .qr-tab {
   background-color:var(--solid-glass) !important;
 }
 /* 节能模式:取消按钮/导航/卡片的悬浮位移(开头卡片 #termBox 保留) */
@@ -221,12 +240,45 @@ body.lite-mode .btn, body.lite-mode .card:not(#termBox), body.lite-mode .card:no
 body.lite-mode .btn, body.lite-mode .icon-btn, body.lite-mode .ft-tab, body.lite-mode .tp-item, body.lite-mode .badge-btn, body.lite-mode .carousel-nav, body.lite-mode .ext-install, body.lite-mode .pt-btn { transition:background .3s,color .3s,box-shadow .3s; }
 body.lite-mode .btn:hover, body.lite-mode .icon-btn:hover, body.lite-mode .ft-tab:hover, body.lite-mode .tp-item:hover, body.lite-mode .badge-btn:hover, body.lite-mode .ext-install:hover, body.lite-mode .pt-btn:hover,
 body.lite-mode .nav-links a:hover, body.lite-mode #backTop:hover, body.lite-mode .card:not(#termBox):hover { transform:none !important; }
-/* 节能模式:悬浮窗保留液态玻璃模糊(可读性优先) */
-body.lite-mode header, body.lite-mode .theme-pop, body.lite-mode .qq-pop, body.lite-mode .perf-pop, body.lite-mode .nav-more-pop, body.lite-mode .m-pop, body.lite-mode .lang-pop, body.lite-mode .card, body.lite-mode .term, body.lite-mode .st-col { backdrop-filter:blur(24px) saturate(170%) !important; -webkit-backdrop-filter:blur(24px) saturate(170%) !important; }
+
 /* 节能模式:切页箭头保持垂直居中,不掉落 */
 body.lite-mode .carousel-nav, body.lite-mode .carousel-nav:hover, body.lite-mode .carousel-nav:active { transform:translateY(-50%) !important; }
 body.lite-mode .stack-card, body.lite-mode .feat-panel { transform:perspective(900px) rotateX(0) rotateY(0) translateY(var(--off,0px)) scale(var(--sc,1)) rotate(var(--rot,0deg)) !important; }
 
+/* ---------- 下载移动端 ---------- */
+.dl-mobile { margin-top:26px; text-align:center; }
+.dl-m-title { font-size:14px; font-weight:800; letter-spacing:2px; color:var(--text-3); margin-bottom:12px; }
+.dl-m-row { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+.dl-m-btn { display:inline-flex; align-items:center; gap:8px; padding:11px 24px; border-radius:30px; border:none; cursor:pointer; font-size:13.5px; font-weight:700; color:var(--text-2); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); text-decoration:none; font-family:inherit; transition:transform .45s cubic-bezier(.34,1.56,.64,1),background .3s,color .3s; }
+.dl-m-btn:hover { transform:translateY(-3px) scale(1.04); color:var(--accent-1); background:var(--glass-tint-2); }
+.dl-m-btn.soon:hover { color:var(--text-2); background:var(--glass-tint); }
+/* ---------- 友情链接 ---------- */
+.fl-row { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
+.fl-link { display:inline-flex; align-items:center; gap:9px; padding:11px 22px; border-radius:30px; background:var(--glass-tint); color:var(--text-2); font-weight:700; font-size:14px; text-decoration:none; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); transition:transform .45s cubic-bezier(.34,1.56,.64,1),background .3s,color .3s; }
+.fl-link:hover { transform:translateY(-3px) scale(1.05); color:var(--accent-1); background:var(--glass-tint-2); }
+.fl-ico { display:flex; }
+/* ---------- 制作团队(水平滑移堆叠) ---------- */
+.cr-show { position:relative; max-width:900px; margin:0 auto; }
+.cr-stage { position:relative; height:350px; }
+.cr-card { position:absolute; left:0; right:0; top:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:34px 40px; border-radius:28px; background:var(--glass-card); backdrop-filter:blur(16px) saturate(160%); -webkit-backdrop-filter:blur(16px) saturate(160%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:.45; transform:perspective(1000px) translateX(var(--cr-x,0px)) rotate(var(--cr-r,0deg)) scale(var(--cr-s,1)); transform-origin:50% 100%; pointer-events:none; transition:transform .65s cubic-bezier(.34,1.56,.64,1),opacity .45s; }
+.cr-card.cur { opacity:1; z-index:10; pointer-events:auto; background:rgba(255,255,255,.30); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); }
+body.dark-mode .cr-card.cur { background:rgba(255,255,255,.10); }
+.cr-ava { width:86px; height:86px; border-radius:50%; object-fit:cover; margin-bottom:14px; box-shadow:0 10px 26px var(--accent-glow); }
+.cr-card h3 { font-size:21px; margin-bottom:2px; }
+.cr-role { font-size:13px; font-weight:800; color:var(--accent-1); margin-bottom:12px; letter-spacing:.5px; }
+.cr-card p { font-size:14px; line-height:1.75; color:var(--text-3); max-width:520px; }
+.cr-tabs { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:26px; }
+.cr-tab { padding:8px 18px; border-radius:24px; border:none; cursor:pointer; background:var(--glass-tint); color:var(--text-2); font-size:13px; font-weight:700; font-family:inherit; transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .25s,color .25s; }
+.cr-tab:hover { transform:translateY(-2px) scale(1.05); }
+.cr-tab.active { background:var(--glass-tint-2); color:var(--accent-1); box-shadow:inset 0 1px 0 var(--glass-hi-top); }
+#crShow .carousel-nav { z-index:50; }
+@media (max-width:720px) {
+  .cr-stage { height:400px; }
+  .cr-card { padding:24px 18px; }
+  .cr-ava { width:70px; height:70px; }
+  .fl-row { gap:10px; }
+  .fl-link { padding:9px 16px; font-size:13px; }
+}
 /* 主题切换层 */
 .theme-fade { position:fixed; inset:0; z-index:2000; pointer-events:none; opacity:0; background:radial-gradient(circle at 50% 45%,transparent 30%,rgba(255,255,255,.5) 100%); transition:opacity .4s ease; }
 .burst-layer { position:fixed; inset:0; z-index:2100; pointer-events:none; overflow:hidden; }
@@ -256,7 +308,7 @@ header.scrolled { background:var(--glass-card); }
 .nav-more-pop { position:absolute; top:calc(100% + 14px); right:0; min-width:220px; padding:8px; border-radius:18px; background:rgba(255,255,255,.72); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(10px) scale(.95); pointer-events:none; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1); z-index:60; transform-origin:top right; display:grid; grid-template-columns:1fr 1fr; gap:4px; }
 .nav-more.open .nav-more-pop { opacity:1; transform:none; pointer-events:auto; }
 .nav-more-title { display:none; }
-.nav-more-pop a { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; color:var(--text-2); font-size:13.5px; font-weight:600; text-decoration:none; opacity:0; transform:translateX(8px); transition:opacity .4s,transform .5s cubic-bezier(.34,1.56,.64,1),background .25s,color .25s; }
+.nav-more-pop a { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; color:var(--text-2); font-size:13.5px; font-weight:600; text-decoration:none; opacity:0; transform:translateX(8px); transition:opacity .35s ease,transform .45s cubic-bezier(.34,1.56,.64,1),background .25s,color .25s; }
 .nav-more.open .nav-more-pop a { opacity:1; transform:none; }
 .nav-more.open .nav-more-pop a:nth-child(2) { transition-delay:.05s; }
 .nav-more.open .nav-more-pop a:nth-child(3) { transition-delay:.1s; }
@@ -445,11 +497,11 @@ body.theme-amber .feature-icon { color:#241505; box-shadow:inset 0 1px 0 var(--g
 .ext-install:hover { background:var(--glass-tint-2); transform:translateY(-2px); }
 
 /* ---------- 统计(大标题 + 三列) ---------- */
-.stats-card { position:relative; padding:34px 40px 36px; }
+.stats-card { position:relative; padding:34px 40px 52px; }
 .st-nav-btn { display:flex; position:absolute; top:50%; transform:translateY(-50%); z-index:30; }
-#stPrev { left:-14px; }
-#stNext { right:-14px; }
-.st-dots { display:flex; position:absolute; bottom:-30px; left:50%; transform:translateX(-50%); z-index:30; }
+#stPrev { left:-48px; z-index:60; }
+#stNext { right:-48px; z-index:60; }
+.st-dots { position:static; margin:16px auto 0; transform:none; }
 .st-head { display:flex; align-items:baseline; gap:12px; margin-bottom:28px; }
 .st-title { font-size:26px; font-weight:800; }
 .st-sub { font-size:14px; color:var(--text-3); }
@@ -498,7 +550,7 @@ body.theme-amber .feature-icon { color:#241505; box-shadow:inset 0 1px 0 var(--g
 .stack-body p { color:var(--text-3); line-height:1.7; margin-bottom:14px; }
 .m-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
 .m-chip { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; padding:7px 14px; border-radius:30px; color:var(--text-2); background:var(--glass-card); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); }
-.m-progress { height:8px; border-radius:6px; margin-top:18px; background:rgba(120,126,160,.16); overflow:hidden; max-width:340px; }
+.m-progress { height:8px; border-radius:6px; margin-top:10px; background:rgba(120,126,160,.16); overflow:hidden; max-width:340px; }
 .m-progress i { display:block; height:100%; border-radius:6px; background:var(--grad-btn); width:0; transition:width 1.2s cubic-bezier(.22,.61,.36,1); }
 .stack-card.top .m-progress i { width:var(--w,100%); }
 .stack-wrap .carousel-nav.prev { left:-60px; }
@@ -516,6 +568,7 @@ body.theme-amber .feature-icon { color:#241505; box-shadow:inset 0 1px 0 var(--g
 .dl-col small { color:var(--text-3); font-size:13px; }
 .dl-go { display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:9px 22px; border-radius:30px; border:none; font-size:13.5px; font-weight:700; color:var(--accent-1); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .3s; }
 .dl-col:hover .dl-go { background:var(--glass-tint-2); transform:translateY(-2px); }
+.dl-go:hover { transform:translateY(-3px) scale(1.06); background:var(--glass-tint-2); box-shadow:0 8px 18px var(--accent-glow); }
 
 /* footer */
 footer { text-align:center; padding:40px 20px 46px; color:var(--text-3); margin-top:60px; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-top:1px solid var(--glass-hi-bot); }
@@ -529,10 +582,10 @@ footer { text-align:center; padding:40px 20px 46px; color:var(--text-3); margin-
 #backTop:hover { transform:translateY(-6px) scale(1.14); background:var(--glass-tint); color:var(--accent-1); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), var(--shadow-hover); }
 
 /* 滚动入场 */
-.reveal { opacity:.25; transform:translateY(46px); transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .8s cubic-bezier(.22,.61,.36,1); }
+.reveal { opacity:0; transform:translateY(46px); transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .8s cubic-bezier(.22,.61,.36,1); }
 .reveal.in { opacity:1; transform:none; }
-.card.reveal { opacity:.25; transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(calc(var(--ty,0px) + 46px)); transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .5s,background .5s; }
-.card.reveal.in { opacity:1; transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)); }
+.card.reveal { opacity:0; background:rgba(255,255,255,0); transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(calc(var(--ty,0px) + 46px)); transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .5s,background .5s; }
+.card.reveal.in { opacity:1; background:var(--glass-card); transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)); }
 
 /* ---------- 加载界面(与切换动画同款:大 logo + 光点) ---------- */
 .intro { position:fixed; inset:0; z-index:3000; background:var(--bg-base); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px; transition:opacity .55s ease; }
@@ -555,7 +608,12 @@ body.theme-amber .step-badge, body.theme-ocean .step-badge { background:rgba(255
 body.theme-amber .m-chip, body.theme-ocean .m-chip { color:#e6e0d8; }
 /* 图片背景主题:文字全部改深色,不提供阴影 */
 body.theme-ocean .step-badge, body.theme-amber .step-badge { color:var(--text-1); background:var(--glass-tint); }
-body.theme-amber .m-chip, body.theme-ocean .m-chip { color:var(--text-2); }
+body.theme-amber .m-chip { color:#241505; }
+body.theme-amber .chip { color:#241505; }
+body.theme-amber .qr-tab, body.theme-amber .qr-tab.active { color:#241505; }
+body.theme-amber .look-perf, body.theme-amber .tp-item, body.theme-amber .tp-ico { color:#241505; }
+body.theme-amber .carousel-dots button.active { background:#241505; }
+body.theme-amber .slide-inner .chip { color:#241505; }
 
 /* ---------- 主题 Logo 实时切换(CSS 驱动,不依赖 JS) ---------- */
 body.theme-aurora .th-def, body.dark-mode .th-def { display:block; }
@@ -587,10 +645,10 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   header.menu-open .nav-links { display:grid; grid-template-columns:repeat(auto-fit,minmax(88px,auto)); gap:6px 8px; width:100%; padding:6px 2px 0; }
   header.menu-open .nav-links > a, header.menu-open .nav-more-pop a { justify-self:center; justify-content:center; text-align:center; padding:8px 16px; font-size:13px; border-radius:30px; }
   header.menu-open .nav-right { display:flex; width:100%; justify-content:center; padding:4px 0 6px; }
-  header.menu-open .nav-links, header.menu-open .nav-right { animation:fadeIn .45s ease both; }
-  header.closing .nav-links, header.closing .nav-right, header.closing .menu-title { animation:fadeOut .28s ease both; }
+  header.menu-open .nav-links, header.menu-open .nav-right { animation:fadeIn .5s ease both; }
+  header.closing .nav-links, header.closing .nav-right, header.closing .menu-title { animation:fadeOut .42s ease both; }
   @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-  @keyframes fadeOut { to { opacity:0; transform:translateY(-8px); } }
+  @keyframes fadeOut { to { opacity:0; transform:translateY(-14px); } }
   main { flex-direction:column; padding-top:120px; }
   .text-area { text-align:center; }
   .btns { justify-content:center; }
@@ -636,11 +694,13 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   .st-ring svg { width:76px; height:76px; }
   .st-sub-row span { font-size:12.5px; }
 
-  .st-col { position:absolute; left:0; right:0; top:0; bottom:0; opacity:.85; transform:perspective(1000px) translateY(var(--st-off,0px)) scale(var(--st-sc,1)) rotate(var(--st-rot,0deg)); transform-origin:50% 100%; pointer-events:none; transition:transform .65s cubic-bezier(.34,1.56,.64,1),opacity .4s; background:rgba(255,255,255,.32); backdrop-filter:blur(16px) saturate(160%); -webkit-backdrop-filter:blur(16px) saturate(160%); border-radius:22px; padding:16px; border:none !important; }
+  .st-col { position:absolute; left:0; right:0; top:0; bottom:0; opacity:.5; overflow:hidden;}
+.st-col.cur { opacity:1; pointer-events:auto; background:rgba(255,255,255,.30); backdrop-filter:blur(22px) saturate(170%) !important; -webkit-backdrop-filter:blur(22px) saturate(170%) !important; box-shadow:var(--shadow-hover); } transform:perspective(1000px) translateY(var(--st-off,0px)) scale(var(--st-sc,1)) rotate(var(--st-rot,0deg)); transform-origin:50% 100%; pointer-events:none; transition:transform .65s cubic-bezier(.34,1.56,.64,1),opacity .4s; background:rgba(255,255,255,.32); backdrop-filter:blur(16px) saturate(160%); -webkit-backdrop-filter:blur(16px) saturate(160%); border-radius:22px; padding:16px; border:none !important; }
 
   body.dark-mode .st-col { background:rgba(255,255,255,.10); }
   .stack { height:520px; }
   .stack-card { padding:20px 16px; }
+  .stack-wrap .carousel-dots { margin-top:6px; }
   .dl-big { width:54px; height:54px; }
   .dl-col { padding:30px 12px; }
   .ext-stage { height:350px; }
@@ -671,7 +731,13 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   .dl-col h4 { font-size:14px; }
   .dl-col small { font-size:9.5px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .dl-col .btn { font-size:10.5px; padding:7px 6px; width:100%; white-space:nowrap; ju
-  .dl-go { margin-top:6px; padding:6px 8px; font-size:11px; white-space:nowrap; }stify-content:center; }
+  .download-card { display:flex; flex-direction:column; gap:10px; padding:12px; }
+  .dl-col { flex-direction:row; align-items:center; gap:12px; padding:12px 14px; text-align:left; justify-content:flex-start; }
+  .dl-col .dl-big { width:34px; height:34px; margin:0; flex:none; }
+  .dl-col b { font-size:15px; }
+  .dl-col small { flex:1; font-size:10px; min-width:0; }
+  .dl-go { margin:0 0 0 auto; padding:7px 12px; font-size:11px; flex:none; }
+  .dl-col + .dl-col { border-left:none; border-top:1px solid var(--glass-hi-bot); }stify-content:center; }
   .dl-col .dl-badges { flex-wrap:wrap; justify-content:center; }
   .ext-foot { flex-wrap:wrap; gap:8px; }
   .intro-name { font-size:27px; }
@@ -737,26 +803,32 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
     </nav>
   </div>
   <div class="nav-right">
-    <div class="m-wrap">
+    <div class="m-wrap" style="display:none">
       <button class="icon-btn" id="mbtn" aria-label="移动端下载">
         <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>
       </button>
       
     </div>
-    <div class="perf-wrap">
+    <div class="perf-wrap" style="display:none">
       <button class="icon-btn" id="perfBtn" aria-label="节能模式" title="节能模式">
         <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg>
       </button>
       
     </div>
-    <button class="icon-btn" id="themeToggle" aria-label="切换主题">
+    <button class="icon-btn" id="themeToggle" aria-label="切换主题" style="display:none">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/><circle cx="7.5" cy="11.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="10.2" cy="7.6" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.8" cy="7.6" r="1.2" fill="currentColor" stroke="none"/></svg>
     </button>
     
-    <button class="icon-btn" id="qqBtn" aria-label="加入QQ群">
+    <button class="icon-btn" id="qqBtn" aria-label="加入QQ群" style="display:none">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H7l-4 3 1.3-4.7A8 8 0 1 1 21 12Z"/><path d="M9 10.3h6M9 13.7h4"/></svg>
     </button>
     
+    <button class="icon-btn" id="qrBtn" aria-label="二维码">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg>
+    </button>
+    <button class="icon-btn" id="lookBtn" aria-label="外观设置">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7.5 16.5 4h-1.2a2.8 2.8 0 0 1-6.6 0H7.5L4 7.5l2.6 2.2 1-1.1V20h8.8V8.6l1 1.1Z"/></svg>
+    </button>
     <div class="lang-wrap">
       <button class="icon-btn" id="langBtn" aria-label="切换语言">
         <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.4 3.8 5.2 3.8 8.5s-1.3 6.1-3.8 8.5c-2.5-2.4-3.8-5.2-3.8-8.5s1.3-6.1 3.8-8.5Z"/></svg>
@@ -1101,6 +1173,60 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
       </button>
     </div>
   </div>
+  <div class="dl-mobile reveal">
+    <div class="dl-m-title" data-i18n="dl_m_title">移动端下载</div>
+    <div class="dl-m-row">
+      <a class="dl-m-btn" href="https://github.com/danjvan114/knu/releases" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="dl_android">安卓 · 扫码下载</span></a>
+      <button class="dl-m-btn soon" type="button"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.7-1 2-1.4 3-1 1 .5 1.5 1.5 1.4 2.6-.9.4-2 .4-3 .3-.5-.7-.9-1.3-1.4-1.9Z"/><path d="M16.5 8.2c1.9 2 2.8 4.5 2.4 7.1-.5 3.3-2.8 5.7-6 5.7h-1.8c-3.2 0-5.5-2.4-6-5.7-.4-2.6.5-5.1 2.4-7.1.3-.3.7-.4 1.1-.3.8.2 1.6.2 2.4 0 .9-.2 1.8-.2 2.7 0 .8.2 1.7.2 2.4 0 .4-.1.8 0 1.1.3Z"/></svg><span data-i18n="dl_ios">iOS · 正在研发</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 友情链接 ===================== -->
+<section id="friends">
+  <h2 class="section-title reveal"><span data-i18n="fl_title">友情链接</span><span class="handwritten-title">friends</span></h2>
+  <div class="fl-row reveal">
+    <a class="fl-link" href="https://www.codemao.cn/" target="_blank" rel="noopener"><span class="fl-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.1 3.7 5.1 3.7 8.5s-1.3 6.4-3.7 8.5c-2.4-2.1-3.7-5.1-3.7-8.5s1.3-6.4 3.7-8.5Z"/></svg></span>点猫科技</a>
+    <a class="fl-link" href="https://code.pgrm.run/" target="_blank" rel="noopener"><span class="fl-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M4 10h16M10 4v16"/></svg></span>KNHX工作室</a>
+    <a class="fl-link" href="https://code.pgrm.run/app/ccvue" target="_blank" rel="noopener"><span class="fl-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></span>CatCode</a>
+  </div>
+</section>
+
+<!-- ===================== 制作团队 ===================== -->
+<section id="credits">
+  <h2 class="section-title reveal"><span data-i18n="cr_title">制作团队</span><span class="handwritten-title">credits</span></h2>
+  <div class="cr-show reveal" id="crShow">
+    <div class="cr-stage" id="crStage">
+      <div class="cr-card cur" data-c="0">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAlqfbtEqRjhfOBunI_HQH_leyt7nAACQCIAAvLa8VfkpwVQ7yU4Cz0E.jpg" alt="Starry">
+        <h3>Starry</h3><span class="cr-role">创始人 &amp; 核心开发</span>
+        <p>KNExpanse 项目发起人,构思产品整体框架,负责核心功能开发,决定项目后续更新方向。</p>
+      </div>
+      <div class="cr-card" data-c="1">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHApqfbt9tXvUV0ii7Ik54cseyIriAANCIgAC8trxV7_cQrV9GkgNPQQ.jpg" alt="danjvan114">
+        <h3>danjvan114</h3><span class="cr-role">前后端 + JS 开发</span>
+        <p>包揽前端页面、后端服务和数据库相关开发,搭建私有化云平台,保障云端功能稳定不掉线。</p>
+      </div>
+      <div class="cr-card" data-c="2">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAxqfbuGOe2o31A0Tfanha29bEw0QgACRCIAAvLa8VezI2dHK_oRyj0E.jpg" alt="Sleepforest">
+        <h3>Sleepforest</h3><span class="cr-role">UI 设计</span>
+        <p>大名鼎鼎的 Vibecoding 之神(bushi)!全权负责界面视觉与交互设计,敲定页面布局、动画效果,打造整套项目视觉风格。</p>
+      </div>
+      <div class="cr-card" data-c="3">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAtqfbt_PMPFSPAJm034HEsDijjozAACQyIAAvLa8VdlgZfTIXacAT0E.jpg" alt="Inventocode">
+        <h3>Inventocode</h3><span class="cr-role">特别感谢</span>
+        <p>开发过程中交流技术,提供思路与指导,给予项目支持。</p>
+      </div>
+    </div>
+    <button class="carousel-nav prev cr-nav" id="crPrev" aria-label="上一个"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
+    <button class="carousel-nav next cr-nav" id="crNext" aria-label="下一个"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button>
+    <div class="cr-tabs" id="crTabs">
+      <button class="cr-tab active" data-c="0">Starry</button>
+      <button class="cr-tab" data-c="1">danjvan114</button>
+      <button class="cr-tab" data-c="2">Sleepforest</button>
+      <button class="cr-tab" data-c="3">Inventocode</button>
+    </div>
+  </div>
 </section>
 
 <footer>
@@ -1121,7 +1247,7 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
 
 <div class="theme-pop" id="themePop">
       <button class="tp-item" data-i="0" style="--c:#8f96f9;--tint:rgba(139,148,247,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="m12 2.6 2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.3l-5.8 2.9 1.1-6.4L2.7 9.3l6.4-.9Z"/></svg></span><span data-i18n="theme_aurora">极光紫霞</span></button>
-      <button class="tp-item" data-i="1" style="--c:#4ade80;--tint:rgba(74,222,128,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 3C18 5 20 12 16 19 9 18 5 11 7 4 9 3 11 3 12 3Z"/></svg></span><span data-i18n="theme_ocean">深海琉璃</span></button>
+      <button class="tp-item" data-i="1" style="--c:#4ade80;--tint:rgba(74,222,128,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M7 3h10l5 7-10 11L2 10Z"/><path d="M2 10h20M7 3l5 7 5-7" stroke="rgba(255,255,255,.4)" stroke-width="1" fill="none" stroke-linejoin="round"/></svg></span><span data-i18n="theme_ocean">深海琉璃</span></button>
       <button class="tp-item" data-i="2" style="--c:#241505;--tint:rgba(251,146,60,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 3C18 5 20 12 16 19 9 18 5 11 7 4 9 3 11 3 12 3Z"/></svg></span><span data-i18n="theme_amber">琥珀暮光</span></button>
       <button class="tp-item" data-i="3" style="--c:#0b1020;--tint:rgba(11,16,32,.18)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2.5 14.2 9.8 21.5 12l-7.3 2.2L12 21.5 9.8 14.2 2.5 12l7.3-2.2Z"/></svg></span><span data-i18n="theme_dark">暗夜模式</span></button>
     </div>
@@ -1146,7 +1272,27 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
         <button class="lang-item" data-lang="ko">한국어</button>
         <button class="lang-item" data-lang="es">Español</button>
       </div>
-    <!-- 性能提示浮层 -->
+    <!-- 外观设置悬浮窗 -->
+<div class="look-pop" id="lookPop">
+  <button class="tp-item" data-i="0" style="--c:#8f96f9;--tint:rgba(139,148,247,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="m12 2.6 2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.3l-5.8 2.9 1.1-6.4L2.7 9.3l6.4-.9Z"/></svg></span><span data-i18n="theme_aurora">极光紫霞</span></button>
+  <button class="tp-item" data-i="1" style="--c:#4ade80;--tint:rgba(74,222,128,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M7 3h10l5 7-10 11L2 10Z"/><path d="M2 10h20M7 3l5 7 5-7" stroke="rgba(255,255,255,.4)" stroke-width="1" fill="none" stroke-linejoin="round"/></svg></span><span data-i18n="theme_ocean">深海琉璃</span></button>
+  <button class="tp-item" data-i="2" style="--c:#fb923c;--tint:rgba(251,146,60,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 3C18 5 20 12 16 19 9 18 5 11 7 4 9 3 11 3 12 3Z"/></svg></span><span data-i18n="theme_amber">琥珀暮光</span></button>
+  <button class="tp-item" data-i="3" style="--c:#0b1020;--tint:rgba(11,16,32,.12)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2.5 14.2 9.8 21.5 12l-7.3 2.2L12 21.5 9.8 14.2 2.5 12l7.3-2.2Z"/></svg></span><span data-i18n="theme_dark">暗夜模式</span></button>
+  <div class="look-sep"></div>
+  <button class="look-perf" id="lookPerf"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg><span class="look-perf-main"><span id="lookPerfState">节能模式 · 已关闭</span><small data-i18n="perf_desc">关闭特效 · 保留流畅基础体验</small></span></button>
+</div>
+<!-- 二维码悬浮窗(移动端下载 + QQ 群) -->
+<div class="qr-pop" id="qrPop">
+  <div class="qr-tabs">
+    <button class="qr-tab active" data-q="m"><span data-i18n="qr_tab_m">移动端下载</span></button>
+    <button class="qr-tab" data-q="q"><span data-i18n="qr_tab_q">QQ 群</span></button>
+  </div>
+  <div class="qr-imgs">
+  <img class="qr-img show" id="qrM" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZCd1qfEJzDF0wJ6vVFg3WQf-QeQIjNwACCyMAAkWI6FcCA6Hs1_s1CD0E.png" alt="移动端下载">
+  <img class="qr-img" id="qrQ" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mJqezETEdhmnMoucEwbiIyjhXm4bgACeioAAmsm2FcKDclIeIoVyz0E.png" alt="QQ 群">
+</div>
+</div>
+<!-- 性能提示浮层 -->
 <div class="perf-tip" id="perfTip">
   <span class="pt-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></span>
   <div class="pt-txt"><b><span data-i18n="perf_tip_t">检测到设备性能不足</span></b><span data-i18n="perf_tip_d">当前帧率较低,切换节能模式可让页面更流畅。</span></div>
@@ -1228,6 +1374,8 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   });
 
   /* ---------- 加载界面(与切换动画同款) ---------- */
+  var docsBtn = document.querySelector('[data-i18n="btn_docs"]');
+  if (docsBtn && docsBtn.parentElement) { docsBtn.parentElement.addEventListener('click', function () { window.open('https://code.pgrm.run/dev/kn/docs', '_blank'); }); }
   var intro = $('#intro');
   var introStarted = false;
   function startIntro() {
@@ -1435,6 +1583,7 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   /* ---------- 导航 ---------- */
   var header = $('#header');
   var hamburger = $('#hamburgerBtn');
+  $$('.nav-more-pop a').forEach(function (a) { a.addEventListener('click', function (e) { e.stopPropagation(); }); });
   $$('a[data-scroll]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var target = document.querySelector(this.getAttribute('href'));
@@ -1445,13 +1594,13 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   function closeMenu() {
     if (!header.classList.contains('menu-open')) return;
     header.classList.add('closing');
-    setTimeout(function () { header.style.height = '60px'; }, 240);
+    header.style.height = '60px';
     setTimeout(function () {
       header.classList.remove('menu-open');
       header.classList.remove('closing');
       header.style.height = '';
       hamburger.setAttribute('aria-expanded', 'false');
-    }, 640);
+    }, 460);
   }
   hamburger.addEventListener('click', function (e) {
     e.stopPropagation();
@@ -1690,9 +1839,24 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
     m_qq:{zh:'加入 QQ 群',en:'Join QQ Group',ja:'QQグループに参加',ko:'QQ 그룹 가입',es:'Unirse al grupo QQ',tw:'加入 QQ 群'},
     m_detail:{zh:'进入详细介绍页',en:'View Detailed Intro',ja:'詳細紹介ページへ',ko:'상세 소개 페이지로',es:'Ver introducción detallada',tw:'進入詳細介紹頁'},
     perf_badge:{zh:'▶ 运行中 · 120 FPS',en:'▶ Running · 120 FPS',ja:'▶ 実行中 · 120FPS',ko:'▶ 실행 중 · 120FPS',es:'▶ En ejecución · 120 FPS',tw:'▶ 运行中 · 120 FPS'},
+
     toast_coming:{zh:' 版正在研发中,敬请期待',en:' version is in development, stay tuned',ja:' 版は開発中です。お楽しみに',ko:' 버전은 개발 중입니다. 기대해 주세요',es:' versión en desarrollo, estad atentos',tw:' 版正在研發中,敬请期待'}
   };
   Object.keys(I18N_EXTRA).forEach(function (k) { I18N[k] = I18N_EXTRA[k]; });
+  var I18N_QR = {
+    qr_tab_m:{zh:'移动端下载',tw:'移動端下載',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil'},
+    qr_tab_q:{zh:'QQ 群',tw:'QQ 群',en:'QQ Group',ja:'QQグループ',ko:'QQ 그룹',es:'Grupo QQ'}
+  };
+  Object.keys(I18N_QR).forEach(function (k) { I18N[k] = I18N_QR[k]; });
+  var I18N_PAGE = {
+    dl_m_title:{zh:'移动端下载',tw:'移動端下載',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil'},
+    dl_android:{zh:'安卓 · 扫码下载',tw:'安卓 · 掃碼下載',en:'Android · Scan to Download',ja:'Android · QRでダウンロード',ko:'Android · QR로 다운로드',es:'Android · Escanea para descargar'},
+    dl_ios:{zh:'iOS · 正在研发',tw:'iOS · 正在研發',en:'iOS · In Development',ja:'iOS · 開発中',ko:'iOS · 개발 중',es:'iOS · En desarrollo'},
+    dl_ios_tip:{zh:'iOS 版正在研发中,敬请期待',tw:'iOS 版正在研發中,敬請期待',en:'iOS version is in development, stay tuned',ja:'iOS版は開発中です。お楽しみに',ko:'iOS 버전은 개발 중입니다. 기대해 주세요',es:'La versión iOS está en desarrollo, estad atentos'},
+    fl_title:{zh:'友情链接',tw:'友情連結',en:'Friends',ja:'リンク',ko:'링크',es:'Enlaces'},
+    cr_title:{zh:'制作团队',tw:'製作團隊',en:'Credits',ja:'制作チーム',ko:'제작 팀',es:'Créditos'}
+  };
+  Object.keys(I18N_PAGE).forEach(function (k) { I18N[k] = I18N_PAGE[k]; });
   var I18N_NEW = {
     theme_aurora:{zh:'极光紫霞',en:'Aurora Violet',ja:'オーロラ紫',ko:'오로라 바이올렛',es:'Aurora Violeta',tw:'极光紫霞'},
     theme_ocean:{zh:'深海琉璃',en:'Deep Sea Glass',ja:'深海ガラス',ko:'심해 글라스',es:'Vidrio de Mar Profundo',tw:'深海琉璃'},
@@ -1743,12 +1907,90 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   var langBtn = $('#langBtn');
   var langPop = $('#langPop');
   var langTimer = null;
+  var qrBtn = $('#qrBtn'), qrPop = $('#qrPop'), qrTimer = null;
+  var lookBtn = $('#lookBtn'), lookPop = $('#lookPop'), lookTimer = null;
+  function hideQrPop() { qrTimer = setTimeout(function () { qrPop.classList.remove('show'); }, 250); }
+  function hideLookPop() { lookTimer = setTimeout(function () { lookPop.classList.remove('show'); }, 250); }
+  function perfSyncLook() {
+    var on = document.body.classList.contains('lite-mode');
+    var d = I18N || {};
+    var s = on ? (d.perf_state_on || {}) : (d.perf_state_off || {});
+    var el = $('#lookPerfState');
+    if (el) el.textContent = s[curLang] || (on ? '节能模式 · 已开启' : '节能模式 · 已关闭');
+    $('#lookPerf').classList.toggle('on', on);
+  }
+  function showQr() {
+    clearTimeout(qrTimer);
+    langPop.classList.remove('show'); clearTimeout(langTimer);
+    lookPop.classList.remove('show'); clearTimeout(lookTimer);
+    posPop(qrPop, qrBtn); qrPop.classList.add('show');
+  }
+  function showLook() {
+    clearTimeout(lookTimer);
+    langPop.classList.remove('show'); clearTimeout(langTimer);
+    qrPop.classList.remove('show'); clearTimeout(qrTimer);
+    perfSyncLook();
+    posPop(lookPop, lookBtn); lookPop.classList.add('show');
+  }
+  qrBtn.addEventListener('mouseenter', showQr);
+  qrBtn.addEventListener('mouseleave', hideQrPop);
+  qrPop.addEventListener('mouseenter', showQr);
+  qrPop.addEventListener('mouseleave', hideQrPop);
+  lookBtn.addEventListener('mouseenter', showLook);
+  lookBtn.addEventListener('mouseleave', hideLookPop);
+  lookPop.addEventListener('mouseenter', showLook);
+  lookPop.addEventListener('mouseleave', hideLookPop);
+  $$('.qr-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var q = tab.dataset.q;
+      $$('.qr-tab').forEach(function (x) { x.classList.toggle('active', x === tab); });
+      $('#qrM').classList.toggle('show', q === 'm');
+      $('#qrQ').classList.toggle('show', q === 'q');
+    });
+  });
+  $('#lookPerf').addEventListener('click', function () {
+    setLite(!document.body.classList.contains('lite-mode'));
+    perfSyncLook();
+  });
+  /* ---------- 制作团队(水平滑移堆叠) ---------- */
+  var crCards = $$('.cr-card'), crTabs = $$('.cr-tab'), crCur = 0;
+  function crRender() {
+    crCards.forEach(function (c, k) {
+      c.classList.toggle('cur', k === crCur);
+      if (k === crCur) {
+        c.style.setProperty('--cr-x', '0px');
+        c.style.setProperty('--cr-r', '0deg');
+        c.style.setProperty('--cr-s', '1');
+        c.style.zIndex = 10;
+      } else {
+        var side = k < crCur ? -1 : 1;
+        var d = Math.abs(k - crCur);
+        c.style.setProperty('--cr-x', (side * (90 + d * 60)) + 'px');
+        c.style.setProperty('--cr-r', (side * d * 6).toFixed(1) + 'deg');
+        c.style.setProperty('--cr-s', (1 - d * 0.06).toFixed(3));
+        c.style.zIndex = 10 - d;
+      }
+    });
+    crTabs.forEach(function (t, k) { t.classList.toggle('active', k === crCur); });
+  }
+  function crGo(i) { crCur = ((i % crCards.length) + crCards.length) % crCards.length; crRender(); }
+  crTabs.forEach(function (t) { t.addEventListener('click', function () { crGo(parseInt(t.dataset.c, 10)); }); });
+  var crPrev = $('#crPrev'), crNext = $('#crNext');
+  if (crPrev) crPrev.addEventListener('click', function () { crGo(crCur - 1); });
+  if (crNext) crNext.addEventListener('click', function () { crGo(crCur + 1); });
+  crRender();
+  /* iOS 下载按钮提示 */
+  $$('.dl-m-btn.soon').forEach(function (b) {
+    b.addEventListener('click', function () { toast(I18N.dl_ios_tip ? I18N.dl_ios_tip[curLang] : 'iOS 版正在研发中,敬请期待'); });
+  });
   function showLang() {
     clearTimeout(langTimer);
     themePop.classList.remove('show'); clearTimeout(popTimer);
     qqPop.classList.remove('show'); clearTimeout(qqTimer);
     perfPop.classList.remove('show'); clearTimeout(perfTimer);
     mPop.classList.remove('show'); clearTimeout(mTimer);
+    lookPop.classList.remove('show'); clearTimeout(lookTimer);
+    qrPop.classList.remove('show'); clearTimeout(qrTimer);
     posPop(langPop, langBtn); langPop.classList.add('show');
   }
   function hideLang() { langTimer = setTimeout(function () { langPop.classList.remove('show'); syncPopOpen(); }, 250); }
@@ -2059,6 +2301,14 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
     });
   }, { threshold: 0.3 });
   statsObs.observe(statsCard);
+  setInterval(function () {
+    ['stat1', 'stat2'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = parseInt(el.textContent.replace(/,/g, ''), 10) || 0;
+      el.textContent = (v + 1).toLocaleString();
+    });
+  }, 1000);
 
 /* 移动端:项目数据三列 → 堆叠卡片(点击切换,桌面端保持三列) */
   var stCols = $$('.st-col');
@@ -2146,7 +2396,13 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
 
   /* ---------- 占位提示 ---------- */
   function toast(msg) {
+    document.querySelectorAll('[data-toast]').forEach(function (old) {
+      old.style.opacity = '0';
+      old.style.transform = 'translateX(-50%) translateY(8px)';
+      setTimeout(function () { old.remove(); }, 240);
+    });
     var t = document.createElement('div');
+    t.setAttribute('data-toast', '1');
     t.textContent = msg;
     t.style.cssText = 'position:fixed;left:50%;bottom:34px;transform:translateX(-50%);background:var(--glass-strong);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--text-1);padding:11px 22px;border-radius:30px;font-size:14px;box-shadow:var(--shadow),inset 0 1px 0 var(--glass-hi-top);z-index:9999;opacity:0;transition:opacity .3s,transform .3s;';
     document.body.appendChild(t);
