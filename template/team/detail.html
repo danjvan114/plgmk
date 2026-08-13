@@ -66,8 +66,7 @@
         .invite-item{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid #f5f5f5;font-size:13px}
         .invite-item:last-child{border-bottom:none}
         .select-arrow{appearance:none;-webkit-appearance:none;background:#fafafa}
-        .tab-content{display:none;padding:16px 0}
-        .tab-content.active{display:block}
+        .tab-content{padding:16px 0}
         .tab-loading{text-align:center;padding:40px;color:#999}
         .tab-loading .mdui-spinner{width:40px;height:40px;color:#2196f3}
         .tab-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
@@ -166,15 +165,12 @@
                     </div>
                     {% endif %}
                     <div id="post-list">
-                        <div class="tab-loading" id="post-loading">
-                            <div class="mdui-spinner">
-                                <div class="mdui-spinner-layer mdui-spinner-layer-1"></div>
-                                <div class="mdui-spinner-layer mdui-spinner-layer-2"></div>
-                                <div class="mdui-spinner-layer mdui-spinner-layer-3"></div>
-                                <div class="mdui-spinner-layer mdui-spinner-layer-4"></div>
-                            </div>
-                            <p>加载中...</p>
+                        {{ posts_html|safe }}
+                        {% if p_has_more %}
+                        <div style="text-align:center;padding-top:6px">
+                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="post-more-btn">加载更多帖子</button>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -199,15 +195,12 @@
                     </div>
                     {% endif %}
                     <ul class="mdui-list" style="padding:0" id="member-list">
-                        <div class="tab-loading" id="member-loading">
-                            <div class="mdui-spinner">
-                                <div class="mdui-spinner-layer mdui-spinner-layer-1"></div>
-                                <div class="mdui-spinner-layer mdui-spinner-layer-2"></div>
-                                <div class="mdui-spinner-layer mdui-spinner-layer-3"></div>
-                                <div class="mdui-spinner-layer mdui-spinner-layer-4"></div>
-                            </div>
-                            <p>加载中...</p>
+                        {{ members_html|safe }}
+                        {% if m_has_more %}
+                        <div style="text-align:center;padding-top:6px">
+                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="member-more-btn">加载更多成员</button>
                         </div>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -235,15 +228,12 @@
                     </div>
                     {% endif %}
                     <div class="work-grid" id="work-list">
-                        <div class="tab-loading" id="work-loading">
-                            <div class="mdui-spinner">
-                                <div class="mdui-spinner-layer mdui-spinner-layer-1"></div>
-                                <div class="mdui-spinner-layer mdui-spinner-layer-2"></div>
-                                <div class="mdui-spinner-layer mdui-spinner-layer-3"></div>
-                                <div class="mdui-spinner-layer mdui-spinner-layer-4"></div>
-                            </div>
-                            <p>加载中...</p>
+                        {{ works_html|safe }}
+                        {% if w_has_more %}
+                        <div style="text-align:center;padding-top:6px">
+                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="work-more-btn">加载更多作品</button>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -264,15 +254,12 @@
                     <div class="section-gap">
                         <div style="font-size:13px;color:#666;font-weight:600;margin:12px 0 4px">待处理邀请</div>
                         <div id="invite-list">
-                            <div class="tab-loading" id="invite-loading">
-                                <div class="mdui-spinner">
-                                    <div class="mdui-spinner-layer mdui-spinner-layer-1"></div>
-                                    <div class="mdui-spinner-layer mdui-spinner-layer-2"></div>
-                                    <div class="mdui-spinner-layer mdui-spinner-layer-3"></div>
-                                    <div class="mdui-spinner-layer mdui-spinner-layer-4"></div>
-                                </div>
-                                <p>加载中...</p>
+                            {{ invites_html|safe }}
+                            {% if i_has_more %}
+                            <div style="text-align:center;padding-top:6px">
+                                <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="invite-more-btn">加载更多邀请</button>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -330,111 +317,35 @@
         {% endif %}
     </div>
 
+    <script src="/localcdn/gzs/mkh.js"></script>
     <script>
         window.addEventListener('load', function(){ document.getElementById('loader').style.display='none'; });
 
-        // 懒加载选项卡内容
-        var tabLoaded = {};
         var teamId = {{ team.id }};
         var isMember = {{ 'true' if is_member else 'false' }};
         var isAdmin = {{ 'true' if is_admin else 'false' }};
         var isOwner = {{ 'true' if is_owner else 'false' }};
 
-        document.getElementById('team-tabs').addEventListener('tab:change', function(e) {
-            var tabId = e.detail.tabId;
-            if (tabLoaded[tabId]) return;
-            tabLoaded[tabId] = true;
-
-            if (tabId === 'tab-posts') {
-                loadPosts();
-            } else if (tabId === 'tab-members') {
-                loadMembers();
-            } else if (tabId === 'tab-works') {
-                loadWorks();
-            } else if (tabId === 'tab-invites') {
-                loadInvites();
+        // 初始化"加载更多"按钮
+        (function(){
+            function setupMore(btnId, url, contId, page){
+                var btn = document.getElementById(btnId), cont = document.getElementById(contId);
+                if (!btn || !cont) return;
+                btn.addEventListener('click', function(){
+                    fetch(url + '?page=' + page).then(function(r){ return r.json(); }).then(function(d){
+                        if (d.html) {
+                            cont.insertAdjacentHTML('beforeend', d.html);
+                        }
+                        page++;
+                        if (!d.has_more) btn.style.display = 'none';
+                    });
+                });
             }
-        });
-
-        function loadPosts() {
-            fetch('/team/' + teamId + '/posts/ajax?page=1')
-                .then(function(r){ return r.json(); })
-                .then(function(d) {
-                    document.getElementById('post-loading').style.display = 'none';
-                    document.getElementById('post-list').innerHTML = d.html;
-                    if (d.has_more) {
-                        var btn = document.createElement('div');
-                        btn.style.textAlign = 'center';
-                        btn.style.paddingTop = '6px';
-                        btn.innerHTML = '<button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="post-more-btn">加载更多帖子</button>';
-                        document.getElementById('post-list').appendChild(btn);
-                        setupMore('post-more-btn', '/team/' + teamId + '/posts/ajax', 'post-list', 2);
-                    }
-                });
-        }
-
-        function loadMembers() {
-            fetch('/team/' + teamId + '/members/ajax?page=1')
-                .then(function(r){ return r.json(); })
-                .then(function(d) {
-                    document.getElementById('member-loading').style.display = 'none';
-                    document.getElementById('member-list').innerHTML = d.html;
-                    if (d.has_more) {
-                        var btn = document.createElement('div');
-                        btn.style.textAlign = 'center';
-                        btn.style.paddingTop = '6px';
-                        btn.innerHTML = '<button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="member-more-btn">加载更多成员</button>';
-                        document.getElementById('member-list').appendChild(btn);
-                        setupMore('member-more-btn', '/team/' + teamId + '/members/ajax', 'member-list', 2);
-                    }
-                });
-        }
-
-        function loadWorks() {
-            fetch('/team/' + teamId + '/works/ajax?page=1')
-                .then(function(r){ return r.json(); })
-                .then(function(d) {
-                    document.getElementById('work-loading').style.display = 'none';
-                    document.getElementById('work-list').innerHTML = d.html;
-                    if (d.has_more) {
-                        var btn = document.createElement('div');
-                        btn.style.textAlign = 'center';
-                        btn.style.paddingTop = '6px';
-                        btn.innerHTML = '<button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="work-more-btn">加载更多作品</button>';
-                        document.getElementById('work-list').appendChild(btn);
-                        setupMore('work-more-btn', '/team/' + teamId + '/works/ajax', 'work-list', 2);
-                    }
-                });
-        }
-
-        function loadInvites() {
-            fetch('/team/' + teamId + '/invites/ajax?page=1')
-                .then(function(r){ return r.json(); })
-                .then(function(d) {
-                    document.getElementById('invite-loading').style.display = 'none';
-                    document.getElementById('invite-list').innerHTML = d.html;
-                    if (d.has_more) {
-                        var btn = document.createElement('div');
-                        btn.style.textAlign = 'center';
-                        btn.style.paddingTop = '6px';
-                        btn.innerHTML = '<button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="invite-more-btn">加载更多邀请</button>';
-                        document.getElementById('invite-list').appendChild(btn);
-                        setupMore('invite-more-btn', '/team/' + teamId + '/invites/ajax', 'invite-list', 2);
-                    }
-                });
-        }
-
-        function setupMore(btnId, url, contId, page){
-            var btn = document.getElementById(btnId), cont = document.getElementById(contId);
-            if (!btn || !cont) return;
-            btn.addEventListener('click', function(){
-                fetch(url + '?page=' + page).then(function(r){ return r.json(); }).then(function(d){
-                    cont.insertAdjacentHTML('beforeend', d.html);
-                    page++;
-                    if (!d.has_more) btn.style.display = 'none';
-                });
-            });
-        }
+            setupMore('post-more-btn', '/team/' + teamId + '/posts/ajax', 'post-list', 2);
+            setupMore('member-more-btn', '/team/' + teamId + '/members/ajax', 'member-list', 2);
+            setupMore('work-more-btn', '/team/' + teamId + '/works/ajax', 'work-list', 2);
+            setupMore('invite-more-btn', '/team/' + teamId + '/invites/ajax', 'invite-list', 2);
+        })();
 
         function postForm(url, formData, tipEl){
             return fetch(url, {method:'POST', body: formData})
