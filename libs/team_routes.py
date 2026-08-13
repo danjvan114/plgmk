@@ -167,7 +167,7 @@ def register_team_routes():
                  'cover': t['cover'], 'qq': t['qq'], 'bulletin': t['bulletin'],
                  'created_by': t['created_by'], 'created_at': t['created_at'],
                  'member_count': counts.get(t['id'], 0),
-                 'avatar_url': ('https://q1.qlogo.cn/g?b=qq&nk=%s&s=100' % t['qq']) if t['qq'] else ''}
+                 'avatar_url': ('https://q.qlogo.cn/headimg_dl?dst_uin=%s&spec=640&img_type=jpg' % t['qq']) if t['qq'] else ''}
             team_list.append(d)
         # 收到的待处理邀请（分页）
         invites, inv_has_more = [], False
@@ -301,7 +301,7 @@ def register_team_routes():
         return render_root_template('team/detail.html', team={'id': t['id'], 'name': t['name'],
                                        'description': t['description'], 'cover': t['cover'],
                                        'qq': t['qq'], 'bulletin': t['bulletin'],
-                                       'avatar_url': ('https://q1.qlogo.cn/g?b=qq&nk=%s&s=200' % t['qq']) if t['qq'] else '',
+                                       'avatar_url': ('https://q.qlogo.cn/headimg_dl?dst_uin=%s&spec=640&img_type=jpg' % t['qq']) if t['qq'] else '',
                                        'created_by': t['created_by'], 'created_at': t['created_at']},
                                     members_html=members_html, m_has_more=m_has_more, members_total=members_total,
                                     works_html=works_html, w_has_more=w_has_more, works_total=works_total,
