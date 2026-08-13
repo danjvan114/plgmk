@@ -1246,18 +1246,26 @@ def register_workpool_routes():
                                     total_posts=total_posts, total_pages=total_pages)
 
     @app.route('/forum/<int:forum_id>')
-    def forum_section(forum_id):
-        """分区帖子列表"""
+    @app.route('/forum/<int:forum_id>/page/<int:page>')
+    def forum_section(forum_id, page=1):
+        """分区帖子列表（分页）"""
+        per_page = 20
+        page = max(int(page), 1)
+        offset = (page - 1) * per_page
         conn = get_forum_db()
         forum = conn.execute("SELECT * FROM forums WHERE id = ?", (forum_id,)).fetchone()
         if not forum:
             conn.close()
             return render_root_template('404.html'), 404
-        posts = [dict(r) for r in conn.execute(
-            "SELECT * FROM posts WHERE forum_id = ? AND status = 'active' ORDER BY is_pinned DESC, created_at DESC LIMIT 100",
-            (forum_id,)).fetchall()]
+        total = conn.execute("SELECT COUNT(*) FROM posts WHERE forum_id = ? AND status = 'active'", (forum_id,)).fetchone()[0]
+        rows = conn.execute(
+            "SELECT * FROM posts WHERE forum_id = ? AND status = 'active' ORDER BY is_pinned DESC, created_at DESC LIMIT ? OFFSET ?",
+            (forum_id, per_page, offset)).fetchall()
+        posts = [dict(r) for r in rows]
         conn.close()
-        return render_root_template('forum/section.html', forum=dict(forum), posts=posts)
+        total_pages = (total + per_page - 1) // per_page or 1
+        return render_root_template('forum/section.html', forum=dict(forum), posts=posts,
+                                    page=page, per_page=per_page, total_posts=total, total_pages=total_pages)
 
     @app.route('/forum/post/<int:post_id>')
     def forum_post(post_id):
@@ -1488,6 +1496,15 @@ def register_workpool_routes():
         if not is_admin_user(session.get('user', '')):
             return redirect('/login')
         conn = get_forum_db()
+        per_page = 50
+        page = max(int(request.args.get('page', 1)), 1)
+        offset = (page - 1) * per_page
+
+        def fetch_boards():
+            return [dict(r) for r in conn.execute("SELECT * FROM forums ORDER BY sort ASC, id ASC LIMIT ? OFFSET ?", (per_page, offset)).fetchall()]
+        def total_count():
+            return conn.execute("SELECT COUNT(*) FROM forums").fetchone()[0]
+
         if request.method == 'POST':
             name = (request.form.get('name') or '').strip()
             desc = (request.form.get('description') or '').strip()
@@ -1497,16 +1514,19 @@ def register_workpool_routes():
                 sort = 0
             admin_only = 1 if request.form.get('admin_only') else 0
             if not name:
+                boards = fetch_boards()
                 conn.close()
-                return render_root_template('forum/admin_boards.html', boards=[dict(r) for r in conn.execute("SELECT * FROM forums ORDER BY sort ASC, id ASC").fetchall()], error='请输入版块名称')
+                return render_root_template('forum/admin_boards.html', boards=boards, page=page, total_pages=max((total_count() + per_page - 1) // per_page, 1), error='请输入版块名称')
             conn.execute("INSERT INTO forums (name, description, sort, admin_only) VALUES (?, ?, ?, ?)",
                          (name, desc, sort, admin_only))
             conn.commit()
             conn.close()
             return redirect('/forum/admin/boards')
-        boards = [dict(r) for r in conn.execute("SELECT * FROM forums ORDER BY sort ASC, id ASC").fetchall()]
+        boards = fetch_boards()
+        total = total_count()
         conn.close()
-        return render_root_template('forum/admin_boards.html', boards=boards)
+        total_pages = (total + per_page - 1) // per_page or 1
+        return render_root_template('forum/admin_boards.html', boards=boards, page=page, total_pages=total_pages)
 
     @app.route('/forum/admin/boards/edit/<int:board_id>', methods=['POST'])
     def forum_admin_board_edit(board_id):

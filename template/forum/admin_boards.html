@@ -48,6 +48,12 @@
         .badge.admin{background:#e3f2fd;color:#2196f3;border-color:#bbdefb}
         .toggle{cursor:pointer;font-size:16px}
         .error-msg{color:#f44336;font-size:13px;margin-bottom:10px}
+        .pagination{display:flex;justify-content:center;gap:6px;margin-top:16px;flex-wrap:wrap}
+        .pagination a,.pagination span{padding:7px 14px;border-radius:4px;text-decoration:none;font-size:13px;transition:all .2s}
+        .pagination a{background:#2196f3;color:#fff}
+        .pagination a:hover{background:#1976d2}
+        .pagination .current{background:#ff9800;color:#fff}
+        .pagination .disabled{color:#bbb;cursor:not-allowed}
         .tip{color:#999;font-size:13px}
         #loader{position:fixed;top:0;left:0;width:100%;z-index:9999;background:#fff}
     </style>
@@ -148,6 +154,27 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% if total_pages and total_pages > 1 %}
+            <div class="pagination">
+                {% if page > 1 %}
+                <a href="/forum/admin/boards?page={{ page - 1 }}">上一页</a>
+                {% else %}
+                <span class="disabled">上一页</span>
+                {% endif %}
+                {% for pg in range(1, total_pages + 1) %}
+                {% if pg == page %}
+                <span class="current">{{ pg }}</span>
+                {% elif pg == 1 or pg == total_pages or (pg >= page - 2 and pg <= page + 2) %}
+                <a href="/forum/admin/boards?page={{ pg }}">{{ pg }}</a>
+                {% endif %}
+                {% endfor %}
+                {% if page < total_pages %}
+                <a href="/forum/admin/boards?page={{ page + 1 }}">下一页</a>
+                {% else %}
+                <span class="disabled">下一页</span>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
     </div>
     <script>
