@@ -8,7 +8,7 @@ import os
 USER_DATA_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
 MARKETS = {'kn': 'KN插件市场'}
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static'))
 CORS(app)
 
 market_jinja_envs = {}
