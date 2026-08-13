@@ -52,7 +52,20 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </style>
 </head>
 <body>
-<div id="topbar-app"></div>
+<header>
+<div class="wrap">
+<div class="logo">用户管理</div>
+<div class="nav-links">
+<a href="/mk/kn">插件市场</a>
+<a href="/mk/kn/admin">插件管理</a>
+<a href="/op/user" class="active">用户管理</a>
+<a href="/logout">退出</a>
+</div>
+<div style="margin-left:16px">
+<a href="/change_password" class="btn mdui-ripple">修改密码</a>
+<a href="/logout" class="btn mdui-ripple">退出</a>
+</div>
+</header>
 <div class="main-box">
 <div class="card">
 <div class="admin-header">
@@ -140,6 +153,5 @@ function closeModal() {
     document.getElementById('editModal').classList.remove('active');
 }
 </script>
-<script src="/static/js/topbar.js"></script>
 </body>
 </html>

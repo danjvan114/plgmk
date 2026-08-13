@@ -21,11 +21,6 @@ def register_other_routes():
     def about():
         return render_root_template('about.html')
 
-    @app.route('/topbar')
-    def topbar():
-        """统一顶栏片段：topbar.js 动态加载渲染"""
-        return render_root_template('base.html')
-
     @app.route('/health')
     def health_check():
         print(f"DEBUG: /health endpoint called")

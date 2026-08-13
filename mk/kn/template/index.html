@@ -76,7 +76,54 @@ header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:
 <div class="mdui-progress-indeterminate"></div>
 </div>
 </div>
-<div id="topbar-app"></div>
+<header>
+<div class="wrap">
+<div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>菠菜面</div>
+<div class="nav-links">
+<a href="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}">首页</a>
+<a href="https://pan1.pgrm.run">我的存储</a>
+<a href="/workpool">作品池</a>
+{% if not compact_mode %}
+<a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
+<a href="/app/kn/d">应用下载</a>
+<div class="dropdown">
+<button class="dropbtn">插件市场 ▼</button>
+<div class="dropdown-content">
+{% if markets %}
+{% for market_id, market_name in markets.items() %}
+<a class="mdui-ripple" href="/mk/{{ market_id }}">{{ market_name }}</a>
+{% endfor %}
+{% endif %}
+</div>
+</div>
+{% if session.user %}
+<a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+<a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+{% if users and users.get(session.user, {}).get('role') == 'admin' %}
+<a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+{% endif %}
+{% endif %}
+{% endif %}
+</div>
+<div class="head-space"></div>
+<form class="search" action="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}" method="get">
+<input name="search" placeholder="搜索插件名称/标签" value="{{ search_query }}">
+</form>
+{% if session.user %}
+<div class="icon-btn" title="通知"><i class="mdui-icon material-icons" style="font-size:22px">notifications</i></div>
+<div class="dropdown">
+<div class="user-avatar" title="{{ session.user }}">{% if users.get(session.user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[session.user]['qq'] }}&s=100" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">{% else %}{{ session.user[0].upper() }}{% endif %}</div>
+<div class="dropdown-content">
+<a href="/u/{{ session.user }}">我的主页</a>
+<a href="/change_password">修改密码</a>
+<a href="/logout">退出登录</a>
+</div>
+</div>
+{% else %}
+<a href="/login" class="btn mdui-ripple" style="margin-left:12px">登录</a>
+{% endif %}
+</div>
+</header>
 <div class="main-box">
 <div class="grid">
 {% for plugin in plugins %}
@@ -154,6 +201,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 {% endif %}
 </script>
-<script src="/static/js/topbar.js"></script>
 </body>
 </html>

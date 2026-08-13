@@ -129,7 +129,53 @@
             <div class="mdui-progress-indeterminate"></div>
         </div>
     </div>
-    <div id="topbar-app"></div>
+    <header>
+        <div class="wrap">
+            <div class="logo">
+                <div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>
+                菠菜面
+            </div>
+            <div class="nav-links">
+                <a href="/mk/{{ current_market or 'kn' }}">首页</a>
+                <a href="https://pan1.pgrm.run">我的存储</a>
+                <a href="/workpool" style="color:#fff;font-weight:bold">作品池</a>
+                <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
+                <a href="/app/kn/d">应用下载</a>
+                <div class="dropdown">
+                    <button class="dropbtn">插件市场 ▼</button>
+                    <div class="dropdown-content">
+                        {% if markets %}
+                        {% for market_id, market_name in markets.items() %}
+                        <a class="mdui-ripple" href="/mk/{{ market_id }}">{{ market_name }}</a>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if session.user %}
+                <a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
+                <a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
+                {% if users and users.get(session.user, {}).get('role') == 'admin' %}
+                <a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="head-space"></div>
+            {% if session.user %}
+            <div class="icon-btn" title="通知" onclick="location.href='/messages'"><i class="fa-solid fa-bell" style="font-size:22px"></i><span class="notify-badge" id="unread-badge" style="display:none">0</span></div>
+            <div class="dropdown">
+                <div class="user-avatar" title="{{ session.user }}">{% if users.get(session.user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[session.user]['qq'] }}&s=100" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">{% else %}{{ session.user[0].upper() }}{% endif %}</div>
+                <div class="dropdown-content">
+                    <a href="/u/{{ session.user }}">我的主页</a>
+                    <a href="/workpool/my">我的作品</a>
+                    <a href="/change_password">修改密码</a>
+                    <a href="/logout">退出登录</a>
+                </div>
+            </div>
+            {% else %}
+            <a href="/login" class="btn mdui-ripple" style="margin-left:12px">登录</a>
+            {% endif %}
+        </div>
+    </header>
     <div class="main-box">
         <a href="/workpool" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
         <div class="detail-layout">
@@ -499,7 +545,7 @@
             fetch('/messages/unread')
                 .then(r => r.json())
                 .then(data => {
-                    const badge = document.getElementById('tb-unread');
+                    const badge = document.getElementById('unread-badge');
                     if (badge && data.count > 0) {
                         badge.textContent = data.count > 99 ? '99+' : data.count;
                         badge.style.display = 'block';
@@ -530,6 +576,5 @@
             });
         });
     </script>
-<script src="/static/js/topbar.js"></script>
 </body>
 </html>

@@ -81,7 +81,12 @@
     </style>
 </head>
 <body>
-<div id="topbar-app"></div>
+<header>
+    <button class="menu-btn mdui-ripple" onclick="toggleSidebar()">
+        <i class="mdui-icon material-icons">menu</i>
+    </button>
+    <div class="title">云·文档</div>
+</header>
 
 <div class="progress-container" id="progressBar">
     <div class="mdui-progress">
@@ -372,6 +377,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-<script src="/static/js/topbar.js"></script>
 </body>
 </html>

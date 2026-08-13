@@ -41,7 +41,15 @@ h1{color:#333;margin-bottom:8px;text-align:center;font-size:24px}
 </style>
 </head>
 <body>
-<div id="topbar-app"></div>
+<header>
+<div class="wrap">
+<div class="logo">用户中心</div>
+<div class="nav-links">
+<a href="/mk/kn">插件市场</a>
+<a href="/login" class="active">登录</a>
+</div>
+</div>
+</header>
 <div class="main-box">
 <div class="card">
 <h1>用户登录</h1>
@@ -87,6 +95,5 @@ function closeModal() {
 showError('{{ error }}');
 {% endif %}
 </script>
-<script src="/static/js/topbar.js"></script>
 </body>
 </html>

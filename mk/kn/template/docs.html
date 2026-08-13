@@ -60,7 +60,12 @@ header .title{font-size:18px;font-weight:bold;color:#333}
 </style>
 </head>
 <body>
-<div id="topbar-app"></div>
+<header>
+<button class="menu-btn mdui-ripple" onclick="toggleSidebar()">
+    <i class="mdui-icon material-icons">menu</i>
+</button>
+<div class="title">开发文档</div>
+</header>
 
 <div class="progress-container" id="progressBar">
 <div class="mdui-progress">
@@ -241,6 +246,5 @@ function toggleFolder(el) {
     el.classList.toggle('open');
 }
 </script>
-<script src="/static/js/topbar.js"></script>
 </body>
 </html>

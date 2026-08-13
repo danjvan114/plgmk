@@ -408,7 +408,22 @@
     </style>
 </head>
 <body>
-<div id="topbar-app"></div>
+<header>
+    <div class="nav-left">
+        <div class="logo">
+            <span>KNExpanse</span>
+        </div>
+        <div class="nav-links">
+            <a href="/app/kn/d">主页</a>
+            <a href="#" onclick="window.open('/mk/kn')">插件市场</a>
+            <a href="#">开发文档</a>
+            <a href="#" onclick="window.open('https://github.com/danjvan114/knu/releases')">更新记录</a>
+            <a href="#" onclick="window.open('/kn/about')">关于团队</a>
+            
+        </div>
+    </div>
+    
+</header>
 
 <!-- 团队介绍区域 -->
 <section class="team-section">
@@ -480,6 +495,5 @@ window.addEventListener('load', () => {
     });
 });
 </script>
-<script src="/static/js/topbar.js"></script>
 </body>
 </html>
