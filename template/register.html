@@ -37,16 +37,7 @@ h1{color:#333;margin-bottom:24px;text-align:center}
 </style>
 </head>
 <body>
-<header>
-<div class="wrap">
-<div class="logo">用户中心</div>
-<div class="nav-links">
-<a href="/mk/kn">KN插件市场</a>
-<a href="/login">登录</a>
-<a href="/register" class="active">注册</a>
-</div>
-</div>
-</header>
+<div id="topbar-app"></div>
 <div class="main-box">
 <div class="card">
 <h1>用户注册</h1>
@@ -98,5 +89,6 @@ showModal('success', '{{ success }}');
 showModal('error', '{{ error }}');
 {% endif %}
 </script>
+<script src="/static/js/topbar.js"></script>
 </body>
 </html>

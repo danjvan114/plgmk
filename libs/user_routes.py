@@ -1,4 +1,4 @@
-from flask import request, redirect, url_for, session
+from flask import request, redirect, url_for, session, jsonify
 from .config import app, User, db
 from .utils import render_market_template, render_root_template, render_user_profile_template
 import requests
@@ -95,6 +95,8 @@ def register_user_routes():
         followers = []
         following = []
         favorites = []
+        wall_messages = []
+        msg_count = 0
         total_works = 0
         is_following = False
         try:
@@ -115,7 +117,7 @@ def register_user_routes():
                 import os as _os
                 favs = []
                 cursor = conn.execute(
-                    "SELECT id, title, author, db_path, like_count, fav_count, comment_count, coin_count, created_at "
+                    "SELECT id, title, author, thumbnail, view_count, db_path, like_count, fav_count, comment_count, coin_count, created_at "
                     "FROM works WHERE status = 'active' AND is_hidden = 0 ORDER BY id DESC LIMIT 100")
                 for row in cursor.fetchall():
                     fpath = _os.path.join(WORKPOOL_DIR, row['db_path'])
@@ -140,7 +142,7 @@ def register_user_routes():
                     params += [f'%{q}%', f'%{q}%', f'%{q}%']
                 total_works = conn.execute(f"SELECT COUNT(*) FROM works WHERE {where_sql}", params).fetchone()[0]
                 rows = conn.execute(
-                    f"SELECT id, title, author, like_count, fav_count, comment_count, coin_count, created_at "
+                    f"SELECT id, title, author, thumbnail, view_count, like_count, fav_count, comment_count, coin_count, created_at "
                     f"FROM works WHERE {where_sql} ORDER BY {order_sql} LIMIT ? OFFSET ?",
                     params + [per_page, (page - 1) * per_page]
                 ).fetchall()
@@ -149,6 +151,19 @@ def register_user_routes():
                 row = conn.execute("SELECT id FROM follows WHERE user_id = ? AND follow_user = ?",
                                    (session['user'], user.username)).fetchone()
                 is_following = row is not None
+            try:
+                msg_count = conn.execute(
+                    "SELECT COUNT(*) AS c FROM messages WHERE to_user = ? AND is_read = 0",
+                    (user.username,)).fetchone()['c']
+            except Exception:
+                msg_count = 0
+            try:
+                wrows = conn.execute(
+                    "SELECT id, from_user, content, created_at FROM wall_messages WHERE username = ? ORDER BY created_at DESC LIMIT 50",
+                    (user.username,)).fetchall()
+                wall_messages = [dict(r) for r in wrows]
+            except Exception:
+                wall_messages = []
             conn.close()
         except Exception:
             pass
@@ -157,7 +172,7 @@ def register_user_routes():
                                             tab=tab, sort=sort, q=q, page=page, per_page=per_page,
                                             total_works=total_works, total_pages=(total_works + per_page - 1) // per_page,
                                             followers=followers, following=following, favorites=favorites,
-                                            is_following=is_following)
+                                            is_following=is_following, msg_count=msg_count, wall_messages=wall_messages)
 
     @app.route('/user/set_bio', methods=['POST'])
     def user_set_bio():
@@ -196,6 +211,53 @@ def register_user_routes():
             db.session.commit()
             return redirect(url_for('user_profile', username=user.username))
         return redirect(url_for('login'))
+
+    @app.route('/u/<username>/wall', methods=['POST'])
+    def post_wall_message(username):
+        """发布留言到用户主页留言墙"""
+        if 'user' not in session:
+            return jsonify({'success': False, 'message': '请先登录'}), 401
+        if not User.query.get(username):
+            return jsonify({'success': False, 'message': '用户不存在'}), 404
+        content = request.form.get('content', '').strip()[:1000]
+        if not content:
+            return jsonify({'success': False, 'message': '留言内容不能为空'}), 400
+        try:
+            from .workpool import get_main_db, send_message
+            conn = get_main_db()
+            conn.execute("INSERT INTO wall_messages (username, from_user, content) VALUES (?, ?, ?)",
+                         (username, session['user'], content))
+            conn.commit()
+            conn.close()
+            if session['user'] != username:
+                send_message(username, 'wall', content, from_user=session['user'])
+        except Exception:
+            return jsonify({'success': False, 'message': '留言失败，请重试'}), 500
+        return jsonify({'success': True, 'message': '留言发布成功'})
+
+    @app.route('/u/<username>/wall/delete/<int:msg_id>', methods=['POST'])
+    def delete_wall_message(username, msg_id):
+        """删除留言：仅留言作者或墙主或管理员可删"""
+        if 'user' not in session:
+            return jsonify({'success': False, 'message': '请先登录'}), 401
+        try:
+            from .workpool import get_main_db, is_admin_user
+            conn = get_main_db()
+            row = conn.execute(
+                "SELECT from_user FROM wall_messages WHERE id = ? AND username = ?",
+                (msg_id, username)).fetchone()
+            if row is None:
+                conn.close()
+                return jsonify({'success': False, 'message': '留言不存在'}), 404
+            if row['from_user'] != session['user'] and session['user'] != username and not is_admin_user(session['user']):
+                conn.close()
+                return jsonify({'success': False, 'message': '无权限删除'}), 403
+            conn.execute("DELETE FROM wall_messages WHERE id = ? AND username = ?", (msg_id, username))
+            conn.commit()
+            conn.close()
+        except Exception:
+            return jsonify({'success': False, 'message': '删除失败'}), 500
+        return jsonify({'success': True, 'message': '删除成功'})
 
     @app.route('/logout')
     def logout():

@@ -177,6 +177,16 @@ def migrate_main_db(conn):
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS wall_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username VARCHAR(100) NOT NULL,
+        from_user VARCHAR(100) NOT NULL,
+        content TEXT NOT NULL,
+        is_read INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
     conn.commit()
 
 
@@ -276,6 +286,16 @@ def init_main_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title VARCHAR(200) NOT NULL,
         content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS wall_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username VARCHAR(100) NOT NULL,
+        from_user VARCHAR(100) NOT NULL,
+        content TEXT NOT NULL,
+        is_read INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)

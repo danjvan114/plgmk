@@ -1,0 +1,87 @@
+{# 统一顶栏组件：由 /topbar 渲染，topbar.js 动态注入到各页面 #}
+<style>
+    .tb-header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:tbHeaderSlideDown .4s cubic-bezier(.4,0,.2,1)}
+    @keyframes tbHeaderSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
+    .tb-wrap{max-width:1400px;margin:0 auto;width:100%;height:56px;display:flex;align-items:center;padding:0 24px}
+    .tb-logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;text-decoration:none;animation:tbLogoFadeIn .5s .1s both}
+    @keyframes tbLogoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+    .tb-logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
+    .tb-logo-icon img{width:100%;height:100%;object-fit:cover}
+    .tb-nav{display:flex;gap:20px;align-items:center;flex-wrap:nowrap;overflow-x:auto}
+    .tb-nav a,.tb-nav .tb-dropbtn{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative;white-space:nowrap;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px}
+    .tb-nav a:hover,.tb-nav .tb-dropbtn:hover{color:#fff;transform:translateY(-1px)}
+    .tb-nav a::after,.tb-nav .tb-dropbtn::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
+    .tb-nav a:hover::after,.tb-nav .tb-dropbtn:hover::after{width:100%}
+    .tb-nav a.tb-active{color:#fff;font-weight:bold}
+    .tb-space{flex:1}
+    .tb-search{height:36px;width:280px;background:rgba(255,255,255,.2);border-radius:18px;display:flex;align-items:center;padding:0 16px;animation:tbSearchFadeIn .5s .15s both}
+    @keyframes tbSearchFadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+    .tb-search input{background:transparent;border:none;outline:none;color:#fff;width:100%;font-size:14px}
+    .tb-search input::placeholder{color:rgba(255,255,255,.7)}
+    .tb-search input::-webkit-search-cancel-button{-webkit-appearance:none}
+    .tb-dropdown{position:relative;display:inline-block}
+    .tb-dropdown-content{display:none;position:absolute;top:100%;right:0;background:#fff;min-width:170px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:tbDropdownFade .2s}
+    @keyframes tbDropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    .tb-dropdown-content.tb-show{display:block}
+    .tb-dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s;white-space:nowrap}
+    .tb-dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
+    .tb-user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:tbAvatarPop .5s .3s both;user-select:none}
+    @keyframes tbAvatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+    .tb-user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
+    .tb-user-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+    .tb-icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin:0 8px;position:relative;animation:tbIconFade .5s .25s both;text-decoration:none}
+    @keyframes tbIconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+    .tb-icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+    .tb-notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px;display:none}
+    .tb-btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;white-space:nowrap}
+    .tb-btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+    .tb-btn:active{transform:scale(.95)}
+</style>
+<header class="tb-header">
+    <div class="tb-wrap">
+        <a class="tb-logo" href="/{{ current_market or 'kn' }}">
+            <div class="tb-logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>
+            菠菜面
+        </a>
+        <nav class="tb-nav" id="tb-nav">
+            <a href="/mk/{{ current_market or 'kn' }}" data-tb-page="market">首页</a>
+            <a href="https://pan1.pgrm.run" target="_blank" rel="noopener">我的存储</a>
+            <a href="/workpool" data-tb-page="workpool">作品池</a>
+            <a href="/forum" data-tb-page="forum">论坛</a>
+            <div class="tb-dropdown tb-compact-hide">
+                <button class="tb-dropbtn">插件市场 ▾</button>
+                <div class="tb-dropdown-content">
+                    {% if markets %}
+                    {% for market_id, market_name in markets.items() %}
+                    <a href="/mk/{{ market_id }}">{{ market_name }}</a>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            {% if session.user %}
+            {% if users and users.get(session.user, {}).get('role') == 'admin' %}
+            <a href="/mk/{{ current_market or 'kn' }}/admin" class="tb-compact-hide" data-tb-page="admin">后台管理</a>
+            {% endif %}
+            {% endif %}
+        </nav>
+        <div class="tb-space"></div>
+        <form class="tb-search" id="tb-search-form">
+            <input type="search" name="search" id="tb-search-input" placeholder="搜索" autocomplete="off">
+        </form>
+        {% if session.user %}
+        <a class="tb-icon-btn" id="tb-bell" href="/messages" title="通知"><i class="fa-solid fa-bell" style="font-size:22px"></i><span class="tb-notify-badge" id="tb-unread">0</span></a>
+        <div class="tb-dropdown">
+            <div class="tb-user-avatar" id="tb-user-btn" title="{{ session.user }}">{% if users.get(session.user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&amp;nk={{ users[session.user]['qq'] }}&amp;s=100" alt="头像">{% else %}{{ session.user[0].upper() }}{% endif %}</div>
+            <div class="tb-dropdown-content" id="tb-user-menu">
+                <a href="/u/{{ session.user }}">我的主页</a>
+                <a href="/workpool/my">我的作品</a>
+                <a href="/messages">消息中心</a>
+                <a href="/change_password">修改密码</a>
+                <a href="/logout">退出登录</a>
+            </div>
+        </div>
+        {% else %}
+        <a href="/login" class="tb-btn" id="tb-login">登录</a>
+        {% endif %}
+    </div>
+</header>
