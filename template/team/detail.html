@@ -15,7 +15,7 @@
         .wrap{max-width:980px;margin:0 auto;padding:72px 16px 24px}
         .section-title{font-size:18px;color:#fff;font-weight:bold;margin:22px 0 12px;display:flex;align-items:center;gap:8px;text-shadow:0 2px 6px rgba(0,0,0,.3)}
         .cover-box{position:relative;width:100%;height:180px;border-radius:10px;overflow:hidden;background:rgba(76,175,80,.15);box-shadow:0 4px 18px rgba(0,0,0,.15);margin-bottom:6px}
-        .cover-box img{width:100%;height:100%;object-fit-cover}
+        .cover-box img{width:100%;height:100%;object-fit:cover}
         .cover-box .blank{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;color:#4caf50}
         .team-icon{position:absolute;left:50%;bottom:-40px;transform:translateX(-50%);width:80px;height:80px;border-radius:50%;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.2);background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;overflow:hidden}
         .team-icon img{width:100%;height:100%;border-radius:50%;object-fit:cover}
@@ -43,10 +43,12 @@
         .member-role.admin{background:#e3f2fd;color:#1563c0}
         .member-role.member{background:#f5f5f5;color:#616161}
         .work-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-        .work-card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden}
-        .work-thumb{height:90px;background:rgba(0,0,0,.05);display:flex;align-items:center;justify-content:center}
-        .work-thumb img{width:100%;height:100%;object-fit-cover}
+        .work-card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;position:relative;cursor:pointer}
+        .work-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.12)}
+        .work-thumb{height:90px;background:rgba(0,0,0,.05);display:flex;align-items:center;justify-content:center;position:relative}
+        .work-thumb img{width:100%;height:100%;object-fit:cover}
         .work-thumb .placeholder{font-size:20px;color:#bbb}
+        .work-remove{position:absolute;top:6px;right:6px;z-index:2;background:rgba(0,0,0,.45);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer}
         .work-info{padding:8px 10px}
         .work-title{font-size:13px;color:#333;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .work-meta{font-size:11px;color:#999;margin-top:4px}
@@ -56,6 +58,15 @@
         .mdui-textfield-input{border:1px solid #ddd !important;border-radius:6px}
         .empty-tip{text-align:center;color:#999;padding:30px;font-size:13px}
         .section-gap{margin:8px 0}
+        .post-item{border-bottom:1px solid #f0f0f0;padding:14px 4px}
+        .post-item:last-child{border-bottom:none}
+        .post-title{font-size:15px;font-weight:600;color:#333}
+        .post-pin{display:inline-block;background:#fff3e0;color:#e65100;font-size:11px;padding:1px 8px;border-radius:10px;margin-left:8px;vertical-align:2px}
+        .post-content{color:#555;font-size:14px;line-height:1.7;margin-top:6px;white-space:pre-wrap;word-break:break-all}
+        .post-meta{color:#999;font-size:12px;margin-top:8px;display:flex;align-items:center;gap:10px}
+        .invite-item{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid #f5f5f5;font-size:13px}
+        .invite-item:last-child{border-bottom:none}
+        .select-arrow{appearance:none;-webkit-appearance:none;background:#fafafa}
     </style>
 </head>
 <body>
@@ -115,12 +126,70 @@
             </div>
         </div>
 
+        <!-- 团队帖子 -->
+        <div class="section-title"><i class="fa-solid fa-pen-nib"></i> 团队帖子</div>
+        <div class="card">
+            <div class="card-head">
+                <span>帖子（{{ posts|length }}）</span>
+                {% if is_member %}<span class="mdui-text-color-blue" style="margin-left:auto;cursor:pointer" onclick="document.getElementById('post-form-box').style.display='block'"><i class="fa-solid fa-plus"></i> 发帖</span>{% endif %}
+            </div>
+            <div class="card-body">
+                {% if is_member %}
+                <div id="post-form-box" class="mgr-form" style="display:none">
+                    <div class="mdui-textfield mdui-textfield-floating">
+                        <input type="text" name="title" id="new-post-title" class="mdui-textfield-input" placeholder="标题（可选）">
+                    </div>
+                    <div class="mdui-textfield mdui-textfield-floating">
+                        <textarea name="content" id="new-post-content" class="mdui-textfield-input" rows="4" placeholder="帖子内容..."></textarea>
+                    </div>
+                    {% if is_admin %}
+                    <label style="font-size:13px;color:#666;display:flex;align-items:center;gap:6px;margin:4px 0 10px">
+                        <input type="checkbox" id="new-post-pin"> 置顶
+                    </label>
+                    {% endif %}
+                    <div class="section-gap">
+                        <button class="mdui-btn mdui-btn-raised" onclick="addPost()">发布</button>
+                        <span id="post-tip" class="mdui-text-color-red" style="margin-left:10px;font-size:13px"></span>
+                    </div>
+                </div>
+                {% endif %}
+                {% if posts|length == 0 %}
+                <p class="empty-tip">还没有帖子，快来发布第一条吧。</p>
+                {% else %}
+                {% for p in posts %}
+                <div class="post-item">
+                    <div class="post-title">
+                        {% if p.is_pin %}<i class="fa-solid fa-thumbtack" style="color:#e65100"></i>{% endif %}
+                        {{ (p.title or '（无标题）')|e }}
+                        <span class="post-pin">{{ p.author }}</span>
+                    </div>
+                    {% if p.content %}<div class="post-content">{{ p.content|e }}</div>{% endif %}
+                    <div class="post-meta">
+                        <span><i class="fa-solid fa-user"></i> {{ p.author }}</span>
+                        <span><i class="fa-solid fa-clock"></i> {{ p.created_at }}</span>
+                        {% if is_admin %}
+                        <span style="margin-left:auto">
+                            <a class="mdui-text-color-blue" style="cursor:pointer;font-size:12px" onclick="pinPost({{ p.id }})">{{ '取消置顶' if p.is_pin else '置顶' }}</a>
+                            <a class="mdui-text-color-red" style="cursor:pointer;font-size:12px;margin-left:10px" onclick="delPost({{ p.id }})">删除</a>
+                        </span>
+                        {% elif p.author == session.user %}
+                        <span style="margin-left:auto">
+                            <a class="mdui-text-color-red" style="cursor:pointer;font-size:12px" onclick="delPost({{ p.id }})">删除</a>
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
         <!-- 成员 -->
         <div class="section-title"><i class="fa-solid fa-users"></i> 成员</div>
         <div class="card">
             <div class="card-head">
                 <span>成员列表（{{ members|length }} 人）</span>
-                {% if is_admin %}<span class="mdui-text-color-blue" style="margin-left:auto;cursor:pointer" onclick="document.getElementById('member-add-form').style.display='block'"><i class="fa-solid fa-plus"></i> 添加成员</span>{% endif %}
+                {% if is_admin %}<span class="mdui-text-color-blue" style="margin-left:auto;cursor:pointer" onclick="document.getElementById('member-add-form').style.display='block'"><i class="fa-solid fa-user-plus"></i> 添加成员</span>{% endif %}
             </div>
             <div class="card-body">
                 {% if is_admin %}
@@ -141,9 +210,12 @@
                         </div>
                         <div class="mdui-list-item-text">
                             <div><a href="/u/{{ m.username }}" class="mdui-text-color-blue">{{ m.username }}</a>
-                                <span class="member-role {{ m.role }}">{{ m.role }}</span>
+                                <span class="member-role {{ m.role }}">{{ m.role_name }}</span>
                             </div>
-                            <div class="mdui-text-color-blue-grey" style="font-size:12px">加入：{{ m.joined_at }}</div>
+                            <div class="mdui-text-color-blue-grey" style="font-size:12px">
+                                加入：{{ m.joined_at }}
+                                {% if m.work_count > 0 %} · 贡献 {{ m.work_count }} 个共有作品{% endif %}
+                            </div>
                         </div>
                         {% if is_admin and m.username != team.created_by %}
                         <div class="mdui-btn mdui-btn-dense" style="margin-left:auto;background:#eee;color:#666" onclick="removeMember('{{ m.username }}')"><i class="fa-solid fa-trash-can"></i> 移除</div>
@@ -154,19 +226,38 @@
             </div>
         </div>
 
-        <!-- 作品展示 -->
-        <div class="section-title"><i class="fa-solid fa-cube"></i> 作品展示</div>
+        <!-- 共有作品 -->
+        <div class="section-title"><i class="fa-solid fa-cube"></i> 共有作品</div>
         <div class="card">
+            <div class="card-head">
+                <span>团队共有作品（{{ works|length }}）</span>
+                {% if is_member and my_works %}<span class="mdui-text-color-blue" style="margin-left:auto;cursor:pointer" onclick="document.getElementById('work-add-form').style.display='block'"><i class="fa-solid fa-plus"></i> 添加作品</span>{% endif %}
+            </div>
             <div class="card-body">
+                {% if is_member and my_works %}
+                <div id="work-add-form" class="mgr-form" style="display:none">
+                    <div class="mdui-textfield mdui-textfield-floating">
+                        <select name="work_id" id="new-work-select" class="mdui-textfield-input select-arrow">
+                            {% for w in my_works %}
+                            <option value="{{ w.id }}">{{ w.title|e }}（{{ w.author }}）</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="section-gap"><button class="mdui-btn mdui-btn-raised" onclick="addWork()">添加到共有作品</button></div>
+                    <div id="work-tip" class="mdui-text-color-red" style="font-size:13px"></div>
+                </div>
+                {% endif %}
                 {% if works|length == 0 %}
-                <p class="empty-tip">团队成员还没有发布作品。</p>
+                <p class="empty-tip">还没有共有作品。{{ '添加你名下的作品到团队展示吧。' if is_member else '' }}</p>
                 {% else %}
                 <div class="work-grid">
                     {% for w in works %}
                     <div class="work-card" onclick="location.href='/workpool/{{ w.id }}'">
+                        {% if is_admin or w.author == session.user %}
+                        <button class="work-remove" title="移除" onclick="event.stopPropagation();removeWork({{ w.id }})"><i class="fa-solid fa-xmark"></i></button>
+                        {% endif %}
                         <div class="work-thumb">
                             {% if w.thumbnail %}<img src="/mk/{{ current_market or 'kn' }}/uploads/{{ w.thumbnail }}" alt="thumb">{% else %}<div class="placeholder"><i class="fa-solid fa-image"></i></div>{% endif %}
-                            <span class="tea-badge" style="position:absolute;top:6px;left:6px;background:#fff3e6;color:#e65100"><i class="fa-solid fa-building"></i></span>
                         </div>
                         <div class="work-info">
                             <div class="work-title">{{ w.title|e }}</div>
@@ -178,6 +269,37 @@
                 {% endif %}
             </div>
         </div>
+
+        <!-- 邀请管理（管理员） -->
+        {% if is_admin %}
+        <div class="section-title"><i class="fa-solid fa-envelope-open-text"></i> 邀请管理</div>
+        <div class="card">
+            <div class="card-body">
+                <div class="mdui-textfield mdui-textfield-floating">
+                    <input type="text" name="username" id="invite-username" class="mdui-textfield-input" placeholder="输入要邀请的用户名">
+                </div>
+                <div class="section-gap">
+                    <button class="mdui-btn mdui-btn-raised" onclick="sendInvite()">发送邀请</button>
+                    <span id="invite-tip" class="mdui-text-color-red" style="margin-left:10px;font-size:13px"></span>
+                </div>
+                <div class="section-gap">
+                    <div style="font-size:13px;color:#666;font-weight:600;margin:12px 0 4px">待处理邀请（{{ invites|length }}）</div>
+                    {% if invites|length == 0 %}
+                    <div style="font-size:13px;color:#bbb">暂无待处理邀请</div>
+                    {% else %}
+                    {% for iv in invites %}
+                    <div class="invite-item">
+                        <span><i class="fa-solid fa-user"></i> <b>{{ iv.from_user }}</b></span>
+                        <span class="mdui-text-color-blue-grey" style="font-size:12px">→ {{ iv.username }}</span>
+                        <span style="font-size:12px;color:#999">{{ iv.created_at }}</span>
+                        <span style="margin-left:auto"><a class="mdui-text-color-red" style="cursor:pointer;font-size:12px" onclick="cancelInvite({{ iv.id }})">撤销</a></span>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
         <!-- 管理设置（团长） -->
         {% if is_owner %}
@@ -231,23 +353,72 @@
     <script>
         window.addEventListener('load', function(){ document.getElementById('loader').style.display='none'; });
 
+        function postForm(url, formData, tipEl){
+            return fetch(url, {method:'POST', body: formData})
+                .then(function(r){ return r.json(); })
+                .then(function(d){
+                    if (tipEl) tipEl.textContent = d.message || '';
+                    if (d.success) setTimeout(function(){ location.reload(); }, 400);
+                });
+        }
+
         function addMember(){
             var uname = document.getElementById('new-member-username').value.trim();
             var tip = document.getElementById('member-tip');
             if (!uname){ tip.textContent='请输入用户名'; return; }
             var fd = new FormData();
             fd.append('username', uname);
-            fetch('/team/{{ team.id }}/members/add', {method:'POST', body: fd})
-                .then(function(r){ return r.json(); })
-                .then(function(d){ tip.textContent=d.message || ''; if(d.success) setTimeout(function(){location.reload();},400); });
+            postForm('/team/{{ team.id }}/members/add', fd, tip);
         }
         function removeMember(username){
             if (!confirm('移除成员 '+username+'？')) return;
             var fd = new FormData();
             fd.append('username', username);
-            fetch('/team/{{ team.id }}/members/remove', {method:'POST', body: fd})
-                .then(function(r){ return r.json(); })
-                .then(function(d){ if(d.success) setTimeout(function(){location.reload();},400); else alert(d.message); });
+            postForm('/team/{{ team.id }}/members/remove', fd, null);
+        }
+        function sendInvite(){
+            var uname = document.getElementById('invite-username').value.trim();
+            var tip = document.getElementById('invite-tip');
+            if (!uname){ tip.textContent='请输入用户名'; return; }
+            var fd = new FormData();
+            fd.append('username', uname);
+            postForm('/team/{{ team.id }}/invite', fd, tip);
+        }
+        function cancelInvite(id){
+            if (!confirm('撤销这条邀请？')) return;
+            postForm('/team/{{ team.id }}/invite/cancel/' + id, new FormData(), null);
+        }
+        function addWork(){
+            var sel = document.getElementById('new-work-select');
+            var tip = document.getElementById('work-tip');
+            if (!sel || !sel.value){ tip.textContent='请选择作品'; return; }
+            var fd = new FormData();
+            fd.append('work_id', sel.value);
+            postForm('/team/{{ team.id }}/works/add', fd, tip);
+        }
+        function removeWork(workId){
+            if (!confirm('从共有作品移除？')) return;
+            postForm('/team/{{ team.id }}/works/remove/' + workId, new FormData(), null);
+        }
+        function addPost(){
+            var title = document.getElementById('new-post-title').value.trim();
+            var content = document.getElementById('new-post-content').value.trim();
+            var tip = document.getElementById('post-tip');
+            if (!title && !content){ tip.textContent='标题和内容不能都为空'; return; }
+            var fd = new FormData();
+            fd.append('title', title);
+            fd.append('content', content);
+            {% if is_admin %}
+            fd.append('pin', document.getElementById('new-post-pin').checked ? '1' : '');
+            {% endif %}
+            postForm('/team/{{ team.id }}/posts/add', fd, tip);
+        }
+        function delPost(id){
+            if (!confirm('删除这条帖子？')) return;
+            postForm('/team/{{ team.id }}/posts/delete/' + id, new FormData(), null);
+        }
+        function pinPost(id){
+            postForm('/team/{{ team.id }}/posts/pin/' + id, new FormData(), null);
         }
         (function(){
             var ef = document.getElementById('team-edit-form');
@@ -256,9 +427,7 @@
                     e.preventDefault();
                     var tip = document.getElementById('edit-tip');
                     var fd = new FormData(ef);
-                    fetch('/team/{{ team.id }}/edit', {method:'POST', body: fd})
-                        .then(function(r){ return r.json(); })
-                        .then(function(d){ tip.textContent=d.message||''; if(d.success) setTimeout(function(){location.reload();},400); });
+                    postForm('/team/{{ team.id }}/edit', fd, tip);
                 });
             }
             var bf = document.getElementById('bulletin-form');
@@ -270,9 +439,7 @@
                     fd.append('description', '{{ team.description }}');
                     fd.append('cover', '{{ team.cover }}');
                     fd.append('qq', '{{ team.qq }}');
-                    fetch('/team/{{ team.id }}/edit', {method:'POST', body: fd})
-                        .then(function(r){ return r.json(); })
-                        .then(function(d){ if(d.success) setTimeout(function(){location.reload();},400); });
+                    postForm('/team/{{ team.id }}/edit', fd, null);
                 });
             }
         })();
