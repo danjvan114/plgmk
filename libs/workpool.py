@@ -1569,3 +1569,27 @@ def register_workpool_routes():
         conn.commit()
         conn.close()
         return redirect('/forum/admin/boards')
+
+    @app.route('/api/header')
+    def api_header():
+        """站头数据：提供给全局 mkh.js 统一渲染导航。"""
+        from .config import MARKETS
+        current_market = session.get('market', 'kn')
+        username = session.get('user')
+        user_info = None
+        unread = 0
+        if username:
+            u = User.query.get(username)
+            if u:
+                user_info = {'username': username, 'role': u.role or 'user', 'qq': (u.qq or ''),
+                             'reg_time': (u.reg_time or ''), 'is_admin': bool(u.role == 'admin')}
+                try:
+                    conn = get_main_db()
+                    unread = conn.execute(
+                        "SELECT COUNT(*) FROM messages WHERE to_user = ? AND is_read = 0",
+                        (username,)).fetchone()[0]
+                    conn.close()
+                except Exception:
+                    unread = 0
+        return jsonify({'markets': MARKETS, 'current_market': current_market,
+                        'user': user_info, 'unread_count': unread})

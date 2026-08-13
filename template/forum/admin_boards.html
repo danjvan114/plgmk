@@ -60,25 +60,7 @@
 </head>
 <body>
     <div class="loader" id="loader"><div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div></div>
-    <header>
-        <div class="wrap">
-            <a href="/forum" class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>菠菜面</a>
-            <div class="head-space"></div>
-            <div class="search"><input placeholder="搜索插件名称/标签"></div>
-            <div class="nav-links">
-                <a href="/forum">论坛首页</a>
-                <a href="/forum/review" class="active">审核工作台</a>
-                {% if session.user %}
-                <a href="/forum/admin/boards" class="active">板块管理</a>
-                {% endif %}
-            </div>
-            {% if session.user %}
-            <a href="/logout" class="btn">退出</a>
-            {% else %}
-            <a href="/login" class="btn">登录</a>
-            {% endif %}
-        </div>
-    </header>
+    <header id="hz5kl"></header>
     <div class="main-box">
         <div class="page-title"><i class="fa-solid fa-cube"></i> 板块管理</div>
 
@@ -185,5 +167,5 @@
             if(e.key==='Enter' && this.value.trim()){location.href='/mk/kn?search='+encodeURIComponent(this.value.trim())}
         });
     </script>
-</body>
+<script src="/localcdn/gzs/mkh.js"></script></body>
 </html>
