@@ -89,6 +89,8 @@
         nav.push('<a href="/mk/' + esc(current) + '">首页</a>');
         nav.push('<a href="https://pan1.pgrm.run">我的存储</a>');
         nav.push('<a href="/workpool">作品池</a>');
+        nav.push('<a href="/team">团队</a>');
+        nav.push('<a href="/forum">论坛</a>');
         nav.push('<a href="/dev/' + esc(current) + '">开发者中心</a>');
         nav.push('<a href="/app/' + esc(current) + '/d">应用下载</a>');
 

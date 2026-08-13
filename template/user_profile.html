@@ -9,7 +9,7 @@
     <title>{{ profile_user.username|e }} - 用户主页</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
+        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
         header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
         .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
         .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px}
@@ -31,12 +31,12 @@
         .dropdown-content.show{display:block}
         .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px}
         .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50}
-        .main-box{max-width:1100px;margin:0 auto;padding-top:76px;padding-left:16px;padding-right:16px}
+        .main-box{max-width:95%;margin:0 auto;padding-top:76px;padding-left:24px;padding-right:24px}
         .back-link{display:inline-flex;align-items:center;gap:4px;color:#4caf50;text-decoration:none;margin-bottom:16px;font-size:14px}
         .banner{width:100%;height:220px;border-radius:12px 12px 0 0;background:linear-gradient(135deg,#a5d6a7,#4caf50);overflow:hidden;position:relative}
         .banner img{width:100%;height:100%;object-fit:cover}
         .banner .banner-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:48px}
-        .profile-card{background:#fff;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none;padding:0 28px 28px;display:flex;gap:24px;align-items:center;margin-top:-44px;position:relative;z-index:2}
+        .profile-card{background:#fff;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none;padding:0 32px 32px;display:flex;gap:28px;align-items:center;margin-top:-44px;position:relative;z-index:2}
         .profile-avatar{width:110px;height:110px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:bold;color:#4caf50;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.15);margin-top:-55px}
         .profile-avatar img{width:100%;height:100%;object-fit:cover}
         .profile-info{flex:1;min-width:0;padding-top:8px}
@@ -47,13 +47,6 @@
         .profile-meta span{display:flex;align-items:center;gap:5px}
         .profile-bio{color:#555;font-size:14px;margin-top:10px;line-height:1.7;background:#f5f5f5;border-radius:8px;padding:10px 14px}
         .profile-qq{font-size:13px;color:#999;margin-top:10px}
-        .qq-form{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
-        .qq-form input,.bio-form input,.banner-form input{border:1px solid #ddd;border-radius:8px;padding:8px 12px;font-size:14px;outline:none;width:180px}
-        .qq-form input:focus,.bio-form input:focus,.banner-form input:focus{border-color:#4caf50}
-        .qq-form button,.bio-form button,.banner-form button{background:#4caf50;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px}
-        .qq-form button:hover,.bio-form button:hover,.banner-form button:hover{background:#43a047}
-        .qq-form .qq-tip,.bio-form .qq-tip,.banner-form .qq-tip{font-size:12px;color:#999}
-        .bio-form input,.banner-form input{width:260px}
         .follow-btn{background:#4caf50;color:#fff;border:none;border-radius:16px;padding:8px 20px;cursor:pointer;font-size:14px;font-weight:500;transition:all .2s}
         .follow-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(76,175,80,.3)}
         .follow-btn.following{background:#ef5350}
@@ -61,6 +54,8 @@
         .tabs a{background:rgba(255,255,255,.9);color:#4caf50;padding:8px 20px;border-radius:20px;text-decoration:none;font-size:14px;transition:all .2s}
         .tabs a:hover{transform:translateY(-1px)}
         .tabs a.active{background:#4caf50;color:#fff;font-weight:600}
+        .tab-content{display:none}
+        .tab-content.active{display:block}
         .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
         .toolbar input{border:1px solid #ddd;border-radius:8px;padding:8px 14px;font-size:14px;outline:none;flex:1;max-width:300px}
         .toolbar input:focus{border-color:#4caf50}
@@ -104,59 +99,24 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="wrap">
-            <div class="logo">
-                <div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>
-                菠菜面
-            </div>
-            <div class="nav-links">
-                <a href="/mk/{{ current_market or 'kn' }}">首页</a>
-                <a href="/workpool" style="color:#fff;font-weight:bold">作品池</a>
-                <a href="/forum">论坛</a>
-                <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
-            </div>
-            <div class="head-space"></div>
-            {% if session.user %}
-            <div class="icon-btn" title="通知" onclick="location.href='/messages'" style="position:relative"><i class="fa-solid fa-bell" style="font-size:22px"></i><span class="notify-badge" id="unread-badge" style="display:none">0</span></div>
-            <div class="dropdown">
-                <div class="user-avatar" title="{{ session.user }}">
-                    {% set su = users.get(session.user, {}) %}
-                    {% if su.get('qq') %}
-                    <img src="https://q1.qlogo.cn/g?b=qq&nk={{ su['qq'] }}&s=100" alt="头像">
-                    {% else %}
-                    {{ session.user[0].upper() }}
-                    {% endif %}
-                </div>
-                <div class="dropdown-content">
-                    <a href="/u/{{ session.user }}">我的主页</a>
-                    <a href="/workpool/my">我的作品</a>
-                    <a href="/messages">消息中心</a>
-                    <a href="/change_password">修改密码</a>
-                    <a href="/logout">退出登录</a>
-                </div>
-            </div>
-            {% else %}
-            <a href="/login" class="btn mdui-ripple" style="margin-left:12px">登录</a>
-            {% endif %}
-        </div>
-    </header>
+    <header id="hz5kl"></header>
     <div class="main-box">
         <a href="javascript:history.back()" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回</a>
         <div class="banner">
-            {% if profile_user.banner %}<img src="{{ profile_user.banner|e }}" alt="头图">{% else %}<div class="banner-placeholder"><i class="fa-regular fa-image"></i></div>{% endif %}
+            {% if profile_user.banner %}<img src="{{ profile_user.banner|e }}" alt="头图">{% else %}<img src="https://cdn-community.bcmcdn.com/47/community/qHrkuIrcIWh1dXcSsjX8WoP63amM6qZxqtwiZXtTQV44.avif?hash=Fplr0V7Sahn9Wrt-W-vquxg9bOu5" alt="默认头图">{% endif %}
         </div>
         <div class="profile-card">
             <div class="profile-avatar">
                 {% if profile_user.qq %}
                 <img src="https://q1.qlogo.cn/g?b=qq&nk={{ profile_user.qq }}&s=640" alt="头像">
                 {% else %}
-                {{ profile_user.username[:1].upper() }}
+                <img src="https://static.codemao.cn/FjCi6RLz1-HB5C47m7M_0gZqJNDG" alt="默认头像">
                 {% endif %}
             </div>
             <div class="profile-info">
                 <div class="profile-name">
                     {{ profile_user.username|e }}
+                    {% set _t = user_team(profile_user.username) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}
                     {% if profile_user.role == 'admin' %}
                     <span class="role-tag admin">管理员</span>
                     {% else %}
@@ -182,169 +142,226 @@
                 <div class="profile-qq"><i class="fa-brands fa-qq"></i>已绑定 QQ：{{ profile_user.qq }}</div>
                 {% endif %}
                 {% if session.user and session.user == profile_user.username %}
-                <div class="qq-form" style="gap:8px">
-                    <form class="qq-form" method="post" action="/user/set_qq" style="margin:0">
-                        <input type="text" name="qq" placeholder="输入QQ号设置头像/头图" value="{{ profile_user.qq }}" maxlength="20">
-                        <button type="submit">保存头像</button>
-                    </form>
-                    <form class="bio-form" method="post" action="/user/set_bio" style="margin:0">
-                        <input type="text" name="bio" placeholder="个人简介" value="{{ profile_user.bio }}" maxlength="500">
-                        <button type="submit">保存简介</button>
-                    </form>
-                    <form class="banner-form" method="post" action="/user/set_banner" style="margin:0">
-                        <input type="text" name="banner" placeholder="头图 URL（图片直链）" value="{{ profile_user.banner }}" maxlength="500">
-                        <button type="submit">保存头图</button>
-                    </form>
+                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" style="margin-top:10px;font-size:13px;padding:0 16px;height:32px" mdui-dialog="{target:'#edit-profile-dialog'}"><i class="fa-solid fa-pen"></i> 编辑资料</button>
+                {% endif %}
+            </div>
+        </div>
+        <div class="mdui-tab" mdui-tab id="profile-tabs">
+            <a href="#tab-works" class="mdui-ripple {% if tab == 'works' %}mdui-tab-active{% endif %}" data-tab="works">作品 ({{ total_works }})</a>
+            <a href="#tab-followers" class="mdui-ripple {% if tab == 'followers' %}mdui-tab-active{% endif %}" data-tab="followers">粉丝 ({{ followers|length }})</a>
+            <a href="#tab-following" class="mdui-ripple {% if tab == 'following' %}mdui-tab-active{% endif %}" data-tab="following">关注 ({{ following|length }})</a>
+            <a href="#tab-favorites" class="mdui-ripple {% if tab == 'favorites' %}mdui-tab-active{% endif %}" data-tab="favorites">收藏 ({{ favorites|length }})</a>
+            <a href="#tab-wall" class="mdui-ripple {% if tab == 'wall' %}mdui-tab-active{% endif %}" data-tab="wall">留言 ({{ wall_messages|length }})</a>
+        </div>
+
+        <div id="tab-works" class="tab-content {% if tab == 'works' %}active{% endif %}">
+            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loaded">
+                <form class="toolbar" method="get" action="/u/{{ profile_user.username }}">
+                    <input type="hidden" name="tab" value="works">
+                    <input type="text" name="q" placeholder="搜索作品名称/标签" value="{{ q }}">
+                    <select name="sort">
+                        <option value="new" {% if sort == 'new' %}selected{% endif %}>最新发布</option>
+                        <option value="hot" {% if sort == 'hot' %}selected{% endif %}>最热</option>
+                        <option value="like" {% if sort == 'like' %}selected{% endif %}>最多赞</option>
+                        <option value="fav" {% if sort == 'fav' %}selected{% endif %}>最多藏</option>
+                        <option value="coin" {% if sort == 'coin' %}selected{% endif %}>最多币</option>
+                    </select>
+                    <button type="submit">筛选</button>
+                </form>
+                {% if workpool_works %}
+                <div class="work-grid">
+                    {% for w in workpool_works %}
+                    <div class="work-card" onclick="location.href='/workpool/{{ w.id }}'" style="animation:cardUp .4s ease both">
+                        {% if w.thumbnail %}
+                        <img class="work-thumb" src="{{ w.thumbnail|e }}" alt="缩略图" onerror="this.style.display='none'">
+                        {% else %}
+                        <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
+                        {% endif %}
+                        <h3>{{ w.title|e }}</h3>
+                        <p>
+                            <span><i class="fa-solid fa-eye"></i>{{ w.view_count }}</span>
+                            <span><i class="fa-solid fa-thumbs-up"></i>{{ w.like_count }}</span>
+                            <span><i class="fa-solid fa-heart"></i>{{ w.fav_count }}</span>
+                            <span><i class="fa-solid fa-coins"></i>{{ w.coin_count if w.coin_count is defined else 0 }}</span>
+                            <span><i class="fa-regular fa-comment"></i>{{ w.comment_count }}</span>
+                        </p>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endif %}
-            </div>
-        </div>
-        <div class="tabs">
-            <a href="/u/{{ profile_user.username }}?tab=works{% if q %}&q={{ q }}{% endif %}" class="{% if tab == 'works' %}active{% endif %}"><i class="fa-solid fa-box-open"></i> 作品 ({{ total_works }})</a>
-            <a href="/u/{{ profile_user.username }}?tab=followers" class="{% if tab == 'followers' %}active{% endif %}"><i class="fa-solid fa-users"></i> 粉丝 ({{ followers|length }})</a>
-            <a href="/u/{{ profile_user.username }}?tab=following" class="{% if tab == 'following' %}active{% endif %}"><i class="fa-solid fa-user-plus"></i> 关注 ({{ following|length }})</a>
-             <a href="/u/{{ profile_user.username }}?tab=favorites" class="{% if tab == 'favorites' %}active{% endif %}"><i class="fa-solid fa-heart"></i> 收藏 ({{ favorites|length }})</a>
-             <a href="/u/{{ profile_user.username }}?tab=wall" class="{% if tab == 'wall' %}active{% endif %}"><i class="fa-solid fa-message-medical"></i> 留言 ({{ wall_messages|length }})</a>
-         </div>
-
-        {% if tab == 'works' %}
-        <form class="toolbar" method="get" action="/u/{{ profile_user.username }}">
-            <input type="hidden" name="tab" value="works">
-            <input type="text" name="q" placeholder="搜索作品名称/标签" value="{{ q }}">
-            <select name="sort">
-                <option value="new" {% if sort == 'new' %}selected{% endif %}>最新发布</option>
-                <option value="hot" {% if sort == 'hot' %}selected{% endif %}>最热</option>
-                <option value="like" {% if sort == 'like' %}selected{% endif %}>最多赞</option>
-                <option value="fav" {% if sort == 'fav' %}selected{% endif %}>最多藏</option>
-                <option value="coin" {% if sort == 'coin' %}selected{% endif %}>最多币</option>
-            </select>
-            <button type="submit">筛选</button>
-        </form>
-        {% if workpool_works %}
-        <div class="work-grid">
-            {% for w in workpool_works %}
-            <div class="work-card" onclick="location.href='/workpool/{{ w.id }}'" style="animation:cardUp .4s ease both">
-                {% if w.thumbnail %}
-                <img class="work-thumb" src="{{ w.thumbnail|e }}" alt="缩略图" onerror="this.style.display='none'">
-                {% else %}
-                <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
-                {% endif %}
-                <h3>{{ w.title|e }}</h3>
-                <p>
-                    <span><i class="fa-solid fa-eye"></i>{{ w.view_count }}</span>
-                    <span><i class="fa-solid fa-thumbs-up"></i>{{ w.like_count }}</span>
-                    <span><i class="fa-solid fa-heart"></i>{{ w.fav_count }}</span>
-                    <span><i class="fa-solid fa-coins"></i>{{ w.coin_count if w.coin_count is defined else 0 }}</span>
-                    <span><i class="fa-regular fa-comment"></i>{{ w.comment_count }}</span>
-                </p>
-            </div>
-            {% endfor %}
-        </div>
-        {% if total_pages > 1 %}
-        <div class="pagination">
-            {% if page > 1 %}
-            <a href="/u/{{ profile_user.username }}?tab=works&page={{ page - 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">上一页</a>
-            {% endif %}
-            {% for p in range(1, total_pages + 1) %}
-            {% if p == page %}
-            <span class="current">{{ p }}</span>
-            {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
-            <a href="/u/{{ profile_user.username }}?tab=works&page={{ p }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">{{ p }}</a>
-            {% endif %}
-            {% endfor %}
-            {% if page < total_pages %}
-            <a href="/u/{{ profile_user.username }}?tab=works&page={{ page + 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">下一页</a>
-            {% endif %}
-        </div>
-        {% endif %}
-        {% else %}
-        <div class="empty-tip">还没有发布作品</div>
-        {% endif %}
-
-        {% elif tab == 'followers' %}
-        {% if followers %}
-        <div class="user-list">
-            {% for f in followers %}
-            <div class="user-item" onclick="location.href='/u/{{ f.username|e }}'">
-                <div class="user-item-avatar">{% if users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
-                <div style="font-weight:600">{{ f.username|e }}</div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-tip">还没有粉丝</div>
-        {% endif %}
-
-        {% elif tab == 'following' %}
-        {% if following %}
-        <div class="user-list">
-            {% for f in following %}
-            <div class="user-item" onclick="location.href='/u/{{ f.username|e }}'">
-                <div class="user-item-avatar">{% if users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
-                <div style="font-weight:600">{{ f.username|e }}</div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-tip">还没有关注任何人</div>
-        {% endif %}
-
-        {% elif tab == 'favorites' %}
-        {% if favorites %}
-        <div class="work-grid">
-            {% for w in favorites %}
-            <div class="work-card" onclick="location.href='/workpool/{{ w.id }}'" style="animation:cardUp .4s ease both">
-                {% if w.thumbnail %}
-                <img class="work-thumb" src="{{ w.thumbnail|e }}" alt="缩略图" onerror="this.style.display='none'">
-                {% else %}
-                <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
-                {% endif %}
-                <h3>{{ w.title|e }}</h3>
-                <p>
-                    <span><i class="fa-solid fa-eye"></i>{{ w.view_count }}</span>
-                    <span><i class="fa-solid fa-thumbs-up"></i>{{ w.like_count }}</span>
-                    <span><i class="fa-solid fa-heart"></i>{{ w.fav_count }}</span>
-                    <span><i class="fa-solid fa-coins"></i>{{ w.coin_count if w.coin_count is defined else 0 }}</span>
-                    <span><i class="fa-regular fa-comment"></i>{{ w.comment_count }}</span>
-                </p>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-tip">还没有收藏任何作品</div>
-        {% endif %}
-
-        {% elif tab == 'wall' %}
-        {% if session.user %}
-        <div class="wall-box">
-            <textarea class="wall-input" id="wall-input" placeholder="留下一条友善的留言... (最多1000字)" maxlength="1000"></textarea>
-            <button class="wall-send" id="wall-send" onclick="postWall()">发布留言</button>
-        </div>
-        {% else %}
-        <div class="wall-box"><div class="empty-tip">登录后才能留言</div></div>
-        {% endif %}
-        <div class="wall-list" id="wall-list">
-            {% if wall_messages %}
-            {% for m in wall_messages %}
-            <div class="wall-item" id="wall-{{ m.id }}">
-                <div class="from-user">
-                    <span class="wall-author-avatar">{% if users.get(m.from_user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[m.from_user]['qq'] }}&s=100" alt="头像">{% else %}{{ m.from_user[:1].upper() }}{% endif %}</span>
-                    {{ m.from_user|e }}
-                    <span class="time">{{ m.created_at }}</span>
-                    {% if session.user and (session.user == m.from_user or session.user == profile_user.username) %}
-                    <span class="del" onclick="deleteWall({{ m.id }})"><i class="fa-solid fa-xmark"></i> 删除</span>
+                {% if total_pages > 1 %}
+                <div class="pagination">
+                    {% if page > 1 %}
+                    <a href="/u/{{ profile_user.username }}?tab=works&page={{ page - 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">上一页</a>
+                    {% endif %}
+                    {% for p in range(1, total_pages + 1) %}
+                    {% if p == page %}
+                    <span class="current">{{ p }}</span>
+                    {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+                    <a href="/u/{{ profile_user.username }}?tab=works&page={{ p }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">{{ p }}</a>
+                    {% endif %}
+                    {% endfor %}
+                    {% if page < total_pages %}
+                    <a href="/u/{{ profile_user.username }}?tab=works&page={{ page + 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">下一页</a>
                     {% endif %}
                 </div>
-                <div class="content">{{ m.content|e }}</div>
+                {% endif %}
+                {% else %}
+                <div class="empty-tip">还没有发布作品</div>
+                {% endif %}
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="empty-tip">还没有留言，来说一句吧</div>
-            {% endif %}
         </div>
-        {% endif %}
+
+        <div id="tab-followers" class="tab-content {% if tab == 'followers' %}active{% endif %}">
+            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loaded">
+                {% if followers %}
+                <div class="user-list">
+                    {% for f in followers %}
+                    <div class="user-item" onclick="location.href='/u/{{ f.username|e }}'">
+                        <div class="user-item-avatar">{% if users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
+                        <div style="font-weight:600">{{ f.username|e }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-tip">还没有粉丝</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="tab-following" class="tab-content {% if tab == 'following' %}active{% endif %}">
+            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loaded">
+                {% if following %}
+                <div class="user-list">
+                    {% for f in following %}
+                    <div class="user-item" onclick="location.href='/u/{{ f.username|e }}'">
+                        <div class="user-item-avatar">{% if users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
+                        <div style="font-weight:600">{{ f.username|e }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-tip">还没有关注任何人</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="tab-favorites" class="tab-content {% if tab == 'favorites' %}active{% endif %}">
+            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loaded">
+                {% if favorites %}
+                <div class="work-grid">
+                    {% for w in favorites %}
+                    <div class="work-card" onclick="location.href='/workpool/{{ w.id }}'" style="animation:cardUp .4s ease both">
+                        {% if w.thumbnail %}
+                        <img class="work-thumb" src="{{ w.thumbnail|e }}" alt="缩略图" onerror="this.style.display='none'">
+                        {% else %}
+                        <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
+                        {% endif %}
+                        <h3>{{ w.title|e }}</h3>
+                        <p>
+                            <span><i class="fa-solid fa-eye"></i>{{ w.view_count }}</span>
+                            <span><i class="fa-solid fa-thumbs-up"></i>{{ w.like_count }}</span>
+                            <span><i class="fa-solid fa-heart"></i>{{ w.fav_count }}</span>
+                            <span><i class="fa-solid fa-coins"></i>{{ w.coin_count if w.coin_count is defined else 0 }}</span>
+                            <span><i class="fa-regular fa-comment"></i>{{ w.comment_count }}</span>
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-tip">还没有收藏任何作品</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="tab-wall" class="tab-content {% if tab == 'wall' %}active{% endif %}">
+            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loaded">
+                {% if session.user %}
+                <div class="wall-box">
+                    <textarea class="wall-input" id="wall-input" placeholder="留下一条友善的留言... (最多1000字)" maxlength="1000"></textarea>
+                    <button class="wall-send" id="wall-send" onclick="postWall()">发布留言</button>
+                </div>
+                {% else %}
+                <div class="wall-box"><div class="empty-tip">登录后才能留言</div></div>
+                {% endif %}
+                <div class="wall-list" id="wall-list">
+                    {% if wall_messages %}
+                    {% for m in wall_messages %}
+                    <div class="wall-item" id="wall-{{ m.id }}">
+                        <div class="from-user">
+                            <span class="wall-author-avatar">{% if users.get(m.from_user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[m.from_user]['qq'] }}&s=100" alt="头像">{% else %}{{ m.from_user[:1].upper() }}{% endif %}</span>
+                            {{ m.from_user|e }}
+                            <span class="time">{{ m.created_at }}</span>
+                            {% if session.user and (session.user == m.from_user or session.user == profile_user.username) %}
+                            <span class="del" onclick="deleteWall({{ m.id }})"><i class="fa-solid fa-xmark"></i> 删除</span>
+                            {% endif %}
+                        </div>
+                        <div class="content">{{ m.content|e }}</div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-tip">还没有留言，来说一句吧</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
     <script>
+        var currentTab = '{{ tab }}';
+        var username = '{{ profile_user.username }}';
+        var loadedTabs = { '{{ tab }}': true };
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+            document.querySelectorAll('#profile-tabs a').forEach(function(el) { el.classList.remove('mdui-tab-active'); });
+
+            var tabEl = document.getElementById('tab-' + tabName);
+            var linkEl = document.querySelector('#profile-tabs a[data-tab="' + tabName + '"]');
+            if (tabEl) tabEl.classList.add('active');
+            if (linkEl) linkEl.classList.add('mdui-tab-active');
+
+            if (!loadedTabs[tabName]) {
+                var loadingEl = tabEl.querySelector('.tab-loading');
+                var loadedEl = tabEl.querySelector('.tab-loaded');
+                if (loadingEl) loadingEl.style.display = 'block';
+                if (loadedEl) loadedEl.style.display = 'none';
+
+                fetch('/u/' + username + '?tab=' + tabName)
+                    .then(r => r.text())
+                    .then(html => {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, 'text/html');
+                        var newContent = doc.querySelector('#tab-' + tabName + ' .tab-loaded');
+                        if (newContent && loadedEl) {
+                            loadedEl.innerHTML = newContent.innerHTML;
+                            loadedEl.style.display = 'block';
+                            if (loadingEl) loadingEl.style.display = 'none';
+                            loadedTabs[tabName] = true;
+                        }
+                    })
+                    .catch(() => {
+                        if (loadingEl) loadingEl.innerHTML = '<span style="color:#e53935">加载失败，请刷新重试</span>';
+                    });
+            }
+
+            history.replaceState(null, '', '/u/' + username + '?tab=' + tabName);
+            currentTab = tabName;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('#profile-tabs a').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        });
+
         function toggleFollow(username) {
             fetch('/workpool/follow/' + encodeURIComponent(username), { method: 'POST' })
                 .then(r => r.json())
@@ -434,5 +451,37 @@
             });
         });
     </script>
+
+    <div class="mdui-dialog" id="edit-profile-dialog">
+        <div class="mdui-dialog-title">编辑个人资料</div>
+        <div class="mdui-dialog-content">
+            <form id="edit-qq-form" method="post" action="/user/set_qq" style="margin-bottom:16px">
+                <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">QQ号（设置头像/头图）</label>
+                    <input class="mdui-textfield-input" type="text" name="qq" placeholder="输入QQ号" value="{{ profile_user.qq }}" maxlength="20">
+                </div>
+                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存头像</button>
+            </form>
+            <form id="edit-bio-form" method="post" action="/user/set_bio" style="margin-bottom:16px">
+                <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">个人简介</label>
+                    <input class="mdui-textfield-input" type="text" name="bio" placeholder="介绍一下自己" value="{{ profile_user.bio }}" maxlength="500">
+                </div>
+                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存简介</button>
+            </form>
+            <form id="edit-banner-form" method="post" action="/user/set_banner">
+                <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">头图 URL（图片直链）</label>
+                    <input class="mdui-textfield-input" type="text" name="banner" placeholder="输入头图链接" value="{{ profile_user.banner }}" maxlength="500">
+                </div>
+                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存头图</button>
+            </form>
+        </div>
+        <div class="mdui-dialog-actions">
+            <button class="mdui-btn mdui-ripple" mdui-dialog-close>关闭</button>
+        </div>
+    </div>
+
+    <script src="/localcdn/gzs/mkh.js"></script>
 </body>
 </html>

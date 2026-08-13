@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
+    <meta charset="UTF-8">
+    <title>{{ team.name }} - 团队主页</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999;background:#fff}
+        #loader .mdui-progress{margin:0;border-radius:0}
+        .wrap{max-width:95%;margin:0 auto;padding:72px 24px 24px}
+        .team-wrap{max-width:95%;margin:0 auto;padding:0 24px 24px}
+        .team-header{position:relative;width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;margin-top:72px;margin-bottom:16px}
+        .cover-box{width:100%;height:200px;overflow:hidden;background:rgba(76,175,80,.15)}
+        .cover-box img{width:100%;height:100%;object-fit:cover}
+        .cover-box .blank{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;color:#4caf50}
+        .team-icon{position:absolute;left:24px;top:24px;width:80px;height:80px;border-radius:50%;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.2);background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:2}
+        .team-icon img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+        .team-icon .initial{width:44px;font-size:32px;color:#4caf50;font-weight:bold}
+        .team-meta{padding:20px 24px}
+        .team-title{font-size:24px;font-weight:bold;color:#1565c0;margin-bottom:6px}
+        .tea-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px}
+        .team-meta-sub{color:#888;font-size:13px}
+        .team-desc{max-width:760px;margin:0 auto 6px;color:#555;font-size:15px;line-height:1.7;text-align:center}
+        .mdui-btn-raised{background:#2196f3;color:#fff}
+        .mdui-btn-raised:hover{background:#1976d2}
+        .mdui-btn-raised.warn{background:#ff9800}
+        .mdui-btn-raised.warn:hover{background:#f57c00}
+        .mdui-btn-raised.danger{background:#f44336}
+        .mdui-btn-raised.danger:hover{background:#d32f2f}
+        .card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:16px}
+        .card-head{font-size:15px;color:#444;font-weight:600;padding:14px 18px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}
+        .card-body{padding:16px 18px}
+        .bulletin{background:#fff7f9;border-left:3px solid #ff5195;border-radius:6px;padding:14px 18px;margin-top:6px}
+        .bulletin.empty{color:#bbb;font-style:italic}
+        .mdui-list{margin:0}
+        .mdui-list-item{padding:10px 0}
+        .member-role{display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;margin-left:8px}
+        .member-role.owner{background:#fff3e0;color:#e65100}
+        .member-role.admin{background:#e3f2fd;color:#1563c0}
+        .member-role.member{background:#f5f5f5;color:#616161}
+        .work-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+        .work-card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;position:relative;cursor:pointer}
+        .work-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.12)}
+        .work-thumb{height:90px;background:rgba(0,0,0,.05);display:flex;align-items:center;justify-content:center;position:relative}
+        .work-thumb img{width:100%;height:100%;object-fit:cover}
+        .work-thumb .placeholder{font-size:20px;color:#bbb}
+        .work-remove{position:absolute;top:6px;right:6px;z-index:2;background:rgba(0,0,0,.45);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer}
+        .work-info{padding:8px 10px}
+        .work-title{font-size:13px;color:#333;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .work-meta{font-size:11px;color:#999;margin-top:4px}
+        .mgr-form{border-top:1px solid #eee;padding-top:14px;margin-top:14px}
+        .mgr-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+        .mgr-row.full{grid-template-columns:1fr}
+        .mdui-textfield-input{border:1px solid #ddd !important;border-radius:6px}
+        .empty-tip{text-align:center;color:#999;padding:30px;font-size:13px}
+        .section-gap{margin:8px 0}
+        .post-item{border-bottom:1px solid #f0f0f0;padding:14px 4px}
+        .post-item:last-child{border-bottom:none}
+        .post-title{font-size:15px;font-weight:600;color:#333}
+        .post-pin{display:inline-block;background:#fff3e0;color:#e65100;font-size:11px;padding:1px 8px;border-radius:10px;margin-left:8px;vertical-align:2px}
+        .post-content{color:#555;font-size:14px;line-height:1.7;margin-top:6px;white-space:pre-wrap;word-break:break-all}
+        .post-meta{color:#999;font-size:12px;margin-top:8px;display:flex;align-items:center;gap:10px}
+        .invite-item{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid #f5f5f5;font-size:13px}
+        .invite-item:last-child{border-bottom:none}
+        .select-arrow{appearance:none;-webkit-appearance:none;background:#fafafa}
+        .tab-content{padding:16px 0}
+        .tab-loading{text-align:center;padding:40px;color:#999}
+        .tab-loading .mdui-spinner{width:40px;height:40px;color:#2196f3}
+        .tab-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader"><div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div></div>
+    <header id="hz5kl"></header>
+    <div class="team-wrap">
+
+        <!-- 顶部：封面 + 团队图标 + 名称信息 -->
+        <div class="team-header">
+            <div class="cover-box">
+                {% if team.cover %}<img src="{{ team.cover }}" alt="cover">{% else %}<div class="blank"><i class="fa-solid fa-image"></i></div>{% endif %}
+            </div>
+            <div class="team-icon">
+                {% if team.avatar_url %}
+                <img src="{{ team.avatar_url }}" alt="team">
+                {% else %}
+                <div class="initial"><i class="fa-solid fa-building"></i></div>
+                {% endif %}
+            </div>
+            <div class="team-meta">
+                <div class="team-title">
+                    {{ team.name|e }}
+                    {% if team.qq %}<span class="tea-badge">QQ {{ team.qq }}</span>{% endif %}
+                    <span class="tea-badge"><i class="fa-solid fa-user-group"></i> {{ members_total }} 人</span>
+                </div>
+                <div class="team-meta-sub">
+                    创建者：<span class="mdui-text-color-blue">{{ team.created_by }}</span>
+                    · 成立：<span class="mdui-text-color-blue">{{ team.created_at }}</span>
+                </div>
+                {% if team.description %}
+                <div class="team-desc">{{ team.description|e }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 告示牌 -->
+        <div class="card">
+            <div class="card-body">
+                {% if is_admin %}
+                <form id="bulletin-form">
+                    <div class="mdui-textfield">
+                        <textarea name="bulletin" class="mdui-textfield-input" rows="3" placeholder="编写告示牌内容...">{{ team.bulletin }}</textarea>
+                    </div>
+                    <div class="section-gap">
+                        <button type="submit" class="mdui-btn mdui-btn-raised">保存告示牌</button>
+                    </div>
+                </form>
+                <div id="bulletin-tip" class="mdui-text-color-red" style="font-size:13px"></div>
+                {% else %}
+                <div class="bulletin">
+                    {% if team.bulletin %}<div style="color:#333;line-height:1.7">{{ team.bulletin|e }}</div>{% else %}<div class="empty">（团队暂未发布公告）</div>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- MDUI 选项卡 -->
+        <div class="mdui-tab" mdui-tab id="team-tabs" style="margin-top:20px">
+            <a href="#tab-posts" class="mdui-ripple"><i class="fa-solid fa-pen-nib"></i> 帖子</a>
+            <a href="#tab-members" class="mdui-ripple"><i class="fa-solid fa-users"></i> 成员</a>
+            <a href="#tab-works" class="mdui-ripple"><i class="fa-solid fa-cube"></i> 作品</a>
+            {% if is_admin %}<a href="#tab-invites" class="mdui-ripple"><i class="fa-solid fa-envelope-open-text"></i> 邀请</a>{% endif %}
+            {% if is_owner %}<a href="#tab-settings" class="mdui-ripple"><i class="fa-solid fa-gear"></i> 设置</a>{% endif %}
+        </div>
+
+        <!-- 帖子选项卡 -->
+        <div id="tab-posts" class="tab-content">
+            <div class="card">
+                <div class="tab-actions" style="padding:14px 18px;border-bottom:1px solid #eee">
+                    <span style="font-size:15px;color:#444;font-weight:600">帖子（<span id="posts-count">{{ posts_total }}</span>）</span>
+                    {% if is_member %}<span class="mdui-text-color-blue" style="cursor:pointer" onclick="document.getElementById('post-form-box').style.display='block'"><i class="fa-solid fa-plus"></i> 发帖</span>{% endif %}
+                </div>
+                <div class="card-body">
+                    {% if is_member %}
+                    <div id="post-form-box" class="mgr-form" style="display:none">
+                        <div class="mdui-textfield mdui-textfield-floating">
+                            <input type="text" name="title" id="new-post-title" class="mdui-textfield-input" placeholder="标题（可选）">
+                        </div>
+                        <div class="mdui-textfield mdui-textfield-floating">
+                            <textarea name="content" id="new-post-content" class="mdui-textfield-input" rows="4" placeholder="帖子内容..."></textarea>
+                        </div>
+                        {% if is_admin %}
+                        <label style="font-size:13px;color:#666;display:flex;align-items:center;gap:6px;margin:4px 0 10px">
+                            <input type="checkbox" id="new-post-pin"> 置顶
+                        </label>
+                        {% endif %}
+                        <div class="section-gap">
+                            <button class="mdui-btn mdui-btn-raised" onclick="addPost()">发布</button>
+                            <span id="post-tip" class="mdui-text-color-red" style="margin-left:10px;font-size:13px"></span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div id="post-list">
+                        {{ posts_html|safe }}
+                        {% if p_has_more %}
+                        <div style="text-align:center;padding-top:6px">
+                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="post-more-btn">加载更多帖子</button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 成员选项卡 -->
+        <div id="tab-members" class="tab-content">
+            <div class="card">
+                <div class="tab-actions" style="padding:14px 18px;border-bottom:1px solid #eee">
+                    <span style="font-size:15px;color:#444;font-weight:600">成员列表（{{ members_total }} 人）</span>
+                    {% if is_admin %}<span class="mdui-text-color-blue" style="cursor:pointer" onclick="document.getElementById('member-add-form').style.display='block'"><i class="fa-solid fa-user-plus"></i> 添加成员</span>{% endif %}
+                </div>
+                <div class="card-body">
+                    {% if is_admin %}
+                    <div id="member-add-form" class="mgr-form" style="display:none">
+                        <div class="mdui-textfield mdui-textfield-floating">
+                            <input type="text" name="username" id="new-member-username" class="mdui-textfield-input" required>
+                            <label class="mdui-textfield-label">成员用户名</label>
+                        </div>
+                        <div class="section-gap"><button class="mdui-btn mdui-btn-raised" onclick="addMember()">添加</button></div>
+                        <div id="member-tip" class="mdui-text-color-red" style="font-size:13px"></div>
+                    </div>
+                    {% endif %}
+                    <ul class="mdui-list" style="padding:0" id="member-list">
+                        {{ members_html|safe }}
+                        {% if m_has_more %}
+                        <div style="text-align:center;padding-top:6px">
+                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="member-more-btn">加载更多成员</button>
+                        </div>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 作品选项卡 -->
+        <div id="tab-works" class="tab-content">
+            <div class="card">
+                <div class="tab-actions" style="padding:14px 18px;border-bottom:1px solid #eee">
+                    <span style="font-size:15px;color:#444;font-weight:600">团队共有作品（<span id="works-count">{{ works_total }}</span>）</span>
+                    {% if is_member and my_works %}<span class="mdui-text-color-blue" style="cursor:pointer" onclick="document.getElementById('work-add-form').style.display='block'"><i class="fa-solid fa-plus"></i> 添加作品</span>{% endif %}
+                </div>
+                <div class="card-body">
+                    {% if is_member and my_works %}
+                    <div id="work-add-form" class="mgr-form" style="display:none">
+                        <div class="mdui-textfield mdui-textfield-floating">
+                            <select name="work_id" id="new-work-select" class="mdui-textfield-input select-arrow">
+                                {% for w in my_works %}
+                                <option value="{{ w.id }}">{{ w.title|e }}（{{ w.author }}）</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="section-gap"><button class="mdui-btn mdui-btn-raised" onclick="addWork()">添加到共有作品</button></div>
+                        <div id="work-tip" class="mdui-text-color-red" style="font-size:13px"></div>
+                    </div>
+                    {% endif %}
+                    <div class="work-grid" id="work-list">
+                        {{ works_html|safe }}
+                        {% if w_has_more %}
+                        <div style="text-align:center;padding-top:6px">
+                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="work-more-btn">加载更多作品</button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 邀请管理选项卡（管理员） -->
+        {% if is_admin %}
+        <div id="tab-invites" class="tab-content">
+            <div class="card">
+                <div class="card-body">
+                    <div class="mdui-textfield mdui-textfield-floating">
+                        <input type="text" name="username" id="invite-username" class="mdui-textfield-input" placeholder="输入要邀请的用户名">
+                    </div>
+                    <div class="section-gap">
+                        <button class="mdui-btn mdui-btn-raised" onclick="sendInvite()">发送邀请</button>
+                        <span id="invite-tip" class="mdui-text-color-red" style="margin-left:10px;font-size:13px"></span>
+                    </div>
+                    <div class="section-gap">
+                        <div style="font-size:13px;color:#666;font-weight:600;margin:12px 0 4px">待处理邀请</div>
+                        <div id="invite-list">
+                            {{ invites_html|safe }}
+                            {% if i_has_more %}
+                            <div style="text-align:center;padding-top:6px">
+                                <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="invite-more-btn">加载更多邀请</button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 管理设置选项卡（团长） -->
+        {% if is_owner %}
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <div class="card-body">
+                    <form id="team-edit-form">
+                        <div class="mgr-form">
+                            <div class="mgr-row">
+                                <div class="mdui-textfield mdui-textfield-floating">
+                                    <input type="text" name="name" class="mdui-textfield-input" value="{{ team.name }}" required>
+                                    <label class="mdui-textfield-label">团队名称</label>
+                                </div>
+                                <div class="mdui-textfield mdui-textfield-floating">
+                                    <input type="text" name="cover" class="mdui-textfield-input" placeholder="https://..." value="{{ team.cover or '' }}">
+                                    <label class="mdui-textfield-label">头图 URL</label>
+                                </div>
+                            </div>
+                            <div class="mgr-row">
+                                <div class="mdui-textfield mdui-textfield-floating">
+                                    <input type="text" name="description" class="mdui-textfield-input" value="{{ team.description or '' }}">
+                                    <label class="mdui-textfield-label">介绍</label>
+                                </div>
+                                <div class="mdui-textfield mdui-textfield-floating">
+                                    <input type="text" name="qq" class="mdui-textfield-input" placeholder="QQ 号" value="{{ team.qq or '' }}">
+                                    <label class="mdui-textfield-label">QQ 号（团队图标）</label>
+                                </div>
+                            </div>
+                            <div class="mgr-row full">
+                                <div class="mdui-textfield mdui-textfield-floating">
+                                    <textarea name="bulletin" class="mdui-textfield-input" rows="3" placeholder="团队公告">{{ team.bulletin }}</textarea>
+                                    <label class="mdui-textfield-label">告示牌内容</label>
+                                </div>
+                            </div>
+                            <div class="section-gap">
+                                <button type="submit" class="mdui-btn mdui-btn-raised">保存设置</button>
+                                <span id="edit-tip" class="mdui-text-color-red" style="margin-left:10px;font-size:13px"></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="section-gap">
+                        <form action="/team/{{ team.id }}/delete" method="post" onsubmit="return confirm('删除团队后不可恢复，确定吗？')">
+                            <button type="submit" class="mdui-btn mdui-btn-raised danger"><i class="fa-solid fa-trash-can"></i> 删除团队</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="/localcdn/gzs/mkh.js"></script>
+    <script>
+        window.addEventListener('load', function(){ document.getElementById('loader').style.display='none'; });
+
+        var teamId = {{ team.id }};
+        var isMember = {{ 'true' if is_member else 'false' }};
+        var isAdmin = {{ 'true' if is_admin else 'false' }};
+        var isOwner = {{ 'true' if is_owner else 'false' }};
+
+        // 初始化"加载更多"按钮
+        (function(){
+            function setupMore(btnId, url, contId, page){
+                var btn = document.getElementById(btnId), cont = document.getElementById(contId);
+                if (!btn || !cont) return;
+                btn.addEventListener('click', function(){
+                    fetch(url + '?page=' + page).then(function(r){ return r.json(); }).then(function(d){
+                        if (d.html) {
+                            cont.insertAdjacentHTML('beforeend', d.html);
+                        }
+                        page++;
+                        if (!d.has_more) btn.style.display = 'none';
+                    });
+                });
+            }
+            setupMore('post-more-btn', '/team/' + teamId + '/posts/ajax', 'post-list', 2);
+            setupMore('member-more-btn', '/team/' + teamId + '/members/ajax', 'member-list', 2);
+            setupMore('work-more-btn', '/team/' + teamId + '/works/ajax', 'work-list', 2);
+            setupMore('invite-more-btn', '/team/' + teamId + '/invites/ajax', 'invite-list', 2);
+        })();
+
+        function postForm(url, formData, tipEl){
+            return fetch(url, {method:'POST', body: formData})
+                .then(function(r){ return r.json(); })
+                .then(function(d){
+                    if (tipEl) tipEl.textContent = d.message || '';
+                    if (d.success) {
+                        setTimeout(function(){ location.reload(); }, 400);
+                    }
+                });
+        }
+
+        function addMember(){
+            var uname = document.getElementById('new-member-username').value.trim();
+            var tip = document.getElementById('member-tip');
+            if (!uname){ tip.textContent='请输入用户名'; return; }
+            var fd = new FormData();
+            fd.append('username', uname);
+            postForm('/team/' + teamId + '/members/add', fd, tip);
+        }
+        function removeMember(username){
+            if (!confirm('移除成员 '+username+'？')) return;
+            var fd = new FormData();
+            fd.append('username', username);
+            postForm('/team/' + teamId + '/members/remove', fd, null);
+        }
+        function sendInvite(){
+            var uname = document.getElementById('invite-username').value.trim();
+            var tip = document.getElementById('invite-tip');
+            if (!uname){ tip.textContent='请输入用户名'; return; }
+            var fd = new FormData();
+            fd.append('username', uname);
+            postForm('/team/' + teamId + '/invite', fd, tip);
+        }
+        function cancelInvite(id){
+            if (!confirm('撤销这条邀请？')) return;
+            postForm('/team/' + teamId + '/invite/cancel/' + id, new FormData(), null);
+        }
+        function addWork(){
+            var sel = document.getElementById('new-work-select');
+            var tip = document.getElementById('work-tip');
+            if (!sel || !sel.value){ tip.textContent='请选择作品'; return; }
+            var fd = new FormData();
+            fd.append('work_id', sel.value);
+            postForm('/team/' + teamId + '/works/add', fd, tip);
+        }
+        function removeWork(workId){
+            if (!confirm('从共有作品移除？')) return;
+            postForm('/team/' + teamId + '/works/remove/' + workId, new FormData(), null);
+        }
+        function addPost(){
+            var title = document.getElementById('new-post-title').value.trim();
+            var content = document.getElementById('new-post-content').value.trim();
+            var tip = document.getElementById('post-tip');
+            if (!title && !content){ tip.textContent='标题和内容不能都为空'; return; }
+            var fd = new FormData();
+            fd.append('title', title);
+            fd.append('content', content);
+            {% if is_admin %}
+            fd.append('pin', document.getElementById('new-post-pin').checked ? '1' : '');
+            {% endif %}
+            postForm('/team/' + teamId + '/posts/add', fd, tip);
+        }
+        function delPost(id){
+            if (!confirm('删除这条帖子？')) return;
+            postForm('/team/' + teamId + '/posts/delete/' + id, new FormData(), null);
+        }
+        function pinPost(id){
+            postForm('/team/' + teamId + '/posts/pin/' + id, new FormData(), null);
+        }
+        (function(){
+            var ef = document.getElementById('team-edit-form');
+            if (ef){
+                ef.addEventListener('submit', function(e){
+                    e.preventDefault();
+                    var tip = document.getElementById('edit-tip');
+                    var fd = new FormData(ef);
+                    postForm('/team/' + teamId + '/edit', fd, tip);
+                });
+            }
+            var bf = document.getElementById('bulletin-form');
+            if (bf){
+                bf.addEventListener('submit', function(e){
+                    e.preventDefault();
+                    var fd = new FormData(bf);
+                    fd.append('name', '{{ team.name }}');
+                    fd.append('description', '{{ team.description }}');
+                    fd.append('cover', '{{ team.cover }}');
+                    fd.append('qq', '{{ team.qq }}');
+                    postForm('/team/' + teamId + '/edit', fd, null);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

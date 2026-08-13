@@ -9,7 +9,7 @@
     <title>论坛</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
         body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
         @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
         header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
@@ -109,11 +109,7 @@
     <div class="main-box">
         <div class="main-col">
             <div class="page-title"><i class="fa-solid fa-comments"></i>菠菜面论坛</div>
-            <div class="filter-tabs">
-                <a href="/forum?tab=new{% if q %}&q={{ q }}{% endif %}" class="filter-tab {% if tab == 'new' %}active{% endif %}"><i class="fa-solid fa-clock"></i> 最新回复</a>
-                <a href="/forum?tab=pin{% if q %}&q={{ q }}{% endif %}" class="filter-tab {% if tab == 'pin' %}active{% endif %}"><i class="fa-solid fa-star"></i> 精品合辑</a>
-                <a href="/forum?tab=help{% if q %}&q={{ q }}{% endif %}" class="filter-tab {% if tab == 'help' %}active{% endif %}"><i class="fa-solid fa-circle-help"></i> 求帮助</a>
-            </div>
+            
             <div class="community-search">
                 <form action="/forum" method="get" style="display:flex;width:100%;align-items:center">
                     <input type="hidden" name="tab" value="{{ tab }}">
@@ -122,7 +118,7 @@
             </div>
             <ul class="post-list">
                 {% for p in posts %}
-                <li class="post-item" onclick="location.href='/forum/post/{{ p.id }}'">
+                <li class="post-item mdui-ripple" onclick="location.href='/forum/post/{{ p.id }}'">
                     {% set au = users.get(p.author, {}) %}
                     <div class="post-avatar">{% if au.get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ au['qq'] }}&s=100" alt="头像">{% else %}<img src="https://static-platform.codemao.cn/avatar/default/v1_user_006.png" alt="头像">{% endif %}</div>
                     <div class="post-main">
@@ -131,7 +127,7 @@
                             {% if p.is_pinned %}<span class="post-tag">置顶</span>{% endif %}
                         </div>
                         {% if p.preview %}<div class="post-preview">{{ p.preview|e }}</div>{% endif %}
-                        <div class="post-author">@{{ p.author|e }}</div>
+                        <div class="post-author">@{{ p.author|e }}{% set _t = user_team(p.author) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</div>
                     </div>
                     <div class="post-footer">
                         <span><i class="fa-regular fa-comment"></i>{{ p.comment_count }}</span>
@@ -171,7 +167,7 @@
                 <div class="hd"><i class="fa-solid fa-grip"></i> 论坛广场</div>
                 <div class="bd">
                     {% for f in forums %}
-                    <div class="board-item" onclick="location.href='/forum/{{ f.id }}'"><span class="board-dot"></span>{{ f.name|e }}</div>
+                    <div class="mdui-ripple board-item" onclick="location.href='/forum/{{ f.id }}'"><span class="board-dot"></span>{{ f.name|e }}</div>
                     {% endfor %}
                     {% if forums|length == 0 %}
                     <div class="board-item">暂无分区</div>
@@ -181,7 +177,7 @@
             <div class="publish-card">
                 <div class="hd">发布</div>
                 <div class="bd">
-                    <a href="/forum/new" class="publish-btn">发布帖子</a>
+                    <a href="/forum/new" class="mdui-ripple mdui-btn">发布帖子</a>
                 </div>
             </div>
             {% if session.user %}
@@ -189,11 +185,11 @@
                 <div class="hd">我的</div>
                 <div class="bd">
                     <div class="my-opt">
-                        <a href="/u/{{ session.user }}?tab=works" style="flex:1">我的主页</a>
+                        <a class="mdui-ripple mdui-btn" href="/u/{{ session.user }}?tab=works" style="flex:1">我的主页</a>
                     </div>
                     <div class="my-opt">
-                        <a href="/forum/new" style="flex:1">发新帖</a>
-                        <a href="/u/{{ session.user }}" style="flex:1">我的收藏</a>
+                        <a class="mdui-ripple mdui-btn" href="/forum/new" style="flex:1">发新帖</a>
+                        <a class="mdui-ripple mdui-btn" href="/u/{{ session.user }}" style="flex:1">我的收藏</a>
                     </div>
                 </div>
             </div>
@@ -202,8 +198,8 @@
                 <div class="hd">管理</div>
                 <div class="bd">
                     <div class="my-opt">
-                        <a href="/forum/admin/boards" style="flex:1">板块管理</a>
-                        <a href="/forum/review" style="flex:1">审核工作台</a>
+                        <a class="mdui-ripple mdui-btn" href="/forum/admin/boards" style="flex:1">板块管理</a>
+                        <a class="mdui-ripple mdui-btn" href="/forum/review" style="flex:1">审核工作台</a>
                     </div>
                 </div>
             </div>

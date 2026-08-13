@@ -9,7 +9,7 @@
     <title>我的作品 - 作品池</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
         body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
         @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
         header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
@@ -94,11 +94,11 @@
                     <span class="meta-item"><i class="fa-regular fa-comment" style="font-size:16px"></i>{{ work.comment_count }}</span>
                 </div>
                 <div style="margin-top:12px;text-align:right">
-                    <button class="action-btn" style="color:#1976d2;border-color:#1976d2;font-size:12px;padding:6px 12px;margin-right:6px" onclick="event.stopPropagation();updateWork({{ work.id }})">
+                    <button class="mdui-ripple action-btn mdui-btn" style="color:#1976d2;border-color:#1976d2;font-size:12px;padding:6px 12px;margin-right:6px" onclick="event.stopPropagation();updateWork({{ work.id }})">
                         <i class="fa-solid fa-rotate" style="font-size:16px"></i>
                         更新文件
                     </button>
-                    <button class="action-btn" style="color:#f44336;border-color:#f44336;font-size:12px;padding:6px 12px" onclick="event.stopPropagation();deleteWork({{ work.id }})">
+                    <button class="mdui-ripple action-btn mdui-btn" style="color:#f44336;border-color:#f44336;font-size:12px;padding:6px 12px" onclick="event.stopPropagation();deleteWork({{ work.id }})">
                         <i class="fa-solid fa-trash-can" style="font-size:16px"></i>
                         擦除
                     </button>

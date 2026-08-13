@@ -10,6 +10,7 @@ from libs.developer_routes import register_developer_routes
 from libs.other_routes import register_other_routes
 from libs.file_manager import register_file_manager_routes
 from libs.workpool import register_workpool_routes
+from libs.team_routes import register_team_routes, init_team_db
 import os
 
 
@@ -72,6 +73,7 @@ for market_id in MARKETS:
     init_market_database(market_id)
 
 init_player_database()
+init_team_db()
 print("DEBUG: player database initialized")
 
 register_market_routes()
@@ -84,6 +86,8 @@ register_other_routes()
 print("DEBUG: other routes registered")
 register_workpool_routes()
 print("DEBUG: workpool routes registered")
+register_team_routes()
+print("DEBUG: team routes registered")
 
 LOCALCDN_PATH = os.path.join(os.path.dirname(__file__), 'localcdn')
 register_file_manager_routes(app, LOCALCDN_PATH)

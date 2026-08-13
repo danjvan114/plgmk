@@ -1452,14 +1452,25 @@ def register_workpool_routes():
         conn.execute("INSERT INTO responses (post_id, parent_id, user_id, username, content) VALUES (?, ?, ?, ?, ?)",
                      (post_id, parent_id, session['user'], session['user'], content))
         conn.execute("UPDATE posts SET comment_count = comment_count + 1 WHERE id = ?", (post_id,))
-        conn.commit()
+        conn.commit()  # 提交回复 + 评论计数（forum.db）
         if parent_id and target and target['user_id'] != session['user']:
-            conn.execute("INSERT INTO messages (to_user, from_user, msg_type, content, work_id) VALUES (?, ?, 'reply', ?, 0)",
-                         (target['user_id'], session['user'], f'用户 {session["user"]} 回复了你在《{post["author"]} 的帖子》里的跟帖'))
+            try:
+                mconn = get_main_db()
+                mconn.execute("INSERT INTO messages (to_user, from_user, msg_type, content, work_id) VALUES (?, ?, 'reply', ?, 0)",
+                              (target['user_id'], session['user'], '用户 %s 回复了你在《%s 的帖子》里的跟帖' % (session['user'], post['author'])))
+                mconn.commit()
+                mconn.close()
+            except Exception:
+                pass
         elif not parent_id and post['author'] != session['user']:
-            conn.execute("INSERT INTO messages (to_user, from_user, msg_type, content, work_id) VALUES (?, ?, 'reply', ?, 0)",
-                         (post['author'], session['user'], f'用户 {session["user"]} 回复了你的帖子'))
-        conn.commit()
+            try:
+                mconn = get_main_db()
+                mconn.execute("INSERT INTO messages (to_user, from_user, msg_type, content, work_id) VALUES (?, ?, 'reply', ?, 0)",
+                              (post['author'], session['user'], '用户 %s 回复了你的帖子' % session['user']))
+                mconn.commit()
+                mconn.close()
+            except Exception:
+                pass
         conn.close()
         return jsonify({'success': True, 'message': '回复成功'})
 

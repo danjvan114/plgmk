@@ -9,7 +9,7 @@
     <title>{{ post.title }} - 论坛</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
         body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
         @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
         header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
@@ -135,7 +135,7 @@
             <div class="post-head">
                 <h1 class="post-title">{% if post.is_pinned %}📌{% endif %}{{ post.title|e }}{% if post.is_pinned %}<span class="pin-badge"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}</h1>
                 <div class="post-info">
-                    <a href="/u/{{ post.author|e }}"><i class="fa-solid fa-user"></i> {{ post.author|e }}</a>
+                    <a href="/u/{{ post.author|e }}"><i class="fa-solid fa-user"></i> {{ post.author|e }}{% set _t = user_team(post.author) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</a>
                     <span><i class="fa-regular fa-clock"></i>{{ post.created_at }}</span>
                     <span><i class="fa-regular fa-eye"></i>{{ post.view_count }} 浏览</span>
                     <span><i class="fa-regular fa-comment"></i>{{ post.comment_count }} 回帖</span>
@@ -182,7 +182,7 @@
             <div class="reply-item">
                 <div class="floor-head">
                     <div class="floor-user">
-                        <a href="/u/{{ rep.username|e }}" style="font-size:13px;font-weight:500">{{ rep.username|e }}</a>
+                        <a href="/u/{{ rep.username|e }}" style="font-size:13px;font-weight:500">{{ rep.username|e }}{% set _t = user_team(rep.username) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:1px 6px;margin-left:4px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</a>
                         {% if rep.is_pinned %}<span class="floor-pin"><i class="fa-solid fa-thumbtack"></i></span>{% endif %}
                     </div>
                     <div class="floor-ops">
@@ -259,8 +259,40 @@
             })
             .then(function(r){ return r.json(); })
             .then(function(data){
-                if (data.success) { location.reload(); } else { alert(data.message); }
+                if (data.success) {
+                    document.getElementById('reply-content').value = '';
+                    var mainBox = document.querySelector('.main-box');
+                    var pagination = mainBox.querySelector('.pagination');
+                    var replyBox = document.querySelector('.reply-box');
+                    var floorHTML = '<div class="floor" id="floor-' + data.reply.id + '" style="animation:cardSlideUp .3s ease">' +
+                        '<div class="floor-head">' +
+                        '<div class="floor-user">' +
+                        '<span class="floor-no">' + data.floor_no + '楼</span>' +
+                        '<a href="/u/' + data.reply.username + '">' + data.reply.username + '</a>' +
+                        '</div>' +
+                        '<div class="floor-ops">' +
+                        '<span class="floor-time">' + data.reply.created_at + '</span>' +
+                        '<a onclick="replyPrompt(' + data.reply.id + ')"><i class="fa-solid fa-reply"></i> 回复</a>' +
+                        '<a class="danger" onclick="deleteReply(' + data.reply.id + ')"><i class="fa-solid fa-trash-can"></i> 删除</a>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="floor-content">' + data.reply.content + '</div>' +
+                        '</div>';
+                    if (pagination) {
+                        mainBox.insertBefore(createElementFromHTML(floorHTML), pagination);
+                    } else if (replyBox) {
+                        mainBox.insertBefore(createElementFromHTML(floorHTML), replyBox);
+                    } else {
+                        mainBox.insertAdjacentHTML('beforeend', floorHTML);
+                    }
+                } else { alert(data.message); }
             });
+        }
+
+        function createElementFromHTML(html) {
+            var div = document.createElement('div');
+            div.innerHTML = html.trim();
+            return div.firstChild;
         }
 
         function replyPrompt(floorId) {
@@ -274,7 +306,25 @@
             })
             .then(function(r){ return r.json(); })
             .then(function(data){
-                if (data.success) { location.reload(); } else { alert(data.message); }
+                if (data.success) {
+                    var floorEl = document.getElementById('floor-' + floorId);
+                    if (floorEl) {
+                        var replyHTML = '<div class="reply-item" style="animation:cardSlideUp .3s ease">' +
+                            '<div class="floor-head">' +
+                            '<div class="floor-user">' +
+                            '<a href="/u/' + data.reply.username + '" style="font-size:13px;font-weight:500">' + data.reply.username + '</a>' +
+                            '</div>' +
+                            '<div class="floor-ops">' +
+                            '<span class="floor-time">' + data.reply.created_at + '</span>' +
+                            '<a onclick="replyPrompt(' + floorId + ')"><i class="fa-solid fa-reply"></i> 回复</a>' +
+                            '<a class="danger" onclick="deleteReply(' + data.reply.id + ')"><i class="fa-solid fa-trash-can"></i> 删除</a>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="reply-content">' + data.reply.content + '</div>' +
+                            '</div>';
+                        floorEl.insertAdjacentHTML('beforeend', replyHTML);
+                    }
+                } else { alert(data.message); }
             });
         }
 
@@ -282,7 +332,14 @@
             if (!confirm('确定删除该楼层？')) return;
             fetch('/forum/reply/delete/' + replyId, { method: 'POST' })
                 .then(function(r){ return r.json(); })
-                .then(function(data){ alert(data.message); if (data.success) location.reload(); });
+                .then(function(data){
+                    if (data.success) {
+                        var el = document.getElementById('floor-' + replyId);
+                        if (el) el.remove();
+                    } else {
+                        alert(data.message);
+                    }
+                });
         }
 
         function pinReply(replyId) {

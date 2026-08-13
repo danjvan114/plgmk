@@ -9,7 +9,7 @@
     <title>{{ work.title }} - 作品池</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
         body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
         @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
         header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
@@ -151,7 +151,7 @@
                             <div class="mdui-spinner-layer mdui-spinner-layer-3"></div>
                             <div class="mdui-spinner-layer mdui-spinner-layer-4"></div>
                         </div>
-                        <span>作品加载中...</span>
+                        <span>作品播放器正在加载，请稍后...</span>
                     </div>
                     <iframe id="player-frame" src="{{ work.file_url }}" frameborder="0" allowfullscreen onload="playerLoaded()"></iframe>
                     {% elif work.file_url %}
@@ -242,7 +242,7 @@
                         <div class="comment-item" id="comment-{{ comment.id }}">
                             <div class="comment-header">
                                 <span class="comment-user">
-                                    <a href="/u/{{ comment.username|e }}" style="color:#333;text-decoration:none">{{ comment.username|e }}</a>
+                                     <a href="/u/{{ comment.username|e }}" style="color:#333;text-decoration:none">{{ comment.username|e }}{% set _t = user_team(comment.username) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:1px 6px;margin-left:4px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</a>
                                     {% if comment.is_pinned %}<span class="comment-pinned"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}
                                 </span>
                                 <span class="comment-time">{{ comment.created_at }}
@@ -309,7 +309,7 @@
             <div class="side-col">
                 <div class="author-card">
                     <div class="author-head">
-                        <span class="author-name" style="cursor:pointer" onclick="location.href='/u/{{ work.author|e }}'">{{ work.author|e }}</span>
+                        <span class="author-name" style="cursor:pointer" onclick="location.href='/u/{{ work.author|e }}'">{{ work.author|e }}{% set _t = user_team(work.author) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</span>
                         <div class="author-avatar" onclick="location.href='/u/{{ work.author|e }}'" style="cursor:pointer;overflow:hidden">{% if users.get(work.author, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[work.author]['qq'] }}&s=100" style="width:100%;height:100%;object-fit:cover" alt="头像">{% else %}{{ work.author[:1].upper() }}{% endif %}</div>
                     </div>
                     <p class="author-sign">{% if users.get(work.author, {}).get('bio') %}{{ users[work.author]['bio'] }}{% else %}作者 ID：{{ work.author_id|e or work.author|e }}{% endif %}</p>
@@ -410,7 +410,31 @@
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    document.getElementById('comment-content').value = '';
+                    const commentCount = document.querySelector('.comments-title b, .comments-title');
+                    if (commentCount) {
+                        const text = commentCount.textContent;
+                        const match = text.match(/\d+/);
+                        if (match) commentCount.textContent = text.replace(match[0], parseInt(match[0]) + 1);
+                    }
+                    const commentsList = document.getElementById('comments-list');
+                    const noComment = commentsList.querySelector('p[style*="text-align:center"]');
+                    if (noComment) noComment.remove();
+                    const commentHTML = `
+                        <div class="comment-item" id="comment-${data.comment.id}" style="animation:commentSlideIn .3s ease">
+                            <div class="comment-header">
+                                <span class="comment-user">
+                                    <a href="/u/${data.comment.username}" style="color:#333;text-decoration:none">${data.comment.username}</a>
+                                </span>
+                                <span class="comment-time">${data.comment.created_at}
+                                    <a href="javascript:void(0)" class="comment-reply" onclick="replyComment(${workId}, ${data.comment.id})">回复</a>
+                                    <a href="javascript:void(0)" class="comment-op" onclick="deleteComment(${workId}, ${data.comment.id})">删除</a>
+                                    <a href="javascript:void(0)" class="comment-op" onclick="reportComment(${workId}, ${data.comment.id})">举报</a>
+                                </span>
+                            </div>
+                            <div class="comment-content">${data.comment.content}</div>
+                        </div>`;
+                    commentsList.insertAdjacentHTML('beforeend', commentHTML);
                 } else {
                     alert(data.message);
                 }
@@ -490,7 +514,26 @@
             })
             .then(r => r.json())
             .then(data => {
-                if (data.success) { location.reload(); } else { alert(data.message); }
+                if (data.success) {
+                    const commentItem = document.getElementById('comment-' + commentId);
+                    if (commentItem) {
+                        const replyHTML = `
+                            <div class="reply-item" style="animation:commentSlideIn .3s ease">
+                                <div class="comment-header">
+                                    <span class="comment-user"><a href="/u/${data.comment.username}" style="color:#666;text-decoration:none">${data.comment.username}</a></span>
+                                    <span class="comment-time">${data.comment.created_at}
+                                        <a href="javascript:void(0)" class="comment-reply" onclick="replyComment(${workId}, ${commentId})">回复</a>
+                                        <a href="javascript:void(0)" class="comment-op" onclick="deleteComment(${workId}, ${data.comment.id})">删除</a>
+                                        <a href="javascript:void(0)" class="comment-op" onclick="reportComment(${workId}, ${data.comment.id})">举报</a>
+                                    </span>
+                                </div>
+                                <div class="comment-content">${data.comment.content}</div>
+                            </div>`;
+                        commentItem.insertAdjacentHTML('beforeend', replyHTML);
+                    }
+                } else {
+                    alert(data.message);
+                }
             });
         }
 
@@ -499,7 +542,12 @@
             fetch('/workpool/comment/delete/' + workId + '/' + commentId, { method: 'POST' })
                 .then(r => r.json())
                 .then(data => {
-                    if (data.success) { location.reload(); } else { alert(data.message); }
+                    if (data.success) {
+                        const el = document.getElementById('comment-' + commentId);
+                        if (el) el.remove();
+                    } else {
+                        alert(data.message);
+                    }
                 });
         }
 
@@ -507,7 +555,11 @@
             fetch('/workpool/comment/pin/' + workId + '/' + commentId, { method: 'POST' })
                 .then(r => r.json())
                 .then(data => {
-                    if (data.success) { location.reload(); } else { alert(data.message); }
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
                 });
         }
 
