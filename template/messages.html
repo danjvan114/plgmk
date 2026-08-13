@@ -9,7 +9,7 @@
     <title>消息中心</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
         body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
         @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
         header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
@@ -51,7 +51,7 @@
         #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
         #loader .mdui-progress{margin:0;border-radius:0}
         .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
-        .main-box{max-width:900px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
+        .main-box{max-width:95%;margin:0 auto;padding-top:72px;padding-left:24px;padding-right:24px}
         .tabs{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border-radius:8px;padding:6px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.1)}
         .tab{flex:1;text-align:center;padding:12px 0;border-radius:6px;cursor:pointer;color:#666;font-size:15px;font-weight:500;transition:all .2s}
         .tab:hover{background:rgba(76,175,80,.08);color:#4caf50}
@@ -133,9 +133,11 @@
     </header>
     <div class="main-box">
         {% set type_map = {'like': ['被点赞', 'fa-thumbs-up'], 'fav': ['被收藏', 'fa-heart'], 'coin': ['被投币', 'fa-coins'], 'follow': ['被关注', 'fa-user-plus'], 'comment': ['作品评论', 'fa-comment'], 'reply': ['评论/跟帖回复', 'fa-reply'], 'official': ['官方私信', 'fa-envelope']} %}
-        <div class="tabs">
-            <div class="tab active" id="tab-notify" onclick="switchTab('notify')">通知</div>
-            <div class="tab" id="tab-announce" onclick="switchTab('announce')">全局公告</div>
+        <div class="mdui-tab" mdui-tab>
+            <a href="#tab-notify" class="mdui-ripple mdui-tab-active">通知</a>
+            <a href="#tab-announce" class="mdui-ripple">全局公告</a>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;margin-top:8px">
             <button class="read-all-btn" onclick="readAll()"><i class="fa-solid fa-check-double"></i> 全部已读</button>
         </div>
         <div id="panel-notify">
@@ -177,11 +179,28 @@
         });
 
         function switchTab(name) {
-            document.getElementById('tab-notify').classList.toggle('active', name === 'notify');
-            document.getElementById('tab-announce').classList.toggle('active', name === 'announce');
-            document.getElementById('panel-notify').style.display = name === 'notify' ? 'block' : 'none';
-            document.getElementById('panel-announce').style.display = name === 'announce' ? 'block' : 'none';
+            document.querySelectorAll('.mdui-tab a').forEach(function(el) { el.classList.remove('mdui-tab-active'); });
+            if (name === 'notify') {
+                document.querySelector('.mdui-tab a[href="#tab-notify"]').classList.add('mdui-tab-active');
+                document.getElementById('panel-notify').style.display = 'block';
+                document.getElementById('panel-announce').style.display = 'none';
+            } else {
+                document.querySelector('.mdui-tab a[href="#tab-announce"]').classList.add('mdui-tab-active');
+                document.getElementById('panel-notify').style.display = 'none';
+                document.getElementById('panel-announce').style.display = 'block';
+            }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.mdui-tab a').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var href = this.getAttribute('href');
+                    if (href === '#tab-notify') switchTab('notify');
+                    else if (href === '#tab-announce') switchTab('announce');
+                });
+            });
+        });
 
         function readMsg(id, el) {
             if (el && !el.classList.contains('unread')) return;
