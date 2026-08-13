@@ -13,6 +13,7 @@
         #loader{position:fixed;top:0;left:0;width:100%;z-index:9999;background:#fff}
         #loader .mdui-progress{margin:0;border-radius:0}
         .wrap{max-width:1100px;margin:0 auto;padding-top:72px;padding:72px 16px 40px}
+        .team-wrap{max-width:1100px;margin:0 auto;padding:72px 16px 40px}
         .page-title{font-size:22px;color:#fff;font-weight:bold;margin-bottom:18px;display:flex;align-items:center;gap:10px;text-shadow:0 2px 8px rgba(0,0,0,.3)}
         .team-card.mdui-card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden;margin-bottom:16px}
         .team-cover{height:140px;background:rgba(76,175,80,.12);display:flex;align-items:center;justify-content:center}
@@ -32,7 +33,7 @@
 <body>
     <div class="loader" id="loader"><div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div></div>
     <header id="hz5kl"></header>
-    <div class="wrap">
+    <div class="team-wrap">
         <div class="page-title"><i class="fa-solid fa-users-rectangle"></i> 团队中心</div>
 
         {% if session.user %}
