@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Download KE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background-color: #f8fbff;
+            overflow-x: hidden;
+        }
+        /* 顶部导航栏 */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 15%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(248, 251, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(54, 136, 255, 0.1);
+        }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 26px;
+            font-size: 17px;
+        }
+        .nav-links a {
+            color: #222;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .nav-right {
+            display: flex;
+            gap: 22px;
+        }
+        .icon {
+            width: 26px;
+            height: 26px;
+            opacity: 0.8;
+        }
+        /* 主体内容区 左右布局 */
+        main {
+            display: flex;
+            align-items: center;
+            padding: 120px 15% 60px;
+            gap: 60px;
+            min-height: 100vh;
+        }
+        .text-area {
+            flex: 1;
+        }
+        h1 {
+            font-size: 58px;
+            line-height: 1.2;
+        }
+        .blue-text {
+            color: #3688ff;
+        }
+        .desc {
+            font-size: 20px;
+            line-height: 1.6;
+            color: #333;
+            margin: 30px 0;
+            max-width: 520px;
+        }
+        .btns {
+            display: flex;
+            gap: 16px;
+        }
+        .btn-blue {
+            background: #3688ff;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-white {
+            background: white;
+            color: #222;
+            border: 1px solid #ccc;
+            padding: 14px 32px;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        /* 右侧终端窗口 */
+        .terminal-box {
+            flex: 1;
+            background: #222831;
+            border-radius: 10px;
+            padding: 12px;
+            color: #eee;
+            font-family: Consolas,monospace;
+            font-size: 14px;
+            line-height: 1.45;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .terminal-head {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .dot-red,.dot-yellow,.dot-green{
+            width:12px;height:12px;border-radius:50%;
+        }
+        .dot-red{background:#ff4545;}
+        .dot-yellow{background:#ffcc33;}
+        .dot-green{background:#39cc60;}
+        .terminal-image {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+        }
+
+        /* 滚动动画基础样式 */
+        .animate-on-scroll {
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .animate-on-scroll.from-left {
+            transform: translateX(-80px);
+        }
+        .animate-on-scroll.from-right {
+            transform: translateX(80px);
+        }
+        .animate-on-scroll.from-bottom {
+            transform: translateY(60px);
+        }
+        .animate-on-scroll.from-top {
+            transform: translateY(-60px);
+        }
+        .animate-on-scroll.scale-in {
+            transform: scale(0.8);
+        }
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translate(0) scale(1);
+        }
+
+        /* 特性区域 */
+        .features-section {
+            padding: 100px 15%;
+            background: linear-gradient(180deg, #f8fbff 0%, #e8f2ff 100%);
+        }
+        .section-title {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 60px;
+            color: #1a1a1a;
+        }
+        .section-title span {
+            color: #3688ff;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(54, 136, 255, 0.1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3688ff 0%, #5aa0ff 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+        .feature-card p {
+            color: #666;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* 展示区域 */
+        .showcase-section {
+            padding: 100px 15%;
+            background: white;
+        }
+        .showcase-row {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 80px;
+        }
+        .showcase-row:last-child {
+            margin-bottom: 0;
+        }
+        .showcase-row.reverse {
+            flex-direction: row-reverse;
+        }
+        .showcase-text {
+            flex: 1;
+        }
+        .showcase-text h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        .showcase-text p {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 24px;
+        }
+        .showcase-image {
+            flex: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+        }
+        .showcase-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.6s;
+        }
+        
+
+        /* 数据统计区域 */
+        .stats-section {
+            padding: 80px 15%;
+            background: linear-gradient(135deg, #3688ff 0%, #1a5fd6 100%);
+            color: white;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+        .stat-item h3 {
+            font-size: 56px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .stat-item p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* 下载区域 */
+        .download-section {
+            padding: 100px 15%;
+            text-align: center;
+            background: linear-gradient(180deg, #e8f2ff 0%, #f8fbff 100%);
+        }
+        .download-section h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        .download-section p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .download-btns {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .download-card {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s;
+            cursor: pointer;
+            min-width: 200px;
+        }
+        
+        .download-card .platform {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .download-card .version {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* 页脚 */
+        footer {
+            padding: 40px 15%;
+            text-align: center;
+            background: #1a1a1a;
+            color: #999;
+        }
+        footer a {
+            color: #3688ff;
+            text-decoration: none;
+        }
+        
+
+        /* 延迟动画类 */
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+        .delay-6 { transition-delay: 0.6s; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="nav-left">
+        <div class="logo">
+            <span>KNExpanse</span>
+        </div>
+        <div class="nav-links">
+            <a href="#">主页</a>
+            <a href="#" onclick="window.open('/mk/kn')">插件市场</a>
+            <a href="#">开发文档</a>
+            <a href="#" onclick="window.open('https://github.com/danjvan114/knu/releases')">更新记录</a>
+            <a href="/kn/about" >关于团队</a>
+            
+        </div>
+    </div>
+    
+</header>
+
+<main>
+    <div class="text-area animate-on-scroll from-left">
+        <h1>
+            现代化图形化编辑器<br>
+            <span class="blue-text">为生态而生</span>
+        </h1>
+        <p class="desc">
+            KE是一个高性能可扩展的图形化编程软件，它为开发者提供了一种简单而快速的方式来创建和分发游戏。
+        </p>
+        <div class="btns">
+            <button class="btn-blue mdui-ripple" onclick="document.querySelector('.download-section').scrollIntoView({behavior: 'smooth'})">立即下载</button>
+            <button class="btn-white mdui-ripple" onclick="window.open('/dev/kn/docs')">开发文档</button>
+            <button class="btn-white mdui-ripple" onclick="window.open('/app/ccvue')">其他产品</button>
+        </div>
+    </div>
+    <div class="terminal-box animate-on-scroll from-right">
+        <div class="terminal-head">
+            <div class="dot-red"></div>
+            <div class="dot-yellow"></div>
+            <div class="dot-green"></div>
+        </div>
+        <img src="https://code.pgrm.run/localcdn/app2.png" alt="" class="terminal-image">
+    </div>
+</main>
+
+<!-- 特性区域 -->
+<section class="features-section">
+    <h2 class="section-title animate-on-scroll from-bottom">
+        为什么选择 <span>KE</span>？
+    </h2>
+    <div class="features-grid">
+        <div class="feature-card animate-on-scroll from-bottom delay-1">
+            <div class="feature-icon"><i class="mdui-icon material-icons " style="font-size: 48px;color: #ffffff;">memory</i></div>
+            <h3>高性能绘制</h3>
+            <p>采用先进的画布绘图技术，搭配显示卡起飞模式，性能加倍</p>
+        </div>
+        <div class="feature-card animate-on-scroll from-bottom delay-2">
+            <div class="feature-icon"><i class="mdui-icon material-icons " style="font-size: 48px;color: #ffffff;">touch_app</i></div>
+            <h3>可视化编程</h3>
+            <p>直观的拖拽式界面，无需编写代码即可创建复杂逻辑，让创意快速落地。</p>
+        </div>
+        <div class="feature-card animate-on-scroll from-bottom delay-3">
+            <div class="feature-icon"><i class="mdui-icon material-icons " style="font-size: 48px;color: #ffffff;">apps</i></div>
+            <h3>插件生态</h3>
+            <p>各种插件均可开发，基于js，满足各种需求，让生态不再遥远</p>
+        </div>
+        <div class="feature-card animate-on-scroll from-bottom delay-4">
+            <div class="feature-icon"><i class="mdui-icon material-icons " style="font-size: 48px;color: #ffffff;">cloud</i></div>
+            <h3>快速分发</h3>
+            <p>内置云保存系统，支持窗户/安卓/企鹅等平台分发，让你的作品快速触达用户。</p>
+        </div>
+    </div>
+</section>
+
+<!-- 展示区域 -->
+<section class="showcase-section">
+    <div class="showcase-row">
+        <div class="showcase-text animate-on-scroll from-left">
+            <h2>强大的图形化编辑器</h2>
+            <p>KE提供了直观的可视化编辑界面，支持节点式编程、事件驱动设计。通过简单的拖拽操作，即可构建复杂的游戏逻辑和交互效果。无论是初学者还是专业开发者，都能快速上手。</p>
+            <button class="btn-blue mdui-ripple" onclick="window.open('/mk/kn')">浏览插件市场</button>
+        </div>
+        <div class="showcase-image animate-on-scroll from-right">
+            <img src="https://code.pgrm.run/localcdn/app2.png" alt="图形化编辑器">
+        </div>
+    </div>
+    <div class="showcase-row reverse">
+        <div class="showcase-text animate-on-scroll from-right">
+            <h2>丰富的插件生态</h2>
+            <p>插件市场汇聚了社区开发者的优秀作品，涵盖游戏模板、工具组件、美术资源等多个类别。一键安装，即刻使用，大幅缩短开发周期。你也可以上传自己的插件，与全球开发者分享创意。</p>
+            <button class="btn-white mdui-ripple" onclick="window.open('/dev/kn')">成为开发者</button>
+        </div>
+        <div class="showcase-image animate-on-scroll from-left">
+            <img src="https://code.pgrm.run/localcdn/gzs/ele.png" alt="插件生态">
+        </div>
+    </div>
+</section>
+
+<!-- 数据统计区域 -->
+<section class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-item animate-on-scroll scale-in delay-1">
+            <h3>1000+</h3>
+            <p>开发者</p>
+        </div>
+        
+        <div class="stat-item animate-on-scroll scale-in delay-3">
+            <h3>50K+</h3>
+            <p>项目创建</p>
+        </div>
+        <div class="stat-item animate-on-scroll scale-in delay-4">
+            <h3>88.88%</h3>
+            <p>服务可用性</p>
+        </div>
+    </div>
+</section>
+
+<!-- 下载区域 -->
+<section class="download-section">
+    <h2 class="animate-on-scroll from-bottom">立即开始创作</h2>
+    <p class="animate-on-scroll from-bottom delay-1">选择适合你平台的版本，开启你的创意之旅</p>
+    <div class="download-btns">
+        <div class="download-card animate-on-scroll from-bottom delay-2" onclick="window.open('https://api.gitproxy.dev/github.com/danjvan114/knu/releases/download/1.2.4/KN.Expanse.v1.2.4.exe')">
+            <div class="platform"><i class="mdui-icon material-icons " style="color: #a200ff;">desktop_windows</i>Windows</div>
+            <div class="version mdui-ripple" onclick="window.open('https://github.com/danjvan114/knu/releases')">全部版本<i class="mdui-icon material-icons">open_in_new</i></div>
+        </div>
+        <div class="download-card animate-on-scroll from-bottom delay-3" onclick="window.open('/dev/kn/docs')">
+            <div class="platform"><i class="mdui-icon material-icons" style="color: #ff8800;">book</i>开发文档</div>
+            <div class="version">在线查看</div>
+        </div>
+        <div class="download-card animate-on-scroll from-bottom delay-4" onclick="window.open('/mk/kn')">
+            <div class="platform"><i class="mdui-icon material-icons" style="color: #007bff;">fiber_smart_record</i>插件市场</div>
+            <div class="version">浏览插件</div>
+        </div>
+
+
+    <div>
+        <h2 class="animate-on-scroll from-bottom">扫一扫，立即获取内测</h2>
+        <img src="/localcdn/gzs/q2.png" alt="CatCode">
+    </div>
+    </div>
+</section>
+
+<!-- 页脚 -->
+
+
+<script>
+// 滚动动画
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.animate-on-scroll').forEach(el => {
+    observer.observe(el);
+});
+
+// 页面加载时立即显示首屏元素
+window.addEventListener('load', () => {
+    document.querySelectorAll('main .animate-on-scroll').forEach(el => {
+        el.classList.add('visible');
+    });
+});
+</script>
+</body>
+</html>

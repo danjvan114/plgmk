@@ -104,7 +104,7 @@
         {% endif %}
         <div class="grid">
             {% for work in works %}
-            <div class="card work-card" onclick="location.href='/workpool/{{ work.id }}'">
+            <div class="mdui-ripple card work-card" onclick="location.href='/workpool/{{ work.id }}'">
                 <h3>{{ work.title|e }}</h3>
                 <p>{{ work.description|e }}</p>
                 {% if work.tags %}

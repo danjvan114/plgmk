@@ -94,11 +94,11 @@
                     <span class="meta-item"><i class="fa-regular fa-comment" style="font-size:16px"></i>{{ work.comment_count }}</span>
                 </div>
                 <div style="margin-top:12px;text-align:right">
-                    <button class="action-btn" style="color:#1976d2;border-color:#1976d2;font-size:12px;padding:6px 12px;margin-right:6px" onclick="event.stopPropagation();updateWork({{ work.id }})">
+                    <button class="mdui-ripple action-btn mdui-btn" style="color:#1976d2;border-color:#1976d2;font-size:12px;padding:6px 12px;margin-right:6px" onclick="event.stopPropagation();updateWork({{ work.id }})">
                         <i class="fa-solid fa-rotate" style="font-size:16px"></i>
                         更新文件
                     </button>
-                    <button class="action-btn" style="color:#f44336;border-color:#f44336;font-size:12px;padding:6px 12px" onclick="event.stopPropagation();deleteWork({{ work.id }})">
+                    <button class="mdui-ripple action-btn mdui-btn" style="color:#f44336;border-color:#f44336;font-size:12px;padding:6px 12px" onclick="event.stopPropagation();deleteWork({{ work.id }})">
                         <i class="fa-solid fa-trash-can" style="font-size:16px"></i>
                         擦除
                     </button>
