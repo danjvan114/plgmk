@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>kauth 加解密工具</title>
+<script src="auth.js"></script>
+<style>
+*{box-sizing:border-box}
+body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:20px;background:#f5f5f5;color:#333}
+h1{font-size:18px;margin:0 0 16px;color:#222}
+.box{background:#fff;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#555}
+input[type=text]{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:4px;font-size:13px;font-family:monospace}
+textarea{width:100%;min-height:160px;padding:10px;border:1px solid #ddd;border-radius:4px;font-size:12px;font-family:monospace;resize:vertical}
+.row{display:flex;gap:12px;align-items:flex-end;margin-bottom:12px}
+.row>div{flex:1}
+button{padding:8px 18px;border:none;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.btn-enc{background:#4a90d9;color:#fff}
+.btn-enc:hover{background:#357abd}
+.btn-dec{background:#e67e22;color:#fff}
+.btn-dec:hover{background:#d35400}
+.btn-clear{background:#eee;color:#666}
+.btn-clear:hover{background:#ddd}
+.btn-copy{background:#52c41a;color:#fff}
+.btn-copy:hover{background:#389e0d}
+.btn-file{background:#722ed1;color:#fff;padding:8px 14px}
+.btn-file:hover{background:#531dab}
+.file-wrap{margin-bottom:12px}
+.file-label{display:inline-block;padding:8px 14px;background:#722ed1;color:#fff;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600}
+.file-label:hover{background:#531dab}
+#fileIn,#fileIn2{display:none}
+.status{margin-top:8px;padding:8px;border-radius:4px;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all}
+.ok{background:#e8f8e8;color:#2e7d32}
+.err{background:#fdecea;color:#c62828}
+.info{background:#e3f2fd;color:#1565c0}
+.tab{display:flex;border-bottom:1px solid #ddd;margin-bottom:16px}
+.tab button{background:none;border:none;border-bottom:2px solid transparent;padding:8px 16px;font-size:13px;color:#666;border-radius:0}
+.tab button.active{color:#4a90d9;border-bottom-color:#4a90d9;background:none}
+</style>
+</head>
+<body>
+<h1>kauth AES-CBC 加解密工具</h1>
+<div class="box">
+<label>鉴权字符 (u)</label>
+<input type="text" id="authChar" placeholder="例如: mySecret123" value="test123">
+</div>
+<div class="tab">
+<button id="tabEnc" class="active">加密</button>
+<button id="tabDec">解密</button>
+</div>
+<div id="panelEnc" class="box">
+<label>明文（作品 JSON）</label>
+<div class="file-wrap">
+<label class="file-label" for="fileIn">选择文件</label>
+<span id="fileName" style="font-size:12px;color:#888;margin-left:8px"></span>
+<input type="file" id="fileIn">
+</div>
+<textarea id="plaintext" placeholder="将 JSON 内容粘贴到这里，或点上方选择文件..."></textarea>
+<div class="row">
+<button class="btn-enc" onclick="doEnc()">加密</button>
+<button class="btn-clear" onclick="document.getElementById('plaintext').value=''">清空</button>
+</div>
+<label>密文（Base64）</label>
+<textarea id="ciphertext" readonly placeholder="加密结果将显示在这里..."></textarea>
+<div class="row">
+<button class="btn-copy" onclick="copy('ciphertext','statusEnc')">复制密文</button>
+<button class="btn-file" onclick="download('ciphertext','encrypted.bcmkn','text/plain')">下载</button>
+</div>
+<div id="statusEnc"></div>
+</div>
+<div id="panelDec" class="box" style="display:none">
+<label>密文（Base64）</label>
+<div class="file-wrap">
+<label class="file-label" for="fileIn2">选择文件</label>
+<span id="fileName2" style="font-size:12px;color:#888;margin-left:8px"></span>
+<input type="file" id="fileIn2">
+</div>
+<textarea id="cipherIn" placeholder="将密文粘贴到这里，或点上方选择文件..."></textarea>
+<div class="row">
+<button class="btn-dec" onclick="doDec()">解密并校验鉴权</button>
+<button class="btn-clear" onclick="document.getElementById('cipherIn').value=''">清空</button>
+</div>
+<label>明文（作品 JSON）</label>
+<textarea id="plainOut" readonly placeholder="解密结果将显示在这里..."></textarea>
+<div class="row">
+<button class="btn-copy" onclick="copy('plainOut','statusDec')">复制明文</button>
+<button class="btn-file" onclick="download('plainOut','decrypted.json','application/json')">下载</button>
+</div>
+<div id="statusDec"></div>
+</div>
+<script>
+document.getElementById('tabEnc').onclick=function(){this.classList.add('active');document.getElementById('tabDec').classList.remove('active');document.getElementById('panelEnc').style.display='';document.getElementById('panelDec').style.display='none';};
+document.getElementById('tabDec').onclick=function(){this.classList.add('active');document.getElementById('tabEnc').classList.remove('active');document.getElementById('panelDec').style.display='';document.getElementById('panelEnc').style.display='none';};
+document.getElementById('fileIn').onchange=function(e){var f=e.target.files[0];if(!f)return;document.getElementById('fileName').textContent=f.name;var r=new FileReader();r.onload=function(){document.getElementById('plaintext').value=r.result;};r.readAsText(f);};
+document.getElementById('fileIn2').onchange=function(e){var f=e.target.files[0];if(!f)return;document.getElementById('fileName2').textContent=f.name;var r=new FileReader();r.onload=function(){document.getElementById('cipherIn').value=r.result;};r.readAsText(f);};
+function setStatus(id,msg,type){var el=document.getElementById(id);el.className='status '+type;el.textContent=msg;}
+function doEnc(){var u=document.getElementById('authChar').value.trim();var pt=document.getElementById('plaintext').value;if(!u){setStatus('statusEnc','请填写鉴权字符','err');return;}if(!pt){setStatus('statusEnc','明文为空','err');return;}try{var ct=window.kauth.e(pt,u);document.getElementById('ciphertext').value=ct;setStatus('statusEnc','加密成功 密文长度: '+ct.length,'ok');}catch(err){setStatus('statusEnc','加密失败: '+err.message,'err');}}
+function doDec(){var u=document.getElementById('authChar').value.trim();var ct=document.getElementById('cipherIn').value.trim();if(!u){setStatus('statusDec','请填写期望的鉴权字符','err');return;}if(!ct){setStatus('statusDec','密文为空','err');return;}try{var pt=window.kauth.c(ct,u);document.getElementById('plainOut').value=pt;setStatus('statusDec','解密成功 鉴权校验通过','ok');}catch(err){setStatus('statusDec',err.message,'err');}}
+function copy(id,statusId){var el=document.getElementById(id);el.select();try{document.execCommand('copy');setStatus(statusId,'已复制','info');}catch(e){}}
+function download(id,name,type){var v=document.getElementById(id).value;if(!v)return;var blob=new Blob([v],{type:type});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+</script>
+</body>
+</html>

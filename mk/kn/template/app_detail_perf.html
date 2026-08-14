@@ -6,6 +6,7 @@
 <title>KE 主页</title>
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 <link rel="shortcut icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
 <style>
 /* ============================================================
    KN Expanse Landing — v8
@@ -147,6 +148,15 @@ body.dark-mode #particles svg.glow { filter:drop-shadow(0 0 16px #eef2ff); }
 .cursor-glow { position:fixed; pointer-events:none; z-index:9999; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(107,114,245,.05) 0%,transparent 65%); transform:translate(-50%,-50%); opacity:0; transition:opacity .4s; }
 @media (hover:hover) { body:hover .cursor-glow { opacity:1; } }
 @media (hover:none) { .cursor-glow { display:none !important; } }
+/* ---------- PixiJS GPU 画布(光斑/粒子由 WebGL 渲染,不再吃主线程) ---------- */
+#pixiBg { position:fixed; inset:0; z-index:-2; pointer-events:none; overflow:hidden; }
+#pixiBg canvas { display:block; pointer-events:auto; cursor:pointer; }
+body.fx-on .bg-orb, body.fx-on #particles { display:none !important; }
+body.lite-mode #pixiBg { display:none !important; }
+@media (prefers-reduced-motion: reduce) {
+  #pixiBg { display:none !important; }
+  body:not(.fx-on) .bg-orb, body:not(.fx-on) #particles svg { animation:none !important; }
+}
 /* 轻量模式(手动节能 / 无 WebGL):关掉重特效(orb 大模糊/粒子/鼠标光晕/视差),CPU 渲染不卡,下载不受影响 */
 body.no-webgl .bg-orb, body.lite-mode .bg-orb,
 body.no-webgl #particles, body.lite-mode #particles,
@@ -754,14 +764,14 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   .dl-big { width:38px; height:38px; margin-bottom:6px; }
   .dl-col h4 { font-size:14px; }
   .dl-col small { font-size:9.5px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .dl-col .btn { font-size:10.5px; padding:7px 6px; width:100%; white-space:nowrap; ju
+  .dl-col .btn { font-size:10.5px; padding:7px 6px; width:100%; white-space:nowrap; justify-content:center; }
   .download-card { display:flex; flex-direction:column; gap:10px; padding:12px; }
   .dl-col { flex-direction:row; align-items:center; gap:12px; padding:12px 14px; text-align:left; justify-content:flex-start; }
   .dl-col .dl-big { width:34px; height:34px; margin:0; flex:none; }
   .dl-col b { font-size:15px; }
   .dl-col small { flex:1; font-size:10px; min-width:0; }
   .dl-go { margin:0 0 0 auto; padding:7px 12px; font-size:11px; flex:none; }
-  .dl-col + .dl-col { border-left:none; border-top:1px solid var(--glass-hi-bot); }stify-content:center; }
+  .dl-col + .dl-col { border-left:none; border-top:1px solid var(--glass-hi-bot); }
   .dl-col .dl-badges { flex-wrap:wrap; justify-content:center; }
   .ext-foot { flex-wrap:wrap; gap:8px; }
   .intro-name { font-size:27px; }
@@ -770,6 +780,20 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   .perf-tip .pt-btns { width:100%; justify-content:center; }
   .perf-tip.show { transform:translateY(0); }
 }
+
+/* ===================== 性能优化覆盖层(保留特效,降低 GPU/CPU 开销) ===================== */
+/* 毛玻璃模糊统一降档:8px 视觉效果几乎不变,合成开销大幅下降 */
+header, .icon-btn, .card, .btn-primary, .btn-glass, .badge-btn, .feature-icon, .ft-tab,
+.stack-card, .step-badge, .st-col, .st-col.cur, .cr-card, .perf-pop, .lang-pop, .look-pop,
+.qr-pop, .theme-pop, .qq-pop, .m-pop, .perf-tip, #backTop, .dl-big, .st-icon, footer {
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  backdrop-filter: blur(8px) saturate(160%);
+}
+/* 无 Pixi 回退路径:全屏光斑模糊半径 120px→44px(最重的重绘来源之一) */
+.bg-orb { filter:blur(44px); }
+body.theme-aurora .bg-layer::after { filter:blur(14px); }
+/* 固定背景层做布局/绘制隔离,减少合成范围 */
+.bg-layer, #particles, .burst-layer, .theme-fade { contain:layout paint; }
 </style>
 </head>
 <body class="theme-aurora">
@@ -795,6 +819,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   <div class="parallax" data-speed="0.2"><div class="bg-orb orb-3"></div></div>
 </div>
 <div id="particles"></div>
+<div id="pixiBg"></div>
 
 <!-- ===================== 导航 ===================== -->
 <header id="header">
@@ -1560,6 +1585,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   var particlesBox = $('#particles');
   function spawnParticles(theme) {
     if (document.body.classList.contains('lite-mode')) return;
+    if (fxOn) { FX.setTheme(theme); return; }
     particlesBox.innerHTML = '';
     var svg = THEME_ICON[theme.icon] || THEME_ICON.circles;
     var count = theme.anim === 'twinkle' ? 16 : (theme.cls === 'theme-amber' ? 8 : 12);
@@ -1709,9 +1735,11 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
     if (on) {
       particlesBox.innerHTML = '';
+      if (fxOn) FX.setPaused(true);
       toast('已开启节能模式,特效已精简');
     } else {
       toast('已关闭节能模式');
+      if (fxOn) FX.setPaused(false);
       spawnParticles(THEMES[curIdx]);
     }
     perfPopSync();
