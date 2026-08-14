@@ -168,6 +168,7 @@ body.no-webgl .bg-photo, body.lite-mode .bg-photo { filter:none !important; }
 /* 悬浮窗:更实的玻璃(底字不透)+ 更高模糊 */
 .theme-pop, .qq-pop, .perf-pop, .nav-more-pop { background:rgba(255,255,255,.46); }
 body.dark-mode .theme-pop, body.dark-mode .qq-pop, body.dark-mode .perf-pop, body.dark-mode .nav-more-pop { background:rgba(18,22,40,.92); }
+body.dark-mode .nav-more-pop { background:rgba(24,29,50,.94); }
 /* 节能按钮悬停状态小窗 */
 .perf-wrap { position:relative; display:flex; }
 .perf-pop { position:fixed; top:0; right:0; z-index:1300; background:var(--glass-strong); backdrop-filter:blur(36px) saturate(200%); -webkit-backdrop-filter:blur(36px) saturate(200%); border-radius:14px; padding:9px 14px; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:0; transform:translateY(6px) scale(.94); pointer-events:none; transition:opacity .3s,transform .4s cubic-bezier(.34,1.56,.64,1); z-index:50; white-space:nowrap; }
@@ -178,7 +179,7 @@ body.dark-mode .theme-pop, body.dark-mode .qq-pop, body.dark-mode .perf-pop, bod
 /* 移动端下载悬浮窗 */
 .m-wrap { position:relative; display:flex; }
 .lang-wrap { position:relative; display:flex; }
-.lang-pop { position:fixed; top:0; right:0; min-width:132px; z-index:4500; padding:8px; border-radius:16px; background:rgba(255,255,255,.46); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:0; transform:translateY(8px) scale(.92); pointer-events:none; visibility:hidden; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1),visibility .3s; z-index:50; }
+.lang-pop { position:fixed; top:0; right:0; min-width:132px; z-index:5000; padding:8px; border-radius:16px; background:rgba(255,255,255,.46); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:0; transform:translateY(8px) scale(.92); pointer-events:none; visibility:hidden; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1),visibility .3s; }
 body.dark-mode .lang-pop { background:rgba(22,26,45,.86); }
 .lang-pop.show { opacity:1; transform:none; pointer-events:auto; visibility:visible; }
 .lang-item { display:block; width:100%; border:none; cursor:pointer; background:transparent; color:var(--text-2); font-size:13px; font-weight:700; font-family:inherit; text-align:left; padding:8px 12px; border-radius:10px; transition:background .25s,color .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
@@ -187,7 +188,7 @@ body.dark-mode .lang-pop { background:rgba(22,26,45,.86); }
 .lang-item.cur::after { content:"\2713"; float:right; font-weight:800; }
 .lang-item.popped { animation:langPop .32s cubic-bezier(.34,1.56,.64,1); }
 @keyframes langPop { 0% { transform:scale(1); } 45% { transform:scale(1.08); } 70% { transform:scale(.96); } 100% { transform:scale(1); } }
-.look-pop, .qr-pop { position:fixed; top:0; right:0; z-index:4500; padding:10px; border-radius:20px; background:rgba(255,255,255,.46); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(10px) scale(.95); pointer-events:none; visibility:hidden; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1),visibility .3s; transform-origin:top right; }
+.look-pop, .qr-pop { position:fixed; top:0; right:0; z-index:5000; padding:10px; border-radius:20px; background:rgba(255,255,255,.46); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(10px) scale(.95); pointer-events:none; visibility:hidden; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1),visibility .3s; transform-origin:top right; }
 .look-pop { min-width:214px; }
 .look-pop.show, .qr-pop.show { opacity:1; transform:none; pointer-events:auto; visibility:visible; }
 body.dark-mode .look-pop, body.dark-mode .qr-pop { background:rgba(22,26,45,.86); }
@@ -237,7 +238,7 @@ body.theme-ocean .m-dl-logo.th-ocean, body.theme-amber .m-dl-logo.th-amber { dis
 /* for creators:手写体、加粗、间距收紧 */
 .m-dl-hand { display:block; font-size:17px; font-weight:900; font-style:italic; font-family:'Comic Sans MS','Segoe Print','Kaiti SC',cursive; letter-spacing:1px; color:var(--accent-1); margin-top:4px; text-transform:lowercase; }
 body.theme-ocean .m-dl-hero, body.theme-amber .m-dl-hero { color:#fff; }
-body.theme-ocean .m-dl-grad, body.theme-amber .m-dl-grad { background:linear-gradient(135deg,#fff,rgba(255,255,255,.78)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+body.theme-ocean .m-dl-grad, body.theme-amber .m-dl-grad { background:var(--grad-title); -webkit-background-clip:text; background-clip:text; color:transparent; }
 body.theme-ocean .m-dl-hand, body.theme-amber .m-dl-hand { color:rgba(255,255,255,.92); }
 .m-dl-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:48px; border:none; cursor:pointer; margin-top:10px; padding:13px; border-radius:40px; font-size:15px; font-weight:800; color:#fff; font-family:inherit; background:linear-gradient(135deg,var(--accent-1),var(--accent-2)); box-shadow:0 10px 26px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.35); transition:transform .4s cubic-bezier(.34,1.56,.64,1),filter .3s; }
 .m-dl-btn:hover { transform:translateY(-2px) scale(1.02); filter:brightness(1.06); }
@@ -248,9 +249,6 @@ body.theme-ocean .m-dl-btn.ghost, body.theme-amber .m-dl-btn.ghost { color:#fff;
 /* 移动端:回到下载页按钮(右下角) */
 .m-back-btn { position:fixed; right:20px; bottom:90px; z-index:950; display:none; align-items:center; gap:6px; padding:10px 16px; border-radius:30px; border:none; cursor:pointer; background:var(--grad-btn); color:#fff; font-size:13px; font-weight:800; font-family:inherit; box-shadow:0 10px 26px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.35); transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .m-back-btn:hover { transform:translateY(-3px) scale(1.05); }
-/* 悬浮窗打开时 header 临时去掉 backdrop-filter:header 内的更多菜单才能采样原始背景实现真模糊 */
-header.pop-open { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; background:rgba(255,255,255,.58); }
-body.dark-mode header.pop-open { background:rgba(20,24,44,.72); }
 /* 节能模式:关闭液态玻璃(backdrop-filter),减少 GPU 开销 */
 body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
 /* 节能模式:切页/交互动画直接进行完毕,无过渡;但保留默认启动动画(intro) */
@@ -272,8 +270,8 @@ body.lite-mode .nav-links a:hover, body.lite-mode #backTop:hover, body.lite-mode
 /* 节能模式:切页箭头保持垂直居中,不掉落 */
 body.lite-mode .carousel-nav, body.lite-mode .carousel-nav:hover, body.lite-mode .carousel-nav:active { transform:translateY(-50%) !important; }
 body.lite-mode .stack-card, body.lite-mode .feat-panel { transform:perspective(900px) rotateX(0) rotateY(0) translateY(var(--off,0px)) scale(var(--sc,1)) rotate(var(--rot,0deg)) !important; }
-/* 节能模式:项目数据卡片摆正(去掉旋转)且全不透明 */
-body.lite-mode .st-col { transform:perspective(900px) translateY(var(--st-y,0px)) scale(var(--st-sc,1)) !important; opacity:1 !important; }
+/* 节能模式:项目数据卡片摆正(去掉旋转)且全不透明、无模糊(cur 的 blur !important 特异性更高,必须单独压制) */
+body.lite-mode .st-col, body.lite-mode .st-col.cur { transform:perspective(900px) translateY(var(--st-y,0px)) scale(var(--st-sc,1)) !important; opacity:1 !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; background:var(--solid-glass) !important; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); }
 
 /* ---------- 下载移动端 ---------- */
 .dl-mobile { margin-top:26px; text-align:center; }
@@ -290,7 +288,7 @@ body.lite-mode .st-col { transform:perspective(900px) translateY(var(--st-y,0px)
 /* ---------- 制作团队(水平滑移堆叠) ---------- */
 .cr-show { position:relative; max-width:640px; margin:0 auto; }
 .cr-stage { position:relative; height:350px; }
-.cr-card { position:absolute; left:0; right:0; top:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px 34px; border-radius:28px; background:var(--glass-card); backdrop-filter:blur(18px) saturate(170%); -webkit-backdrop-filter:blur(18px) saturate(170%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:.4; transform:perspective(1000px) translateX(var(--cr-x,0px)) rotate(var(--cr-r,0deg)) scale(var(--cr-s,1)); transform-origin:50% 100%; pointer-events:none; transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .5s,filter .5s; will-change:transform; }
+.cr-card { position:absolute; left:0; right:0; top:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px 34px; border-radius:28px; background:var(--glass-card); backdrop-filter:blur(18px) saturate(170%); -webkit-backdrop-filter:blur(18px) saturate(170%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:.4; transform:perspective(1000px) translateX(var(--cr-x,0px)) rotate(var(--cr-r,0deg)) scale(var(--cr-s,1)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); transform-origin:50% 100%; pointer-events:none; transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .5s,filter .5s; will-change:transform; }
 .cr-card.cur { opacity:1; z-index:10; pointer-events:auto; background:rgba(255,255,255,.30); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); }
 body.dark-mode .cr-card.cur { background:rgba(255,255,255,.10); }
 .cr-ava { width:86px; height:86px; border-radius:50%; object-fit:cover; margin-bottom:14px; box-shadow:0 10px 26px var(--accent-glow); }
@@ -337,7 +335,7 @@ header.scrolled { background:var(--glass-card); }
 .logo-img { height:32px; width:auto; border-radius:8px; display:none; flex:none; }
 .logo-mark { width:34px; height:34px; border-radius:11px; flex:none; background:var(--grad-btn); display:none; align-items:center; justify-content:center; color:#fff; box-shadow:0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.5); }
 .logo-mark.show { display:flex; }
-.nav-links { display:flex; gap:4px; font-size:14.5px; font-weight:600; }
+.nav-links { display:flex; gap:4px; font-size:14.5px; font-weight:600; max-width:1000px; opacity:1; visibility:visible; overflow:visible; transition:max-width .5s cubic-bezier(.4,0,.2,1),opacity .3s ease,visibility .5s,margin .45s,padding .45s,gap .4s; }
 .nav-links a { display:flex; align-items:center; gap:6px; padding:9px 15px; border-radius:30px; color:var(--text-2); cursor:pointer; white-space:nowrap; transition:color .25s,background .3s,box-shadow .3s,transform .5s cubic-bezier(.34,1.56,.64,1); }
 .nav-links a svg { opacity:.75; transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .nav-links a:hover { color:var(--accent-1); background:var(--glass-tint); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot); transform:translateY(-2px) scale(1.05); }
@@ -349,7 +347,7 @@ header.scrolled { background:var(--glass-card); }
 .nav-more-btn:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateY(-2px) scale(1.05); }
 .nav-more-btn svg { transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
 .nav-more.open .nav-more-btn svg { transform:rotate(180deg); }
-.nav-more-pop { position:absolute; top:calc(100% + 14px); right:0; min-width:220px; padding:7px 8px 5px; border-radius:18px; background:rgba(255,255,255,.46); backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(12px) scale(.94); pointer-events:none; transition:opacity .45s ease,transform .55s cubic-bezier(.34,1.56,.64,1); z-index:60; transform-origin:top right; display:grid; grid-template-columns:1fr 1fr; gap:4px; }
+.nav-more-pop { position:absolute; top:calc(100% + 14px); right:0; min-width:220px; padding:7px 8px 5px; border-radius:18px; background:rgba(255,255,255,.88); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(12px) scale(.94); pointer-events:none; transition:opacity .45s ease,transform .55s cubic-bezier(.34,1.56,.64,1); z-index:60; transform-origin:top right; display:grid; grid-template-columns:1fr 1fr; gap:4px; }
 .nav-more.open .nav-more-pop { opacity:1; transform:none; pointer-events:auto; }
 .nav-more-title { display:none; }
 .nav-more-pop a { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:12px; color:var(--text-2); font-size:13.5px; font-weight:600; text-decoration:none; opacity:0; transform:translateY(12px) scale(.92); transition:opacity .35s ease,transform .5s cubic-bezier(.34,1.56,.64,1),background .25s,color .25s; }
@@ -383,7 +381,7 @@ header.scrolled { background:var(--glass-card); }
 .icon-btn:hover { background:var(--glass-tint); color:var(--accent-1); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot); transform:scale(1.1); }
 .icon-btn.pop { animation:btnPop .55s cubic-bezier(.34,1.56,.64,1); }
 @keyframes btnPop { 0%{transform:scale(1)} 35%{transform:scale(1.3)} 70%{transform:scale(.94)} 100%{transform:scale(1)} }
-.hamburger { display:none; flex-direction:column; align-items:center; justify-content:center; gap:4.5px; }
+.hamburger { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4.5px; width:0; opacity:0; visibility:hidden; overflow:hidden; margin:0; padding:0; transition:width .55s cubic-bezier(.34,1.56,.64,1),opacity .4s ease .08s,visibility .55s,margin .5s,padding .5s,transform .5s cubic-bezier(.34,1.56,.64,1),background .3s,color .3s,box-shadow .3s; }
 .hamburger i { display:block; width:18px; height:2px; border-radius:2px; background:currentColor; transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .25s; }
 header.menu-open .hamburger i:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
 header.menu-open .hamburger i:nth-child(2) { opacity:0; }
@@ -554,8 +552,6 @@ body.lite-mode #statsCard { background:transparent !important; }
 #stNext { right:-48px; z-index:60; }
 .st-dots { position:static; margin:16px auto 0; transform:none; }
 .st-head { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:24px; }
-.st-title { font-size:26px; font-weight:800; }
-.st-sub { font-size:14px; color:var(--text-3); }
 .st-clock { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color:var(--accent-1); background:var(--glass-tint); padding:7px 14px; border-radius:22px; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); letter-spacing:.6px; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .st-clock svg { flex:none; opacity:.85; }
 .st-clock em { font-style:normal; }
@@ -563,7 +559,7 @@ body.lite-mode #statsCard { background:transparent !important; }
 .st-live::after { content:''; width:1px; height:14px; background:var(--glass-hi-bot); margin-left:4px; opacity:.6; }
 .live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.18); flex:none; }
 .st-grid { position:relative; min-height:380px; }
-.st-col { position:absolute; left:0; right:0; top:0; height:auto; opacity:.5; overflow:hidden; transform:perspective(1200px) translateY(var(--st-y,0px)) scale(var(--st-sc,1)) rotate(var(--st-rot,0deg)); transform-origin:50% 50%; pointer-events:auto; transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .45s; background:rgba(255,255,255,.32); backdrop-filter:blur(16px) saturate(160%); -webkit-backdrop-filter:blur(16px) saturate(160%); border-radius:22px; padding:16px; border:none !important; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); }
+.st-col { position:absolute; left:0; right:0; top:0; height:auto; opacity:.5; overflow:hidden; transform:perspective(1200px) translateY(var(--st-y,0px)) scale(var(--st-sc,1)) rotate(var(--st-rot,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); transform-origin:50% 50%; pointer-events:auto; transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .45s; background:rgba(255,255,255,.32); backdrop-filter:blur(16px) saturate(160%); -webkit-backdrop-filter:blur(16px) saturate(160%); border-radius:22px; padding:16px; border:none !important; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); }
 .st-col.cur { opacity:1; pointer-events:auto; background:rgba(255,255,255,.30); backdrop-filter:blur(22px) saturate(170%) !important; -webkit-backdrop-filter:blur(22px) saturate(170%) !important; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); }
 .stat-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
 .st-icon { width:42px; height:42px; border-radius:50%; background:var(--glass-tint); color:var(--accent-1); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); display:flex; align-items:center; justify-content:center; }
@@ -688,8 +684,11 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   #stNext { right:10px; }
 }
 @media (max-width:900px) {
-  .nav-links { display:none; }
-  .hamburger { display:flex; }
+  /* 断点切换动画:导航链接文字渐隐+收缩;汉堡按钮宽度弹簧展开挤压推开右侧按钮 */
+  .nav-links { max-width:0; opacity:0; visibility:hidden; margin:0; padding:0; gap:0; overflow:hidden; }
+  .hamburger { width:40px; height:40px; opacity:1; visibility:visible; }
+  /* 移动端菜单展开时:导航链接恢复显示(网格布局) */
+  header.menu-open .nav-links { max-width:1000px; opacity:1; visibility:visible; transition:none !important; }
   header.menu-open { border-radius:26px; flex-direction:column; align-items:stretch; background:var(--glass-strong); padding:6px 14px; }
   header.menu-open .nav-left { width:100%; flex-direction:column; align-items:stretch; gap:8px; }
   header.menu-open .logo { display:none; }
@@ -944,9 +943,9 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
       <span class="dot dot-g" data-action="scale" title="scale"></span>
       <span class="term-title" data-i18n="term_title">拥抱 KN Expanse</span>
     </div>
-    <img class="terminal-image term-img term-def" id="termImg" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mZqezFYne5ES8Pqlk88KVlHbJu9mwACfioAAmsm2FdXlTCxQYOpFj0E.png" alt="编辑器预览">
-    <img class="terminal-image term-img term-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-btqex9uP0t1sJIePCyRgejEZyY-CwACuCkAAmsm2FdierBKhSg5SD0E.png" alt="编辑器预览">
-    <img class="terminal-image term-img term-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-aVqex2-qT9U9N0WXwYbWtRIiTqZ8QACnSkAAmsm2Fec5-j2b9AlCz0E.png" alt="编辑器预览">
+    <img class="terminal-image term-img term-def" id="termImg" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mZqezFYne5ES8Pqlk88KVlHbJu9mwACfioAAmsm2FdXlTCxQYOpFj0E.png" alt="编辑器预览" loading="lazy">
+    <img class="terminal-image term-img term-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-btqex9uP0t1sJIePCyRgejEZyY-CwACuCkAAmsm2FdierBKhSg5SD0E.png" alt="编辑器预览" loading="lazy">
+    <img class="terminal-image term-img term-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-aVqex2-qT9U9N0WXwYbWtRIiTqZ8QACnSkAAmsm2Fec5-j2b9AlCz0E.png" alt="编辑器预览" loading="lazy">
     <svg class="term-fallback" id="termFallback" viewBox="0 0 620 330" role="img" aria-label="编辑器界面预览">
       <defs><pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#ffffff" stroke-opacity=".05"/></pattern></defs>
       <rect width="620" height="330" fill="#0d1020"/><rect width="620" height="330" fill="url(#grid)"/>
@@ -1230,22 +1229,22 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   <div class="cr-show reveal" id="crShow">
     <div class="cr-stage" id="crStage">
       <div class="cr-card cur" data-c="0">
-        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAlqfbtEqRjhfOBunI_HQH_leyt7nAACQCIAAvLa8VfkpwVQ7yU4Cz0E.jpg" alt="Starry">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAlqfbtEqRjhfOBunI_HQH_leyt7nAACQCIAAvLa8VfkpwVQ7yU4Cz0E.jpg" alt="Starry" loading="lazy">
         <h3>Starry</h3><span class="cr-role" data-i18n="cr_role_0">创始人 &amp; 核心开发</span>
         <p data-i18n="cr_desc_0">KNExpanse 项目发起人,构思产品整体框架,负责核心功能开发,决定项目后续更新方向。</p>
       </div>
       <div class="cr-card" data-c="1">
-        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHApqfbt9tXvUV0ii7Ik54cseyIriAANCIgAC8trxV7_cQrV9GkgNPQQ.jpg" alt="danjvan">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHApqfbt9tXvUV0ii7Ik54cseyIriAANCIgAC8trxV7_cQrV9GkgNPQQ.jpg" alt="danjvan" loading="lazy">
         <h3>danjvan</h3><span class="cr-role" data-i18n="cr_role_1">前后端 + JS 开发</span>
         <p data-i18n="cr_desc_1">包揽前端页面、后端服务和数据库相关开发,搭建私有化云平台,保障云端功能稳定不掉线。</p>
       </div>
       <div class="cr-card" data-c="2">
-        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAxqfbuGOe2o31A0Tfanha29bEw0QgACRCIAAvLa8VezI2dHK_oRyj0E.jpg" alt="Sleepforest">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAxqfbuGOe2o31A0Tfanha29bEw0QgACRCIAAvLa8VezI2dHK_oRyj0E.jpg" alt="Sleepforest" loading="lazy">
         <h3>Sleepforest</h3><span class="cr-role" data-i18n="cr_role_2">UI 设计</span>
         <p data-i18n="cr_desc_2">大名鼎鼎的 Vibecoding 之神(bushi)!全权负责界面视觉与交互设计,敲定页面布局、动画效果,打造整套项目视觉风格。</p>
       </div>
       <div class="cr-card" data-c="3">
-        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAtqfbt_PMPFSPAJm034HEsDijjozAACQyIAAvLa8VdlgZfTIXacAT0E.jpg" alt="Inventocode">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAtqfbt_PMPFSPAJm034HEsDijjozAACQyIAAvLa8VdlgZfTIXacAT0E.jpg" alt="Inventocode" loading="lazy">
         <h3>Inventocode</h3><span class="cr-role" data-i18n="cr_role_3">特别感谢</span>
         <p data-i18n="cr_desc_3">开发过程中交流技术,提供思路与指导,给予项目支持。</p>
       </div>
@@ -1295,9 +1294,9 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
 
 <footer>
   <div style="display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--text-2)">
-    <img class="footer-logo th-def" id="footerLogo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse">
-    <img class="footer-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse">
-    <img class="footer-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse">
+    <img class="footer-logo th-def" id="footerLogo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse" loading="lazy">
+    <img class="footer-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse" loading="lazy">
+    <img class="footer-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse" loading="lazy">
     <span class="logo-mark footer-mark" id="footerMark" style="width:26px;height:26px;border-radius:8px">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><rect x="7" y="7" width="10" height="10" rx="3"/></svg>
     </span> KN Expanse
@@ -1593,13 +1592,15 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     if (!pop || !btn) return;
     var r = btn.getBoundingClientRect();
     var pw = pop.offsetWidth || 220;
+    /* 悬浮窗在按钮正下方:右缘对齐按钮右缘(视觉居中于按钮下方),防溢出左缘 */
     var left = r.right - pw;
-    if (left < 10) left = Math.max(10, window.innerWidth - pw - 12);
+    if (left < 10) left = 10;
     pop.style.left = left + 'px';
     pop.style.top = (r.bottom + 12) + 'px';
     pop.style.right = 'auto';
   }
-  function syncPopOpen() { var any = document.querySelector('.theme-pop.show,.qq-pop.show,.perf-pop.show,.m-pop.show,.lang-pop.show,.nav-more.open'); header.classList.toggle('pop-open', !!any); }
+  /* pop-open 仅由更多菜单控制:其它悬浮窗(fixed 在 header 外)不需要 header 让位模糊 */
+  function syncPopOpen() { header.classList.toggle('pop-open', !!document.querySelector('.nav-more.open')); }
   function showPop() { if (!isMobileUA && otherPopOpen('.theme-pop.show')) return; clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); perfPop.classList.remove('show'); clearTimeout(perfTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(themePop, themeToggle); themePop.classList.add('show'); unlockBtnId = 'themeToggle'; syncNavLock(); }
   function hidePop() { popTimer = setTimeout(function () { themePop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
   /* 按钮悬停 200ms 才打开悬浮窗:鼠标扫过相邻按钮不误触 */
@@ -1708,6 +1709,12 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   });
   function closeMenu() {
     if (!header.classList.contains('menu-open')) return;
+    /* 节能模式:无动画,立即收起 */
+    if (document.body.classList.contains('lite-mode')) {
+      header.classList.remove('menu-open'); header.classList.remove('closing');
+      header.style.height = ''; hamburger.setAttribute('aria-expanded', 'false');
+      return;
+    }
     header.classList.add('closing');
     header.style.height = '60px';
     setTimeout(function () {
@@ -1722,7 +1729,20 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   hamburger.addEventListener('click', function (e) {
     e.stopPropagation();
     if (header.classList.contains('menu-open')) { closeMenu(); return; }
+    /* 打开导航菜单前先收起已开的悬浮窗(二维码/外观/语言),避免并存 */
+    if (isMobileUA) { [qrPop, lookPop, langPop, navMore].forEach(function (p) { if (p) { p.classList.remove('show'); p.classList.remove('open'); } }); }
     header.classList.add('hiding-nav');
+    if (document.body.classList.contains('lite-mode')) {
+      /* 节能模式:无动画延迟,但等一帧布局后再取高度(立即读 scrollHeight 会算错) */
+      header.classList.remove('hiding-nav'); header.classList.add('menu-open');
+      hamburger.setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          header.style.height = header.scrollHeight + 'px';
+        });
+      });
+      return;
+    }
     setTimeout(function () {
       header.classList.remove('hiding-nav');
       header.classList.add('menu-open');
@@ -1803,7 +1823,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   }
   perfBtn.addEventListener('click', function () {
     setLite(!document.body.classList.contains('lite-mode'));
-  });
+  }, { passive: true });
   if (document.body.classList.contains('lite-mode')) perfBtn.classList.add('lite');
   var perfTimer = null;
   function showPerfPop() { if (!isMobileUA && otherPopOpen('.perf-pop.show')) return; clearTimeout(perfTimer); themePop.classList.remove('show'); clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(perfPop, perfBtn); perfPopSync(); perfPop.classList.add('show'); unlockBtnId = 'perfBtn'; syncNavLock(); }
@@ -1849,15 +1869,13 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     mDl.classList.remove('show');
     document.body.style.overflow = '';
     document.body.classList.remove('m-boot');
-    /* 查看详细介绍:直接进主页(不刷新,否则会弹回起始页),记住已进过 */
-    try { sessionStorage.setItem('knexpanse-booted', '1'); } catch (e) {}
+    /* 查看详细介绍:直接进主页(不刷新,否则会弹回起始页) */
     window.scrollTo(0, 0);
   }
-  var mDlBooted = false;
-  try { mDlBooted = !!sessionStorage.getItem('knexpanse-booted'); } catch (e) {}
   if (isMobileUA) {
     document.body.classList.add('mobile');
-    if (!mDlBooted) mDlOpen();
+    /* 移动端每次打开都默认进入下载首屏 */
+    mDlOpen();
   }
   /* 移动端:悬浮窗改点击交互,禁用 hover 打开 */
   var hoverPop = !isMobileUA;
@@ -1868,12 +1886,8 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   var mBackBtn = $('#mBackBtn');
   if (mBackBtn && isMobileUA) {
     mBackBtn.style.display = 'flex';
-    mBackBtn.addEventListener('click', function () {
-      /* 回到下载页:播放返回动画后刷新页面,重新干净渲染缓解卡顿 */
-      mDlOpen();
-      try { sessionStorage.removeItem('knexpanse-booted'); } catch (e) {}
-      setTimeout(function () { location.reload(); }, 420);
-    });
+    /* 回到下载页:直接回到起始页,不再自动刷新 */
+    mBackBtn.addEventListener('click', mDlOpen);
   }
   /* ---------- 语言系统(5 语言) ---------- */
   var I18N = {
@@ -1997,7 +2011,6 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     m_qq:{zh:'加入 QQ 群',en:'Join QQ Group',ja:'QQグループに参加',ko:'QQ 그룹 가입',es:'Unirse al grupo QQ',tw:'加入 QQ 群'},
     m_detail:{zh:'查看详细介绍',en:'View Details',ja:'詳細を見る',ko:'상세 보기',es:'Ver detalles',tw:'查看詳細介紹'},
     m_back:{zh:'下载',en:'Download',ja:'ダウンロード',ko:'다운로드',es:'Descargar',tw:'下載'},
-    m_swipe:{zh:'下滑进入详细介绍',en:'Swipe up to explore',ja:'上にスワイプして詳細へ',ko:'위로 스와이프하여 상세 보기',es:'Desliza hacia arriba para explorar',tw:'下滑進入詳細介紹'},
     perf_badge:{zh:'▶ 运行中 · 120 FPS',en:'▶ Running · 120 FPS',ja:'▶ 実行中 · 120FPS',ko:'▶ 실행 중 · 120FPS',es:'▶ En ejecución · 120 FPS',tw:'▶ 运行中 · 120 FPS'},
 
     toast_coming:{zh:' 版正在研发中,敬请期待',en:' version is in development, stay tuned',ja:' 版は開発中です。お楽しみに',ko:' 버전은 개발 중입니다. 기대해 주세요',es:' versión en desarrollo, estad atentos',tw:' 版正在研發中,敬请期待'},
@@ -2110,7 +2123,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     if (el) el.textContent = s[curLang] || (on ? '节能模式 · 已开启' : '节能模式 · 已关闭');
     $('#lookPerf').classList.toggle('on', on);
   }
-  function showQr() {
+  function showQr(btn) {
     if (!isMobileUA && otherPopOpen('.qr-pop.show')) return;
     clearTimeout(qrTimer);
     clearTimeout(qrAutoT);
@@ -2120,11 +2133,14 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     if (isMobileUA) {
       $$('.qr-tab').forEach(function (x) { x.classList.toggle('active', x.dataset.q === 'q'); });
       $$('.qr-pane').forEach(function (p) { p.classList.toggle('show', p.dataset.q === 'q'); });
-      var qrImgsBox = $('#qrImgs');
-      var qrActivePane = $('.qr-pane.show');
-      if (qrImgsBox && qrActivePane) qrImgsBox.style.height = qrActivePane.offsetHeight + 'px';
     }
-    posPop(qrPop, qrBtn); qrPop.classList.add('show'); unlockBtnId = 'qrBtn'; syncNavLock();
+    posPop(qrPop, btn || qrBtn); qrPop.classList.add('show'); unlockBtnId = 'qrBtn'; syncNavLock();
+    /* 移动端:悬浮窗显示后再算容器高度(display:none 时 offsetHeight 为 0,框就塌了) */
+    if (isMobileUA) {
+      var qrImgsBox2 = $('#qrImgs');
+      var qrActivePane2 = $('.qr-pane.show');
+      if (qrImgsBox2 && qrActivePane2) qrImgsBox2.style.height = qrActivePane2.offsetHeight + 'px';
+    }
     /* 兜底(仅桌面 hover):打开后鼠标若不在悬浮窗/按钮上,1.2s 自动关闭,杜绝"残留打开、鼠标移过区域就显现" */
     qrAutoT = setTimeout(function () {
       if (hoverPop && !qrPop.matches(':hover') && !qrBtn.matches(':hover')) {
@@ -2132,13 +2148,13 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
       }
     }, 1200);
   }
-  function showLook() {
+  function showLook(btn) {
     if (!isMobileUA && otherPopOpen('.look-pop.show')) return;
     clearTimeout(lookTimer);
     langPop.classList.remove('show'); clearTimeout(langTimer);
     qrPop.classList.remove('show'); clearTimeout(qrTimer); clearTimeout(qrAutoT);
     perfSyncLook();
-    posPop(lookPop, lookBtn); lookPop.classList.add('show'); unlockBtnId = 'lookBtn'; syncNavLock();
+    posPop(lookPop, btn || lookBtn); lookPop.classList.add('show'); unlockBtnId = 'lookBtn'; syncNavLock();
   }
   var qrOpenT = null, lookOpenT = null;
   qrBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(qrOpenT); qrOpenT = setTimeout(showQr, 300); });
@@ -2168,9 +2184,26 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     });
     /* 首屏工具按钮:语言/外观/二维码(在开启页也能切换) */
     var mDlLangBtn = $('#mDlLang'), mDlLookBtn = $('#mDlLook'), mDlQrBtn = $('#mDlQr');
-    if (mDlLangBtn) mDlLangBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showLang(); });
-    if (mDlLookBtn) mDlLookBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showLook(); });
-    if (mDlQrBtn) mDlQrBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showQr(); });
+    if (mDlLangBtn) mDlLangBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showLang(mDlLangBtn); });
+    if (mDlLookBtn) mDlLookBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showLook(mDlLookBtn); });
+    if (mDlQrBtn) mDlQrBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showQr(mDlQrBtn); });
+    /* via/移动 WebView:部分浏览器 click 会被吞,用 touchstart 直接打开(preventDefault 防 click 双触发) */
+    if ('ontouchstart' in window) {
+      [['qrBtn', 'qrPop', showQr, hideQrPop], ['lookBtn', 'lookPop', showLook, hideLookPop], ['langBtn', 'langPop', showLang, hideLang]].forEach(function (cfg) {
+        var b2 = $(cfg[0]), p2 = $(cfg[1]);
+        if (b2) b2.addEventListener('touchstart', function (e) {
+          e.preventDefault(); e.stopPropagation();
+          if (p2.classList.contains('show')) { cfg[3](); } else { closeAllPops(); cfg[2](); }
+        }, { passive: false });
+      });
+      [['mDlLang', showLang, mDlLangBtn, langPop], ['mDlLook', showLook, mDlLookBtn, lookPop], ['mDlQr', showQr, mDlQrBtn, qrPop]].forEach(function (cfg) {
+        var b2 = $(cfg[0]);
+        if (b2) b2.addEventListener('touchstart', function (e) {
+          e.preventDefault(); e.stopPropagation();
+          closeAllPops(); cfg[1](cfg[2]);
+        }, { passive: false });
+      });
+    }
   }
   $$('.qr-tab').forEach(function (tab) {
     tab.addEventListener('click', function () {
@@ -2217,7 +2250,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   $$('.dl-m-btn.soon').forEach(function (b) {
     b.addEventListener('click', function () { toast(I18N.dl_ios_tip ? I18N.dl_ios_tip[curLang] : 'iOS 版正在研发中,敬请期待'); });
   });
-  function showLang() {
+  function showLang(btn) {
     if (!isMobileUA && otherPopOpen('.lang-pop.show')) return;
     clearTimeout(langTimer);
     themePop.classList.remove('show'); clearTimeout(popTimer);
@@ -2226,7 +2259,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     mPop.classList.remove('show'); clearTimeout(mTimer);
     lookPop.classList.remove('show'); clearTimeout(lookTimer);
     qrPop.classList.remove('show'); clearTimeout(qrTimer); clearTimeout(qrAutoT);
-    posPop(langPop, langBtn); langPop.classList.add('show'); unlockBtnId = 'langBtn'; syncNavLock();
+    posPop(langPop, btn || langBtn); langPop.classList.add('show'); unlockBtnId = 'langBtn'; syncNavLock();
   }
   function hideLang() { langTimer = setTimeout(function () { langPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
   var langOpenT = null;
@@ -2313,19 +2346,29 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
 
   /* ---------- 全局悬浮 ---------- */
   function bindTilt(el, maxDeg) {
+    /* 性能优化:rAF 节流(每帧至多一次布局读取;缓存 rect 会因滚动/位移失效,故不缓存) */
+    var pending = false;
     el.addEventListener('mousemove', function (e) {
-      var r = el.getBoundingClientRect();
-      var rx = ((e.clientY - r.top) / r.height - 0.5) * -maxDeg;
-      var ry = ((e.clientX - r.left) / r.width - 0.5) * maxDeg;
-      el.style.setProperty('--rx', rx.toFixed(2) + 'deg');
-      el.style.setProperty('--ry', ry.toFixed(2) + 'deg');
-    });
-    el.addEventListener('mouseleave', function () { el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg'); });
+      if (document.body.classList.contains('lite-mode')) return;
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(function () {
+        pending = false;
+        var r = el.getBoundingClientRect();
+        var rx = ((e.clientY - r.top) / r.height - 0.5) * -maxDeg;
+        var ry = ((e.clientX - r.left) / r.width - 0.5) * maxDeg;
+        el.style.setProperty('--rx', rx.toFixed(2) + 'deg');
+        el.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+      });
+    }, { passive: true });
+    el.addEventListener('mouseleave', function () { el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg'); }, { passive: true });
   }
   /* 始终绑定 tilt(节能模式下由 CSS 强制压住,开头卡片除外),切回标准模式立即生效 */
   $$('.card').forEach(function (c) { bindTilt(c, 9); });
   $$('.btn').forEach(function (b) { bindTilt(b, 6); });
   $$('.stack-card').forEach(function (c) { bindTilt(c, 6); });
+  $$('.cr-card').forEach(function (c) { bindTilt(c, 5); });
+  $$('.st-col').forEach(function (c) { bindTilt(c, 5); });
 
   /* ---------- 终端点交互 ---------- */
   var termBox = $('#termBox');
