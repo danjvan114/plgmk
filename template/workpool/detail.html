@@ -164,7 +164,7 @@
                         </div>
                         <span>作品加载中...</span>
                     </div>
-                    <iframe id="player-frame" src="https://code.pgrm.run/app/player/?f={{ work.file_url|urlencode }}" frameborder="0" allowfullscreen onload="playerLoaded()"></iframe>
+                    <iframe id="player-frame" src="/app/player/?f={{ work.file_url|urlencode }}" frameborder="0" allowfullscreen onload="playerLoaded()"></iframe>
                     {% else %}
                     <div class="player-placeholder">
                         <i class="fa-regular fa-circle-play"></i>

@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KN Expanse</title>
+<title>KE 主页</title>
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 <link rel="shortcut icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
 <style>
 /* ============================================================
    KN Expanse Landing — v8
@@ -147,6 +148,15 @@ body.dark-mode #particles svg.glow { filter:drop-shadow(0 0 16px #eef2ff); }
 .cursor-glow { position:fixed; pointer-events:none; z-index:9999; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(107,114,245,.05) 0%,transparent 65%); transform:translate(-50%,-50%); opacity:0; transition:opacity .4s; }
 @media (hover:hover) { body:hover .cursor-glow { opacity:1; } }
 @media (hover:none) { .cursor-glow { display:none !important; } }
+/* ---------- PixiJS GPU 画布(光斑/粒子由 WebGL 渲染,不再吃主线程) ---------- */
+#pixiBg { position:fixed; inset:0; z-index:-2; pointer-events:none; overflow:hidden; }
+#pixiBg canvas { display:block; pointer-events:auto; cursor:pointer; }
+body.fx-on .bg-orb, body.fx-on #particles { display:none !important; }
+body.lite-mode #pixiBg { display:none !important; }
+@media (prefers-reduced-motion: reduce) {
+  #pixiBg { display:none !important; }
+  body:not(.fx-on) .bg-orb, body:not(.fx-on) #particles svg { animation:none !important; }
+}
 /* 轻量模式(手动节能 / 无 WebGL):关掉重特效(orb 大模糊/粒子/鼠标光晕/视差),CPU 渲染不卡,下载不受影响 */
 body.no-webgl .bg-orb, body.lite-mode .bg-orb,
 body.no-webgl #particles, body.lite-mode #particles,
@@ -168,7 +178,6 @@ body.no-webgl .bg-photo, body.lite-mode .bg-photo { filter:none !important; }
 /* 悬浮窗:更实的玻璃(底字不透)+ 更高模糊 */
 .theme-pop, .qq-pop, .perf-pop, .nav-more-pop { background:rgba(255,255,255,.46); }
 body.dark-mode .theme-pop, body.dark-mode .qq-pop, body.dark-mode .perf-pop, body.dark-mode .nav-more-pop { background:rgba(18,22,40,.92); }
-body.dark-mode .nav-more-pop { background:rgba(24,29,50,.94); }
 /* 节能按钮悬停状态小窗 */
 .perf-wrap { position:relative; display:flex; }
 .perf-pop { position:fixed; top:0; right:0; z-index:1300; background:var(--glass-strong); backdrop-filter:blur(36px) saturate(200%); -webkit-backdrop-filter:blur(36px) saturate(200%); border-radius:14px; padding:9px 14px; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:0; transform:translateY(6px) scale(.94); pointer-events:none; transition:opacity .3s,transform .4s cubic-bezier(.34,1.56,.64,1); z-index:50; white-space:nowrap; }
@@ -179,18 +188,18 @@ body.dark-mode .nav-more-pop { background:rgba(24,29,50,.94); }
 /* 移动端下载悬浮窗 */
 .m-wrap { position:relative; display:flex; }
 .lang-wrap { position:relative; display:flex; }
-.lang-pop { position:fixed; top:0; right:0; min-width:132px; z-index:5000; padding:8px; border-radius:16px; background:rgba(255,255,255,.46); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:0; transform:translateY(8px) scale(.92); pointer-events:none; visibility:hidden; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1),visibility .3s; }
+.lang-pop { position:fixed; top:0; right:0; min-width:132px; z-index:1300; padding:8px; border-radius:16px; background:rgba(255,255,255,.46); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:0; transform:translateY(8px) scale(.92); pointer-events:none; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1); z-index:50; }
 body.dark-mode .lang-pop { background:rgba(22,26,45,.86); }
-.lang-pop.show { opacity:1; transform:none; pointer-events:auto; visibility:visible; }
+.lang-pop.show { opacity:1; transform:none; pointer-events:auto; }
 .lang-item { display:block; width:100%; border:none; cursor:pointer; background:transparent; color:var(--text-2); font-size:13px; font-weight:700; font-family:inherit; text-align:left; padding:8px 12px; border-radius:10px; transition:background .25s,color .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
 .lang-item:hover { background:var(--glass-tint); color:var(--accent-1); transform:translateX(3px); }
 .lang-item.cur { color:var(--accent-1); background:var(--glass-tint); }
 .lang-item.cur::after { content:"\2713"; float:right; font-weight:800; }
 .lang-item.popped { animation:langPop .32s cubic-bezier(.34,1.56,.64,1); }
 @keyframes langPop { 0% { transform:scale(1); } 45% { transform:scale(1.08); } 70% { transform:scale(.96); } 100% { transform:scale(1); } }
-.look-pop, .qr-pop { position:fixed; top:0; right:0; z-index:5000; padding:10px; border-radius:20px; background:rgba(255,255,255,.46); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(10px) scale(.95); pointer-events:none; visibility:hidden; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1),visibility .3s; transform-origin:top right; }
+.look-pop, .qr-pop { position:fixed; top:0; right:0; z-index:1300; padding:10px; border-radius:20px; background:rgba(255,255,255,.46); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(10px) scale(.95); pointer-events:none; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1); transform-origin:top right; }
 .look-pop { min-width:214px; }
-.look-pop.show, .qr-pop.show { opacity:1; transform:none; pointer-events:auto; visibility:visible; }
+.look-pop.show, .qr-pop.show { opacity:1; transform:none; pointer-events:auto; }
 body.dark-mode .look-pop, body.dark-mode .qr-pop { background:rgba(22,26,45,.86); }
 .look-sep { height:1px; background:var(--glass-hi-bot); margin:6px 4px; }
 .look-perf { display:flex; align-items:center; gap:8px; width:100%; padding:9px 12px; border:none; background:transparent; color:var(--text-2); font-size:13.5px; font-weight:600; font-family:inherit; cursor:pointer; border-radius:14px; transition:background .25s,color .25s; }
@@ -207,9 +216,7 @@ body.dark-mode .look-pop, body.dark-mode .qr-pop { background:rgba(22,26,45,.86)
 .qr-imgs { position:relative; height:172px; margin-top:6px; transition:height .5s cubic-bezier(.34,1.56,.64,1); }
 .qr-pane { position:absolute; left:0; right:0; top:0; display:flex; flex-direction:column; align-items:center; gap:8px; opacity:0; transform:scale(.88); pointer-events:none; transition:opacity .35s ease,transform .55s cubic-bezier(.34,1.56,.64,1); transform-origin:50% 15%; }
 .qr-pane.show { opacity:1; transform:scale(1); pointer-events:auto; }
-.qr-pane img { width:100%; height:172px; object-fit:contain; border-radius:12px; background:#fff; display:block; }
-/* 移动端(按设备 UA 判定,与窗口宽度无关):二维码二级菜单只保留 QQ 群码 */
-body.mobile .qr-tab[data-q="m"], body.mobile .qr-pane[data-q="m"] { display:none; }
+.qr-pane img { width:100%; height:172px; object-fit:contain; border-radius:12px; background:rgba(255,255,255,.4); display:block; }
 .qr-name { font-size:12.5px; font-weight:700; color:var(--text-2); white-space:nowrap; letter-spacing:.3px; }
 .m-pop { position:fixed; top:0; right:0; width:188px; z-index:1300; padding:12px; border-radius:18px; background:rgba(255,255,255,.46); backdrop-filter:blur(36px) saturate(200%); -webkit-backdrop-filter:blur(36px) saturate(200%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:0; transform:translateY(8px) scale(.92); pointer-events:none; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1); z-index:50; text-align:center; }
 body.dark-mode .m-pop { background:rgba(22,26,45,.86); }
@@ -218,37 +225,18 @@ body.dark-mode .m-pop { background:rgba(22,26,45,.86); }
 .m-pop img { display:block; width:132px; max-width:100%; margin:0 auto; border-radius:10px; }
 .m-pop small { display:block; margin-top:7px; font-size:11.5px; font-weight:600; color:var(--accent-1); }
 /* 移动端全屏下载页 */
-.m-dl { position:fixed; inset:0; z-index:4000; display:flex; align-items:center; justify-content:center; padding:28px 22px; background:radial-gradient(circle at 50% 18%, var(--accent-glow), transparent 62%), var(--bg-base); opacity:0; transform:translateY(26px) scale(.97); pointer-events:none; transition:opacity .45s ease, transform .6s cubic-bezier(.34,1.56,.64,1); overflow-y:auto; }
-.m-dl.show { opacity:1; pointer-events:auto; transform:none; }
-/* 折叠屏/节能:起始页打开时主内容与页脚先不渲染,点"查看详细介绍"再加载 */
-body.m-boot main, body.m-boot footer { display:none; }
-body:not(.m-boot) main { animation:fadeIn .5s ease; }
-.m-dl-inner { width:min(420px,100%); text-align:center; padding-top:28px; animation:menuIn .6s cubic-bezier(.34,1.56,.64,1) both; }
-/* 首屏 logo:裸图等比放大,不套玻璃框/圆角,不拉伸;按主题显示对应配色 */
-.m-dl-logo { display:none; height:72px; width:auto; margin-bottom:16px; }
-body.theme-aurora .m-dl-logo.th-def, body.dark-mode .m-dl-logo.th-def,
-body.theme-ocean .m-dl-logo.th-ocean, body.theme-amber .m-dl-logo.th-amber { display:inline-block; }
-/* 首屏右上角工具按钮(语言/外观/二维码):z-index 压过内容层,否则被 m-dl-inner 盖住点不到 */
-.m-dl-tools { position:absolute; top:18px; right:18px; display:flex; gap:10px; z-index:10; }
-.m-dl-tool { width:40px; height:40px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-1); background:var(--solid-glass); box-shadow:inset 0 1px 0 rgba(255,255,255,.35); transition:transform .4s cubic-bezier(.34,1.56,.64,1); }
-.m-dl-tool:active { transform:scale(.9); }
-/* 首屏文字:默认(紫色主题)用主题色;绿色/橙色主题背景偏暗,文字改白 */
-.m-dl-hero { font-size:31px; font-weight:900; line-height:1.25; letter-spacing:.5px; color:var(--text-1); margin-bottom:36px; }
-.m-dl-grad { background:var(--grad-title); -webkit-background-clip:text; background-clip:text; color:transparent; }
-/* for creators:手写体、加粗、间距收紧 */
-.m-dl-hand { display:block; font-size:17px; font-weight:900; font-style:italic; font-family:'Comic Sans MS','Segoe Print','Kaiti SC',cursive; letter-spacing:1px; color:var(--accent-1); margin-top:4px; text-transform:lowercase; }
-body.theme-ocean .m-dl-hero, body.theme-amber .m-dl-hero { color:#fff; }
-body.theme-ocean .m-dl-grad, body.theme-amber .m-dl-grad { background:var(--grad-title); -webkit-background-clip:text; background-clip:text; color:transparent; }
-body.theme-ocean .m-dl-hand, body.theme-amber .m-dl-hand { color:rgba(255,255,255,.92); }
-.m-dl-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:48px; border:none; cursor:pointer; margin-top:10px; padding:13px; border-radius:40px; font-size:15px; font-weight:800; color:#fff; font-family:inherit; background:linear-gradient(135deg,var(--accent-1),var(--accent-2)); box-shadow:0 10px 26px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.35); transition:transform .4s cubic-bezier(.34,1.56,.64,1),filter .3s; }
+.m-dl { position:fixed; inset:0; z-index:4000; display:flex; align-items:center; justify-content:center; padding:24px; background:radial-gradient(circle at 50% 18%, var(--accent-glow), transparent 62%), var(--bg-base); opacity:0; pointer-events:none; transition:opacity .5s ease; overflow-y:auto; }
+.m-dl.show { opacity:1; pointer-events:auto; }
+.m-dl-inner { width:min(420px,100%); text-align:center; animation:menuIn .6s cubic-bezier(.34,1.56,.64,1) both; }
+.m-dl-inner h2 { font-size:30px; font-weight:900; line-height:1.25; letter-spacing:.5px; color:var(--text-1); margin-bottom:4px; }
+.m-dl-inner h2 span { background:var(--grad-title); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.m-dl-card { display:block; width:100%; border-radius:18px; margin:20px 0 22px; box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); }
+.m-dl-btn { display:block; width:100%; border:none; cursor:pointer; margin-top:10px; padding:13px; border-radius:40px; font-size:15px; font-weight:800; color:#fff; background:linear-gradient(135deg,var(--accent-1),var(--accent-2)); box-shadow:0 10px 26px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.35); transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .4s,filter .3s; }
 .m-dl-btn:hover { transform:translateY(-2px) scale(1.02); filter:brightness(1.06); }
-/* 移动端快捷下载:按钮全部实心(不做液态玻璃) */
-.m-dl-btn.ios { color:var(--text-1); background:var(--solid-glass); box-shadow:inset 0 1px 0 rgba(255,255,255,.45); }
-.m-dl-btn.ghost { color:var(--text-1); background:rgba(255,255,255,.18); box-shadow:inset 0 1px 0 rgba(255,255,255,.22); }
-body.theme-ocean .m-dl-btn.ghost, body.theme-amber .m-dl-btn.ghost { color:#fff; }
-/* 移动端:回到下载页按钮(右下角) */
-.m-back-btn { position:fixed; right:20px; bottom:90px; z-index:950; display:none; align-items:center; gap:6px; padding:10px 16px; border-radius:30px; border:none; cursor:pointer; background:var(--grad-btn); color:#fff; font-size:13px; font-weight:800; font-family:inherit; box-shadow:0 10px 26px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.35); transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
-.m-back-btn:hover { transform:translateY(-3px) scale(1.05); }
+.m-dl-btn.ghost { color:var(--text-2); background:var(--glass-card); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); }
+.m-dl-qq { display:none; margin-top:10px; }
+.m-dl-qq.show { display:block; animation:menuIn .4s cubic-bezier(.34,1.56,.64,1) both; }
+.m-dl-qq img { width:168px; border-radius:12px; }
 /* 节能模式:关闭液态玻璃(backdrop-filter),减少 GPU 开销 */
 body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
 /* 节能模式:切页/交互动画直接进行完毕,无过渡;但保留默认启动动画(intro) */
@@ -270,8 +258,8 @@ body.lite-mode .nav-links a:hover, body.lite-mode #backTop:hover, body.lite-mode
 /* 节能模式:切页箭头保持垂直居中,不掉落 */
 body.lite-mode .carousel-nav, body.lite-mode .carousel-nav:hover, body.lite-mode .carousel-nav:active { transform:translateY(-50%) !important; }
 body.lite-mode .stack-card, body.lite-mode .feat-panel { transform:perspective(900px) rotateX(0) rotateY(0) translateY(var(--off,0px)) scale(var(--sc,1)) rotate(var(--rot,0deg)) !important; }
-/* 节能模式:项目数据卡片摆正(去掉旋转)且全不透明、无模糊(cur 的 blur !important 特异性更高,必须单独压制) */
-body.lite-mode .st-col, body.lite-mode .st-col.cur { transform:perspective(900px) translateY(var(--st-y,0px)) scale(var(--st-sc,1)) !important; opacity:1 !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; background:var(--solid-glass) !important; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); }
+/* 节能模式:项目数据卡片摆正(仅保留向下错落,去掉歪斜旋转) */
+body.lite-mode .st-col { transform:perspective(900px) translateY(var(--st-off,0px)) scale(var(--st-sc,1)) !important; }
 
 /* ---------- 下载移动端 ---------- */
 .dl-mobile { margin-top:26px; text-align:center; }
@@ -288,7 +276,7 @@ body.lite-mode .st-col, body.lite-mode .st-col.cur { transform:perspective(900px
 /* ---------- 制作团队(水平滑移堆叠) ---------- */
 .cr-show { position:relative; max-width:640px; margin:0 auto; }
 .cr-stage { position:relative; height:350px; }
-.cr-card { position:absolute; left:0; right:0; top:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px 34px; border-radius:28px; background:var(--glass-card); backdrop-filter:blur(18px) saturate(170%); -webkit-backdrop-filter:blur(18px) saturate(170%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:.4; transform:perspective(1000px) translateX(var(--cr-x,0px)) rotate(var(--cr-r,0deg)) scale(var(--cr-s,1)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); transform-origin:50% 100%; pointer-events:none; transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .5s,filter .5s; will-change:transform; }
+.cr-card { position:absolute; left:0; right:0; top:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px 34px; border-radius:28px; background:var(--glass-card); backdrop-filter:blur(18px) saturate(170%); -webkit-backdrop-filter:blur(18px) saturate(170%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:.4; transform:perspective(1000px) translateX(var(--cr-x,0px)) rotate(var(--cr-r,0deg)) scale(var(--cr-s,1)); transform-origin:50% 100%; pointer-events:none; transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .5s,filter .5s; will-change:transform; }
 .cr-card.cur { opacity:1; z-index:10; pointer-events:auto; background:rgba(255,255,255,.30); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); }
 body.dark-mode .cr-card.cur { background:rgba(255,255,255,.10); }
 .cr-ava { width:86px; height:86px; border-radius:50%; object-fit:cover; margin-bottom:14px; box-shadow:0 10px 26px var(--accent-glow); }
@@ -312,7 +300,7 @@ body.dark-mode .cr-card.cur { background:rgba(255,255,255,.10); }
 .qr-modal.show { opacity:1; pointer-events:auto; }
 .qr-modal-box { background:var(--glass-strong); border-radius:24px; padding:30px 34px; text-align:center; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); transform:scale(.9); transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .qr-modal.show .qr-modal-box { transform:scale(1); }
-.qr-modal-box img { width:190px; height:190px; object-fit:contain; border-radius:16px; background:#fff; display:block; margin:0 auto 14px; }
+.qr-modal-box img { width:190px; height:190px; object-fit:contain; border-radius:16px; background:rgba(255,255,255,.6); display:block; margin:0 auto 14px; }
 .qr-modal-box p { font-size:13.5px; color:var(--text-2); margin-bottom:16px; }
 .qr-modal-close { padding:8px 26px; border-radius:24px; border:none; cursor:pointer; background:var(--glass-tint); color:var(--text-1); font-weight:700; font-size:13px; font-family:inherit; transition:background .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
 .qr-modal-close:hover { background:var(--glass-tint-2); transform:translateY(-2px); }
@@ -335,7 +323,7 @@ header.scrolled { background:var(--glass-card); }
 .logo-img { height:32px; width:auto; border-radius:8px; display:none; flex:none; }
 .logo-mark { width:34px; height:34px; border-radius:11px; flex:none; background:var(--grad-btn); display:none; align-items:center; justify-content:center; color:#fff; box-shadow:0 6px 16px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.5); }
 .logo-mark.show { display:flex; }
-.nav-links { display:flex; gap:4px; font-size:14.5px; font-weight:600; max-width:1000px; opacity:1; visibility:visible; overflow:visible; transition:max-width .5s cubic-bezier(.4,0,.2,1),opacity .3s ease,visibility .5s,margin .45s,padding .45s,gap .4s; }
+.nav-links { display:flex; gap:4px; font-size:14.5px; font-weight:600; }
 .nav-links a { display:flex; align-items:center; gap:6px; padding:9px 15px; border-radius:30px; color:var(--text-2); cursor:pointer; white-space:nowrap; transition:color .25s,background .3s,box-shadow .3s,transform .5s cubic-bezier(.34,1.56,.64,1); }
 .nav-links a svg { opacity:.75; transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .nav-links a:hover { color:var(--accent-1); background:var(--glass-tint); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot); transform:translateY(-2px) scale(1.05); }
@@ -347,33 +335,31 @@ header.scrolled { background:var(--glass-card); }
 .nav-more-btn:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateY(-2px) scale(1.05); }
 .nav-more-btn svg { transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
 .nav-more.open .nav-more-btn svg { transform:rotate(180deg); }
-.nav-more-pop { position:absolute; top:calc(100% + 14px); right:0; min-width:220px; padding:7px 8px 5px; border-radius:18px; background:rgba(255,255,255,.88); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(12px) scale(.94); pointer-events:none; transition:opacity .45s ease,transform .55s cubic-bezier(.34,1.56,.64,1); z-index:60; transform-origin:top right; display:grid; grid-template-columns:1fr 1fr; gap:4px; }
+.nav-more-pop { position:absolute; top:calc(100% + 14px); right:0; min-width:220px; padding:8px; border-radius:18px; background:rgba(255,255,255,.72); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); opacity:0; transform:translateY(12px) scale(.94); pointer-events:none; transition:opacity .45s ease,transform .55s cubic-bezier(.34,1.56,.64,1); z-index:60; transform-origin:top right; display:grid; grid-template-columns:1fr 1fr; gap:4px; }
 .nav-more.open .nav-more-pop { opacity:1; transform:none; pointer-events:auto; }
 .nav-more-title { display:none; }
-.nav-more-pop a { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:12px; color:var(--text-2); font-size:13.5px; font-weight:600; text-decoration:none; opacity:0; transform:translateY(12px) scale(.92); transition:opacity .35s ease,transform .5s cubic-bezier(.34,1.56,.64,1),background .25s,color .25s; }
+.nav-more-pop a { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; color:var(--text-2); font-size:13.5px; font-weight:600; text-decoration:none; opacity:0; transform:translateX(8px); transition:opacity .35s ease,transform .45s cubic-bezier(.34,1.56,.64,1),background .25s,color .25s; }
 .nav-more.open .nav-more-pop a { opacity:1; transform:none; }
 .nav-more.open .nav-more-pop a:nth-child(2) { transition-delay:.05s; }
 .nav-more.open .nav-more-pop a:nth-child(3) { transition-delay:.1s; }
 .nav-more.open .nav-more-pop a:nth-child(4) { transition-delay:.15s; }
 .nav-more.open .nav-more-pop a:nth-child(5) { transition-delay:.2s; }
-.nav-more-pop a:hover { background:var(--glass-tint); color:var(--accent-1); transform:translateY(-2px) scale(1.05); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot); transition-delay:0s; }
+.nav-more-pop a:hover { background:var(--glass-tint); color:var(--accent-1); transform:translateY(-2px) scale(1.05); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot); }
 .nav-more-pop a:hover svg { transform:rotate(-8deg) scale(1.15); }
 .nav-more-pop a svg { transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .nav-more-pop .nav-dl-pop { display:none; }
-/* 下载收纳:平滑收缩/展开(max-width 可过渡,width auto→0 无法插值);保留 hover 的 Q 弹过渡 */
-.nav-links > .nav-dl { transition:opacity .4s ease,max-width .5s cubic-bezier(.34,1.56,.64,1),padding .5s,margin .5s,color .25s,background .3s,box-shadow .3s,transform .5s cubic-bezier(.34,1.56,.64,1); overflow:hidden; max-width:150px; }
+/* 下载收纳:平滑收缩/展开 */
+.nav-links > .nav-dl { transition:opacity .4s ease,width .45s cubic-bezier(.34,1.56,.64,1),padding .45s,margin .45s; overflow:hidden; }
 @media (max-width:1280px) {
-  .nav-links > .nav-dl { opacity:0; max-width:0; padding:0; margin:0; pointer-events:none; }
+  .nav-links > .nav-dl { opacity:0; width:0; padding:0; margin:0; pointer-events:none; }
   .nav-more-pop .nav-dl-pop { display:flex; }
 }
 @media (max-width:900px) {
   header.menu-open .nav-more { display:contents; }
   header.menu-open .nav-more-btn { display:none; }
-  /* 更多菜单内已有"下载",隐藏导航末尾的下载项,避免重复 */
-  header.menu-open .nav-links > .nav-dl { display:none; }
   header.menu-open .nav-more-pop { position:static; opacity:1; transform:none; pointer-events:auto; display:contents; background:transparent; box-shadow:none; padding:0; min-width:0; width:auto; }
   header.menu-open .nav-more-title { display:none; }
-  header.menu-open .nav-more-pop a { opacity:0; }
+  header.menu-open .nav-more-pop a { opacity:1; transform:none; transition:none; }
   header.menu-open .nav-more-pop .nav-dl-pop { display:flex; }
 }
 .nav-right { display:flex; gap:10px; align-items:center; position:relative; }
@@ -381,7 +367,7 @@ header.scrolled { background:var(--glass-card); }
 .icon-btn:hover { background:var(--glass-tint); color:var(--accent-1); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot); transform:scale(1.1); }
 .icon-btn.pop { animation:btnPop .55s cubic-bezier(.34,1.56,.64,1); }
 @keyframes btnPop { 0%{transform:scale(1)} 35%{transform:scale(1.3)} 70%{transform:scale(.94)} 100%{transform:scale(1)} }
-.hamburger { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4.5px; width:0; opacity:0; visibility:hidden; overflow:hidden; margin:0; padding:0; transition:width .55s cubic-bezier(.34,1.56,.64,1),opacity .4s ease .08s,visibility .55s,margin .5s,padding .5s,transform .5s cubic-bezier(.34,1.56,.64,1),background .3s,color .3s,box-shadow .3s; }
+.hamburger { display:none; flex-direction:column; align-items:center; justify-content:center; gap:4.5px; }
 .hamburger i { display:block; width:18px; height:2px; border-radius:2px; background:currentColor; transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .25s; }
 header.menu-open .hamburger i:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
 header.menu-open .hamburger i:nth-child(2) { opacity:0; }
@@ -410,7 +396,6 @@ body.theme-amber .ring-num, body.theme-amber .st-trend, body.theme-amber .st-ico
 .qq-pop { position:fixed; top:0; right:0; z-index:1300; background:var(--glass-strong); backdrop-filter:blur(40px) saturate(200%); -webkit-backdrop-filter:blur(40px) saturate(200%); border-radius:18px; padding:14px; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); opacity:0; transform:translateY(8px) scale(.92); pointer-events:none; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1); z-index:50; max-height:min(72vh,460px); overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--accent-1) transparent; }
 .qq-pop::-webkit-scrollbar { width:6px; }
 .qq-pop::-webkit-scrollbar-thumb { background:var(--accent-1); border-radius:3px; }
-.qq-pop img { background:#fff; border-radius:12px; display:block; }
 .qq-pop.show { opacity:1; transform:none; pointer-events:auto; }
 .qq-pop > img { display:block; width:168px; max-width:100%; height:auto; border-radius:12px; }
 .qq-pop span { display:block; margin-top:9px; font-size:12.5px; font-weight:600; color:var(--text-1); text-align:center; white-space:nowrap; }
@@ -543,24 +528,25 @@ body.theme-amber .feature-icon { color:#241505; box-shadow:inset 0 1px 0 var(--g
 
 /* ---------- 统计(大标题 + 三列) ---------- */
 .stats-card { position:relative; padding:34px 40px 52px; }
-/* 项目数据:去掉 .card 的 overflow:hidden(否则左右按钮被裁剪)与父级 backdrop-filter(压住子卡片毛玻璃);
-   同时移除卡片背景——只保留三张堆叠卡片,不要底部再叠一张"底卡";禁 tilt 消除划过时的背景轮廓 */
-#statsCard { overflow:visible !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; background:transparent !important; box-shadow:none !important; border-radius:0 !important; transform:none !important; }
-body.lite-mode #statsCard { background:transparent !important; }
+/* 项目数据:裁掉 .card 的 overflow:hidden(否则左右按钮被裁剪),移除父级 backdrop-filter(否则压住子卡片毛玻璃) */
+#statsCard { overflow:visible !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
 .st-nav-btn { display:flex; position:absolute; top:50%; transform:translateY(-50%); z-index:30; }
 #stPrev { left:-48px; z-index:60; }
 #stNext { right:-48px; z-index:60; }
 .st-dots { position:static; margin:16px auto 0; transform:none; }
-.st-head { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:24px; }
-.st-clock { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color:var(--accent-1); background:var(--glass-tint); padding:7px 14px; border-radius:22px; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); letter-spacing:.6px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.st-head { display:flex; align-items:baseline; gap:12px; margin-bottom:28px; }
+.st-title { font-size:26px; font-weight:800; }
+.st-sub { font-size:14px; color:var(--text-3); }
+.st-clock { margin-left:auto; display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color:var(--accent-1); background:var(--glass-tint); padding:7px 14px; border-radius:22px; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); letter-spacing:.6px; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .st-clock svg { flex:none; opacity:.85; }
 .st-clock em { font-style:normal; }
 .st-live { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-2); opacity:.92; }
 .st-live::after { content:''; width:1px; height:14px; background:var(--glass-hi-bot); margin-left:4px; opacity:.6; }
-.live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.18); flex:none; }
+.live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 0 rgba(34,197,94,.5); animation:livePulse 1.6s ease-out infinite; }
+@keyframes livePulse { 0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)} 70%{box-shadow:0 0 0 7px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
 .st-grid { position:relative; min-height:380px; }
-.st-col { position:absolute; left:0; right:0; top:0; height:auto; opacity:.5; overflow:hidden; transform:perspective(1200px) translateY(var(--st-y,0px)) scale(var(--st-sc,1)) rotate(var(--st-rot,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); transform-origin:50% 50%; pointer-events:auto; transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .45s; background:rgba(255,255,255,.32); backdrop-filter:blur(16px) saturate(160%); -webkit-backdrop-filter:blur(16px) saturate(160%); border-radius:22px; padding:16px; border:none !important; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); }
-.st-col.cur { opacity:1; pointer-events:auto; background:rgba(255,255,255,.30); backdrop-filter:blur(22px) saturate(170%) !important; -webkit-backdrop-filter:blur(22px) saturate(170%) !important; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow-hover); }
+.st-col { position:absolute; left:0; right:0; top:0; height:auto; opacity:.5; overflow:hidden; transform:perspective(1000px) translateY(var(--st-off,0px)) scale(var(--st-sc,1)) rotate(var(--st-rot,0deg)); transform-origin:50% 100%; pointer-events:none; transition:transform .65s cubic-bezier(.34,1.56,.64,1),opacity .4s; background:rgba(255,255,255,.32); backdrop-filter:blur(16px) saturate(160%); -webkit-backdrop-filter:blur(16px) saturate(160%); border-radius:22px; padding:16px; border:none !important; }
+.st-col.cur { opacity:1; pointer-events:auto; background:rgba(255,255,255,.30); backdrop-filter:blur(22px) saturate(170%) !important; -webkit-backdrop-filter:blur(22px) saturate(170%) !important; box-shadow:var(--shadow-hover); }
 .stat-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
 .st-icon { width:42px; height:42px; border-radius:50%; background:var(--glass-tint); color:var(--accent-1); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); display:flex; align-items:center; justify-content:center; }
 .st-trend { display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:800; padding:4px 11px; border-radius:30px; color:#34d399; background:rgba(52,211,153,.14); }
@@ -679,16 +665,10 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   .stack-wrap .carousel-nav.next { right:-12px; }
   .st-grid { grid-template-columns:1fr; gap:18px; }
   .st-col + .st-col { border-left:none; border-top:1px solid var(--glass-hi-bot); padding-top:18px; }
-  /* 中屏:项目数据左右按钮移到卡片内侧(原 -48px 会出屏幕) */
-  #stPrev { left:10px; }
-  #stNext { right:10px; }
 }
 @media (max-width:900px) {
-  /* 断点切换动画:导航链接文字渐隐+收缩;汉堡按钮宽度弹簧展开挤压推开右侧按钮 */
-  .nav-links { max-width:0; opacity:0; visibility:hidden; margin:0; padding:0; gap:0; overflow:hidden; }
-  .hamburger { width:40px; height:40px; opacity:1; visibility:visible; }
-  /* 移动端菜单展开时:导航链接恢复显示(网格布局) */
-  header.menu-open .nav-links { max-width:1000px; opacity:1; visibility:visible; transition:none !important; }
+  .nav-links { display:none; }
+  .hamburger { display:flex; }
   header.menu-open { border-radius:26px; flex-direction:column; align-items:stretch; background:var(--glass-strong); padding:6px 14px; }
   header.menu-open .nav-left { width:100%; flex-direction:column; align-items:stretch; gap:8px; }
   header.menu-open .logo { display:none; }
@@ -697,32 +677,11 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   header.menu-open .nav-links > a, header.menu-open .nav-more-pop a { justify-self:center; justify-content:center; text-align:center; padding:8px 16px; font-size:13px; border-radius:30px; }
   header.menu-open .nav-right { display:flex; width:100%; justify-content:center; padding:4px 0 6px; }
   header.menu-open .nav-links, header.menu-open .nav-right { animation:fadeIn .5s ease both; }
-  /* 移动端菜单:链接项逐个从右挤压滑入(Q 弹) */
-  header.menu-open .nav-links > a,
-  header.menu-open .nav-more-pop a {
-    animation:navItemIn .5s cubic-bezier(.34,1.56,.64,1) both;
-  }
-  header.menu-open .nav-links > a:nth-child(2) { animation-delay:.05s; }
-  header.menu-open .nav-links > a:nth-child(3) { animation-delay:.1s; }
-  header.menu-open .nav-links > a:nth-child(4) { animation-delay:.15s; }
-  header.menu-open .nav-links > .nav-dl { animation-delay:.25s; }
-  header.menu-open .nav-more-pop a { animation-delay:.2s; }
-  header.menu-open .nav-more-pop a:nth-child(3) { animation-delay:.26s; }
-  header.menu-open .nav-more-pop a:nth-child(4) { animation-delay:.32s; }
-  header.menu-open .nav-more-pop a:nth-child(5) { animation-delay:.38s; }
-  @keyframes navItemIn { from { opacity:0; transform:translateX(26px) scale(.92); } to { opacity:1; transform:none; } }
-  /* 收起:菜单项文字慢慢消失 */
-  header.closing .nav-links > a, header.closing .nav-more-pop a, header.closing .nav-links > .nav-dl { animation:navItemOut .32s ease both; }
-  @keyframes navItemOut { to { opacity:0; transform:translateX(-12px); } }
-  /* 节能模式:动画全禁用,菜单项直接显示(不依赖滑入动画) */
-  body.lite-mode header.menu-open .nav-links > a,
-  body.lite-mode header.menu-open .nav-more-pop a { opacity:1 !important; transform:none !important; }
 header.hiding-nav .nav-links, header.hiding-nav .nav-right { animation:fadeOut .2s ease both; }
-header.hiding-nav .logo { animation:fadeOut .2s ease both; }
 header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55s ease both; }
   header.closing .nav-links, header.closing .nav-right, header.closing .menu-title { animation:fadeOut .42s ease both; }
   @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-  @keyframes fadeOut { to { opacity:0; } }
+  @keyframes fadeOut { to { opacity:0; transform:translateY(-14px); } }
   main { flex-direction:column; padding-top:120px; }
   .text-area { text-align:center; }
   .btns { justify-content:center; }
@@ -735,14 +694,9 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   .stack { min-height:380px; }
   .stack-card { flex-direction:column; text-align:center; }
   .m-row, .m-progress { justify-content:center; margin-left:auto; margin-right:auto; }
-  /* 下载区:任何宽度保持三列紧凑小卡,不突变单列大卡 */
-  .download-card { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:10px; }
-  .dl-col { flex-direction:column; align-items:center; gap:6px; padding:14px 6px; text-align:center; min-width:0; overflow:hidden; }
-  .dl-col + .dl-col { border-left:1px solid var(--glass-hi-bot); border-top:none; }
-  .dl-big { width:32px; height:32px; margin-bottom:4px; }
-  .dl-col b { font-size:13px; }
-  .dl-col small { font-size:9px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .dl-go { margin:0; padding:6px 8px; font-size:10.5px; flex:none; }
+  .download-card { grid-template-columns:1fr; }
+  .dl-col + .dl-col { border-left:none; border-top:1px solid var(--glass-hi-bot); }
+  .dl-col { padding:40px 20px; }
   .intro-name { font-size:34px; letter-spacing:1px; }
   .intro-inner { width:300px; height:300px; }
 }
@@ -779,14 +733,8 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   .stack { min-height:420px; }
   .stack-card { padding:20px 16px; }
   .stack-wrap .carousel-dots { margin-top:6px; }
-  /* 移动端:卡片统一内缩,离屏幕边缘留足距离(对齐优秀扩展 80vw 标准) */
-  .feat-stage { margin-left:9vw; margin-right:9vw; }
-  .carousel-stage { margin-left:6vw; margin-right:6vw; }
-  .stack, .st-grid, .cr-stage { margin-left:6vw; margin-right:6vw; }
-  .download-grid { margin-left:6vw; margin-right:6vw; }
-  /* 移动端:项目数据左右按钮移到卡片内侧(原 -48px 会出屏幕) */
-  #stPrev { left:10px; }
-  #stNext { right:10px; }
+  /* 移动端:制作团队卡片与屏幕左右留出距离 */
+  .cr-show { padding:0 8px; }
   .dl-big { width:54px; height:54px; }
   .dl-col { padding:30px 12px; }
   .ext-stage { height:350px; }
@@ -810,6 +758,20 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   .st-ring .ring-num { font-size:12.5px; }
   .st-sub-row span { font-size:11.5px; }
   .feat-stage { height:420px; }
+  .download-card { grid-template-columns:repeat(3,1fr); }
+  .dl-col { padding:18px 6px; text-align:center; min-width:0; overflow:hidden; }
+  .dl-col + .dl-col { border-left:1px solid var(--glass-hi-bot); border-top:none; }
+  .dl-big { width:38px; height:38px; margin-bottom:6px; }
+  .dl-col h4 { font-size:14px; }
+  .dl-col small { font-size:9.5px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dl-col .btn { font-size:10.5px; padding:7px 6px; width:100%; white-space:nowrap; justify-content:center; }
+  .download-card { display:flex; flex-direction:column; gap:10px; padding:12px; }
+  .dl-col { flex-direction:row; align-items:center; gap:12px; padding:12px 14px; text-align:left; justify-content:flex-start; }
+  .dl-col .dl-big { width:34px; height:34px; margin:0; flex:none; }
+  .dl-col b { font-size:15px; }
+  .dl-col small { flex:1; font-size:10px; min-width:0; }
+  .dl-go { margin:0 0 0 auto; padding:7px 12px; font-size:11px; flex:none; }
+  .dl-col + .dl-col { border-left:none; border-top:1px solid var(--glass-hi-bot); }
   .dl-col .dl-badges { flex-wrap:wrap; justify-content:center; }
   .ext-foot { flex-wrap:wrap; gap:8px; }
   .intro-name { font-size:27px; }
@@ -818,6 +780,20 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   .perf-tip .pt-btns { width:100%; justify-content:center; }
   .perf-tip.show { transform:translateY(0); }
 }
+
+/* ===================== 性能优化覆盖层(保留特效,降低 GPU/CPU 开销) ===================== */
+/* 毛玻璃模糊统一降档:8px 视觉效果几乎不变,合成开销大幅下降 */
+header, .icon-btn, .card, .btn-primary, .btn-glass, .badge-btn, .feature-icon, .ft-tab,
+.stack-card, .step-badge, .st-col, .st-col.cur, .cr-card, .perf-pop, .lang-pop, .look-pop,
+.qr-pop, .theme-pop, .qq-pop, .m-pop, .perf-tip, #backTop, .dl-big, .st-icon, footer {
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  backdrop-filter: blur(8px) saturate(160%);
+}
+/* 无 Pixi 回退路径:全屏光斑模糊半径 120px→44px(最重的重绘来源之一) */
+.bg-orb { filter:blur(44px); }
+body.theme-aurora .bg-layer::after { filter:blur(14px); }
+/* 固定背景层做布局/绘制隔离,减少合成范围 */
+.bg-layer, #particles, .burst-layer, .theme-fade { contain:layout paint; }
 </style>
 </head>
 <body class="theme-aurora">
@@ -843,6 +819,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   <div class="parallax" data-speed="0.2"><div class="bg-orb orb-3"></div></div>
 </div>
 <div id="particles"></div>
+<div id="pixiBg"></div>
 
 <!-- ===================== 导航 ===================== -->
 <header id="header">
@@ -857,9 +834,9 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     </div>
     <nav class="nav-links" id="navLinks" aria-label="主导航">
       <a href="#hero" data-scroll><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.2 12 4l9 7.2"/><path d="M5.5 9.8V20h13V9.8"/></svg><span data-i18n="nav_home">主页</span></a>
-      <a href="#extensions" data-scroll><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l3-3 3 3h7v4l3 3-3 3v4h-7l-3 3-3-3H4v-4L1 11l3-3Z"/><circle cx="8.5" cy="11" r="1.4" fill="currentColor" stroke="none"/><circle cx="12.5" cy="15" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8" r="1.4" fill="currentColor" stroke="none"/></svg><span data-i18n="nav_market">插件市场</span></a>
-      <a href="https://pan1.pgrm.run" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg><span data-i18n="nav_community">作品社区</span></a>
-      <a href="https://pan1.pgrm.run/myfiles" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg><span data-i18n="nav_storage">个人存储</span></a>
+      <a href="/mk/kn" data-scroll><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l3-3 3 3h7v4l3 3-3 3v4h-7l-3 3-3-3H4v-4L1 11l3-3Z"/><circle cx="8.5" cy="11" r="1.4" fill="currentColor" stroke="none"/><circle cx="12.5" cy="15" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8" r="1.4" fill="currentColor" stroke="none"/></svg><span data-i18n="nav_market">插件市场</span></a>
+      <a href="/workpool" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg><span data-i18n="nav_community">作品社区</span></a>
+      <a href="https://pan1.pgrm.run/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg><span data-i18n="nav_storage">个人存储</span></a>
       <div class="nav-more" id="navMore">
         <button class="nav-more-btn" id="navMoreBtn" aria-label="更多" aria-expanded="false"><span data-i18n="nav_more">更多</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
         </button>
@@ -871,7 +848,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
           <a href="#download" data-scroll class="nav-dl-pop"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg><span data-i18n="nav_download">下载</span></a>
         </div>
       </div>
-      <a href="#download" data-scroll class="nav-dl"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg><span data-i18n="nav_download">下载</span></a>
+      <a href="#download" data-scroll class="nav-dl"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>下载</a>
     </nav>
   </div>
   <div class="nav-right">
@@ -943,9 +920,9 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
       <span class="dot dot-g" data-action="scale" title="scale"></span>
       <span class="term-title" data-i18n="term_title">拥抱 KN Expanse</span>
     </div>
-    <img class="terminal-image term-img term-def" id="termImg" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mZqezFYne5ES8Pqlk88KVlHbJu9mwACfioAAmsm2FdXlTCxQYOpFj0E.png" alt="编辑器预览" loading="lazy">
-    <img class="terminal-image term-img term-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-btqex9uP0t1sJIePCyRgejEZyY-CwACuCkAAmsm2FdierBKhSg5SD0E.png" alt="编辑器预览" loading="lazy">
-    <img class="terminal-image term-img term-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-aVqex2-qT9U9N0WXwYbWtRIiTqZ8QACnSkAAmsm2Fec5-j2b9AlCz0E.png" alt="编辑器预览" loading="lazy">
+    <img class="terminal-image term-img term-def" id="termImg" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mZqezFYne5ES8Pqlk88KVlHbJu9mwACfioAAmsm2FdXlTCxQYOpFj0E.png" alt="编辑器预览">
+    <img class="terminal-image term-img term-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-btqex9uP0t1sJIePCyRgejEZyY-CwACuCkAAmsm2FdierBKhSg5SD0E.png" alt="编辑器预览">
+    <img class="terminal-image term-img term-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-aVqex2-qT9U9N0WXwYbWtRIiTqZ8QACnSkAAmsm2Fec5-j2b9AlCz0E.png" alt="编辑器预览">
     <svg class="term-fallback" id="termFallback" viewBox="0 0 620 330" role="img" aria-label="编辑器界面预览">
       <defs><pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#ffffff" stroke-opacity=".05"/></pattern></defs>
       <rect width="620" height="330" fill="#0d1020"/><rect width="620" height="330" fill="url(#grid)"/>
@@ -1114,10 +1091,10 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
 <!-- ===================== 统计(大标题 + 三列) ===================== -->
 <div class="stats-wrap" id="statsZone">
   <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b72f5"/><stop offset="1" stop-color="#9b7cf7"/></linearGradient></defs></svg>
-  <h2 class="section-title reveal"><span data-i18n="st_title">项目数据</span> <span class="grad" data-i18n="st_grad">实时数据</span><span class="handwritten-title">data</span></h2>
-  <p class="section-sub reveal"><span data-i18n="st_sub">核心指标一览 · 实时更新</span></p>
-  <div class="stats-card" id="statsCard">
+  <div class="stats-card card reveal" id="statsCard">
     <div class="st-head">
+      <h3 class="st-title" data-i18n="st_title">项目数据</h3>
+      <span class="st-sub" data-i18n="st_sub">核心指标一览 · 实时更新</span>
       <span class="st-clock" id="stClock"><span class="st-live"><i class="live-dot"></i><span data-i18n="st_live">数据实时更新中</span></span><em id="stClockText">--:--:--</em></span>
     </div>
     <div class="st-grid">
@@ -1153,24 +1130,23 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
       </div>
       <div class="st-col" data-p="upt">
         <div class="stat-top">
-          <span class="st-icon"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span>
-          <span class="st-trend">+3.2k</span>
+          <span class="st-icon"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span>
+          <span class="st-trend">99.99%</span>
         </div>
         <div class="st-mid">
-          <div><div class="st-num" id="stat3">0</div><p class="st-label" data-i18n="st_upt_label">发布帖子</p></div>
+          <div><div class="st-num" id="stat3">0</div><p class="st-label" data-i18n="st_upt_label">服务可用性</p></div>
           <div class="st-ring"><svg viewBox="0 0 110 110" width="92" height="92"><circle class="ring-bg" cx="55" cy="55" r="41.5"></circle><circle class="ring-fg" id="ring3" cx="55" cy="55" r="41.5"></circle></svg><span class="ring-num" id="ringNum3">0%</span></div>
         </div>
         <div class="st-subs">
-          <div class="st-sub-row"><span data-i18n="st_upt_s1">今日发布</span><i><b style="--w:72%"></b></i><em>3,218</em></div>
-          <div class="st-sub-row"><span data-i18n="st_upt_s2">本周热度</span><i><b style="--w:88%"></b></i><em>9.6w</em></div>
-          <div class="st-sub-row"><span data-i18n="st_upt_s3">累计点赞</span><i><b style="--w:64%"></b></i><em>42w</em></div>
+          <div class="st-sub-row"><span data-i18n="st_upt_s1">响应时间</span><i><b style="--w:76%"></b></i><em>120ms</em></div>
+          <div class="st-sub-row"><span data-i18n="st_upt_s2">全球节点</span><i><b style="--w:60%"></b></i><em>12</em></div>
+          <div class="st-sub-row"><span data-i18n="st_upt_s3">重大事故</span><i><b style="--w:4%"></b></i><em>0</em></div>
         </div>
       </div>
     </div>
-    <div class="carousel-dots st-dots" id="stDots"></div>
-    <!-- 左右按钮相对卡片边框定位(卡片无 tilt,不会跟着动) -->
     <button class="carousel-nav prev st-nav-btn" id="stPrev" aria-label="上一个"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
     <button class="carousel-nav next st-nav-btn" id="stNext" aria-label="下一个"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button>
+    <div class="carousel-dots st-dots" id="stDots"></div>
   </div>
 </div>
 
@@ -1223,50 +1199,13 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   </div>
 </section>
 
-<!-- ===================== 制作团队 ===================== -->
-<section id="credits">
-  <h2 class="section-title reveal"><span data-i18n="cr_title">制作团队</span><span class="handwritten-title">credits</span></h2>
-  <div class="cr-show reveal" id="crShow">
-    <div class="cr-stage" id="crStage">
-      <div class="cr-card cur" data-c="0">
-        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAlqfbtEqRjhfOBunI_HQH_leyt7nAACQCIAAvLa8VfkpwVQ7yU4Cz0E.jpg" alt="Starry" loading="lazy">
-        <h3>Starry</h3><span class="cr-role" data-i18n="cr_role_0">创始人 &amp; 核心开发</span>
-        <p data-i18n="cr_desc_0">KNExpanse 项目发起人,构思产品整体框架,负责核心功能开发,决定项目后续更新方向。</p>
-      </div>
-      <div class="cr-card" data-c="1">
-        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHApqfbt9tXvUV0ii7Ik54cseyIriAANCIgAC8trxV7_cQrV9GkgNPQQ.jpg" alt="danjvan" loading="lazy">
-        <h3>danjvan</h3><span class="cr-role" data-i18n="cr_role_1">前后端 + JS 开发</span>
-        <p data-i18n="cr_desc_1">包揽前端页面、后端服务和数据库相关开发,搭建私有化云平台,保障云端功能稳定不掉线。</p>
-      </div>
-      <div class="cr-card" data-c="2">
-        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAxqfbuGOe2o31A0Tfanha29bEw0QgACRCIAAvLa8VezI2dHK_oRyj0E.jpg" alt="Sleepforest" loading="lazy">
-        <h3>Sleepforest</h3><span class="cr-role" data-i18n="cr_role_2">UI 设计</span>
-        <p data-i18n="cr_desc_2">大名鼎鼎的 Vibecoding 之神(bushi)!全权负责界面视觉与交互设计,敲定页面布局、动画效果,打造整套项目视觉风格。</p>
-      </div>
-      <div class="cr-card" data-c="3">
-        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAtqfbt_PMPFSPAJm034HEsDijjozAACQyIAAvLa8VdlgZfTIXacAT0E.jpg" alt="Inventocode" loading="lazy">
-        <h3>Inventocode</h3><span class="cr-role" data-i18n="cr_role_3">特别感谢</span>
-        <p data-i18n="cr_desc_3">开发过程中交流技术,提供思路与指导,给予项目支持。</p>
-      </div>
-    </div>
-    <button class="carousel-nav prev cr-nav" id="crPrev" aria-label="上一个"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
-    <button class="carousel-nav next cr-nav" id="crNext" aria-label="下一个"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button>
-    <div class="cr-tabs" id="crTabs">
-      <button class="cr-tab active" data-c="0">Starry</button>
-      <button class="cr-tab" data-c="1">danjvan</button>
-      <button class="cr-tab" data-c="2">Sleepforest</button>
-      <button class="cr-tab" data-c="3">Inventocode</button>
-    </div>
-  </div>
-</section>
-
 <!-- ===================== 下载 ===================== -->
 <section id="download">
   <h2 class="section-title reveal"><span data-i18n="dl_title">立即开始创作</span><span class="handwritten-title">download</span></h2>
   <p class="section-sub reveal"><span data-i18n="dl_sub">选择你的平台,下载 KN Expanse 桌面版</span></p>
   <div class="download-grid reveal">
     <div class="download-card card">
-      <a class="dl-col" href="https://api.gitproxy.dev/github.com/danjvan114/knu/releases/download/1.2.4/KN.Expanse.v1.2.4.exe" target="_blank" rel="noopener">
+      <a class="dl-col" href="https://github.com/danjvan114/knu/releases" target="_blank" rel="noopener">
         <span class="dl-big"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 5.5 11 4.6v6.9H4ZM13 4.4 20 3.7v7.8h-7ZM4 13.5h7v6.9L4 18.5ZM13 13.5h7v7.8l-7-.7Z"/></svg></span>
         <b data-i18n="dl_win">Windows</b><small data-i18n="dl_win_ver">KN Expanse v1.3.0 · 64位 exe</small>
         <span class="dl-go"><span data-i18n="dl_go">下载</span> <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg></span>
@@ -1286,17 +1225,54 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   <div class="dl-mobile reveal">
     <div class="dl-m-title" data-i18n="dl_m_title">移动端下载</div>
     <div class="dl-m-row">
-      <button class="dl-m-btn" type="button" id="dlAndroidBtn"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="dl_android">安卓下载</span></button>
+      <button class="dl-m-btn" type="button" id="dlAndroidBtn"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="dl_android">安卓 · 扫码下载</span></button>
       <button class="dl-m-btn soon" type="button"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.7-1 2-1.4 3-1 1 .5 1.5 1.5 1.4 2.6-.9.4-2 .4-3 .3-.5-.7-.9-1.3-1.4-1.9Z"/><path d="M16.5 8.2c1.9 2 2.8 4.5 2.4 7.1-.5 3.3-2.8 5.7-6 5.7h-1.8c-3.2 0-5.5-2.4-6-5.7-.4-2.6.5-5.1 2.4-7.1.3-.3.7-.4 1.1-.3.8.2 1.6.2 2.4 0 .9-.2 1.8-.2 2.7 0 .8.2 1.7.2 2.4 0 .4-.1.8 0 1.1.3Z"/></svg><span data-i18n="dl_ios">iOS · 正在研发</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 制作团队 ===================== -->
+<section id="credits">
+  <h2 class="section-title reveal"><span data-i18n="cr_title">制作团队</span><span class="handwritten-title">credits</span></h2>
+  <div class="cr-show reveal" id="crShow">
+    <div class="cr-stage" id="crStage">
+      <div class="cr-card cur" data-c="0">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAlqfbtEqRjhfOBunI_HQH_leyt7nAACQCIAAvLa8VfkpwVQ7yU4Cz0E.jpg" alt="Starry">
+        <h3>Starry</h3><span class="cr-role" data-i18n="cr_role_0">创始人 &amp; 核心开发</span>
+        <p data-i18n="cr_desc_0">KNExpanse 项目发起人,构思产品整体框架,负责核心功能开发,决定项目后续更新方向。</p>
+      </div>
+      <div class="cr-card" data-c="1">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHApqfbt9tXvUV0ii7Ik54cseyIriAANCIgAC8trxV7_cQrV9GkgNPQQ.jpg" alt="danjvan114">
+        <h3>danjvan114</h3><span class="cr-role" data-i18n="cr_role_1">前后端 + JS 开发</span>
+        <p data-i18n="cr_desc_1">包揽前端页面、后端服务和数据库相关开发,搭建私有化云平台,保障云端功能稳定不掉线。</p>
+      </div>
+      <div class="cr-card" data-c="2">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAxqfbuGOe2o31A0Tfanha29bEw0QgACRCIAAvLa8VezI2dHK_oRyj0E.jpg" alt="Sleepforest">
+        <h3>Sleepforest</h3><span class="cr-role" data-i18n="cr_role_2">UI 设计</span>
+        <p data-i18n="cr_desc_2">大名鼎鼎的 Vibecoding 之神(bushi)!全权负责界面视觉与交互设计,敲定页面布局、动画效果,打造整套项目视觉风格。</p>
+      </div>
+      <div class="cr-card" data-c="3">
+        <img class="cr-ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAtqfbt_PMPFSPAJm034HEsDijjozAACQyIAAvLa8VdlgZfTIXacAT0E.jpg" alt="Inventocode">
+        <h3>Inventocode</h3><span class="cr-role" data-i18n="cr_role_3">特别感谢</span>
+        <p data-i18n="cr_desc_3">开发过程中交流技术,提供思路与指导,给予项目支持。</p>
+      </div>
+    </div>
+    <button class="carousel-nav prev cr-nav" id="crPrev" aria-label="上一个"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
+    <button class="carousel-nav next cr-nav" id="crNext" aria-label="下一个"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button>
+    <div class="cr-tabs" id="crTabs">
+      <button class="cr-tab active" data-c="0">Starry</button>
+      <button class="cr-tab" data-c="1">danjvan114</button>
+      <button class="cr-tab" data-c="2">Sleepforest</button>
+      <button class="cr-tab" data-c="3">Inventocode</button>
     </div>
   </div>
 </section>
 
 <footer>
   <div style="display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--text-2)">
-    <img class="footer-logo th-def" id="footerLogo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse" loading="lazy">
-    <img class="footer-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse" loading="lazy">
-    <img class="footer-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse" loading="lazy">
+    <img class="footer-logo th-def" id="footerLogo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse">
+    <img class="footer-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse">
+    <img class="footer-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse">
     <span class="logo-mark footer-mark" id="footerMark" style="width:26px;height:26px;border-radius:8px">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><rect x="7" y="7" width="10" height="10" rx="3"/></svg>
     </span> KN Expanse
@@ -1332,7 +1308,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     <div class="m-pop" id="mPop">
         <span class="m-pop-title" data-i18n="m_title">移动端下载</span>
         <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZCd1qfEJzDF0wJ6vVFg3WQf-QeQIjNwACCyMAAkWI6FcCA6Hs1_s1CD0E.png" alt="移动端二维码">
-        <small data-i18n="m_note">移动端下载</small>
+        <small data-i18n="m_note">移动端 · 扫码下载</small>
       </div>
     <div class="lang-pop" id="langPop">
         <button class="lang-item cur" data-lang="zh">中文</button>
@@ -1385,23 +1361,18 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   </div>
 </div>
 
-<!-- 移动端快捷下载首屏 -->
+<!-- 移动端全屏下载页 -->
 <div class="m-dl" id="mDl">
-  <div class="m-dl-tools">
-    <button class="m-dl-tool" id="mDlLang" aria-label="切换语言"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
-    <button class="m-dl-tool" id="mDlLook" aria-label="切换外观"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></button>
-    <button class="m-dl-tool" id="mDlQr" aria-label="QQ 群二维码"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14h1M14 20h1M17 17v4M21 17v1"/></svg></button>
-  </div>
   <div class="m-dl-inner">
-    <img class="m-dl-logo th-def" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse"><img class="m-dl-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse"><img class="m-dl-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse">
-    <h1 class="m-dl-hero"><span data-i18n="hero_t1">现代化图形化编辑器</span><br><span class="m-dl-grad" data-i18n="hero_t2">为生态而生</span><span class="m-dl-hand" data-i18n="hero_t3">for creators</span></h1>
-    <a class="m-dl-btn" id="mDlAndroid" href="https://code.pgrm.run/localcdn/2/app-debug.apk" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="m_android">安卓下载</span></a>
-    <button class="m-dl-btn ios" id="mDlIos" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.7-1 2-1.4 3-1 1 .5 1.5 1.5 1.4 2.6-.9.4-2 .4-3 .3-.5-.7-.9-1.3-1.4-1.9Z"/><path d="M16.5 8.2c1.9 2 2.8 4.5 2.4 7.1-.5 3.3-2.8 5.7-6 5.7h-1.8c-3.2 0-5.5-2.4-6-5.7-.4-2.6.5-5.1 2.4-7.1.3-.3.7-.4 1.1-.3.8.2 1.6.2 2.4 0 .9-.2 1.8-.2 2.7 0 .8.2 1.7.2 2.4 0 .4-.1.8 0 1.1.3Z"/></svg><span data-i18n="m_ios">iOS 下载</span></a>
-    <button class="m-dl-btn ghost" id="mDlEnter" type="button"><span data-i18n="m_detail">查看详细介绍</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+    <h2>KN Expanse<br><span data-i18n="m_slogan">轻松享受编程创意</span></h2>
+    <img class="m-dl-card" id="mDlCard" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mZqezFYne5ES8Pqlk88KVlHbJu9mwACfioAAmsm2FdXlTCxQYOpFj0E.png" alt="主页卡片">
+    <a class="m-dl-btn" id="mDlAndroid" href="https://github.com/danjvan114/knu/releases" target="_blank" rel="noopener"><span data-i18n="m_android">安卓下载</span></a>
+    <button class="m-dl-btn" id="mDlIos" type="button"><span data-i18n="m_ios">iOS 下载</span></button>
+    <button class="m-dl-btn" id="mDlQq" type="button"><span data-i18n="m_qq">加入 QQ 群</span></button>
+    <div class="m-dl-qq" id="mDlQqImg"><img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mJqezETEdhmnMoucEwbiIyjhXm4bgACeioAAmsm2FcKDclIeIoVyz0E.png" alt="QQ 群二维码"></div>
+    <button class="m-dl-btn ghost" id="mDlEnter" type="button"><span data-i18n="m_detail">进入详细介绍页</span></button>
   </div>
 </div>
-<!-- 移动端:回到下载页按钮(右下角) -->
-<button class="m-back-btn" id="mBackBtn" aria-label="回到下载页"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="m_back">下载</span></button>
 
 <script>
 (function () {
@@ -1568,62 +1539,37 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   }
 
   var popTimer = null;
-  /* 悬浮窗打开期间锁定导航栏按钮:鼠标从悬浮窗移出扫过任何按钮都不会误触 */
-  var unlockBtnId = null;
-  function anyPopOpen() {
-    return !!document.querySelector('.theme-pop.show,.qq-pop.show,.perf-pop.show,.m-pop.show,.lang-pop.show,.look-pop.show,.qr-pop.show,.nav-more.open');
-  }
-  /* 悬浮窗互斥守卫:其它悬浮窗打开期间,本悬浮窗的打开请求直接忽略(鼠标扫过不切换) */
-  function otherPopOpen(exceptSel) {
-    var sels = ['.theme-pop.show','.qq-pop.show','.perf-pop.show','.m-pop.show','.lang-pop.show','.look-pop.show','.qr-pop.show','.nav-more.open'];
-    if (exceptSel) sels = sels.filter(function (s) { return s !== exceptSel; });
-    return !!document.querySelector(sels.join(','));
-  }
-  function syncNavLock() {
-    if (isMobileUA) return;
-    var locked = anyPopOpen();
-    ['qrBtn','lookBtn','langBtn','themeToggle','qqBtn','perfBtn','mbtn','navMoreBtn'].forEach(function (id) {
-      var b = document.getElementById(id);
-      /* 当前打开的悬浮窗对应按钮免锁,否则 pointer-events 切换会触发 mouseleave 循环抽搐 */
-      if (b) b.style.pointerEvents = (locked && id !== unlockBtnId) ? 'none' : '';
-    });
-  }
   function posPop(pop, btn) {
     if (!pop || !btn) return;
     var r = btn.getBoundingClientRect();
     var pw = pop.offsetWidth || 220;
-    /* 悬浮窗在按钮正下方:右缘对齐按钮右缘(视觉居中于按钮下方),防溢出左缘 */
     var left = r.right - pw;
     if (left < 10) left = 10;
     pop.style.left = left + 'px';
     pop.style.top = (r.bottom + 12) + 'px';
     pop.style.right = 'auto';
   }
-  /* pop-open 仅由更多菜单控制:其它悬浮窗(fixed 在 header 外)不需要 header 让位模糊 */
-  function syncPopOpen() { header.classList.toggle('pop-open', !!document.querySelector('.nav-more.open')); }
-  function showPop() { if (!isMobileUA && otherPopOpen('.theme-pop.show')) return; clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); perfPop.classList.remove('show'); clearTimeout(perfTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(themePop, themeToggle); themePop.classList.add('show'); unlockBtnId = 'themeToggle'; syncNavLock(); }
-  function hidePop() { popTimer = setTimeout(function () { themePop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
-  /* 按钮悬停 200ms 才打开悬浮窗:鼠标扫过相邻按钮不误触 */
-  var themeOpenT = null;
-  themeToggle.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(themeOpenT); themeOpenT = setTimeout(showPop, 300); });
-  themeToggle.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(themeOpenT); hidePop(); });
+  function syncPopOpen() { var any = document.querySelector('.theme-pop.show,.qq-pop.show,.perf-pop.show,.m-pop.show,.lang-pop.show,.nav-more.open'); header.classList.toggle('pop-open', !!any); }
+  function showPop() { clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); perfPop.classList.remove('show'); clearTimeout(perfTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(themePop, themeToggle); themePop.classList.add('show'); }
+  function hidePop() { popTimer = setTimeout(function () { themePop.classList.remove('show'); syncPopOpen(); }, 250); }
+  themeToggle.addEventListener('mouseenter', showPop);
+  themeToggle.addEventListener('mouseleave', hidePop);
   themePop.addEventListener('mouseenter', showPop);
   themePop.addEventListener('mouseleave', hidePop);
   /* QQ 群悬浮窗 */
   var qqBtn = $('#qqBtn');
   var qqPop = $('#qqPop');
   var qqTimer = null;
-  function showQq() { if (!isMobileUA && otherPopOpen('.qq-pop.show')) return; clearTimeout(qqTimer); themePop.classList.remove('show'); clearTimeout(popTimer); perfPop.classList.remove('show'); clearTimeout(perfTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(qqPop, qqBtn); qqPop.classList.add('show'); unlockBtnId = 'qqBtn'; syncNavLock(); }
-  function hideQq() { qqTimer = setTimeout(function () { qqPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
-  var qqOpenT = null;
-  qqBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(qqOpenT); qqOpenT = setTimeout(showQq, 300); });
-  qqBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(qqOpenT); hideQq(); });
+  function showQq() { clearTimeout(qqTimer); themePop.classList.remove('show'); clearTimeout(popTimer); perfPop.classList.remove('show'); clearTimeout(perfTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(qqPop, qqBtn); qqPop.classList.add('show'); }
+  function hideQq() { qqTimer = setTimeout(function () { qqPop.classList.remove('show'); syncPopOpen(); }, 250); }
+  qqBtn.addEventListener('mouseenter', showQq);
+  qqBtn.addEventListener('mouseleave', hideQq);
   qqPop.addEventListener('mouseenter', showQq);
   qqPop.addEventListener('mouseleave', hideQq);
   $$('.tp-item').forEach(function (it) {
     it.addEventListener('click', function () {
       var i = parseInt(it.dataset.i, 10);
-      if (i === curIdx) { themePop.classList.remove('show'); unlockBtnId = null; syncNavLock(); return; }
+      if (i === curIdx) { themePop.classList.remove('show'); return; }
       /* 先收 QQ 悬浮窗,再切换主题 */
       qqPop.classList.remove('show'); clearTimeout(qqTimer);
       /* 立即同步主题,再播动画(动画使用目标主题的 logo) */
@@ -1632,8 +1578,6 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
       themeTransition(THEMES[i].logo);
       setTimeout(function () { themeFade.style.opacity = '0'; }, 340);
       themePop.classList.remove('show');
-      unlockBtnId = null;
-      syncNavLock();
     });
   });
 
@@ -1641,6 +1585,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   var particlesBox = $('#particles');
   function spawnParticles(theme) {
     if (document.body.classList.contains('lite-mode')) return;
+    if (fxOn) { FX.setTheme(theme); return; }
     particlesBox.innerHTML = '';
     var svg = THEME_ICON[theme.icon] || THEME_ICON.circles;
     var count = theme.anim === 'twinkle' ? 16 : (theme.cls === 'theme-amber' ? 8 : 12);
@@ -1709,12 +1654,6 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   });
   function closeMenu() {
     if (!header.classList.contains('menu-open')) return;
-    /* 节能模式:无动画,立即收起 */
-    if (document.body.classList.contains('lite-mode')) {
-      header.classList.remove('menu-open'); header.classList.remove('closing');
-      header.style.height = ''; hamburger.setAttribute('aria-expanded', 'false');
-      return;
-    }
     header.classList.add('closing');
     header.style.height = '60px';
     setTimeout(function () {
@@ -1729,20 +1668,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   hamburger.addEventListener('click', function (e) {
     e.stopPropagation();
     if (header.classList.contains('menu-open')) { closeMenu(); return; }
-    /* 打开导航菜单前先收起已开的悬浮窗(二维码/外观/语言),避免并存 */
-    if (isMobileUA) { [qrPop, lookPop, langPop, navMore].forEach(function (p) { if (p) { p.classList.remove('show'); p.classList.remove('open'); } }); }
     header.classList.add('hiding-nav');
-    if (document.body.classList.contains('lite-mode')) {
-      /* 节能模式:无动画延迟,但等一帧布局后再取高度(立即读 scrollHeight 会算错) */
-      header.classList.remove('hiding-nav'); header.classList.add('menu-open');
-      hamburger.setAttribute('aria-expanded', 'true');
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          header.style.height = header.scrollHeight + 'px';
-        });
-      });
-      return;
-    }
     setTimeout(function () {
       header.classList.remove('hiding-nav');
       header.classList.add('menu-open');
@@ -1762,22 +1688,17 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   var navMoreBtn = $('#navMoreBtn');
   var navMorePop = $('#navMorePop');
   var moreTimer = null;
-  function showMore() { if (!isMobileUA && otherPopOpen('.nav-more.open')) return; clearTimeout(moreTimer); navMore.classList.add('open'); navMoreBtn.setAttribute('aria-expanded', 'true'); header.classList.add('pop-open'); unlockBtnId = 'navMoreBtn'; syncNavLock(); }
-  function hideMore() { moreTimer = setTimeout(function () { navMore.classList.remove('open'); navMoreBtn.setAttribute('aria-expanded', 'false'); unlockBtnId = null; setTimeout(syncPopOpen, 500); syncNavLock(); }, 250); }
-  var moreOpenT = null;
-  navMoreBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(moreOpenT); moreOpenT = setTimeout(showMore, 300); });
-  navMoreBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(moreOpenT); hideMore(); });
+  function showMore() { clearTimeout(moreTimer); navMore.classList.add('open'); navMoreBtn.setAttribute('aria-expanded', 'true'); header.classList.add('pop-open'); }
+  function hideMore() { moreTimer = setTimeout(function () { navMore.classList.remove('open'); navMoreBtn.setAttribute('aria-expanded', 'false'); setTimeout(syncPopOpen, 500); }, 250); }
+  navMoreBtn.addEventListener('mouseenter', showMore);
+  navMoreBtn.addEventListener('mouseleave', hideMore);
   navMorePop.addEventListener('mouseenter', showMore);
   navMorePop.addEventListener('mouseleave', hideMore);
   navMoreBtn.addEventListener('click', function (e) {
     e.stopPropagation();
-    clearTimeout(moreOpenT);
-    if (navMore.classList.contains('open')) { hideMore(); return; }
-    /* 先关其它悬浮窗,再开更多(其它悬浮窗开着会挡住 showMore) */
-    [qrPop, lookPop, langPop].forEach(function (p) { if (p) p.classList.remove('show'); });
-    showMore();
+    if (navMore.classList.contains('open')) hideMore(); else showMore();
   });
-  document.addEventListener('click', function (e) { if (!navMore.contains(e.target)) { navMore.classList.remove('open'); unlockBtnId = null; syncNavLock(); } });
+  document.addEventListener('click', function (e) { if (!navMore.contains(e.target)) navMore.classList.remove('open'); });
 
   var backTop = $('#backTop');
   window.addEventListener('scroll', function () {
@@ -1814,23 +1735,24 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
     if (on) {
       particlesBox.innerHTML = '';
-      toast(I18N.toast_perf_on ? I18N.toast_perf_on[curLang] : '已开启节能模式,特效已精简');
+      if (fxOn) FX.setPaused(true);
+      toast('已开启节能模式,特效已精简');
     } else {
-      toast(I18N.toast_perf_off ? I18N.toast_perf_off[curLang] : '已关闭节能模式');
+      toast('已关闭节能模式');
+      if (fxOn) FX.setPaused(false);
       spawnParticles(THEMES[curIdx]);
     }
     perfPopSync();
   }
   perfBtn.addEventListener('click', function () {
     setLite(!document.body.classList.contains('lite-mode'));
-  }, { passive: true });
+  });
   if (document.body.classList.contains('lite-mode')) perfBtn.classList.add('lite');
   var perfTimer = null;
-  function showPerfPop() { if (!isMobileUA && otherPopOpen('.perf-pop.show')) return; clearTimeout(perfTimer); themePop.classList.remove('show'); clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(perfPop, perfBtn); perfPopSync(); perfPop.classList.add('show'); unlockBtnId = 'perfBtn'; syncNavLock(); }
-  function hidePerfPop() { perfTimer = setTimeout(function () { perfPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
-  var perfOpenT = null;
-  perfBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(perfOpenT); perfOpenT = setTimeout(showPerfPop, 300); });
-  perfBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(perfOpenT); hidePerfPop(); });
+  function showPerfPop() { clearTimeout(perfTimer); themePop.classList.remove('show'); clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(perfPop, perfBtn); perfPopSync(); perfPop.classList.add('show'); }
+  function hidePerfPop() { perfTimer = setTimeout(function () { perfPop.classList.remove('show'); syncPopOpen(); }, 250); }
+  perfBtn.addEventListener('mouseenter', showPerfPop);
+  perfBtn.addEventListener('mouseleave', hidePerfPop);
   perfPop.addEventListener('mouseenter', showPerfPop);
   perfPop.addEventListener('mouseleave', hidePerfPop);
   perfPopSync();
@@ -1840,55 +1762,31 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   var mPop = $('#mPop');
   var mTimer = null;
   function showMPop() {
-    if (!isMobileUA && otherPopOpen('.m-pop.show')) return;
     clearTimeout(mTimer);
     themePop.classList.remove('show'); clearTimeout(popTimer);
     qqPop.classList.remove('show'); clearTimeout(qqTimer);
     perfPop.classList.remove('show'); clearTimeout(perfTimer);
-    posPop(mPop, mbtn); mPop.classList.add('show'); unlockBtnId = 'mbtn'; syncNavLock();
+    posPop(mPop, mbtn); mPop.classList.add('show');
   }
-  function hideMPop() { mTimer = setTimeout(function () { mPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
-  var mOpenT = null;
-  mbtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(mOpenT); mOpenT = setTimeout(showMPop, 300); });
-  mbtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(mOpenT); hideMPop(); });
+  function hideMPop() { mTimer = setTimeout(function () { mPop.classList.remove('show'); syncPopOpen(); }, 250); }
+  mbtn.addEventListener('mouseenter', showMPop);
+  mbtn.addEventListener('mouseleave', hideMPop);
   mPop.addEventListener('mouseenter', showMPop);
   mPop.addEventListener('mouseleave', hideMPop);
 
-  /* ---------- 移动端快捷下载首屏 ---------- */
+  /* ---------- 移动端全屏下载页 ---------- */
   var mDl = $('#mDl');
   var isMobileUA = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MQQBrowser/i.test(navigator.userAgent);
-  function mDlOpen() {
+  if (isMobileUA && window.innerWidth <= 900) {
     mDl.classList.add('show');
     document.body.style.overflow = 'hidden';
-    /* 折叠屏/节能:起始页只保留自身,主内容先不渲染,点"查看详细介绍"再加载 */
-    document.body.classList.add('m-boot');
-    window.scrollTo(0, 0);
-    mDl.scrollTop = 0;
   }
-  function mDlOff() {
+  $('#mDlEnter').addEventListener('click', function () {
     mDl.classList.remove('show');
     document.body.style.overflow = '';
-    document.body.classList.remove('m-boot');
-    /* 查看详细介绍:直接进主页(不刷新,否则会弹回起始页) */
-    window.scrollTo(0, 0);
-  }
-  if (isMobileUA) {
-    document.body.classList.add('mobile');
-    /* 移动端每次打开都默认进入下载首屏 */
-    mDlOpen();
-  }
-  /* 移动端:悬浮窗改点击交互,禁用 hover 打开 */
-  var hoverPop = !isMobileUA;
-  /* 查看详细介绍:进入主页 */
-  $('#mDlEnter').addEventListener('click', mDlOff);
-  $('#mDlIos').addEventListener('click', function () { toast(I18N.dl_ios_tip ? I18N.dl_ios_tip[curLang] : 'iOS 版正在研发中,敬请期待'); });
-  /* 移动端:右下角"回到下载页"按钮(移动 UA 或窄窗口都显示) */
-  var mBackBtn = $('#mBackBtn');
-  if (mBackBtn && isMobileUA) {
-    mBackBtn.style.display = 'flex';
-    /* 回到下载页:直接回到起始页,不再自动刷新 */
-    mBackBtn.addEventListener('click', mDlOpen);
-  }
+  });
+  $('#mDlIos').addEventListener('click', function () { toast('iOS 版尚未完成,敬请期待'); });
+  $('#mDlQq').addEventListener('click', function () { $('#mDlQqImg').classList.toggle('show'); });
   /* ---------- 语言系统(5 语言) ---------- */
   var I18N = {
     nav_home:{zh:'主页',en:'Home',ja:'ホーム',ko:'홈',es:'Inicio',tw:'主頁'},
@@ -1910,12 +1808,11 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     btn_dl:{zh:'立即下载',en:'Download Now',ja:'今すぐダウンロード',ko:'지금 다운로드',es:'Descargar Ahora',tw:'立即下載'},
     btn_docs:{zh:'开发文档',en:'Docs',ja:'ドキュメント',ko:'문서',es:'Documentación',tw:'開發文档'},
     btn_more:{zh:'其他产品',en:'More Products',ja:'他の製品',ko:'다른 제품',es:'Otros Productos',tw:'其他产品'},
-    term_title:{zh:'拥抱 KN Expanse',en:'Embrace KN Expanse',ja:'KN Expanse を抱きしめよう',ko:'KN Expanse를 안아보세요',es:'Abraza KN Expanse',tw:'擁抱 KN Expanse'},
+    term_title:{zh:'拥抱 KN Expanse',en:'Embrace KN Expanse',ja:'KN Expanse を抱きしめよう',ko:'KN Expanse를 안아보세요',es:'Abraza KN Expanse',tw:'拥抱 KN Expanse',tw:'移動端下載'},
     why_title:{zh:'为什么选择 ',en:'Why Choose ',ja:'選ばれる理由 ',ko:'선택하는 이유 ',es:'¿Por qué ',tw:'為什么選擇 '},
     core_sub:{zh:'核心能力',en:'Core Powers',ja:'コア機能',ko:'핵심 기능',es:'Poderes Clave',tw:'核心能力'},
     ext_sub:{zh:'为创作加速',en:'Speed Up Creation',ja:'創作を加速',ko:'창작을 가속',es:'Acelera tu Creación',tw:'為創作加速'},
     st_title:{zh:'项目数据',en:'Project Data',ja:'プロジェクトデータ',ko:'프로젝트 데이터',es:'Datos del Proyecto',tw:'項目數據'},
-    st_grad:{zh:'实时数据',en:'Live Data',ja:'リアルタイムデータ',ko:'실시간 데이터',es:'Datos en vivo',tw:'實時數據'},
     st_live:{zh:'数据实时更新中',en:'Live Updating',ja:'リアルタイム更新中',ko:'실시간 업데이트 중',es:'Actualización en vivo',tw:'數據實時更新中'},
     step_t1:{zh:'三步开启 ',en:'Start in 3 Steps ',ja:'3ステップで開始 ',ko:'3단계로 시작 ',es:'Empieza en 3 pasos ',tw:'三步開啟 '},
     step_sub:{zh:'创作之旅',en:'Creation Journey',ja:'創作の旅',ko:'창작 여정',es:'Viaje Creativo',tw:'創作之旅'},
@@ -1923,7 +1820,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     footer_note:{zh:'用热爱创造无限可能',en:'Creating with passion',ja:'情熱で無限の可能性を',ko:'열정으로 무한한 가능성을',es:'Creando con pasión',tw:'用熱愛創造無限可能'},
     qq_title:{zh:'KN Expanse 官方交流群',en:'KN Expanse Official Group',ja:'KN Expanse 公式コミュニティ',ko:'KN Expanse 공식 커뮤니티',es:'Grupo Oficial KN Expanse',tw:'KN Expanse 官方交流群'},
     m_title:{zh:'移动端下载',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil'},
-    m_note:{zh:'移动端下载',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil',tw:'移動端下載'},
+    m_note:{zh:'移动端 · 扫码下载',en:'Mobile · Scan to Download',ja:'モバイル · QRでダウンロード',ko:'모바일 · QR로 다운로드',es:'Móvil · Escanea para descargar',tw:'移動端 · 扫碼下載'},
     perf_desc:{zh:'关闭特效 · 保留流畅基础体验',en:'Disable effects · Keep smooth basics',ja:'エフェクトOFF · 快適な基本体験を維持',ko:'효과 OFF · 부드러운 기본 경험 유지',es:'Desactivar efectos · Base fluida',tw:'關閉特效 · 保留流暢基礎體驗'},
     perf_tip_t:{zh:'检测到设备性能不足',en:'Low Performance Detected',ja:'デバイスの性能不足を検出',ko:'기기 성능 부족 감지',es:'Rendimiento bajo detectado',tw:'檢測到設备性能不足'},
     perf_tip_d:{zh:'当前帧率较低,切换节能模式可让页面更流畅。',en:'FPS is low. Power-saving mode will make the page smoother.',ja:'フレームレートが低いです。省エネモードでページが快適になります。',ko:'프레임이 낮습니다. 절전 모드를 켜면 페이지가 부드러워집니다.',es:'FPS bajo. El modo ahorro hará la página más fluida.',tw:'当前幀率較低,切換節能模式可讓頁面更流暢。'},
@@ -2009,16 +1906,10 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     m_android:{zh:'安卓下载',en:'Android Download',ja:'Android ダウンロード',ko:'Android 다운로드',es:'Descargar Android',tw:'安卓下載'},
     m_ios:{zh:'iOS 下载',en:'iOS Download',ja:'iOS ダウンロード',ko:'iOS 다운로드',es:'Descargar iOS',tw:'iOS 下載'},
     m_qq:{zh:'加入 QQ 群',en:'Join QQ Group',ja:'QQグループに参加',ko:'QQ 그룹 가입',es:'Unirse al grupo QQ',tw:'加入 QQ 群'},
-    m_detail:{zh:'查看详细介绍',en:'View Details',ja:'詳細を見る',ko:'상세 보기',es:'Ver detalles',tw:'查看詳細介紹'},
-    m_back:{zh:'下载',en:'Download',ja:'ダウンロード',ko:'다운로드',es:'Descargar',tw:'下載'},
+    m_detail:{zh:'进入详细介绍页',en:'View Detailed Intro',ja:'詳細紹介ページへ',ko:'상세 소개 페이지로',es:'Ver introducción detallada',tw:'進入詳細介紹頁'},
     perf_badge:{zh:'▶ 运行中 · 120 FPS',en:'▶ Running · 120 FPS',ja:'▶ 実行中 · 120FPS',ko:'▶ 실행 중 · 120FPS',es:'▶ En ejecución · 120 FPS',tw:'▶ 运行中 · 120 FPS'},
 
-    toast_coming:{zh:' 版正在研发中,敬请期待',en:' version is in development, stay tuned',ja:' 版は開発中です。お楽しみに',ko:' 버전은 개발 중입니다. 기대해 주세요',es:' versión en desarrollo, estad atentos',tw:' 版正在研發中,敬请期待'},
-    toast_perf_on:{zh:'已开启节能模式,特效已精简',en:'Battery saver on, effects reduced',ja:'省エネモードをオンにしました',ko:'절전 모드를 켰습니다',es:'Modo ahorro activado',tw:'已開啟節能模式,特效已精簡'},
-    toast_perf_off:{zh:'已关闭节能模式',en:'Battery saver off',ja:'省エネモードをオフにしました',ko:'절전 모드를 껐습니다',es:'Modo ahorro desactivado',tw:'已關閉節能模式'},
-    toast_doc:{zh:'开发文档页面即将上线,敬请期待',en:'Dev docs coming soon, stay tuned',ja:'開発ドキュメントは近日公開予定',ko:'개발 문서가 곧 공개됩니다',es:'Documentación próximamente',tw:'開發文檔頁面即將上線,敬請期待'},
-    toast_more:{zh:'更多产品敬请期待',en:'More products coming soon',ja:'その他の製品は近日公開',ko:'더 많은 제품이 곧 출시됩니다',es:'Más productos próximamente',tw:'更多產品敬請期待'},
-    toast_plugin:{zh:'即将跳转到插件详情页',en:'Opening plugin details...',ja:'プラグイン詳細へ移動します',ko:'플러그인 상세로 이동합니다',es:'Abriendo detalles del plugin',tw:'即將跳轉到插件詳情頁'}
+    toast_coming:{zh:' 版正在研发中,敬请期待',en:' version is in development, stay tuned',ja:' 版は開発中です。お楽しみに',ko:' 버전은 개발 중입니다. 기대해 주세요',es:' versión en desarrollo, estad atentos',tw:' 版正在研發中,敬请期待'}
   };
   Object.keys(I18N_EXTRA).forEach(function (k) { I18N[k] = I18N_EXTRA[k]; });
   var I18N_QR = {
@@ -2028,7 +1919,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   Object.keys(I18N_QR).forEach(function (k) { I18N[k] = I18N_QR[k]; });
   var I18N_PAGE = {
     dl_m_title:{zh:'移动端下载',tw:'移動端下載',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil'},
-    dl_android:{zh:'安卓下载',tw:'安卓下載',en:'Android Download',ja:'Android ダウンロード',ko:'Android 다운로드',es:'Descargar Android'},
+    dl_android:{zh:'安卓 · 扫码下载',tw:'安卓 · 掃碼下載',en:'Android · Scan to Download',ja:'Android · QRでダウンロード',ko:'Android · QR로 다운로드',es:'Android · Escanea para descargar'},
     dl_ios:{zh:'iOS · 正在研发',tw:'iOS · 正在研發',en:'iOS · In Development',ja:'iOS · 開発中',ko:'iOS · 개발 중',es:'iOS · En desarrollo'},
     dl_ios_tip:{zh:'iOS 版正在研发中,敬请期待',tw:'iOS 版正在研發中,敬請期待',en:'iOS version is in development, stay tuned',ja:'iOS版は開発中です。お楽しみに',ko:'iOS 버전은 개발 중입니다. 기대해 주세요',es:'La versión iOS está en desarrollo, estad atentos'},
     fl_title:{zh:'友情链接',tw:'友情連結',en:'Friends',ja:'リンク',ko:'링크',es:'Enlaces'},
@@ -2068,10 +1959,10 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     st_proj_s1:{zh:'周创建',en:'Weekly Created',ja:'週間作成',ko:'주간 생성',es:'Creados/Semana',tw:'周創建'},
     st_proj_s2:{zh:'累计下载',en:'Total Downloads',ja:'累計ダウンロード',ko:'누적 다운로드',es:'Descargas Totales',tw:'累計下載'},
     st_proj_s3:{zh:'模板库',en:'Template Library',ja:'テンプレート数',ko:'템플릿 라이브러리',es:'Biblioteca de Plantillas',tw:'模板庫'},
-    st_upt_label:{zh:'发布帖子',en:'Posts Published',ja:'投稿数',ko:'게시물 수',es:'Publicaciones',tw:'發布帖子'},
-    st_upt_s1:{zh:'今日发布',en:'Today',ja:'今日の投稿',ko:'오늘의 게시물',es:'Hoy',tw:'今日發布'},
-    st_upt_s2:{zh:'本周热度',en:'This Week',ja:'今週の投稿',ko:'이번 주 게시물',es:'Esta Semana',tw:'本週熱度'},
-    st_upt_s3:{zh:'累计点赞',en:'Total Likes',ja:'総いいね',ko:'누적 좋아요',es:'Me Gusta Totales',tw:'累計點讚'},
+    st_upt_label:{zh:'服务可用性',en:'Service Uptime',ja:'サービス稼働率',ko:'서비스 가용성',es:'Disponibilidad del Servicio',tw:'服务可用性'},
+    st_upt_s1:{zh:'响应时间',en:'Response Time',ja:'応答時間',ko:'응답 시간',es:'Tiempo de Respuesta',tw:'响应時間'},
+    st_upt_s2:{zh:'全球节点',en:'Global Nodes',ja:'グローバルノード',ko:'글로벌 노드',es:'Nodos Globales',tw:'全球節點'},
+    st_upt_s3:{zh:'重大事故',en:'Major Outages',ja:'重大障害',ko:'대형 장애',es:'Incidencias Mayores',tw:'重大事故'},
     step1_title:{zh:'下载安装',en:'Download & Install',ja:'ダウンロードしてインストール',ko:'다운로드 및 설치',es:'Descargar e Instalar',tw:'下載安裝'},
     step1_desc:{zh:'选择平台版本,一键安装强大编辑器,即装即用。',en:'Choose your platform, install the powerful editor in one click, ready to go.',ja:'プラットフォームを選んでワンクリックインストール。すぐに使えます。',ko:'플랫폼을 선택하고 원클릭 설치, 바로 사용 가능.',es:'Elige tu plataforma, instala el editor en un clic y listo.',tw:'選擇平台版本,一鍵安裝強大編輯器,即裝即用。'},
     step2_title:{zh:'拖拽创作',en:'Drag to Create',ja:'ドラッグで創作',ko:'드래그로 창작',es:'Crea Arrastrando',tw:'拖拽創作'},
@@ -2102,19 +1993,12 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   var langTimer = null;
   var qrModal = $('#qrModal');
   var dlAndroidBtn = $('#dlAndroidBtn');
-  if (dlAndroidBtn) dlAndroidBtn.addEventListener('click', function () {
-    if (isMobileUA) {
-      /* 移动端:直接跳下载链接,不做扫码 */
-      window.open('https://code.pgrm.run/localcdn/2/app-debug.apk', '_blank');
-    } else if (qrModal) {
-      qrModal.classList.add('show');
-    }
-  });
+  if (dlAndroidBtn) dlAndroidBtn.addEventListener('click', function () { if (qrModal) qrModal.classList.add('show'); });
   if (qrModal) qrModal.addEventListener('click', function (e) { if (e.target === qrModal || e.target.id === 'qrModalClose') qrModal.classList.remove('show'); });
-  var qrBtn = $('#qrBtn'), qrPop = $('#qrPop'), qrTimer = null, qrAutoT = null;
+  var qrBtn = $('#qrBtn'), qrPop = $('#qrPop'), qrTimer = null;
   var lookBtn = $('#lookBtn'), lookPop = $('#lookPop'), lookTimer = null;
-  function hideQrPop() { clearTimeout(qrAutoT); qrTimer = setTimeout(function () { qrPop.classList.remove('show'); unlockBtnId = null; syncNavLock(); }, 250); }
-  function hideLookPop() { lookTimer = setTimeout(function () { lookPop.classList.remove('show'); unlockBtnId = null; syncNavLock(); }, 250); }
+  function hideQrPop() { qrTimer = setTimeout(function () { qrPop.classList.remove('show'); }, 250); }
+  function hideLookPop() { lookTimer = setTimeout(function () { lookPop.classList.remove('show'); }, 250); }
   function perfSyncLook() {
     var on = document.body.classList.contains('lite-mode');
     var d = I18N || {};
@@ -2123,88 +2007,27 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
     if (el) el.textContent = s[curLang] || (on ? '节能模式 · 已开启' : '节能模式 · 已关闭');
     $('#lookPerf').classList.toggle('on', on);
   }
-  function showQr(btn) {
-    if (!isMobileUA && otherPopOpen('.qr-pop.show')) return;
+  function showQr() {
     clearTimeout(qrTimer);
-    clearTimeout(qrAutoT);
     langPop.classList.remove('show'); clearTimeout(langTimer);
     lookPop.classList.remove('show'); clearTimeout(lookTimer);
-    /* 移动端:二维码二级菜单只保留 QQ 群码(不展示移动端下载码) */
-    if (isMobileUA) {
-      $$('.qr-tab').forEach(function (x) { x.classList.toggle('active', x.dataset.q === 'q'); });
-      $$('.qr-pane').forEach(function (p) { p.classList.toggle('show', p.dataset.q === 'q'); });
-    }
-    posPop(qrPop, btn || qrBtn); qrPop.classList.add('show'); unlockBtnId = 'qrBtn'; syncNavLock();
-    /* 移动端:悬浮窗显示后再算容器高度(display:none 时 offsetHeight 为 0,框就塌了) */
-    if (isMobileUA) {
-      var qrImgsBox2 = $('#qrImgs');
-      var qrActivePane2 = $('.qr-pane.show');
-      if (qrImgsBox2 && qrActivePane2) qrImgsBox2.style.height = qrActivePane2.offsetHeight + 'px';
-    }
-    /* 兜底(仅桌面 hover):打开后鼠标若不在悬浮窗/按钮上,1.2s 自动关闭,杜绝"残留打开、鼠标移过区域就显现" */
-    qrAutoT = setTimeout(function () {
-      if (hoverPop && !qrPop.matches(':hover') && !qrBtn.matches(':hover')) {
-        qrPop.classList.remove('show'); unlockBtnId = null; syncNavLock();
-      }
-    }, 1200);
+    posPop(qrPop, qrBtn); qrPop.classList.add('show');
   }
-  function showLook(btn) {
-    if (!isMobileUA && otherPopOpen('.look-pop.show')) return;
+  function showLook() {
     clearTimeout(lookTimer);
     langPop.classList.remove('show'); clearTimeout(langTimer);
-    qrPop.classList.remove('show'); clearTimeout(qrTimer); clearTimeout(qrAutoT);
+    qrPop.classList.remove('show'); clearTimeout(qrTimer);
     perfSyncLook();
-    posPop(lookPop, btn || lookBtn); lookPop.classList.add('show'); unlockBtnId = 'lookBtn'; syncNavLock();
+    posPop(lookPop, lookBtn); lookPop.classList.add('show');
   }
-  var qrOpenT = null, lookOpenT = null;
-  qrBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(qrOpenT); qrOpenT = setTimeout(showQr, 300); });
-  qrBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(qrOpenT); hideQrPop(); });
-  qrPop.addEventListener('mouseenter', function () { if (!hoverPop) return; showQr(); });
-  qrPop.addEventListener('mouseleave', function () { if (!hoverPop) return; hideQrPop(); });
-  lookBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(lookOpenT); lookOpenT = setTimeout(showLook, 300); });
-  lookBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(lookOpenT); hideLookPop(); });
-  lookPop.addEventListener('mouseenter', function () { if (!hoverPop) return; showLook(); });
-  lookPop.addEventListener('mouseleave', function () { if (!hoverPop) return; hideLookPop(); });
-  /* 移动端:悬浮窗点击交互——点按钮弹出二级菜单,点选项/外部关闭 */
-  if (isMobileUA) {
-    var closeAllPops = function () {
-      [qrPop, lookPop, langPop, navMore].forEach(function (p) {
-        if (p && (p.classList.contains('show') || p.classList.contains('open'))) {
-          p.classList.remove('show'); p.classList.remove('open');
-        }
-      });
-      unlockBtnId = null;
-    };
-    qrBtn.addEventListener('click', function (e) { e.stopPropagation(); if (qrPop.classList.contains('show')) { hideQrPop(); } else { closeAllPops(); showQr(); } });
-    lookBtn.addEventListener('click', function (e) { e.stopPropagation(); if (lookPop.classList.contains('show')) { hideLookPop(); } else { closeAllPops(); showLook(); } });
-    langBtn.addEventListener('click', function (e) { e.stopPropagation(); if (langPop.classList.contains('show')) { hideLang(); } else { closeAllPops(); showLang(); } });
-    document.addEventListener('click', function (e) {
-      if (e.target.closest('header')) return;
-      closeAllPops(); syncNavLock();
-    });
-    /* 首屏工具按钮:语言/外观/二维码(在开启页也能切换) */
-    var mDlLangBtn = $('#mDlLang'), mDlLookBtn = $('#mDlLook'), mDlQrBtn = $('#mDlQr');
-    if (mDlLangBtn) mDlLangBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showLang(mDlLangBtn); });
-    if (mDlLookBtn) mDlLookBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showLook(mDlLookBtn); });
-    if (mDlQrBtn) mDlQrBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showQr(mDlQrBtn); });
-    /* via/移动 WebView:部分浏览器 click 会被吞,用 touchstart 直接打开(preventDefault 防 click 双触发) */
-    if ('ontouchstart' in window) {
-      [['qrBtn', 'qrPop', showQr, hideQrPop], ['lookBtn', 'lookPop', showLook, hideLookPop], ['langBtn', 'langPop', showLang, hideLang]].forEach(function (cfg) {
-        var b2 = $(cfg[0]), p2 = $(cfg[1]);
-        if (b2) b2.addEventListener('touchstart', function (e) {
-          e.preventDefault(); e.stopPropagation();
-          if (p2.classList.contains('show')) { cfg[3](); } else { closeAllPops(); cfg[2](); }
-        }, { passive: false });
-      });
-      [['mDlLang', showLang, mDlLangBtn, langPop], ['mDlLook', showLook, mDlLookBtn, lookPop], ['mDlQr', showQr, mDlQrBtn, qrPop]].forEach(function (cfg) {
-        var b2 = $(cfg[0]);
-        if (b2) b2.addEventListener('touchstart', function (e) {
-          e.preventDefault(); e.stopPropagation();
-          closeAllPops(); cfg[1](cfg[2]);
-        }, { passive: false });
-      });
-    }
-  }
+  qrBtn.addEventListener('mouseenter', showQr);
+  qrBtn.addEventListener('mouseleave', hideQrPop);
+  qrPop.addEventListener('mouseenter', showQr);
+  qrPop.addEventListener('mouseleave', hideQrPop);
+  lookBtn.addEventListener('mouseenter', showLook);
+  lookBtn.addEventListener('mouseleave', hideLookPop);
+  lookPop.addEventListener('mouseenter', showLook);
+  lookPop.addEventListener('mouseleave', hideLookPop);
   $$('.qr-tab').forEach(function (tab) {
     tab.addEventListener('click', function () {
       var q = tab.dataset.q;
@@ -2250,23 +2073,21 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   $$('.dl-m-btn.soon').forEach(function (b) {
     b.addEventListener('click', function () { toast(I18N.dl_ios_tip ? I18N.dl_ios_tip[curLang] : 'iOS 版正在研发中,敬请期待'); });
   });
-  function showLang(btn) {
-    if (!isMobileUA && otherPopOpen('.lang-pop.show')) return;
+  function showLang() {
     clearTimeout(langTimer);
     themePop.classList.remove('show'); clearTimeout(popTimer);
     qqPop.classList.remove('show'); clearTimeout(qqTimer);
     perfPop.classList.remove('show'); clearTimeout(perfTimer);
     mPop.classList.remove('show'); clearTimeout(mTimer);
     lookPop.classList.remove('show'); clearTimeout(lookTimer);
-    qrPop.classList.remove('show'); clearTimeout(qrTimer); clearTimeout(qrAutoT);
-    posPop(langPop, btn || langBtn); langPop.classList.add('show'); unlockBtnId = 'langBtn'; syncNavLock();
+    qrPop.classList.remove('show'); clearTimeout(qrTimer);
+    posPop(langPop, langBtn); langPop.classList.add('show');
   }
-  function hideLang() { langTimer = setTimeout(function () { langPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
-  var langOpenT = null;
-  langBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(langOpenT); langOpenT = setTimeout(showLang, 300); });
-  langBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(langOpenT); hideLang(); });
-  langPop.addEventListener('mouseenter', function () { if (!hoverPop) return; showLang(); });
-  langPop.addEventListener('mouseleave', function () { if (!hoverPop) return; hideLang(); });
+  function hideLang() { langTimer = setTimeout(function () { langPop.classList.remove('show'); syncPopOpen(); }, 250); }
+  langBtn.addEventListener('mouseenter', showLang);
+  langBtn.addEventListener('mouseleave', hideLang);
+  langPop.addEventListener('mouseenter', showLang);
+  langPop.addEventListener('mouseleave', hideLang);
   $$('.lang-item').forEach(function (it) {
     it.addEventListener('click', function () {
       curLang = it.dataset.lang;
@@ -2274,7 +2095,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
       applyLang();
       it.classList.add('popped');
       setTimeout(function () { it.classList.remove('popped'); }, 320);
-      setTimeout(function () { langPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 180);
+      setTimeout(function () { langPop.classList.remove('show'); syncPopOpen(); }, 180);
     });
   });
 
@@ -2338,29 +2159,19 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
 
   /* ---------- 全局悬浮 ---------- */
   function bindTilt(el, maxDeg) {
-    /* 性能优化:rAF 节流(每帧至多一次布局读取;缓存 rect 会因滚动/位移失效,故不缓存) */
-    var pending = false;
     el.addEventListener('mousemove', function (e) {
-      if (document.body.classList.contains('lite-mode')) return;
-      if (pending) return;
-      pending = true;
-      requestAnimationFrame(function () {
-        pending = false;
-        var r = el.getBoundingClientRect();
-        var rx = ((e.clientY - r.top) / r.height - 0.5) * -maxDeg;
-        var ry = ((e.clientX - r.left) / r.width - 0.5) * maxDeg;
-        el.style.setProperty('--rx', rx.toFixed(2) + 'deg');
-        el.style.setProperty('--ry', ry.toFixed(2) + 'deg');
-      });
-    }, { passive: true });
-    el.addEventListener('mouseleave', function () { el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg'); }, { passive: true });
+      var r = el.getBoundingClientRect();
+      var rx = ((e.clientY - r.top) / r.height - 0.5) * -maxDeg;
+      var ry = ((e.clientX - r.left) / r.width - 0.5) * maxDeg;
+      el.style.setProperty('--rx', rx.toFixed(2) + 'deg');
+      el.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+    });
+    el.addEventListener('mouseleave', function () { el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg'); });
   }
   /* 始终绑定 tilt(节能模式下由 CSS 强制压住,开头卡片除外),切回标准模式立即生效 */
   $$('.card').forEach(function (c) { bindTilt(c, 9); });
   $$('.btn').forEach(function (b) { bindTilt(b, 6); });
   $$('.stack-card').forEach(function (c) { bindTilt(c, 6); });
-  $$('.cr-card').forEach(function (c) { bindTilt(c, 5); });
-  $$('.st-col').forEach(function (c) { bindTilt(c, 5); });
 
   /* ---------- 终端点交互 ---------- */
   var termBox = $('#termBox');
@@ -2551,7 +2362,7 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   var STATS = {
     dev:  { numEl: 'stat1', num: 12000, ringEl: 'ring1', ringNum: 'ringNum1', pct: 92 },
     proj: { numEl: 'stat2', num: 85000, ringEl: 'ring2', ringNum: 'ringNum2', pct: 85 },
-    upt:  { numEl: 'stat3', num: 128000, ringEl: 'ring3', ringNum: 'ringNum3', pct: 90 }
+    upt:  { numEl: 'stat3', num: 99.99, ringEl: 'ring3', ringNum: 'ringNum3', pct: 99.9 }
   };
   var statsCard = $('#statsCard');
   var statsDone = false;
@@ -2589,21 +2400,15 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
       stCols.forEach(function (c, k) {
         c.classList.toggle('cur', k === stCur);
         if (k === stCur) {
-          c.style.setProperty('--st-y', '0px');
-          c.style.setProperty('--st-rot', '0deg');
+          c.style.setProperty('--st-off', '0px');
           c.style.setProperty('--st-sc', '1');
-          c.style.opacity = '1';
-          c.style.filter = 'brightness(1)';
-          c.style.zIndex = 30;
+          c.style.zIndex = 10;
         } else {
-          /* 3D 层叠:当前卡完全覆盖,下层卡向下错落露出顶边;下层卡压暗亮度,不照亮顶层 */
           var d = (k - stCur + n) % n;
-          c.style.setProperty('--st-y', (12 + d * 10) + 'px');
-          c.style.setProperty('--st-sc', (1 - d * 0.035).toFixed(3));
-          c.style.setProperty('--st-rot', ((d % 2 ? 1 : -1) * (d * 1.2)).toFixed(1) + 'deg');
-          c.style.opacity = (d === 1 ? 0.55 : 0.26).toFixed(2);
-          c.style.filter = 'brightness(' + (1 - d * 0.14).toFixed(2) + ')';
-          c.style.zIndex = 30 - d;
+          c.style.setProperty('--st-off', (12 + d * 10) + 'px');
+          c.style.setProperty('--st-sc', (1 - d * 0.03).toFixed(3));
+          c.style.setProperty('--st-rot', ((d % 2 ? 1 : -1) * (d * 2.5)).toFixed(1) + 'deg');
+          c.style.zIndex = 10 - d;
         }
       });
     }
@@ -2674,15 +2479,6 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   /* ---------- 堆叠容器高度自适应(让指示点紧贴卡片,不悬空) ---------- */
   var stackBox = $('.stack');
   var stGridBox = $('.st-grid');
-  function posStNav() {
-    var grid = $('.st-grid');
-    if (!grid) return;
-    /* 按钮在卡片内,top 相对卡片容器,取卡片堆叠区域中心 */
-    var top = grid.offsetTop + grid.offsetHeight / 2;
-    var p = $('#stPrev'), n = $('#stNext');
-    if (p) p.style.top = top + 'px';
-    if (n) n.style.top = top + 'px';
-  }
   function fitStackHeights() {
     if (stackBox && stackCards.length) {
       var maxH = 0;
@@ -2694,7 +2490,6 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
       stCols.forEach(function (c) { if (c.offsetHeight > maxG) maxG = c.offsetHeight; });
       if (maxG > 0) stGridBox.style.height = (maxG + 6) + 'px';
     }
-    posStNav();
   }
   fitStackHeights();
   if (document.readyState === 'loading') window.addEventListener('load', fitStackHeights);
@@ -2719,11 +2514,11 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
       setTimeout(function () { t.remove(); }, 350);
     }, 2200);
   }
-  $('#docBtn').addEventListener('click', function () { toast(I18N.toast_doc ? I18N.toast_doc[curLang] : '开发文档页面即将上线,敬请期待'); });
-  $('#moreBtn').addEventListener('click', function () { toast(I18N.toast_more ? I18N.toast_more[curLang] : '更多产品敬请期待'); });
+  $('#docBtn').addEventListener('click', function () { toast('开发文档页面即将上线,敬请期待'); });
+  $('#moreBtn').addEventListener('click', function () { toast('更多产品敬请期待'); });
   $$('.ext-install').forEach(function (b) {
     b.addEventListener('click', function () {
-      toast(I18N.toast_plugin ? I18N.toast_plugin[curLang] : '即将跳转到插件详情页');
+      toast('即将跳转到插件详情页');
     });
   });
   $$('.dl-soon').forEach(function (b) {
