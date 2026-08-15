@@ -1177,7 +1177,6 @@
     toast_perf_off:{zh:'已关闭节能模式',en:'Battery saver off',ja:'省エネモードをオフにしました',ko:'절전 모드를 껐습니다',es:'Modo ahorro desactivado',tw:'已關閉節能模式'},
     toast_doc:{zh:'开发文档页面即将上线,敬请期待',en:'Dev docs coming soon, stay tuned',ja:'開発ドキュメントは近日公開予定',ko:'개발 문서가 곧 공개됩니다',es:'Documentación próximamente',tw:'開發文檔頁面即將上線,敬請期待'},
     toast_more:{zh:'更多产品敬请期待',en:'More products coming soon',ja:'その他の製品は近日公開',ko:'더 많은 제품이 곧 출시됩니다',es:'Más productos próximamente',tw:'更多產品敬請期待'},
-    toast_plugin:{zh:'即将跳转到插件详情页',en:'Opening plugin details...',ja:'プラグイン詳細へ移動します',ko:'플러그인 상세로 이동합니다',es:'Abriendo detalles del plugin',tw:'即將跳轉到插件詳情頁'}
   };
   Object.keys(I18N_EXTRA).forEach(function (k) { I18N[k] = I18N_EXTRA[k]; });
   var I18N_QR = {
@@ -1693,6 +1692,86 @@
   extCarousel.addEventListener('mouseleave', extStart);
   extRender(); extStart();
 
+  /* ---------- 插件市场 API 接入(列表 /app/api/knmk?page=1;失败自动降级为内置示例) ---------- */
+  var MARKET_BASE = 'https://code.pgrm.run';
+  var PLUGINS = [];
+  var EXT_ICONS = [
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15c-1.6-2.1-2.2-4.6-1.7-7.1 2.6-.4 5.2.2 7.3 1.7-.4 2.6-1.1 4.8-2.6 6.2"/><path d="M9.3 12.8c-3.1 1.6-4.6 3.6-5.1 7.1 3.5-.5 5.6-2 7.2-5.1"/><circle cx="14.7" cy="9.3" r="1.2" fill="currentColor" stroke="none"/></svg>',
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>',
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>'
+  ];
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function renderExtCards() {
+    var stage = $('#extStage');
+    if (!stage || !PLUGINS.length) return;
+    var cards = PLUGINS.slice(0, 8).map(function (p, i) {
+      var tags = (p.tags || []).slice(0, 3).map(escHtml).join(' · ');
+      return '<div class="ext-card' + (i === 0 ? ' active' : '') + '"><div class="ext-inner card">' +
+        '<div class="feature-icon">' + EXT_ICONS[i % EXT_ICONS.length] + '</div>' +
+        '<h3>' + escHtml(p.name) + '</h3>' +
+        '<p class="ext-author">by @' + escHtml(p.author) + '</p>' +
+        '<p>' + tags + '</p>' +
+        '<div class="ext-foot"><span class="ext-rate">★ ' + (p.rating != null ? p.rating : '5.0') + '</span>' +
+        '<button class="ext-install" data-id="' + escHtml(p.id) + '"><span>' + (I18N.ext_view ? I18N.ext_view[curLang] : '查看') + '</span> <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg></button></div>' +
+        '</div></div>';
+    }).join('');
+    stage.innerHTML = cards;
+    /* 重建轮播(卡片与圆点数组需要重新生成) */
+    extCards = $$('.ext-card');
+    extCur = 0;
+    extDotsBox.innerHTML = '';
+    extCards.forEach(function (_, i) {
+      var dot = document.createElement('button');
+      dot.setAttribute('aria-label', '扩展 ' + (i + 1));
+      dot.addEventListener('click', function () { extGo(i); extRestart(); });
+      extDotsBox.appendChild(dot);
+    });
+    extDots = $$('#extDots button');
+    extRender(); extStop(); extStart();
+    bindExtClicks();
+  }
+  /* 统一 GET 请求:fetch 优先(有 AbortController 则 4s 超时;没有则直接请求),fetch 不可用回退 XMLHttpRequest */
+  function apiGet(url) {
+    return new Promise(function (resolve, reject) {
+      try {
+        if (window.fetch) {
+          var opts = {}, ctrl = null, timer = null;
+          if (window.AbortController) { ctrl = new AbortController(); opts.signal = ctrl.signal; }
+          timer = setTimeout(function () { if (ctrl) ctrl.abort(); reject(new Error('timeout')); }, 4000);
+          window.fetch(url, opts).then(function (r) {
+            clearTimeout(timer);
+            if (!r.ok) { reject(new Error('HTTP ' + r.status)); return; }
+            resolve(r);
+          }, function (e) { clearTimeout(timer); reject(e); });
+        } else if (window.XMLHttpRequest) {
+          var xhr = new window.XMLHttpRequest();
+          xhr.open('GET', url, true);
+          xhr.timeout = 4000;
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve({ json: function () { return JSON.parse(xhr.responseText); }, text: function () { return xhr.responseText; } });
+            } else { reject(new Error('HTTP ' + xhr.status)); }
+          };
+          xhr.onerror = function () { reject(new Error('network')); };
+          xhr.ontimeout = function () { reject(new Error('timeout')); };
+          xhr.send();
+        } else { reject(new Error('no-request')); }
+      } catch (e) { reject(e); }
+    });
+  }
+  function loadPlugins() {
+    apiGet(MARKET_BASE + '/app/api/knmk?page=1')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && data.plugins && data.plugins.length) { PLUGINS = data.plugins; renderExtCards(); }
+      })
+      .catch(function () { /* 接口不可用时保持内置示例 */ });
+  }
+
   /* ---------- 统计三列 ---------- */
   var RING_LEN = 2 * Math.PI * 41.5;
   $$('.ring-fg').forEach(function (c) { c.style.strokeDasharray = RING_LEN; });
@@ -1899,11 +1978,28 @@
   }
   $('#docBtn').addEventListener('click', function () { toast(I18N.toast_doc ? I18N.toast_doc[curLang] : '开发文档页面即将上线,敬请期待'); });
   $('#moreBtn').addEventListener('click', function () { toast(I18N.toast_more ? I18N.toast_more[curLang] : '更多产品敬请期待'); });
-  $$('.ext-install').forEach(function (b) {
-    b.addEventListener('click', function () {
-      toast(I18N.toast_plugin ? I18N.toast_plugin[curLang] : '即将跳转到插件详情页');
+  /* 扩展卡点击:有真实插件数据时直接跳转插件详情页,否则跳市场首页 */
+  var MARKET_URL = MARKET_BASE + '/mk/kn';
+  function bindExtClicks() {
+    $$('.ext-install').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var id = b.getAttribute('data-id');
+        if (PLUGINS.length && id != null) window.open(MARKET_BASE + '/mk/kn/plugin/' + encodeURIComponent(id), '_blank', 'noopener');
+        else window.open(MARKET_URL, '_blank', 'noopener');
+      });
     });
-  });
+    $$('.ext-card').forEach(function (c) {
+      c.addEventListener('click', function () {
+        var inst = c.querySelector('.ext-install');
+        var id = inst && inst.getAttribute('data-id');
+        if (PLUGINS.length && id != null) window.open(MARKET_BASE + '/mk/kn/plugin/' + encodeURIComponent(id), '_blank', 'noopener');
+        else window.open(MARKET_URL, '_blank', 'noopener');
+      });
+    });
+  }
+  bindExtClicks();
+  loadPlugins();
   $$('.dl-soon').forEach(function (b) {
     b.addEventListener('click', function (e) {
       e.preventDefault();
