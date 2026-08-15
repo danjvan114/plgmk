@@ -8,6 +8,8 @@
 <link rel="shortcut icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 <link rel="stylesheet" href="/localcdn/project/ked/styles.css">
 <link rel="stylesheet" href="/localcdn/project/ked/env.css">
+<script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
 <style>
 /* ===== 插件市场专属(复用官网主题变量,三主题自动适配) ===== */
 .mk-hero { min-height:0; display:flex; align-items:center; padding:30vh 6vw 0; }
@@ -36,7 +38,7 @@
 body.lite-mode .mk-pop-btn { background:var(--glass-tint); backdrop-filter:none; -webkit-backdrop-filter:none; }
 .mk-menu { position:absolute; top:calc(100% + 10px); left:0; min-width:150px; padding:8px; border-radius:16px; background:var(--glass-strong); backdrop-filter:blur(30px) saturate(200%); -webkit-backdrop-filter:blur(30px) saturate(200%); box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); opacity:0; visibility:hidden; transform:translateY(-8px) scale(.94); transform-origin:top left; transition:opacity .3s ease,transform .4s cubic-bezier(.34,1.56,.64,1),visibility .4s; z-index:1200; }
 .mk-menu.show { opacity:1; visibility:visible; transform:translateY(0) scale(1); }
-body.lite-mode .mk-menu { background:var(--solid-glass); backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.lite-mode .mk-menu { backdrop-filter:none; -webkit-backdrop-filter:none; }
 .mk-menu-item { display:flex; align-items:center; gap:8px; width:100%; padding:8px 12px; border:none; border-radius:11px; background:transparent; color:var(--text-2); font-size:13px; font-weight:700; font-family:inherit; text-align:left; cursor:pointer; transition:color .25s,background .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
 .mk-menu-item:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateX(3px); }
 .mk-menu-item.cur { color:var(--accent-1); background:var(--glass-tint-2); }
@@ -58,10 +60,11 @@ body.lite-mode .mk-menu-item.cur { background:var(--glass-tint-2); }
 header.more-open { overflow:visible !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
 .nav-more-menu { position:absolute; top:calc(100% + 10px); right:0; min-width:178px; padding:8px; border-radius:18px; background:rgba(255,255,255,.5); backdrop-filter:blur(40px) saturate(220%); -webkit-backdrop-filter:blur(40px) saturate(220%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), inset 0 -1px 0 rgba(0,0,0,.08), 0 18px 44px rgba(30,40,80,.25); opacity:0; visibility:visible; transform:translateY(-8px) scale(.94); transform-origin:top right; transition:opacity .35s ease,transform .45s cubic-bezier(.34,1.56,.64,1); pointer-events:none; z-index:2000; }
 body.dark-mode .nav-more-menu { background:rgba(20,26,50,.62); backdrop-filter:blur(40px) saturate(220%); -webkit-backdrop-filter:blur(40px) saturate(220%); box-shadow:inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.3), 0 18px 44px rgba(0,0,0,.5); }
-.nav-more-wrap:hover .nav-more-menu, .nav-more-menu.show { opacity:1; visibility:visible; transform:translateY(0) scale(1); pointer-events:auto; }
+.nav-more-wrap:hover .nav-more-menu { opacity:1; visibility:visible; transform:translateY(0) scale(1); pointer-events:auto; }
+.nav-more-menu.show { opacity:1; visibility:visible; transform:translateY(0) scale(1); pointer-events:auto; }
 .nav-more-menu a { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:30px; background:var(--glass-tint); color:var(--text-2); font-size:13px; font-weight:700; text-decoration:none; transition:color .25s,background .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
 .nav-more-menu a:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateX(3px); }
-body.lite-mode .nav-more-menu { background:var(--solid-glass); backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.lite-mode .nav-more-menu { backdrop-filter:none; -webkit-backdrop-filter:none; }
 /* 移动端菜单展开时,更多下拉改为占位(其子项直接展开为网格项) */
 @media (max-width:1040px) {
   .nav-more-menu { position:static; opacity:1; visibility:visible; transform:none; background:transparent; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; padding:0; display:grid; grid-template-columns:1fr; gap:4px; min-width:0; }
@@ -82,8 +85,6 @@ body.lite-mode .nav-more-menu { background:var(--solid-glass); backdrop-filter:n
   header.menu-open .nav-links { display:grid; grid-template-columns:repeat(auto-fit,minmax(88px,auto)); gap:6px 8px; width:100%; padding:6px 2px 0; }
   header.menu-open .nav-right { display:flex; width:100%; justify-content:center; padding:4px 0 6px; }
   header.menu-open .nav-links, header.menu-open .nav-right { animation:fadeIn .5s ease both; }
-  body.lite-mode header.menu-open .nav-links > a,
-  body.lite-mode header.menu-open .nav-right { animation:none !important; opacity:1 !important; }
 }
 /* 2 形态下登录按钮保留(右侧空间足够) */
 @media (min-width:901px) and (max-width:1040px) {
@@ -102,7 +103,7 @@ body.lite-mode .nav-more-menu { background:var(--solid-glass); backdrop-filter:n
 .mk-card:hover { box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); --ty:-5px; }
 .mk-card:hover::after { opacity:1; }
 .mk-card:hover { box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); }
-body.lite-mode .mk-card { background:var(--solid-glass); backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.lite-mode .mk-card { backdrop-filter:none; -webkit-backdrop-filter:none; }
 .mk-ico { flex:none; width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; color:var(--accent-1); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top); }
 .mk-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
 .mk-card h3 { font-size:16.5px; font-weight:800; color:var(--text-1); margin:0; letter-spacing:.2px; }
@@ -115,7 +116,7 @@ body.lite-mode .mk-card { background:var(--solid-glass); backdrop-filter:none; -
 .mk-dl, .mk-view { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:18px; font-size:12.5px; font-weight:700; text-decoration:none; cursor:pointer; border:none; font-family:inherit; transition:transform .35s cubic-bezier(.34,1.56,.64,1),filter .25s,background .25s,color .25s; }
 .mk-dl { color:var(--text-1); background:var(--glass-card); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); border:1px solid rgba(255,255,255,.18); }
 .mk-dl:hover { transform:translateY(-2px) scale(1.04); box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); filter:brightness(1.04); }
-body.lite-mode .mk-dl { background:var(--glass-tint); backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.lite-mode .mk-dl { backdrop-filter:none; -webkit-backdrop-filter:none; }
 .mk-view { color:var(--text-2); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top); }
 .mk-view:hover { color:var(--accent-1); transform:translateY(-2px) scale(1.04); }
 body.lite-mode .mk-view { background:var(--glass-tint); }
@@ -162,11 +163,11 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
       KN Expanse
     </div>
         <nav class="nav-links" id="navLinks" aria-label="主导航">
-      <a href="https://code.pgrm.run/mk/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg><span data-i18n="mk_home">首页</span></a>
+      <a href="/mk/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg><span data-i18n="mk_home">首页</span></a>
       <a href="#market" data-scroll><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span data-i18n="mk_discover">发现</span></a>
       <a href="#market" data-scroll><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l3-3 3 3h7v4l3 3-3 3v4h-7l-3 3-3-3H4v-4L1 11l3-3Z"/><circle cx="8.5" cy="11" r="1.4" fill="currentColor" stroke="none"/><circle cx="12.5" cy="15" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8" r="1.4" fill="currentColor" stroke="none"/></svg><span data-i18n="nav_market">插件市场</span></a>
-      <a href="https://code.pgrm.run/app/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg><span data-i18n="mk_team">团队</span></a>
-      <a href="https://code.pgrm.run/forum" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></svg><span data-i18n="mk_forum">论坛</span></a>
+      <a href="/app/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg><span data-i18n="mk_team">团队</span></a>
+      <a href="/forum" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></svg><span data-i18n="mk_forum">论坛</span></a>
       <div class="nav-more-wrap">
         <button class="nav-more-btn" id="navMoreBtn" type="button" aria-haspopup="true" aria-expanded="false">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/></svg>
@@ -174,8 +175,8 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
           <svg class="nav-more-caret" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div class="nav-more-menu" id="navMoreMenu">
-          <a href="https://code.pgrm.run/app/kn/d" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg><span data-i18n="mk_appdl">应用下载</span></a>
-          <a href="https://code.pgrm.run/dev/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg><span data-i18n="mk_dev">开发者中心</span></a>
+          <a href="/app/kn/d" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg><span data-i18n="mk_appdl">应用下载</span></a>
+          <a href="/dev/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg><span data-i18n="mk_dev">开发者中心</span></a>
         </div>
       </div>
     </nav>
@@ -212,7 +213,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
       </button>
       
     </div>
-    <a class="mk-login btn btn-glass" href="https://code.pgrm.run/login" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg><span data-i18n="mk_login">登录</span></a>
+    <a class="mk-login btn btn-glass" href="/login" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg><span data-i18n="mk_login">登录</span></a>
     <button class="icon-btn hamburger" id="hamburgerBtn" aria-label="打开菜单" aria-expanded="false">
       <i></i><i></i><i></i>
     </button>
@@ -245,7 +246,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
 <section id="market" class="mk-sec">
   <div class="mk-toolbar">
     <div class="mk-pop-wrap">
-      <button class="mk-pop-btn" id="mkSortBtn" type="button" aria-haspopup="true" aria-expanded="false">
+      <button class="mk-pop-btn mdui-r" id="mkSortBtn" type="button" aria-haspopup="true" aria-expanded="false">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
         <span id="mkSortLabel" data-i18n="mk_latest">最新</span>
         <svg class="mk-pop-caret" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -256,10 +257,10 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
         <button class="mk-menu-item" data-sort="all" type="button"><span data-i18n="mk_all">全部</span></button>
       </div>
     </div>
-    <div class="mk-pop-wrap">
-      <button class="mk-pop-btn" id="mkFilterBtn" type="button" aria-haspopup="true" aria-expanded="false">
+    <div class="mk-pop-wrap mdui-ripple">
+      <button class="mk-pop-btn mdui-ripple" id="mkFilterBtn" type="button" aria-haspopup="true" aria-expanded="false">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v3l-6 6v5l-4 2v-7L4 8Z"/></svg>
-        <span id="mkFilterLabel" data-i18n="mk_filter">筛选</span>
+        <span id="mkFilterLabel" class="mdui-ripple" data-i18n="mk_filter">筛选</span>
         <svg class="mk-pop-caret" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
       </button>
       <div class="mk-menu" id="mkFilterMenu">
@@ -289,9 +290,9 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
   <div class="fl-links">
     <a href="https://www.codemao.cn/" target="_blank" rel="noopener" data-i18n="fl_0">点猫科技</a>
     <span class="fl-sep">·</span>
-    <a href="https://code.pgrm.run/" target="_blank" rel="noopener" data-i18n="fl_1">KNHX工作室</a>
+    <a href="/" target="_blank" rel="noopener" data-i18n="fl_1">KNHX工作室</a>
     <span class="fl-sep">·</span>
-    <a href="https://code.pgrm.run/app/ccvue" target="_blank" rel="noopener" data-i18n="fl_2">CatCode</a>
+    <a href="/app/ccvue" target="_blank" rel="noopener" data-i18n="fl_2">CatCode</a>
   </div>
 </footer>
 
@@ -379,7 +380,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
   <div class="m-dl-inner">
     <img class="m-dl-logo th-def" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse"><img class="m-dl-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse"><img class="m-dl-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse">
     <h1 class="m-dl-hero"><span data-i18n="hero_t1">现代化图形化编辑器</span><br><span class="m-dl-grad" data-i18n="hero_t2">为生态而生</span><span class="m-dl-hand" data-i18n="hero_t3">for creators</span></h1>
-    <a class="m-dl-btn" id="mDlAndroid" href="https://code.pgrm.run/localcdn/2/app-debug.apk" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="m_android">安卓下载</span></a>
+    <a class="m-dl-btn" id="mDlAndroid" href="/localcdn/2/app-debug.apk" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="m_android">安卓下载</span></a>
     <button class="m-dl-btn ios" id="mDlIos" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.7-1 2-1.4 3-1 1 .5 1.5 1.5 1.4 2.6-.9.4-2 .4-3 .3-.5-.7-.9-1.3-1.4-1.9Z"/><path d="M16.5 8.2c1.9 2 2.8 4.5 2.4 7.1-.5 3.3-2.8 5.7-6 5.7h-1.8c-3.2 0-5.5-2.4-6-5.7-.4-2.6.5-5.1 2.4-7.1.3-.3.7-.4 1.1-.3.8.2 1.6.2 2.4 0 .9-.2 1.8-.2 2.7 0 .8.2 1.7.2 2.4 0 .4-.1.8 0 1.1.3Z"/></svg><span data-i18n="m_ios">iOS 下载</span></button>
     <button class="m-dl-btn ghost" id="mDlEnter" type="button"><span data-i18n="m_detail">查看详细介绍</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
   </div>
@@ -663,12 +664,6 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
   });
   function closeMenu() {
     if (!header.classList.contains('menu-open')) return;
-    /* 节能模式:无动画,立即收起 */
-    if (document.body.classList.contains('lite-mode')) {
-      header.classList.remove('menu-open'); header.classList.remove('closing');
-      header.style.height = ''; hamburger.setAttribute('aria-expanded', 'false');
-      return;
-    }
     header.classList.add('closing');
     header.style.height = '60px';
     setTimeout(function () {
@@ -686,17 +681,6 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     /* 打开菜单前收起已开悬浮窗,避免并存 */
     if (isMobileUA) { [qrPop, lookPop, langPop].forEach(function (p) { if (p) p.classList.remove('show'); }); }
     header.classList.add('hiding-nav');
-    if (document.body.classList.contains('lite-mode')) {
-      /* 节能模式:无动画延迟,但等一帧布局后再取高度(立即读 scrollHeight 会算错) */
-      header.classList.remove('hiding-nav'); header.classList.add('menu-open');
-      hamburger.setAttribute('aria-expanded', 'true');
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          header.style.height = header.scrollHeight + 'px';
-        });
-      });
-      return;
-    }
     setTimeout(function () {
       header.classList.remove('hiding-nav');
       header.classList.add('menu-open');
@@ -1089,7 +1073,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
   if (dlAndroidBtn) dlAndroidBtn.addEventListener('click', function () {
     if (isMobileUA) {
       /* 移动端:直接跳下载链接,不做扫码 */
-      window.open('https://code.pgrm.run/localcdn/2/app-debug.apk', '_blank');
+      window.open('/localcdn/2/app-debug.apk', '_blank');
     } else if (qrModal) {
       qrModal.classList.add('show');
     }
@@ -1360,7 +1344,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
   $$('.reveal').forEach(function (el) { revealObs.observe(el); });
 
   /* ---------- 插件市场 API 接入(列表 /app/api/knmk?page=1;失败自动降级为内置示例) ---------- */
-  var MARKET_BASE = 'https://code.pgrm.run';
+  var MARKET_BASE = '';
   var MARKET_URL = MARKET_BASE + '/mk/kn';
   var PLUGINS = [];
   var EXT_ICONS = [
