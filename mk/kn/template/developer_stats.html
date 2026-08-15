@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>更新插件</title>
+<title>开发者统计</title>
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 <style>
 /* ========== 双主题变量(白=aurora紫 / 黑=dark) ========== */
@@ -149,6 +149,13 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#ea580c); c
 }
 
 
+.plugin-item { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:10px; }
+.plugin-item:last-child { border-bottom:none; }
+.plugin-info h3 { margin-bottom:4px; font-size:15.5px; }
+.plugin-info p { color:var(--text-3); font-size:13.5px; }
+.plugin-stats { text-align:right; margin-right:14px; font-size:13.5px; color:var(--text-2); }
+.plugin-actions { display:flex; gap:8px; }
+
 /* ===== 悬浮卡片(tilt 鼠标跟随) ===== */
 .card, .stat-card, .stat-item { transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)); transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .4s,background .3s; will-change:transform; }
 .card:hover, .stat-card:hover, .stat-item:hover { --ty:-5px; box-shadow:inset 0 1px 0 var(--hi-top), var(--shadow-hover); }
@@ -167,54 +174,35 @@ input[type="file"]:hover { border-color:var(--accent-1); background:var(--glass-
 input[type="file"]:focus { outline:none; box-shadow:0 0 0 3px var(--accent-glow); }
 input[type="file"]::file-selector-button { border:none; padding:8px 16px; border-radius:14px; background:var(--glass-tint-2); color:var(--accent-1); font-weight:700; font-size:13px; font-family:inherit; cursor:pointer; margin-right:10px; transition:background .3s,transform .3s cubic-bezier(.34,1.56,.64,1); }
 input[type="file"]::file-selector-button:hover { background:var(--glass-tint); transform:scale(1.05); }
-
-/* ===== 外链地址输入框 UI 适配 ===== */
-input[name="external_url"], input[name^="image_url"] { padding:11px 15px; border:1px solid var(--border); border-radius:12px; background:var(--glass-tint); color:var(--text-1); font-size:13.5px; font-family:inherit; outline:none; transition:border-color .25s,box-shadow .25s,background .3s; }
-input[name="external_url"]:focus, input[name^="image_url"]:focus { border-color:var(--accent-1); box-shadow:0 0 0 3px var(--accent-glow); }
-input[name="external_url"]::placeholder, input[name^="image_url"]::placeholder { color:var(--text-3); }
 </style>
 </head>
 <body class="theme-light">
-<header class="topnav"><a class="logo" href="/mk/kn"><img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="Logo"><span>KE 插件市场</span></a><div class="nav-links"><a href="/mk/kn">首页</a></div><div class="head-space"></div><button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg></button><button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button></header>
+<header class="topnav"><a class="logo" href="/mk/kn"><img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="Logo"><span>KE 插件市场</span></a><div class="nav-links"><a href="/mk/kn">插件市场</a><a href="/dev/kn">开发者中心</a><a href="/mk/kn/developer/stats" class="active">我的统计</a></div><div class="head-space"></div><button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg></button><button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button></header>
 <div class="main-box">
 
-<div class="card" style="max-width:760px;margin:0 auto">
-<h1 class="page-title">更新插件</h1>
-<form method="post" enctype="multipart/form-data">
-<div class="form-group"><label>插件名称</label><input type="text" name="name" value="{{ plugin.name }}" required></div>
-<div class="form-group"><label>版本号</label><input type="text" name="version" value="{{ plugin.version }}" required></div>
-<div class="form-group"><label>标签（用逗号分隔）</label><input type="text" name="tags" value="{{ plugin.tags|join(',') }}" required></div>
-<div class="form-group"><label>插件描述</label><textarea name="description" required>{{ plugin.description }}</textarea></div>
-<div class="form-group">
-<label>插件文件（可选，仅当需要更新文件时上传）</label>
-<input type="file" name="file">
-<div class="form-hint">支持的格式: zip, rar, py, tar, gz, js</div>
-<div style="margin-top:14px">
-<label>或外部下载链接</label>
-<input type="text" name="external_url" value="{{ plugin.file_path if plugin.file_path.startswith('http') else '' }}" placeholder="https://example.com/plugin.zip">
-<div class="form-hint">如果填写外链，将覆盖上传的文件</div>
+<h1 class="page-title">开发者统计 - {{ session.user }}</h1>
+<div class="stats-grid" style="margin-top:20px">
+<div class="stat-card"><div class="stat-value">{{ plugins|length }}</div><div class="stat-label">发布插件数</div></div>
+<div class="stat-card"><div class="stat-value">{{ total_downloads }}</div><div class="stat-label">总下载次数</div></div>
+<div class="stat-card"><div class="stat-value">{{ "%.1f"|format(avg_rating) }}</div><div class="stat-label">平均评分</div></div>
 </div>
+<div class="card">
+<h2 style="font-size:18px;margin-bottom:16px">我的插件</h2>
+{% if plugins %}
+{% for plugin in plugins %}
+<div class="plugin-item">
+<div class="plugin-info"><h3>{{ plugin.name }}</h3><p>{{ plugin.author }} · {{ plugin.version }}</p></div>
+<div class="plugin-stats"><div>{{ plugin.downloads }} 下载</div><div>★ {{ "%.1f"|format(plugin.rating) }}</div></div>
+<div class="plugin-actions">
+<a href="/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}" class="btn sm ghost">查看</a>
+<a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn sm ghost">编辑</a>
+<a href="/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}" class="btn sm {{ 'danger' if plugin.status == 'active' else 'success' }}">{{ '下架' if plugin.status == 'active' else '上架' }}</a>
 </div>
-<div style="border-top:1px solid var(--border);padding-top:20px;margin-top:20px">
-<h2 style="font-size:18px;margin-bottom:14px">插件展示图片 (最多{{ max_images or 5 }}张)</h2>
-<div class="form-hint" style="margin-bottom:14px">前{{ max_images or 5 }}张可直接上传，超过{{ max_images or 5 }}张请使用外链方式</div>
-{% for i in range(max_images or 5) %}
-<div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
-{% if plugin.images and plugin.images[i] and plugin.images[i].url %}
-<img src="{{ plugin.images[i].url }}" style="max-width:90px;max-height:60px;border-radius:8px" alt="当前图片">
-{% endif %}
-<input type="file" name="image{{ i+1 }}" accept="image/*">
-<span style="color:var(--text-3);font-size:13px">或</span>
-<input type="text" name="image_url{{ i+1 }}" placeholder="图片{{ i+1 }}外链地址" {% if plugin.images and plugin.images[i] and plugin.images[i].image_url %}value="{{ plugin.images[i].image_url }}"{% endif %} style="flex:1;min-width:180px">
 </div>
 {% endfor %}
-<div class="form-hint">支持图片格式: png, jpg, jpeg, gif, webp</div>
-</div>
-<div style="display:flex;gap:12px;margin-top:26px">
-<a href="/plugin/{{ plugin.id }}" class="btn ghost">取消</a>
-<button type="submit" class="btn">更新插件</button>
-</div>
-</form>
+{% else %}
+<p style="text-align:center;color:var(--text-3);padding:20px">暂无插件</p>
+{% endif %}
 </div>
 
 </div>

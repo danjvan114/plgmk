@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="icon" type="image/x-icon" href="/localcdn/ico.png">
+    <meta charset="UTF-8">
+<title>{{ plugin.name }}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
+body.page-exit{animation:slideOutToLeft .25s cubic-bezier(.4,0,.2,1)}
+@keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideOutToLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-30px)}}
+header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out;z-index:100}
+.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
+.logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
+.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
+.logo-icon img{width:100%;height:100%;object-fit:cover}
+.head-space{flex:1}
+.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
+.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
+.search input::placeholder{color:#999}
+.main-box{max-width:1000px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
+.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);margin-bottom:20px;animation:slideDown 0.5s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.nav-links{display:flex;gap:16px}
+.nav-links a{color:#333;text-decoration:none}
+.nav-links a:hover{color:#2196f3}
+.tag{background:rgba(33,150,243,.1);color:#2196f3;padding:4px 12px;border-radius:4px;font-size:14px}
+.tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.detail-header{padding:24px;border-bottom:1px solid rgba(0,0,0,.05)}
+.detail-header h1{color:#333;margin-bottom:8px}
+.detail-header .meta{display:flex;align-items:center;gap:16px;color:#666;font-size:14px;margin-bottom:16px}
+.rating{color:#ff9800;font-size:20px}
+.detail-body{padding:24px}
+.detail-body h2{color:#333;margin-bottom:16px;font-size:18px}
+.detail-body p{color:#666;line-height:1.8}
+.btn{background:#2196f3;color:#fff;padding:12px 24px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:16px;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:#1976d2}
+.download-btn{background:#4caf50}
+.download-btn:hover{background:#388e3c}
+.rate-btn{background:#ff9800}
+.rate-btn:hover{background:#f57c00}
+.update-btn{background:#9c27b0}
+.update-btn:hover{background:#7b1fa2}
+.status-off-btn{background:#f44336}
+.status-off-btn:hover{background:#d32f2f}
+.status-on-btn{background:#4caf50}
+.status-on-btn:hover{background:#388e3c}
+.stats{display:flex;gap:32px;margin-top:24px}
+.stat-item{text-align:center}
+.stat-value{font-size:24px;font-weight:bold;color:#2196f3}
+.stat-label{color:#999;font-size:14px}
+.image-gallery{display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:12px;margin-bottom:24px}
+.gallery-image{width:100%;height:150px;object-fit:cover;border-radius:4px;cursor:pointer}
+.image-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);justify-content:center;align-items:center;z-index:1000}
+.image-modal.active{display:flex}
+.modal-image{max-width:90%;max-height:90%;border-radius:8px}
+.ttmp4-container{width:100%;height:500px;border:1px solid rgba(0,0,0,.1);border-radius:4px;overflow:hidden;margin-bottom:20px}
+.ttmp4-iframe{width:100%;height:100%;border:none}
+#loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
+#loader .mdui-progress{margin:0;border-radius:0}
+</style>
+</head>
+<body>
+<div class="loader" id="loader">
+<div class="mdui-progress">
+<div class="mdui-progress-indeterminate"></div>
+</div>
+</div>
+<div class="mdui-toolbar mdui-color-teal" style="position:fixed;top:0;left:0;right:0;z-index:99;">
+        <a class="mdui-ripple mdui-btn-icon" onclick="goBack()">
+            <i class="mdui-icon material-icons">arrow_back</i>
+        </a>
+        <span class="mdui-typo-title">{{ plugin.name }}</span>
+        <div class="mdui-toolbar-spacer"></div>
+        
+      
+</div>
+<div class="main-box">
+<div class="card">
+<div class="detail-header">
+<h1>{{ plugin.name }}</h1>
+<div class="meta">
+<span>作者: {{ plugin.author }}</span>
+<span>版本: {{ plugin.version }}</span>
+<span class="rating">★ {{ "%.1f"|format(plugin.rating) }}</span>
+<span>评价数: {{ plugin.rating_count }}</span>
+<span>发布于: {{ plugin.created_at }}</span>
+</div>
+<div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
+</div>
+<div class="detail-body">
+{% if plugin.ttmp4_url %}
+<h2>预览</h2>
+<div class="ttmp4-container">
+<iframe class="ttmp4-iframe" src="{{ plugin.ttmp4_url }}" sandbox="allow-scripts allow-same-origin allow-popups" allowfullscreen></iframe>
+</div>
+{% elif plugin.images and plugin.images|length > 0 %}
+<h2>插件预览</h2>
+<div class="image-gallery">
+{% for img in plugin.images %}
+{% if img.url %}
+<img src="{{ img.url }}" class="gallery-image" onclick="openImage('{{ img.url }}')" alt="插件图片">
+{% endif %}
+{% endfor %}
+</div>
+{% endif %}
+<h2>插件描述</h2>
+<p>{{ plugin.description|e }}</p>
+<div class="stats">
+<div class="stat-item">
+<div class="stat-value">{{ plugin.downloads }}</div>
+<div class="stat-label">下载次数</div>
+</div>
+<div class="stat-item">
+<div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div>
+<div class="stat-label">评分</div>
+</div>
+<div class="stat-item">
+<div class="stat-value">{{ plugin.rating_count }}</div>
+<div class="stat-label">评价数</div>
+</div>
+</div>
+<div style="margin-top:24px">
+{% if plugin.status == 'active' %}
+<a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn download-btn mdui-ripple">立即下载</a>
+<a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}{% if compact_mode %}?c=1{% endif %}" class="btn rate-btn mdui-ripple">评分</a>
+{% else %}
+<span style="color:#f44336;font-weight:bold">插件已下架</span>
+{% endif %}
+{% if is_owner and not compact_mode %}
+<a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn update-btn mdui-ripple">更新插件</a>
+<a href="javascript:void(0)" onclick="confirmDelete()" class="btn status-off-btn mdui-ripple">擦除插件</a>
+{% endif %}
+</div>
+</div>
+</div>
+</div>
+<div class="image-modal" id="imageModal">
+<img id="modalImage" class="modal-image" src="" alt="大图预览">
+</div>
+
+<script>
+window.addEventListener('load', function() {
+    document.getElementById('loader').style.display = 'none';
+    document.body.classList.add('page-enter');
+    setTimeout(()=>document.body.classList.remove('page-enter'),400);
+});
+
+function goBack() {
+    document.body.classList.add('page-exit');
+    setTimeout(()=>window.history.back(),250);
+}
+
+function openImage(url) {
+    document.getElementById('modalImage').src = url;
+    document.getElementById('imageModal').classList.add('active');
+}
+document.getElementById('imageModal').addEventListener('click', function() {
+    this.classList.remove('active');
+});
+function copyWebUrl() {
+    const url = 'https://code.pgrm.run/mk/{{ current_market or "kn" }}/plugin/{{ plugin.id }}';
+    navigator.clipboard.writeText(url).then(function() {
+        alert('链接已复制到剪贴板！');
+    }).catch(function() {
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('链接已复制到剪贴板！');
+    });
+}
+
+function confirmDelete() {
+    if (confirm('确定要擦除此插件吗？此操作将永久删除插件记录，不可恢复！')) {
+        window.location.href = '/mk/{{ current_market or "kn" }}/delete/{{ plugin.id }}';
+    }
+}
+</script>
+</body>
+</html>

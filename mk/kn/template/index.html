@@ -3,29 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KE Expanse · 插件市场</title>
+<title>插件市场</title>
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 <link rel="shortcut icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="env.css">
 <style>
 /* ===== 插件市场专属(复用官网主题变量,三主题自动适配) ===== */
-.mk-hero { min-height:0; display:flex; align-items:center; padding:116px 6vw 10px; }
+.mk-hero { min-height:0; display:flex; align-items:center; padding:30vh 6vw 0; }
 .mk-hero .text-area { max-width:760px; margin:0 auto; text-align:center; }
 .mk-hero-logo { display:flex; flex:none; }
 .mk-hero-logo .logo-img { height:52px; width:auto; border-radius:13px; }
 .mk-hero-title { display:flex; align-items:center; justify-content:center; gap:16px; }
 .mk-hero-title h1 { margin:0; }
 .mk-hero-sub { font-size:16px; line-height:1.7; color:var(--text-2); margin:14px auto 0; max-width:520px; }
-.mk-search { position:relative; display:flex; align-items:center; gap:10px; max-width:520px; margin:22px auto 0; padding:0 8px 0 18px; height:54px; border-radius:30px; background:var(--glass-card); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); transition:box-shadow .3s,background .3s; }
+.mk-search { position:relative; display:flex; align-items:center; gap:10px; max-width:520px; margin:18px auto 0; padding:0 8px 0 18px; height:54px; border-radius:30px; background:var(--glass-card); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); transition:box-shadow .3s,background .3s; }
 .mk-search:focus-within { box-shadow:0 0 0 2px var(--accent-1), inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); }
 .mk-search svg { flex:none; color:var(--text-3); }
 .mk-search input { flex:1; min-width:0; background:transparent; border:none; outline:none; color:var(--text-1); font-size:15px; font-family:inherit; height:100%; }
 .mk-search input::placeholder { color:var(--text-3); }
 .mk-search input::-webkit-search-cancel-button { -webkit-appearance:none; }
-.mk-sec { padding:2px 6vw 80px; max-width:1400px; margin:0 auto; }
+.mk-sec { padding:0 6vw 80px; max-width:1400px; margin:0 auto; }
 .mk-sorts { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px; }
-.mk-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.mk-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
 .mk-pop-wrap { position:relative; }
 .mk-pop-btn { display:inline-flex; align-items:center; gap:7px; padding:8px 16px; border-radius:20px; border:none; cursor:pointer; font-size:13px; font-weight:700; font-family:inherit; color:var(--text-1); background:var(--glass-card); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); transition:color .25s,background .25s,transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .3s; }
 .mk-pop-btn:hover { color:var(--accent-1); transform:translateY(-2px) scale(1.03); box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); }
@@ -55,10 +55,10 @@ body.lite-mode .mk-menu-item.cur { background:var(--glass-tint-2); }
 .nav-more-caret { transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
 .nav-more-btn[aria-expanded="true"] .nav-more-caret { transform:rotate(180deg); }
 /* 菜单弹出时放开 header 的 overflow:hidden,避免被裁剪 */
-header.more-open { overflow:visible !important; }
-.nav-more-menu { position:absolute; top:calc(100% + 10px); right:0; min-width:178px; padding:8px; border-radius:18px; background:rgba(255,255,255,.62); backdrop-filter:blur(30px) saturate(200%); -webkit-backdrop-filter:blur(30px) saturate(200%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), inset 0 -1px 0 rgba(0,0,0,.08), var(--shadow-hover); opacity:0; visibility:hidden; transform:translateY(-8px) scale(.94); transform-origin:top right; transition:opacity .3s ease,transform .4s cubic-bezier(.34,1.56,.64,1),visibility .4s; z-index:2000; }
-body.dark-mode .nav-more-menu { background:rgba(24,30,58,.9); box-shadow:inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.3), var(--shadow-hover); }
-.nav-more-wrap:hover .nav-more-menu, .nav-more-menu.show { opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+header.more-open { overflow:visible !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+.nav-more-menu { position:absolute; top:calc(100% + 10px); right:0; min-width:178px; padding:8px; border-radius:18px; background:rgba(255,255,255,.5); backdrop-filter:blur(40px) saturate(220%); -webkit-backdrop-filter:blur(40px) saturate(220%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), inset 0 -1px 0 rgba(0,0,0,.08), 0 18px 44px rgba(30,40,80,.25); opacity:0; visibility:visible; transform:translateY(-8px) scale(.94); transform-origin:top right; transition:opacity .35s ease,transform .45s cubic-bezier(.34,1.56,.64,1); pointer-events:none; z-index:2000; }
+body.dark-mode .nav-more-menu { background:rgba(20,26,50,.62); backdrop-filter:blur(40px) saturate(220%); -webkit-backdrop-filter:blur(40px) saturate(220%); box-shadow:inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.3), 0 18px 44px rgba(0,0,0,.5); }
+.nav-more-wrap:hover .nav-more-menu, .nav-more-menu.show { opacity:1; visibility:visible; transform:translateY(0) scale(1); pointer-events:auto; }
 .nav-more-menu a { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:30px; background:var(--glass-tint); color:var(--text-2); font-size:13px; font-weight:700; text-decoration:none; transition:color .25s,background .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
 .nav-more-menu a:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateX(3px); }
 body.lite-mode .nav-more-menu { background:var(--solid-glass); backdrop-filter:none; -webkit-backdrop-filter:none; }
@@ -96,8 +96,8 @@ body.lite-mode .nav-more-menu { background:var(--solid-glass); backdrop-filter:n
   .nav-links a { padding:6px 11px; font-size:13px; gap:5px; }
   .nav-links a svg { width:13px; height:13px; }
 }
-.mk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:22px; }
-.mk-card { position:relative; display:flex; gap:14px; padding:18px; border-radius:20px; background:var(--glass-card); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)); transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .45s,background .4s; cursor:pointer; }
+.mk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:3px; }
+.mk-card { position:relative; display:flex; gap:12px; padding:15px; border-radius:20px; background:var(--glass-card); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)); transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .45s,background .4s; cursor:pointer; }
 .mk-card::after { content:''; position:absolute; inset:0; border-radius:inherit; z-index:-1; background:linear-gradient(135deg,var(--glass-tint),transparent 60%); opacity:0; transition:opacity .45s ease; }
 .mk-card:hover { box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); --ty:-5px; }
 .mk-card:hover::after { opacity:1; }
@@ -124,6 +124,8 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
 .mk-info { font-size:13.5px; font-weight:700; color:var(--text-3); letter-spacing:1px; }
 .mk-pg-btn { display:inline-flex; align-items:center; gap:7px; }
 .mk-pg-btn:disabled { opacity:.4; pointer-events:none; }
+@keyframes mkPop { from { opacity:0; transform:translateY(14px) scale(.97); } to { opacity:1; } }
+.mk-render .mk-card { animation:mkPop .45s cubic-bezier(.34,1.56,.64,1) backwards; }
 @media (max-width:720px) {
   .mk-sec { padding:44px 5vw 64px; }
   .mk-grid { grid-template-columns:1fr; }
@@ -153,11 +155,11 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
   <div class="nav-left">
     <span class="menu-title" id="menuTitle"><span data-i18n="menu_title">导航菜单</span></span>
     <div class="logo">
-      <img class="logo-img th-def" id="logoImg" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KE Expanse">
-      <img class="logo-img th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KE Expanse">
-      <img class="logo-img th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KE Expanse">
+      <img class="logo-img th-def" id="logoImg" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse">
+      <img class="logo-img th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse">
+      <img class="logo-img th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse">
       <span class="logo-mark" id="logoMark" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><rect x="7" y="7" width="10" height="10" rx="3"/></svg></span>
-      KE Expanse
+      KN Expanse
     </div>
         <nav class="nav-links" id="navLinks" aria-label="主导航">
       <a href="https://code.pgrm.run/mk/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg><span data-i18n="mk_home">首页</span></a>
@@ -185,15 +187,6 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
       </button>
       
     </div>
-    <div class="perf-wrap">
-      <button class="icon-btn" id="perfBtn" aria-label="节能模式" title="节能模式">
-        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg>
-      </button>
-      
-    </div>
-    <button class="icon-btn" id="themeToggle" aria-label="切换主题" title="切换主题">
-      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/><circle cx="7.5" cy="11.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="10.2" cy="7.6" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.8" cy="7.6" r="1.2" fill="currentColor" stroke="none"/></svg>
-    </button>
     
     <button class="icon-btn" id="qqBtn" aria-label="加入QQ群" style="display:none">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H7l-4 3 1.3-4.7A8 8 0 1 1 21 12Z"/><path d="M9 10.3h6M9 13.7h4"/></svg>
@@ -202,7 +195,15 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     <button class="icon-btn" id="qrBtn" aria-label="二维码">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg>
     </button>
-    <button class="icon-btn" id="lookBtn" aria-label="外观设置">
+    <div class="perf-wrap">
+      <button class="icon-btn" id="perfBtn" aria-label="节能模式" title="节能模式">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg>
+      </button>
+    </div>
+    <button class="icon-btn" id="themeToggle" aria-label="切换主题" title="切换主题">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg>
+    </button>
+    <button class="icon-btn" id="lookBtn" aria-label="外观设置" style="display:none">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7.5 16.5 4h-1.2a2.8 2.8 0 0 1-6.6 0H7.5L4 7.5l2.6 2.2 1-1.1V20h8.8V8.6l1 1.1Z"/></svg>
     </button>
     <div class="lang-wrap">
@@ -223,16 +224,16 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
   <div class="text-area">
     <div class="mk-hero-title reveal in">
       <div class="mk-hero-logo">
-        <img class="logo-img th-def" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KE Expanse">
-        <img class="logo-img th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KE Expanse">
-        <img class="logo-img th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KE Expanse">
+        <img class="logo-img th-def" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse">
+        <img class="logo-img th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse">
+        <img class="logo-img th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse">
       </div>
       <h1>
         <span class="grad" data-i18n="mk_badge">插件市场</span>
         <span class="handwritten" data-i18n="mk_sub">market</span>
       </h1>
     </div>
-    <p class="mk-hero-sub reveal in" data-i18n="mk_desc">搜索并安装社区精选插件,一键为 KE Expanse 添加强大能力。</p>
+    <p class="mk-hero-sub reveal in" data-i18n="mk_desc">搜索并安装社区精选插件,一键为 KN Expanse 添加强大能力。</p>
     <div class="mk-search reveal in">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="mkInput" type="search" autocomplete="off" data-i18n-ph="mk_ph" placeholder="搜索插件名称 / 标签 / 作者">
@@ -277,12 +278,12 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
 
 <footer>
   <div style="display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--text-2)">
-    <img class="footer-logo th-def" id="footerLogo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KE Expanse" loading="lazy">
-    <img class="footer-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KE Expanse" loading="lazy">
-    <img class="footer-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KE Expanse" loading="lazy">
+    <img class="footer-logo th-def" id="footerLogo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse" loading="lazy">
+    <img class="footer-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse" loading="lazy">
+    <img class="footer-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse" loading="lazy">
     <span class="logo-mark footer-mark" id="footerMark" style="width:26px;height:26px;border-radius:8px">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><rect x="7" y="7" width="10" height="10" rx="3"/></svg>
-    </span> KE Expanse
+    </span> KN Expanse
   </div>
   <p style="margin-top:10px"><span data-i18n="footer_note">用热爱创造无限可能</span></p>
   <div class="fl-links">
@@ -305,8 +306,8 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
       <button class="tp-item" data-i="3" style="--c:#0b1020;--tint:rgba(11,16,32,.18)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2.5 14.2 9.8 21.5 12l-7.3 2.2L12 21.5 9.8 14.2 2.5 12l7.3-2.2Z"/></svg></span><span data-i18n="theme_dark">暗夜模式</span></button>
     </div>
     <div class="qq-pop" id="qqPop">
-      <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mJqezETEdhmnMoucEwbiIyjhXm4bgACeioAAmsm2FcKDclIeIoVyz0E.png" alt="KE Expanse QQ群">
-      <span data-i18n="qq_title">KE Expanse 官方交流群</span>
+      <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mJqezETEdhmnMoucEwbiIyjhXm4bgACeioAAmsm2FcKDclIeIoVyz0E.png" alt="KN Expanse QQ群">
+      <span data-i18n="qq_title">KN Expanse 官方交流群</span>
     </div>
     <div class="perf-pop" id="perfPop">
         <span id="perfPopState" data-i18n="perf_state_off">节能模式 · 已关闭</span>
@@ -346,7 +347,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     </div>
     <div class="qr-pane" data-q="q">
       <img id="qrQ" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mJqezETEdhmnMoucEwbiIyjhXm4bgACeioAAmsm2FcKDclIeIoVyz0E.png" alt="QQ 群">
-      <span class="qr-name" data-i18n="qq_title">KE Expanse 官方交流群</span>
+      <span class="qr-name" data-i18n="qq_title">KN Expanse 官方交流群</span>
     </div>
   </div>
 </div>
@@ -354,7 +355,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
 <div class="qr-modal" id="qrModal">
   <div class="qr-modal-box">
     <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZCd1qfEJzDF0wJ6vVFg3WQf-QeQIjNwACCyMAAkWI6FcCA6Hs1_s1CD0E.png" alt="安卓下载二维码">
-    <p data-i18n="qr_scan_tip">手机扫码,立即下载 KE Expanse</p>
+    <p data-i18n="qr_scan_tip">手机扫码,立即下载 KN Expanse</p>
     <button class="qr-modal-close" id="qrModalClose">关闭</button>
   </div>
 </div>
@@ -376,7 +377,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     <button class="m-dl-tool" id="mDlQr" aria-label="QQ 群二维码"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14h1M14 20h1M17 17v4M21 17v1"/></svg></button>
   </div>
   <div class="m-dl-inner">
-    <img class="m-dl-logo th-def" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KE Expanse"><img class="m-dl-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KE Expanse"><img class="m-dl-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KE Expanse">
+    <img class="m-dl-logo th-def" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse"><img class="m-dl-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KN Expanse"><img class="m-dl-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KN Expanse">
     <h1 class="m-dl-hero"><span data-i18n="hero_t1">现代化图形化编辑器</span><br><span class="m-dl-grad" data-i18n="hero_t2">为生态而生</span><span class="m-dl-hand" data-i18n="hero_t3">for creators</span></h1>
     <a class="m-dl-btn" id="mDlAndroid" href="https://code.pgrm.run/localcdn/2/app-debug.apk" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="m_android">安卓下载</span></a>
     <button class="m-dl-btn ios" id="mDlIos" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.7-1 2-1.4 3-1 1 .5 1.5 1.5 1.4 2.6-.9.4-2 .4-3 .3-.5-.7-.9-1.3-1.4-1.9Z"/><path d="M16.5 8.2c1.9 2 2.8 4.5 2.4 7.1-.5 3.3-2.8 5.7-6 5.7h-1.8c-3.2 0-5.5-2.4-6-5.7-.4-2.6.5-5.1 2.4-7.1.3-.3.7-.4 1.1-.3.8.2 1.6.2 2.4 0 .9-.2 1.8-.2 2.7 0 .8.2 1.7.2 2.4 0 .4-.1.8 0 1.1.3Z"/></svg><span data-i18n="m_ios">iOS 下载</span></button>
@@ -554,8 +555,13 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
   function hidePop() { popTimer = setTimeout(function () { themePop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
   /* 按钮悬停 200ms 才打开悬浮窗:鼠标扫过相邻按钮不误触 */
   var themeOpenT = null;
-  themeToggle.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(themeOpenT); themeOpenT = setTimeout(showPop, 300); });
-  themeToggle.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(themeOpenT); hidePop(); });
+    themeToggle.addEventListener('click', function () {
+    curIdx = (curIdx === 0) ? 3 : 0;
+    applyTheme();
+    try { closeAllPops(); } catch (e) {}
+  });
+  /* 悬浮窗禁用:改为点击直接切换 */
+  if (typeof themePop === 'object' && themePop) { themePop.classList.remove('show'); }
   themePop.addEventListener('mouseenter', showPop);
   themePop.addEventListener('mouseleave', hidePop);
   /* QQ 群悬浮窗 */
@@ -722,7 +728,8 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     navMoreT = setTimeout(function () {
       navMoreMenu.classList.remove('show');
       if (navMoreBtn) navMoreBtn.setAttribute('aria-expanded', 'false');
-      if (header) header.classList.remove('more-open');
+      /* 等淡出动画(≈500ms)结束再收回 overflow,避免遮罩裁剪关闭动画 */
+      if (header) setTimeout(function () { header.classList.remove('more-open'); }, 520);
     }, 180);
   }
   if (navMoreWrap) {
@@ -758,7 +765,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
   }
   function setLite(on) {
     document.body.classList.toggle('lite-mode', on);
-    perfBtn.classList.toggle('lite', on);
+    if (perfBtn) perfBtn.classList.toggle('lite', on);
     try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
     if (on) {
       particlesBox.innerHTML = '';
@@ -769,16 +776,16 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     }
     perfPopSync();
   }
-  perfBtn.addEventListener('click', function () {
+  if (perfBtn) perfBtn.addEventListener('click', function () {
     setLite(!document.body.classList.contains('lite-mode'));
   }, { passive: true });
-  if (document.body.classList.contains('lite-mode')) perfBtn.classList.add('lite');
+  if (perfBtn && document.body.classList.contains('lite-mode')) perfBtn.classList.add('lite');
   var perfTimer = null;
   function showPerfPop() { if (!isMobileUA && otherPopOpen('.perf-pop.show')) return; clearTimeout(perfTimer); themePop.classList.remove('show'); clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(perfPop, perfBtn); perfPopSync(); perfPop.classList.add('show'); unlockBtnId = 'perfBtn'; syncNavLock(); }
   function hidePerfPop() { perfTimer = setTimeout(function () { perfPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
   var perfOpenT = null;
-  perfBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(perfOpenT); perfOpenT = setTimeout(showPerfPop, 300); });
-  perfBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(perfOpenT); hidePerfPop(); });
+  if (perfBtn) perfBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(perfOpenT); perfOpenT = setTimeout(showPerfPop, 300); });
+  if (perfBtn) perfBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(perfOpenT); hidePerfPop(); });
   perfPop.addEventListener('mouseenter', showPerfPop);
   perfPop.addEventListener('mouseleave', hidePerfPop);
   perfPopSync();
@@ -848,7 +855,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     btn_dl:{zh:'立即下载',en:'Download Now',ja:'今すぐダウンロード',ko:'지금 다운로드',es:'Descargar Ahora',tw:'立即下載'},
     btn_docs:{zh:'开发文档',en:'Docs',ja:'ドキュメント',ko:'문서',es:'Documentación',tw:'開發文档'},
     btn_more:{zh:'其他产品',en:'More Products',ja:'他の製品',ko:'다른 제품',es:'Otros Productos',tw:'其他产品'},
-    term_title:{zh:'拥抱 KE Expanse',en:'Embrace KE Expanse',ja:'KE Expanse を抱きしめよう',ko:'KE Expanse를 안아보세요',es:'Abraza KE Expanse',tw:'擁抱 KE Expanse'},
+    term_title:{zh:'拥抱 KN Expanse',en:'Embrace KN Expanse',ja:'KN Expanse を抱きしめよう',ko:'KN Expanse를 안아보세요',es:'Abraza KN Expanse',tw:'擁抱 KN Expanse'},
     why_title:{zh:'为什么选择 ',en:'Why Choose ',ja:'選ばれる理由 ',ko:'선택하는 이유 ',es:'¿Por qué ',tw:'為什么選擇 '},
     core_sub:{zh:'核心能力',en:'Core Powers',ja:'コア機能',ko:'핵심 기능',es:'Poderes Clave',tw:'核心能力'},
     ext_sub:{zh:'为创作加速',en:'Speed Up Creation',ja:'創作を加速',ko:'창작을 가속',es:'Acelera tu Creación',tw:'為創作加速'},
@@ -859,7 +866,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     step_sub:{zh:'创作之旅',en:'Creation Journey',ja:'創作の旅',ko:'창작 여정',es:'Viaje Creativo',tw:'創作之旅'},
     dl_title:{zh:'立即开始创作',en:'Start Creating Now',ja:'今すぐ創作開始',ko:'지금 바로 창작',es:'Empieza a Crear',tw:'立即開始創作'},
     footer_note:{zh:'用热爱创造无限可能',en:'Creating with passion',ja:'情熱で無限の可能性を',ko:'열정으로 무한한 가능성을',es:'Creando con pasión',tw:'用熱愛創造無限可能'},
-    qq_title:{zh:'KE Expanse 官方交流群',en:'KE Expanse Official Group',ja:'KE Expanse 公式コミュニティ',ko:'KE Expanse 공식 커뮤니티',es:'Grupo Oficial KE Expanse',tw:'KE Expanse 官方交流群'},
+    qq_title:{zh:'KN Expanse 官方交流群',en:'KN Expanse Official Group',ja:'KN Expanse 公式コミュニティ',ko:'KN Expanse 공식 커뮤니티',es:'Grupo Oficial KN Expanse',tw:'KN Expanse 官方交流群'},
     m_title:{zh:'移动端下载',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil'},
     m_note:{zh:'移动端下载',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil',tw:'移動端下載'},
     perf_desc:{zh:'关闭特效 · 保留流畅基础体验',en:'Disable effects · Keep smooth basics',ja:'エフェクトOFF · 快適な基本体験を維持',ko:'효과 OFF · 부드러운 기본 경험 유지',es:'Desactivar efectos · Base fluida',tw:'關閉特效 · 保留流暢基礎體驗'},
@@ -934,9 +941,9 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     ext3_desc:{zh:'图表节点与仪表盘模板,让游戏数据流动起来,复盘一目了然。',en:'Chart nodes and dashboard templates — make game data flow and reviews crystal clear.',ja:'チャートノードとダッシュボードで、ゲームデータを見える化し振り返りも一目瞭然。',ko:'차트 노드와 대시보드 템플릿으로 게임 데이터를 시각화, 분석이 한눈에.',es:'Nodos de gráficos y plantillas de panel: visualiza datos del juego y analiza con claridad.',tw:'圖表節點与仪表盤模板,讓游戏數據流動起來,復盤一目了然。'},
     ext_view:{zh:'查看',en:'View',ja:'見る',ko:'보기',es:'Ver',tw:'查看'},
     ext_market:{zh:'进入正式插件市场',en:'Go to Plugin Market',ja:'公式プラグインマーケットへ',ko:'공식 플러그인 마켓으로',es:'Ir al Mercado de Plugins',tw:'進入正式插件市場'},
-    dl_sub:{zh:'选择你的平台,下载 KE Expanse 桌面版',en:'Choose your platform and download KE Expanse desktop',ja:'プラットフォームを選んで KE Expanse デスクトップ版をダウンロード',ko:'플랫폼을 선택하고 KE Expanse 데스크톱을 다운로드하세요',es:'Elige tu plataforma y descarga KE Expanse para escritorio',tw:'選擇你的平台,下載 KE Expanse 桌面版'},
+    dl_sub:{zh:'选择你的平台,下载 KN Expanse 桌面版',en:'Choose your platform and download KN Expanse desktop',ja:'プラットフォームを選んで KN Expanse デスクトップ版をダウンロード',ko:'플랫폼을 선택하고 KN Expanse 데스크톱을 다운로드하세요',es:'Elige tu plataforma y descarga KN Expanse para escritorio',tw:'選擇你的平台,下載 KN Expanse 桌面版'},
     dl_win:{zh:'Windows',en:'Windows',ja:'Windows',ko:'Windows',es:'Windows',tw:'Windows'},
-    dl_win_ver:{zh:'KE Expanse v1.3.0 · 64位 exe',en:'KE Expanse v1.3.0 · 64-bit exe',ja:'KE Expanse v1.3.0 · 64bit exe',ko:'KE Expanse v1.3.0 · 64비트 exe',es:'KE Expanse v1.3.0 · exe 64 bits',tw:'KE Expanse v1.3.0 · 64位 exe'},
+    dl_win_ver:{zh:'KN Expanse v1.3.0 · 64位 exe',en:'KN Expanse v1.3.0 · 64-bit exe',ja:'KN Expanse v1.3.0 · 64bit exe',ko:'KN Expanse v1.3.0 · 64비트 exe',es:'KN Expanse v1.3.0 · exe 64 bits',tw:'KN Expanse v1.3.0 · 64位 exe'},
     dl_mac:{zh:'macOS',en:'macOS',ja:'macOS',ko:'macOS',es:'macOS',tw:'macOS'},
     dl_mac_ver:{zh:'Apple Silicon / Intel · 研发中',en:'Apple Silicon / Intel · In Development',ja:'Apple Silicon / Intel · 開発中',ko:'Apple Silicon / Intel · 개발 중',es:'Apple Silicon / Intel · En desarrollo',tw:'Apple Silicon / Intel · 研發中'},
     dl_linux:{zh:'Linux',en:'Linux',ja:'Linux',ko:'Linux',es:'Linux',tw:'Linux'},
@@ -984,7 +991,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     fl_0:{zh:'点猫科技',tw:'點貓科技',en:'Codemao',ja:'CodeMao',ko:'Codemao',es:'Codemao'},
     fl_1:{zh:'KNHX工作室',tw:'KNHX工作室',en:'KNHX Studio',ja:'KNHXスタジオ',ko:'KNHX 스튜디오',es:'KNHX Studio'},
     fl_2:{zh:'CatCode',tw:'CatCode',en:'CatCode',ja:'CatCode',ko:'CatCode',es:'CatCode'},
-    qr_scan_tip:{zh:'手机扫码,立即下载 KE Expanse',tw:'手機掃碼,立即下載 KE Expanse',en:'Scan with your phone to download KE Expanse now',ja:'スマホでQRコードを読み取り、今すぐKE Expanseをダウンロード',ko:'휴대폰으로 QR코드를 스캔해 KE Expanse를 바로 다운로드하세요',es:'Escanea con tu móvil y descarga KE Expanse ahora'}
+    qr_scan_tip:{zh:'手机扫码,立即下载 KN Expanse',tw:'手機掃碼,立即下載 KN Expanse',en:'Scan with your phone to download KN Expanse now',ja:'スマホでQRコードを読み取り、今すぐKN Expanseをダウンロード',ko:'휴대폰으로 QR코드를 스캔해 KN Expanse를 바로 다운로드하세요',es:'Escanea con tu móvil y descarga KN Expanse ahora'}
   };
   Object.keys(I18N_CR).forEach(function (k) { I18N[k] = I18N_CR[k]; });
   var I18N_NEW = {
@@ -1028,7 +1035,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     mk_t1:{zh:'发现优秀插件',tw:'發現優秀插件',en:'Discover Great Plugins',ja:'素晴らしいプラグインを見つける',ko:'훌륭한 플러그인 발견',es:'Descubre Grandes Plugins'},
     mk_t2:{zh:'为创作加速',tw:'為創作加速',en:'Speed Up Creation',ja:'創作を加速',ko:'창작을 가속',es:'Acelera tu Creación'},
     mk_t3:{zh:'plugins',en:'plugins',ja:'plugins',ko:'plugins',es:'plugins',tw:'plugins'},
-    mk_desc:{zh:'搜索并安装社区精选插件,一键为 KE Expanse 添加强大能力,让创作更进一步。',tw:'搜索並安裝社區精選插件,一鍵為 KE Expanse 添加强大能力,讓創作更進一步。',en:'Search and install community-picked plugins to supercharge KE Expanse and take your creations further.',ja:'コミュニティ厳選のプラグインを検索・インストールして、KE Expanse の可能性を広げよう。',ko:'커뮤니티 선별 플러그인을 검색하고 설치해 KE Expanse를 더 강력하게.',es:'Busca e instala plugins seleccionados por la comunidad para potenciar KE Expanse.'},
+    mk_desc:{zh:'搜索并安装社区精选插件,一键为 KN Expanse 添加强大能力,让创作更进一步。',tw:'搜索並安裝社區精選插件,一鍵為 KN Expanse 添加强大能力,讓創作更進一步。',en:'Search and install community-picked plugins to supercharge KN Expanse and take your creations further.',ja:'コミュニティ厳選のプラグインを検索・インストールして、KN Expanse の可能性を広げよう。',ko:'커뮤니티 선별 플러그인을 검색하고 설치해 KN Expanse를 더 강력하게.',es:'Busca e instala plugins seleccionados por la comunidad para potenciar KN Expanse.'},
     mk_ph:{zh:'搜索插件名称 / 标签 / 作者',tw:'搜索插件名稱 / 標籤 / 作者',en:'Search by name / tag / author',ja:'名前 / タグ / 作者で検索',ko:'이름 / 태그 / 작성자 검색',es:'Buscar por nombre / etiqueta / autor'},
     mk_empty:{zh:'没有找到匹配的插件',tw:'沒有找到匹配的插件',en:'No matching plugins found',ja:'一致するプラグインが見つかりません',ko:'일치하는 플러그인이 없습니다',es:'No se encontraron plugins'},
     mk_prev:{zh:'上一页',tw:'上一頁',en:'Prev',ja:'前へ',ko:'이전',es:'Anterior'},
@@ -1560,7 +1567,12 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
         '</span></div>' +
         '</div></div>';
     }).join('');
+    grid.classList.remove('mk-render');
+    void grid.offsetWidth;
     grid.innerHTML = cards;
+    var mkCards = grid.querySelectorAll('.mk-card');
+    for (var mi = 0; mi < mkCards.length; mi++) { mkCards[mi].style.animationDelay = (mi * 0.05) + 's'; }
+    grid.classList.add('mk-render');
 
     if (pager) {
       pager.style.display = totalPages > 1 ? 'flex' : 'none';
@@ -1647,6 +1659,26 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     });
   } catch (e) {}
   applyTheme();
+})();
+
+/* ===== 访问提示通知(仅移动端,只提示不禁用) ===== */
+(function () {
+  var ua = navigator.userAgent || '';
+  var isMobile = /Android|iPhone|iPad|iPod|Windows Phone|Mobile|Mobi/i.test(ua);
+  if (!isMobile) return;
+  function showNotice() {
+    var el = document.createElement('div');
+    el.style.cssText = 'position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(24px);max-width:88vw;background:rgba(22,28,52,.88);color:#fff;padding:13px 22px;border-radius:16px;font-size:13.5px;line-height:1.65;font-weight:600;box-shadow:0 22px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:99999;opacity:0;transition:opacity .4s,transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;';
+    el.textContent = '提示：当前网页不支持右键复制和粘贴，移动端未做适配，可能存在浏览问题，请使用桌面端访问。';
+    document.body.appendChild(el);
+    requestAnimationFrame(function () { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)'; });
+    setTimeout(function () {
+      el.style.opacity = '0'; el.style.transform = 'translateX(-50%) translateY(24px)';
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
+    }, 6500);
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(showNotice, 900);
+  else window.addEventListener('load', function () { setTimeout(showNotice, 900); });
 })();
 </script>
 </body>
