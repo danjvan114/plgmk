@@ -108,15 +108,21 @@ class ForumAPI:
             resp = self.session.post(
                 f"{self.server}/login",
                 data={"username": self.user, "password": self.password},
-                allow_redirects=False,
+                allow_redirects=True,
                 timeout=10
             )
-            if resp.status_code in [200, 302]:
+            if resp.status_code == 200:
                 self.logged_in = True
                 return True, "登录成功"
-            return False, "登录失败"
+            return False, f"登录失败 (状态码: {resp.status_code})"
         except Exception as e:
             return False, f"登录异常: {str(e)}"
+    
+    def ensure_login(self):
+        """确保已登录"""
+        if not self.logged_in:
+            return self.login()
+        return True, "已登录"
     
     def get_latest_posts(self, limit=10):
         """获取最新帖子"""
@@ -147,6 +153,11 @@ class ForumAPI:
     
     def reply_post(self, post_id, content):
         """回复帖子"""
+        # 确保已登录
+        success, msg = self.ensure_login()
+        if not success:
+            return False, f"登录失败: {msg}"
+        
         try:
             resp = self.session.post(
                 f"{self.server}/forum/reply/{post_id}",
@@ -156,12 +167,17 @@ class ForumAPI:
             if resp.status_code == 200:
                 data = resp.json()
                 return data.get("success", False), data.get("message", "")
-            return False, "回复失败"
+            return False, f"回复失败 (状态码: {resp.status_code})"
         except Exception as e:
             return False, f"回复异常: {str(e)}"
     
     def create_post(self, forum_id, title, content):
         """创建帖子"""
+        # 确保已登录
+        success, msg = self.ensure_login()
+        if not success:
+            return False, f"登录失败: {msg}", 0
+        
         try:
             resp = self.session.post(
                 f"{self.server}/forum/new",
@@ -171,7 +187,7 @@ class ForumAPI:
             if resp.status_code == 200:
                 data = resp.json()
                 return data.get("success", False), data.get("message", ""), data.get("post_id", 0)
-            return False, "发帖失败", 0
+            return False, f"发帖失败 (状态码: {resp.status_code})", 0
         except Exception as e:
             return False, f"发帖异常: {str(e)}", 0
 
