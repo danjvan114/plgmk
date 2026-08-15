@@ -6,6 +6,8 @@
 <title>插件详情</title>
 <link rel="stylesheet" href="/localcdn/project/ked/styles.css">
 <link rel="stylesheet" href="/localcdn/project/ked/env.css">
+<link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+<script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 <style>
 /* ===== 官网基础样式(内嵌,自包含) ===== */
@@ -891,35 +893,71 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
   .page-box { padding:104px 14px 50px; }
   .nav-links { display:none; }
   .search { width:140px; }
+  .content-wrapper { padding:0 16px; }
+  .detail-layout { grid-template-columns:1fr; }
+  .detail-sidebar { position:static; }
+  .detail-sidebar .stats { grid-template-columns:repeat(3,1fr); }
+  .detail-sidebar .stat-item.card { padding:12px 8px; }
+  .detail-sidebar .stat-item .stat-value { font-size:18px; }
+  .detail-sidebar .stat-item .stat-label { font-size:11px; }
+  .detail-actions { flex-direction:row; flex-wrap:wrap; }
+  .detail-actions .btn { width:auto; justify-content:center; flex:1; min-width:120px; }
+  .mdui-tab-item { min-width:80px; padding:12px 16px; font-size:13px; }
+  .mdui-tab-item i { margin-right:4px; }
 }
 
 /* ===== 插件详情 ===== */
-.detail-glow { position:absolute; top:-80px; right:-40px; width:260px; height:260px; border-radius:50%; background:radial-gradient(circle,var(--accent-glow),transparent 65%); filter:blur(30px); pointer-events:none; z-index:0; }
-.card { overflow:hidden; }
-.card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2),transparent); z-index:1; }
-.detail-header { position:relative; padding:28px 20px 24px; margin:-8px -4px 26px; border-radius:18px; background:linear-gradient(135deg,var(--glass-tint),transparent 75%); box-shadow:inset 0 1px 0 var(--glass-hi-top); }
-.detail-header::after { content:''; position:absolute; left:0; right:0; bottom:0; height:1px; background:linear-gradient(90deg,var(--accent-1),transparent 70%); opacity:.55; }
-.detail-header .page-title { font-size:clamp(26px,4vw,36px); background:var(--grad-title); -webkit-background-clip:text; background-clip:text; color:transparent; font-weight:900; letter-spacing:.5px; }
-.detail-header .meta { display:flex; align-items:center; gap:10px; margin:18px 0 0; flex-wrap:wrap; }
-.detail-header .meta > span { display:inline-flex; align-items:center; gap:6px; padding:6px 15px; border-radius:20px; font-size:13px; font-weight:600; color:var(--text-2); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); transition:transform .35s cubic-bezier(.34,1.56,.64,1),color .25s,box-shadow .3s; }
-.detail-header .meta > span:hover { transform:translateY(-2px); color:var(--accent-1); box-shadow:inset 0 1px 0 var(--glass-hi-top), 0 8px 20px var(--accent-glow); }
-.detail-header .meta .rating { color:var(--warn); font-weight:800; }
-.detail-header .tag-list { margin-top:16px; }
-.detail-body h2 { margin:28px 0 16px; font-size:19px; font-weight:800; display:flex; align-items:center; gap:9px; }
-.detail-body h2::before { content:''; width:4px; height:18px; border-radius:4px; background:var(--grad-btn); box-shadow:0 0 10px var(--accent-glow); }
-.detail-body p { color:var(--text-2); line-height:2; font-size:15px; }
-.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-top:30px; }
-.stat-item { text-align:center; padding:22px 16px; border-radius:18px; background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); }
-.stat-value { font-size:28px; font-weight:900; color:var(--accent-1); }
-.stat-label { color:var(--text-3); font-size:13px; margin-top:5px; }
-.image-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-bottom:24px; }
-.gallery-image { width:100%; height:160px; object-fit:cover; border-radius:14px; cursor:pointer; box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow); transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .35s,filter .3s; }
-.gallery-image:hover { transform:scale(1.04); box-shadow:var(--shadow-hover); filter:brightness(1.05); }
+.content-wrapper { max-width:1400px; margin:0 auto; padding:0 32px; }
+.detail-glow { position:absolute; top:-60px; right:-30px; width:200px; height:200px; border-radius:50%; background:radial-gradient(circle,var(--accent-glow),transparent 65%); filter:blur(25px); pointer-events:none; z-index:0; }
+.card { overflow:hidden; position:relative; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2),transparent); z-index:1; }
+.detail-hero { position:relative; overflow:hidden; padding:20px 24px 16px; margin-bottom:16px; border-radius:18px; }
+.detail-hero .page-title { font-size:clamp(22px,3vw,30px); font-weight:900; margin:0 0 10px; background:linear-gradient(120deg,var(--accent-1),var(--accent-2)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
+.detail-hero .meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.meta-badge { display:inline-flex; align-items:center; gap:4px; padding:4px 11px; border-radius:16px; font-size:12px; font-weight:700; color:var(--text-2); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top); }
+.meta-badge.rating { color:var(--accent-1); }
+
+/* MDUI Tab 样式 */
+.mdui-tab-container { background:var(--glass-strong); backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%); border-radius:16px; margin-bottom:16px; box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow); overflow:hidden; }
+.mdui-tab { display:flex; padding:0; margin:0; list-style:none; border-bottom:1px solid var(--border); overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; }
+.mdui-tab::-webkit-scrollbar { display:none; }
+.mdui-tab-item { flex:1; min-width:100px; padding:14px 20px; text-align:center; cursor:pointer; font-size:14px; font-weight:700; color:var(--text-3); transition:color .3s,background .3s; position:relative; border:none; background:transparent; }
+.mdui-tab-item:hover { color:var(--accent-1); background:var(--glass-tint); }
+.mdui-tab-item.active { color:var(--accent-1); }
+.mdui-tab-item.active::after { content:''; position:absolute; bottom:0; left:20%; right:20%; height:3px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); border-radius:3px 3px 0 0; box-shadow:0 0 10px var(--accent-glow); }
+.mdui-tab-item i { margin-right:6px; vertical-align:middle; }
+.tab-content { display:none; padding:20px 24px; }
+.tab-content.active { display:block; animation:fadeIn .3s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+.detail-sec { padding:0; margin-bottom:16px; }
+.sec-title { display:flex; align-items:center; gap:8px; font-size:16px; font-weight:800; margin:0 0 12px; }
+.sec-bar { width:3px; height:16px; border-radius:2px; background:linear-gradient(180deg,var(--accent-1),var(--accent-2)); box-shadow:0 0 8px var(--accent-glow); }
+.detail-desc { font-size:14px; line-height:1.8; color:var(--text-1); margin:0; white-space:pre-wrap; }
+.detail-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+.offline-tip { color:var(--danger); font-weight:700; font-size:14px; }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:0 0 12px; }
+.stat-item.card { padding:14px 10px; text-align:center; border-radius:16px; }
+.stat-value { font-size:22px; font-weight:900; color:var(--accent-1); }
+.stat-label { color:var(--text-3); font-size:12px; margin-top:3px; }
+.image-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; margin-bottom:12px; }
+.gallery-image { width:100%; height:120px; object-fit:cover; border-radius:12px; cursor:pointer; box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow); transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,filter .3s; }
+.gallery-image:hover { transform:scale(1.03); box-shadow:var(--shadow-hover); filter:brightness(1.05); }
 .image-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); justify-content:center; align-items:center; z-index:2000; }
 .image-modal.active { display:flex; }
 .modal-image { max-width:90%; max-height:90%; border-radius:14px; box-shadow:0 30px 80px rgba(0,0,0,.5); }
-.ttmp4-container { width:100%; height:500px; border-radius:16px; overflow:hidden; margin-bottom:20px; background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow); }
+.ttmp4-container { width:100%; height:380px; border-radius:14px; overflow:hidden; margin-bottom:12px; background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow); }
 .ttmp4-iframe { width:100%; height:100%; border:none; }
+
+/* 两列布局 */
+.detail-layout { display:grid; grid-template-columns:1fr 280px; gap:16px; align-items:start; }
+.detail-sidebar { position:sticky; top:140px; }
+.detail-sidebar .stats { display:grid; grid-template-columns:1fr; gap:8px; }
+.detail-sidebar .stat-item.card { padding:12px 14px; }
+.detail-sidebar .stat-item .stat-value { font-size:20px; }
+.detail-sidebar .stat-item .stat-label { font-size:11px; margin-top:2px; }
+.detail-actions { flex-direction:column; }
+.detail-actions .btn { width:100%; justify-content:center; padding:10px 16px; font-size:13px; }
 
 /* ===== 悬浮卡片(tilt 鼠标跟随)补充 ===== */
 .stat-item, .cc-feature, .cc-terminal, .cc-show-img, .cc-qr { transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)); transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .4s,background .3s; will-change:transform; }
@@ -948,23 +986,25 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
 </head>
 <body class="theme-aurora">
 <div id="particles"></div>
-<header>
-  <div class="nav-left">
-    <a class="logo" href="/mk/kn"><img class="logo-img" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse"><span>KE 插件市场</span></a>
-    <nav class="nav-links">
-      <a href="/mk/{{ current_market or 'kn' }}">插件市场</a>
-      <a href="javascript:history.back()">返回</a>
-    </nav>
-  </div>
-  <div class="nav-right">
-    <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"></button>
-    <button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button>
-  </div>
-</header>
-<main class="page-box">
-<div class="detail-nav">
-  <a href="javascript:history.back()" class="detail-back"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>返回列表</a>
+
+<div class="mdui-toolbar mdui-color-teal" style="position:fixed;top:0;left:0;right:0;z-index:99;">
+        <a class="mdui-ripple mdui-btn-icon" onclick="goBack()">
+            <i class="mdui-icon material-icons">arrow_back</i>
+        </a>
+        <span class="mdui-typo-title">{{ plugin.name }}</span>
+        <div class="mdui-toolbar-spacer"></div>
+        <div class="nav-right">
+          <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"></button>
+          <button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button>
+        </div>
+
+        
+      
 </div>
+  
+
+<main class="page-box">
+<div class="content-wrapper">
 
 <div class="detail-hero card">
   <div class="detail-glow"></div>
@@ -979,47 +1019,96 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
   <div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
 </div>
 
-{% if plugin.ttmp4_url %}
-<div class="detail-sec card">
-  <h2 class="sec-title"><span class="sec-bar"></span>预览</h2>
-  <div class="ttmp4-container"><iframe class="ttmp4-iframe" src="{{ plugin.ttmp4_url }}" sandbox="allow-scripts allow-same-origin allow-popups" allowfullscreen></iframe></div>
-</div>
-{% elif plugin.images and plugin.images|length > 0 %}
-<div class="detail-sec card">
-  <h2 class="sec-title"><span class="sec-bar"></span>插件预览</h2>
-  <div class="image-gallery">
-{% for img in plugin.images %}
-{% if img.url %}<img src="{{ img.url }}" class="gallery-image" onclick="openImage('{{ img.url }}')" alt="插件图片">{% endif %}
-{% endfor %}
+<!-- MDUI Tab 组件 -->
+<div class="mdui-tab-container">
+  <div class="mdui-tab">
+    <button class="mdui-tab-item mdui-ripple active" data-tab="overview"><i class="mdui-icon material-icons">info</i>概览</button>
+    <button class="mdui-tab-item mdui-ripple" data-tab="preview"><i class="mdui-icon material-icons">visibility</i>预览</button>
+    <button class="mdui-tab-item mdui-ripple" data-tab="description"><i class="mdui-icon material-icons">description</i>描述</button>
+    <button class="mdui-tab-item mdui-ripple" data-tab="stats"><i class="mdui-icon material-icons">all_inclusive</i>统计</button>
   </div>
-</div>
-{% endif %}
-
-<div class="detail-sec card">
-  <h2 class="sec-title"><span class="sec-bar"></span>插件描述</h2>
-  <p class="detail-desc">{{ plugin.description|e }}</p>
-</div>
-
-<div class="stats">
-  <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label">下载次数</div></div>
-  <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label">评分</div></div>
-  <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count }}</div><div class="stat-label">评价数</div></div>
-</div>
-
-<div class="detail-actions">
-{% if plugin.status == 'active' %}
-<a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn success"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>立即下载</a>
-<a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}{% if compact_mode %}?c=1{% endif %}" class="btn warn">评分</a>
-{% else %}
-<span class="offline-tip">插件已下架</span>
-{% endif %}
-{% if is_owner and not compact_mode %}
-<a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn ghost">更新插件</a>
-<a href="javascript:void(0)" onclick="confirmDelete()" class="btn danger">擦除插件</a>
-{% endif %}
+  
+  <!-- 概览 Tab -->
+  <div class="tab-content active" id="tab-overview">
+    <div class="detail-layout">
+      <div class="detail-main">
+        {% if plugin.ttmp4_url %}
+        <div class="detail-sec">
+          <h2 class="sec-title"><span class="sec-bar"></span>预览</h2>
+          <div class="ttmp4-container"><iframe class="ttmp4-iframe" src="{{ plugin.ttmp4_url }}" sandbox="allow-scripts allow-same-origin allow-popups" allowfullscreen></iframe></div>
+        </div>
+        {% elif plugin.images and plugin.images|length > 0 %}
+        <div class="detail-sec">
+          <h2 class="sec-title"><span class="sec-bar"></span>插件预览</h2>
+          <div class="image-gallery">
+        {% for img in plugin.images %}
+        {% if img.url %}<img src="{{ img.url }}" class="gallery-image" onclick="openImage('{{ img.url }}')" alt="插件图片">{% endif %}
+        {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        
+        <div class="detail-sec">
+          <h2 class="sec-title"><span class="sec-bar"></span>插件描述</h2>
+          <p class="detail-desc">{{ plugin.description|e }}</p>
+        </div>
+      </div>
+      
+      <div class="detail-sidebar">
+        <div class="stats">
+          <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label">下载次数</div></div>
+          <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label">评分</div></div>
+          <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count }}</div><div class="stat-label">评价数</div></div>
+        </div>
+        
+        <div class="detail-actions">
+        {% if plugin.status == 'active' %}
+        <a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn success"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>立即下载</a>
+        <a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}{% if compact_mode %}?c=1{% endif %}" class="btn warn">评分</a>
+        {% else %}
+        <span class="offline-tip">插件已下架</span>
+        {% endif %}
+        {% if is_owner and not compact_mode %}
+        <a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn ghost">更新插件</a>
+        <a href="javascript:void(0)" onclick="confirmDelete()" class="btn danger">擦除插件</a>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 预览 Tab -->
+  <div class="tab-content" id="tab-preview">
+    {% if plugin.ttmp4_url %}
+    <div class="ttmp4-container"><iframe class="ttmp4-iframe" src="{{ plugin.ttmp4_url }}" sandbox="allow-scripts allow-same-origin allow-popups" allowfullscreen></iframe></div>
+    {% elif plugin.images and plugin.images|length > 0 %}
+    <div class="image-gallery">
+    {% for img in plugin.images %}
+    {% if img.url %}<img src="{{ img.url }}" class="gallery-image" onclick="openImage('{{ img.url }}')" alt="插件图片">{% endif %}
+    {% endfor %}
+    </div>
+    {% else %}
+    <p style="text-align:center;color:var(--text-3);padding:40px 0;">暂无预览内容</p>
+    {% endif %}
+  </div>
+  
+  <!-- 描述 Tab -->
+  <div class="tab-content" id="tab-description">
+    <p class="detail-desc">{{ plugin.description|e }}</p>
+  </div>
+  
+  <!-- 统计 Tab -->
+  <div class="tab-content" id="tab-stats">
+    <div class="stats" style="grid-template-columns:repeat(3,1fr);">
+      <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label">下载次数</div></div>
+      <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label">评分</div></div>
+      <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count }}</div><div class="stat-label">评价数</div></div>
+    </div>
+  </div>
 </div>
 
 <div class="image-modal" id="imageModal"><img id="modalImage" class="modal-image" src="" alt="大图预览"></div>
+</div>
 </main>
 
 <script>
@@ -1095,6 +1184,27 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
   /* ===== 启动 ===== */
   applyTheme();
   setLite(liteOn);
+})();
+
+/* ===== MDUI Tab 切换(不刷新页面) ===== */
+(function() {
+  var tabBtns = document.querySelectorAll('.mdui-tab-item');
+  var tabContents = document.querySelectorAll('.tab-content');
+  
+  tabBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var tabId = this.getAttribute('data-tab');
+      
+      // 移除所有 active 状态
+      tabBtns.forEach(function(b) { b.classList.remove('active'); });
+      tabContents.forEach(function(c) { c.classList.remove('active'); });
+      
+      // 激活当前 tab
+      this.classList.add('active');
+      var target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.add('active');
+    });
+  });
 })();
 
 function goBack() { window.history.back(); }
