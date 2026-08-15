@@ -105,15 +105,28 @@ class ForumAPI:
     def login(self):
         """登录论坛"""
         try:
+            # 先访问登录页面获取 cookies
+            self.session.get(f"{self.server}/login", timeout=10)
+            
+            # 提交登录表单
             resp = self.session.post(
                 f"{self.server}/login",
                 data={"username": self.user, "password": self.password},
                 allow_redirects=True,
-                timeout=10
+                timeout=10,
+                headers={
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Referer": f"{self.server}/login"
+                }
             )
+            
+            # 检查是否登录成功（登录后会重定向到首页）
             if resp.status_code == 200:
-                self.logged_in = True
-                return True, "登录成功"
+                # 检查 cookies 是否存在
+                if self.session.cookies:
+                    self.logged_in = True
+                    return True, "登录成功"
+                return False, "登录失败：未获取到会话"
             return False, f"登录失败 (状态码: {resp.status_code})"
         except Exception as e:
             return False, f"登录异常: {str(e)}"
