@@ -1,205 +1,1653 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
-    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
-    <meta charset="UTF-8">
-<title>插件市场</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Expanse · 插件市场</title>
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
+<link rel="shortcut icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="env.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
-body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
-body.page-exit{animation:slideOutToLeft .25s cubic-bezier(.4,0,.2,1)}
-@keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-@keyframes slideOutToLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-30px)}}
-header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
-@keyframes headerSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
-.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
-.logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;animation:logoFadeIn .5s .1s both}
-@keyframes logoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-.logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
-.logo-icon img{width:100%;height:100%;object-fit:cover}
-.head-space{flex:1}
-.search{height:36px;width:280px;background:rgba(255,255,255,.2);border-radius:18px;display:flex;align-items:center;padding:0 16px;animation:searchFadeIn .5s .15s both}
-@keyframes searchFadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-.search input{background:transparent;border:none;outline:none;color:#fff;width:100%;font-size:14px}
-.search input::placeholder{color:rgba(255,255,255,.7)}
-.main-box{max-width:1400px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
-.card{background:rgba(255,255,255,.95);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(0,0,0,.05);opacity:0;animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards}
-@keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-.grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:20px}
-.page-box{margin-top:40px;text-align:center;animation:fadeIn .6s .5s both}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.plugin-card{padding:16px;cursor:pointer;transition:transform .2s,box-shadow .2s}
-.plugin-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 12px 40px rgba(0,0,0,.2)}
-.plugin-card:active{transform:scale(.98)}
-.plugin-card h3{color:#333;margin-bottom:8px}
-.plugin-card p{color:#666;font-size:14px;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.plugin-card .meta{display:flex;align-items:center;gap:12px;font-size:12px;color:#999}
-.rating{color:#ff9800}
-.tag{background:rgba(76,175,80,.1);color:#4caf50;padding:2px 8px;border-radius:4px;font-size:12px;transition:all .2s}
-.tag:hover{background:rgba(76,175,80,.2);transform:scale(1.05)}
-.tag-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-.nav-links{display:flex;gap:24px}
-.nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
-.nav-links a:hover{color:#fff;transform:translateY(-1px)}
-.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
-.nav-links a:hover::after{width:100%}
-.btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
-.btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
-.btn:active{transform:scale(.95)}
-.btn-danger{background:#f44336;color:#fff}
-.btn-danger:hover{background:#d32f2f}
-.dropdown{position:relative;display:inline-block}
-.dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
-.dropbtn:hover{color:#fff}
-.dropbtn:focus{outline:none}
-.dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:dropdownFade .2s}
-@keyframes dropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.dropdown-content.show{display:block}
-.dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s}
-.dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
-.user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
-@keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-.user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-.icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both}
-@keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-.icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
-#loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
-#loader .mdui-progress{margin:0;border-radius:0}
+/* ===== 插件市场专属(复用官网主题变量,三主题自动适配) ===== */
+.mk-hero { min-height:0; display:flex; align-items:center; padding:116px 6vw 10px; }
+.mk-hero .text-area { max-width:760px; margin:0 auto; text-align:center; }
+.mk-hero-logo { display:flex; flex:none; }
+.mk-hero-logo .logo-img { height:52px; width:auto; border-radius:13px; }
+.mk-hero-title { display:flex; align-items:center; justify-content:center; gap:16px; }
+.mk-hero-title h1 { margin:0; }
+.mk-hero-sub { font-size:16px; line-height:1.7; color:var(--text-2); margin:14px auto 0; max-width:520px; }
+.mk-search { position:relative; display:flex; align-items:center; gap:10px; max-width:520px; margin:22px auto 0; padding:0 8px 0 18px; height:54px; border-radius:30px; background:var(--glass-card); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); transition:box-shadow .3s,background .3s; }
+.mk-search:focus-within { box-shadow:0 0 0 2px var(--accent-1), inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); }
+.mk-search svg { flex:none; color:var(--text-3); }
+.mk-search input { flex:1; min-width:0; background:transparent; border:none; outline:none; color:var(--text-1); font-size:15px; font-family:inherit; height:100%; }
+.mk-search input::placeholder { color:var(--text-3); }
+.mk-search input::-webkit-search-cancel-button { -webkit-appearance:none; }
+.mk-sec { padding:2px 6vw 80px; max-width:1400px; margin:0 auto; }
+.mk-sorts { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px; }
+.mk-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.mk-pop-wrap { position:relative; }
+.mk-pop-btn { display:inline-flex; align-items:center; gap:7px; padding:8px 16px; border-radius:20px; border:none; cursor:pointer; font-size:13px; font-weight:700; font-family:inherit; color:var(--text-1); background:var(--glass-card); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); transition:color .25s,background .25s,transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .3s; }
+.mk-pop-btn:hover { color:var(--accent-1); transform:translateY(-2px) scale(1.03); box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); }
+.mk-pop-btn:active { transform:scale(.96); }
+.mk-pop-btn[aria-expanded="true"] { color:var(--accent-1); }
+.mk-pop-caret { transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
+.mk-pop-btn[aria-expanded="true"] .mk-pop-caret { transform:rotate(180deg); }
+body.lite-mode .mk-pop-btn { background:var(--glass-tint); backdrop-filter:none; -webkit-backdrop-filter:none; }
+.mk-menu { position:absolute; top:calc(100% + 10px); left:0; min-width:150px; padding:8px; border-radius:16px; background:var(--glass-strong); backdrop-filter:blur(30px) saturate(200%); -webkit-backdrop-filter:blur(30px) saturate(200%); box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); opacity:0; visibility:hidden; transform:translateY(-8px) scale(.94); transform-origin:top left; transition:opacity .3s ease,transform .4s cubic-bezier(.34,1.56,.64,1),visibility .4s; z-index:1200; }
+.mk-menu.show { opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+body.lite-mode .mk-menu { background:var(--solid-glass); backdrop-filter:none; -webkit-backdrop-filter:none; }
+.mk-menu-item { display:flex; align-items:center; gap:8px; width:100%; padding:8px 12px; border:none; border-radius:11px; background:transparent; color:var(--text-2); font-size:13px; font-weight:700; font-family:inherit; text-align:left; cursor:pointer; transition:color .25s,background .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
+.mk-menu-item:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateX(3px); }
+.mk-menu-item.cur { color:var(--accent-1); background:var(--glass-tint-2); }
+.mk-menu-item.cur::after { content:'✓'; margin-left:auto; font-size:12px; }
+body.lite-mode .mk-menu-item.cur { background:var(--glass-tint-2); }
+.mk-hero h1 { font-size:clamp(32px,5vw,50px); font-weight:900; letter-spacing:.5px; display:flex; align-items:center; }
+.mk-hero h1 .grad { -webkit-background-clip:text; background-clip:text; }
+.mk-hero h1 .handwritten { font-size:.5em; }
+.mk-login { display:inline-flex; align-items:center; gap:7px; margin-left:10px; padding:8px 16px; border-radius:20px; font-size:13px; font-weight:700; color:var(--text-2); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top); text-decoration:none; transition:color .25s,background .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
+.mk-login:hover { color:var(--accent-1); transform:translateY(-1px) scale(1.03); }
+/* 导航"更多"二级菜单 */
+.nav-more-wrap { position:relative; }
+.nav-more-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 13px; border-radius:30px; border:none; background:transparent; color:var(--text-2); font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; white-space:nowrap; transition:color .25s,background .3s,box-shadow .3s,transform .5s cubic-bezier(.34,1.56,.64,1); }
+.nav-more-btn:hover { color:var(--accent-1); background:var(--glass-tint); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot); transform:translateY(-2px) scale(1.05); }
+.nav-more-btn[aria-expanded="true"] { color:var(--accent-1); background:var(--glass-tint); }
+.nav-more-caret { transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
+.nav-more-btn[aria-expanded="true"] .nav-more-caret { transform:rotate(180deg); }
+/* 菜单弹出时放开 header 的 overflow:hidden,避免被裁剪 */
+header.more-open { overflow:visible !important; }
+.nav-more-menu { position:absolute; top:calc(100% + 10px); right:0; min-width:178px; padding:8px; border-radius:18px; background:rgba(255,255,255,.62); backdrop-filter:blur(30px) saturate(200%); -webkit-backdrop-filter:blur(30px) saturate(200%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), inset 0 -1px 0 rgba(0,0,0,.08), var(--shadow-hover); opacity:0; visibility:hidden; transform:translateY(-8px) scale(.94); transform-origin:top right; transition:opacity .3s ease,transform .4s cubic-bezier(.34,1.56,.64,1),visibility .4s; z-index:2000; }
+body.dark-mode .nav-more-menu { background:rgba(24,30,58,.9); box-shadow:inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.3), var(--shadow-hover); }
+.nav-more-wrap:hover .nav-more-menu, .nav-more-menu.show { opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+.nav-more-menu a { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:30px; background:var(--glass-tint); color:var(--text-2); font-size:13px; font-weight:700; text-decoration:none; transition:color .25s,background .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
+.nav-more-menu a:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateX(3px); }
+body.lite-mode .nav-more-menu { background:var(--solid-glass); backdrop-filter:none; -webkit-backdrop-filter:none; }
+/* 移动端菜单展开时,更多下拉改为占位(其子项直接展开为网格项) */
+@media (max-width:1040px) {
+  .nav-more-menu { position:static; opacity:1; visibility:visible; transform:none; background:transparent; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; padding:0; display:grid; grid-template-columns:1fr; gap:4px; min-width:0; }
+  .nav-more-menu a { padding:7px 13px; border-radius:30px; background:var(--glass-tint); }
+  .nav-more-caret { display:none; }
+  .nav-more-btn { display:none; }
+}
+@media (max-width:900px) { .mk-login { display:none; } }
+/* 7 个导航按钮:断点提前到 1180px(900px 太窄,文字会盖住按钮) */
+@media (max-width:1040px) {
+  .nav-links { max-width:0; opacity:0; visibility:hidden; margin:0; padding:0; gap:0; overflow:hidden; }
+  .hamburger { width:40px; height:40px; opacity:1; visibility:visible; }
+  header.menu-open .nav-links { max-width:1000px; opacity:1; visibility:visible; transition:none !important; }
+  header.menu-open { border-radius:26px; flex-direction:column; align-items:stretch; background:var(--glass-strong); padding:6px 14px; }
+  header.menu-open .nav-left { width:100%; flex-direction:column; align-items:stretch; gap:8px; }
+  header.menu-open .logo { display:none; }
+  header.menu-open .menu-title { display:block; font-size:16px; font-weight:900; letter-spacing:2px; color:var(--text-3); padding:2px 6px 0; animation:fadeIn .4s ease both; }
+  header.menu-open .nav-links { display:grid; grid-template-columns:repeat(auto-fit,minmax(88px,auto)); gap:6px 8px; width:100%; padding:6px 2px 0; }
+  header.menu-open .nav-right { display:flex; width:100%; justify-content:center; padding:4px 0 6px; }
+  header.menu-open .nav-links, header.menu-open .nav-right { animation:fadeIn .5s ease both; }
+  body.lite-mode header.menu-open .nav-links > a,
+  body.lite-mode header.menu-open .nav-right { animation:none !important; opacity:1 !important; }
+}
+/* 2 形态下登录按钮保留(右侧空间足够) */
+@media (min-width:901px) and (max-width:1040px) {
+  .mk-login { display:inline-flex; }
+}
+@media (max-width:1280px) and (min-width:901px) {
+  .mk-hero { padding:140px 4vw 14px; }
+  .mk-sec { padding:8px 4vw 70px; }
+  .nav-links { max-width:820px; }
+  .nav-links a { padding:6px 11px; font-size:13px; gap:5px; }
+  .nav-links a svg { width:13px; height:13px; }
+}
+.mk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:22px; }
+.mk-card { position:relative; display:flex; gap:14px; padding:18px; border-radius:20px; background:var(--glass-card); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)); transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .45s,background .4s; cursor:pointer; }
+.mk-card::after { content:''; position:absolute; inset:0; border-radius:inherit; z-index:-1; background:linear-gradient(135deg,var(--glass-tint),transparent 60%); opacity:0; transition:opacity .45s ease; }
+.mk-card:hover { box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); --ty:-5px; }
+.mk-card:hover::after { opacity:1; }
+.mk-card:hover { box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); }
+body.lite-mode .mk-card { background:var(--solid-glass); backdrop-filter:none; -webkit-backdrop-filter:none; }
+.mk-ico { flex:none; width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; color:var(--accent-1); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top); }
+.mk-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+.mk-card h3 { font-size:16.5px; font-weight:800; color:var(--text-1); margin:0; letter-spacing:.2px; }
+.mk-author { font-size:12.5px; color:var(--text-3); margin:0; }
+.mk-tags { display:flex; flex-wrap:wrap; gap:6px; }
+.mk-tag { display:inline-block; padding:2px 10px; border-radius:14px; font-size:11.5px; font-weight:700; color:var(--accent-1); background:var(--glass-tint); }
+.mk-foot { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:8px; }
+.mk-rate { font-size:13px; font-weight:700; color:var(--accent-2); }
+.mk-actions { display:flex; align-items:center; gap:8px; }
+.mk-dl, .mk-view { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:18px; font-size:12.5px; font-weight:700; text-decoration:none; cursor:pointer; border:none; font-family:inherit; transition:transform .35s cubic-bezier(.34,1.56,.64,1),filter .25s,background .25s,color .25s; }
+.mk-dl { color:var(--text-1); background:var(--glass-card); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); border:1px solid rgba(255,255,255,.18); }
+.mk-dl:hover { transform:translateY(-2px) scale(1.04); box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); filter:brightness(1.04); }
+body.lite-mode .mk-dl { background:var(--glass-tint); backdrop-filter:none; -webkit-backdrop-filter:none; }
+.mk-view { color:var(--text-2); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top); }
+.mk-view:hover { color:var(--accent-1); transform:translateY(-2px) scale(1.04); }
+body.lite-mode .mk-view { background:var(--glass-tint); }
+.mk-empty { display:flex; align-items:center; justify-content:center; gap:8px; padding:70px 20px; font-size:15px; color:var(--text-3); }
+.mk-pager { display:flex; align-items:center; justify-content:center; gap:18px; margin-top:44px; }
+.mk-info { font-size:13.5px; font-weight:700; color:var(--text-3); letter-spacing:1px; }
+.mk-pg-btn { display:inline-flex; align-items:center; gap:7px; }
+.mk-pg-btn:disabled { opacity:.4; pointer-events:none; }
+@media (max-width:720px) {
+  .mk-sec { padding:44px 5vw 64px; }
+  .mk-grid { grid-template-columns:1fr; }
+}
 </style>
 </head>
-<body>
-<div class="loader" id="loader">
-<div class="mdui-progress">
-<div class="mdui-progress-indeterminate"></div>
-</div>
-</div>
-<header>
-<div class="wrap">
-<div class="logo"><div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>菠菜面</div>
-<div class="nav-links">
-<a href="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}">首页</a>
-<a href="https://pan1.pgrm.run">我的存储</a>
-<a href="/workpool">作品池</a>
-{% if not compact_mode %}
-<a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
-<a href="/app/kn/d">应用下载</a>
-<div class="dropdown">
-<button class="dropbtn">插件市场 ▼</button>
-<div class="dropdown-content">
-{% if markets %}
-{% for market_id, market_name in markets.items() %}
-<a class="mdui-ripple" href="/mk/{{ market_id }}">{{ market_name }}</a>
-{% endfor %}
-{% endif %}
-</div>
-</div>
-{% if session.user %}
-<a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
-<a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
-{% if users and users.get(session.user, {}).get('role') == 'admin' %}
-<a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
-{% endif %}
-{% endif %}
-{% endif %}
-</div>
-<div class="head-space"></div>
-<form class="search" action="/mk/{{ current_market or 'kn' }}{% if compact_mode %}?c=1{% endif %}" method="get">
-<input name="search" placeholder="搜索插件名称/标签" value="{{ search_query }}">
-</form>
-{% if session.user %}
-<div class="icon-btn" title="通知"><i class="mdui-icon material-icons" style="font-size:22px">notifications</i></div>
-<div class="dropdown">
-<div class="user-avatar" title="{{ session.user }}">{% if users.get(session.user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[session.user]['qq'] }}&s=100" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">{% else %}{{ session.user[0].upper() }}{% endif %}</div>
-<div class="dropdown-content">
-<a href="/u/{{ session.user }}">我的主页</a>
-<a href="/change_password">修改密码</a>
-<a href="/logout">退出登录</a>
-</div>
-</div>
-{% else %}
-<a href="/login" class="btn mdui-ripple" style="margin-left:12px">登录</a>
-{% endif %}
-</div>
-</header>
-<div class="main-box">
-<div class="grid">
-{% for plugin in plugins %}
-<div class="card plugin-card" onclick="location.href='/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}{% if compact_mode %}?c=1{% endif %}'">
-<h3>{{ plugin.name }}</h3>
-<p>{{ plugin.description|e }}</p>
-<div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
-<div class="meta">
-<span>{{ plugin.author }}</span>
-<span class="rating">★ {{ "%.1f"|format(plugin.rating) }}</span>
-<span>{{ plugin.downloads }} 下载</span>
-</div>
-</div>
-{% endfor %}
-</div>
-<div class="page-box">
-{% if plugins|length == 0 %}
-<p>暂无插件</p>
-{% endif %}
-</div>
-</div>
+<body class="theme-aurora">
 
+<!-- 主题背景图(amber / ocean / dark) -->
+<img class="bg-photo bg-photo-ocean" id="bgPhotoOcean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-blqex8C66nGonIanVXR7z_4TLD59gACtSkAAmsm2FenzP-p21Yj7z0E.jpg" alt="深海琉璃背景">
+<img class="bg-photo bg-photo-amber" id="bgPhotoAmber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-Ztqex0lP1b1yTaPIQ3_HDbI9q4nJgACkykAAmsm2Ff0AAEoPnSg5Os9BA.jpg" alt="琥珀暮光背景">
+<img class="bg-photo bg-photo-dark" id="bgPhotoDark" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bBqex51ZLwNxuT2IIs05FTlykLbJAACrCkAAmsm2FcLH3kvBfcaWz0E.jpg" alt="暗夜模式背景">
 
+<!-- 背景光效 -->
+<div class="theme-fade" id="themeFade"></div>
+<div class="burst-layer" id="burstLayer"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="bg-layer" id="bgLayer">
+  <div class="parallax" data-speed="0.08"><div class="bg-orb orb-1"></div></div>
+  <div class="parallax" data-speed="-0.14"><div class="bg-orb orb-2"></div></div>
+  <div class="parallax" data-speed="0.2"><div class="bg-orb orb-3"></div></div>
+</div>
+<div id="particles"></div>
 
-<script>
-window.addEventListener('load', function(){
-    document.getElementById('loader').style.display='none';
-    document.body.classList.add('page-enter');
-    setTimeout(()=>document.body.classList.remove('page-enter'),400);
-});
-
-document.querySelectorAll('.plugin-card').forEach((card,i)=>{
-    card.style.animationDelay=(0.05*i)+'s';
-});
-
-function copyWebUrl() {
-    const url = 'https://code.pgrm.run/mk/{{ current_market or "kn" }}';
-    navigator.clipboard.writeText(url).then(function() {
-        alert('链接已复制到剪贴板！');
-    }).catch(function() {
-        const textarea = document.createElement('textarea');
-        textarea.value = url;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        alert('链接已复制到剪贴板！');
-    });
-}
-
-{% if not compact_mode %}
-document.addEventListener('DOMContentLoaded', function() {
-    var dropdowns = document.querySelectorAll('.dropdown');
-    dropdowns.forEach(function(dropdown) {
-        var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
-        var content = dropdown.querySelector('.dropdown-content');
-        
-        if (trigger && content) {
-            trigger.addEventListener('click', function(e) {
-                e.stopPropagation();
-                content.classList.toggle('show');
-            });
-            
-            content.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
-    });
+<!-- ===================== 导航 ===================== -->
+<header id="header">
+  <div class="nav-left">
+    <span class="menu-title" id="menuTitle"><span data-i18n="menu_title">导航菜单</span></span>
+    <div class="logo">
+      <img class="logo-img th-def" id="logoImg" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KE Expanse">
+      <img class="logo-img th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KE Expanse">
+      <img class="logo-img th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KE Expanse">
+      <span class="logo-mark" id="logoMark" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><rect x="7" y="7" width="10" height="10" rx="3"/></svg></span>
+      KE Expanse
+    </div>
+        <nav class="nav-links" id="navLinks" aria-label="主导航">
+      <a href="https://code.pgrm.run/mk/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg><span data-i18n="mk_home">首页</span></a>
+      <a href="#market" data-scroll><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span data-i18n="mk_discover">发现</span></a>
+      <a href="#market" data-scroll><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l3-3 3 3h7v4l3 3-3 3v4h-7l-3 3-3-3H4v-4L1 11l3-3Z"/><circle cx="8.5" cy="11" r="1.4" fill="currentColor" stroke="none"/><circle cx="12.5" cy="15" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8" r="1.4" fill="currentColor" stroke="none"/></svg><span data-i18n="nav_market">插件市场</span></a>
+      <a href="https://code.pgrm.run/app/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg><span data-i18n="mk_team">团队</span></a>
+      <a href="https://code.pgrm.run/forum" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></svg><span data-i18n="mk_forum">论坛</span></a>
+      <div class="nav-more-wrap">
+        <button class="nav-more-btn" id="navMoreBtn" type="button" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/></svg>
+          <span data-i18n="mk_more">更多</span>
+          <svg class="nav-more-caret" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="nav-more-menu" id="navMoreMenu">
+          <a href="https://code.pgrm.run/app/kn/d" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg><span data-i18n="mk_appdl">应用下载</span></a>
+          <a href="https://code.pgrm.run/dev/kn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg><span data-i18n="mk_dev">开发者中心</span></a>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <div class="nav-right">
+    <div class="m-wrap" style="display:none">
+      <button class="icon-btn" id="mbtn" aria-label="移动端下载">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>
+      </button>
+      
+    </div>
+    <div class="perf-wrap">
+      <button class="icon-btn" id="perfBtn" aria-label="节能模式" title="节能模式">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg>
+      </button>
+      
+    </div>
+    <button class="icon-btn" id="themeToggle" aria-label="切换主题" title="切换主题">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/><circle cx="7.5" cy="11.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="10.2" cy="7.6" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.8" cy="7.6" r="1.2" fill="currentColor" stroke="none"/></svg>
+    </button>
     
-    document.addEventListener('click', function() {
-        document.querySelectorAll('.dropdown-content').forEach(function(content) {
-            content.classList.remove('show');
-        });
+    <button class="icon-btn" id="qqBtn" aria-label="加入QQ群" style="display:none">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H7l-4 3 1.3-4.7A8 8 0 1 1 21 12Z"/><path d="M9 10.3h6M9 13.7h4"/></svg>
+    </button>
+    
+    <button class="icon-btn" id="qrBtn" aria-label="二维码">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg>
+    </button>
+    <button class="icon-btn" id="lookBtn" aria-label="外观设置">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7.5 16.5 4h-1.2a2.8 2.8 0 0 1-6.6 0H7.5L4 7.5l2.6 2.2 1-1.1V20h8.8V8.6l1 1.1Z"/></svg>
+    </button>
+    <div class="lang-wrap">
+      <button class="icon-btn" id="langBtn" aria-label="切换语言">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.4 3.8 5.2 3.8 8.5s-1.3 6.1-3.8 8.5c-2.5-2.4-3.8-5.2-3.8-8.5s1.3-6.1 3.8-8.5Z"/></svg>
+      </button>
+      
+    </div>
+    <a class="mk-login btn btn-glass" href="https://code.pgrm.run/login" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg><span data-i18n="mk_login">登录</span></a>
+    <button class="icon-btn hamburger" id="hamburgerBtn" aria-label="打开菜单" aria-expanded="false">
+      <i></i><i></i><i></i>
+    </button>
+  </div>
+</header>
+
+<!-- ===================== 插件市场 ===================== -->
+<main id="hero" class="mk-hero">
+  <div class="text-area">
+    <div class="mk-hero-title reveal in">
+      <div class="mk-hero-logo">
+        <img class="logo-img th-def" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KE Expanse">
+        <img class="logo-img th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KE Expanse">
+        <img class="logo-img th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KE Expanse">
+      </div>
+      <h1>
+        <span class="grad" data-i18n="mk_badge">插件市场</span>
+        <span class="handwritten" data-i18n="mk_sub">market</span>
+      </h1>
+    </div>
+    <p class="mk-hero-sub reveal in" data-i18n="mk_desc">搜索并安装社区精选插件,一键为 KE Expanse 添加强大能力。</p>
+    <div class="mk-search reveal in">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="mkInput" type="search" autocomplete="off" data-i18n-ph="mk_ph" placeholder="搜索插件名称 / 标签 / 作者">
+    </div>
+  </div>
+</main>
+
+<!-- ===================== 插件列表 ===================== -->
+<section id="market" class="mk-sec">
+  <div class="mk-toolbar">
+    <div class="mk-pop-wrap">
+      <button class="mk-pop-btn" id="mkSortBtn" type="button" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        <span id="mkSortLabel" data-i18n="mk_latest">最新</span>
+        <svg class="mk-pop-caret" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="mk-menu" id="mkSortMenu">
+        <button class="mk-menu-item cur" data-sort="latest" type="button"><span data-i18n="mk_latest">最新</span></button>
+        <button class="mk-menu-item" data-sort="top" type="button"><span data-i18n="mk_top">评分最高</span></button>
+        <button class="mk-menu-item" data-sort="all" type="button"><span data-i18n="mk_all">全部</span></button>
+      </div>
+    </div>
+    <div class="mk-pop-wrap">
+      <button class="mk-pop-btn" id="mkFilterBtn" type="button" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v3l-6 6v5l-4 2v-7L4 8Z"/></svg>
+        <span id="mkFilterLabel" data-i18n="mk_filter">筛选</span>
+        <svg class="mk-pop-caret" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="mk-menu" id="mkFilterMenu">
+        <button class="mk-menu-item cur" data-filter="all" type="button"><span data-i18n="mk_all">全部</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="mk-grid" id="mkGrid"><!-- 动态渲染 --></div>
+  <div class="mk-empty" id="mkEmpty" style="display:none"><span data-i18n="mk_empty">没有找到匹配的插件</span></div>
+  <div class="mk-pager" id="mkPager" style="display:none">
+    <button class="btn btn-glass mk-pg-btn" id="mkPrev" type="button"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="mk_prev">上一页</span></button>
+    <span class="mk-info" id="mkInfo">1 / 1</span>
+    <button class="btn btn-glass mk-pg-btn" id="mkNext" type="button"><span data-i18n="mk_next">下一页</span><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button>
+  </div>
+</section>
+
+<footer>
+  <div style="display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--text-2)">
+    <img class="footer-logo th-def" id="footerLogo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KE Expanse" loading="lazy">
+    <img class="footer-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KE Expanse" loading="lazy">
+    <img class="footer-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KE Expanse" loading="lazy">
+    <span class="logo-mark footer-mark" id="footerMark" style="width:26px;height:26px;border-radius:8px">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><rect x="7" y="7" width="10" height="10" rx="3"/></svg>
+    </span> KE Expanse
+  </div>
+  <p style="margin-top:10px"><span data-i18n="footer_note">用热爱创造无限可能</span></p>
+  <div class="fl-links">
+    <a href="https://www.codemao.cn/" target="_blank" rel="noopener" data-i18n="fl_0">点猫科技</a>
+    <span class="fl-sep">·</span>
+    <a href="https://code.pgrm.run/" target="_blank" rel="noopener" data-i18n="fl_1">KNHX工作室</a>
+    <span class="fl-sep">·</span>
+    <a href="https://code.pgrm.run/app/ccvue" target="_blank" rel="noopener" data-i18n="fl_2">CatCode</a>
+  </div>
+</footer>
+
+<button id="backTop" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>
+</button>
+
+<div class="theme-pop" id="themePop">
+      <button class="tp-item" data-i="0" style="--c:#8f96f9;--tint:rgba(139,148,247,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="m12 2.6 2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.3l-5.8 2.9 1.1-6.4L2.7 9.3l6.4-.9Z"/></svg></span><span data-i18n="theme_aurora">极光紫霞</span></button>
+      <button class="tp-item" data-i="1" style="--c:#4ade80;--tint:rgba(74,222,128,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M7 3h10l5 7-10 11L2 10Z"/><path d="M2 10h20M7 3l5 7 5-7" stroke="rgba(255,255,255,.4)" stroke-width="1" fill="none" stroke-linejoin="round"/></svg></span><span data-i18n="theme_ocean">深海琉璃</span></button>
+      <button class="tp-item" data-i="2" style="--c:#241505;--tint:rgba(251,146,60,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 3C18 5 20 12 16 19 9 18 5 11 7 4 9 3 11 3 12 3Z"/></svg></span><span data-i18n="theme_amber">琥珀暮光</span></button>
+      <button class="tp-item" data-i="3" style="--c:#0b1020;--tint:rgba(11,16,32,.18)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2.5 14.2 9.8 21.5 12l-7.3 2.2L12 21.5 9.8 14.2 2.5 12l7.3-2.2Z"/></svg></span><span data-i18n="theme_dark">暗夜模式</span></button>
+    </div>
+    <div class="qq-pop" id="qqPop">
+      <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mJqezETEdhmnMoucEwbiIyjhXm4bgACeioAAmsm2FcKDclIeIoVyz0E.png" alt="KE Expanse QQ群">
+      <span data-i18n="qq_title">KE Expanse 官方交流群</span>
+    </div>
+    <div class="perf-pop" id="perfPop">
+        <span id="perfPopState" data-i18n="perf_state_off">节能模式 · 已关闭</span>
+        <small class="perf-pop-desc"><span data-i18n="perf_desc">关闭特效 · 保留流畅基础体验</span></small>
+      </div>
+    <div class="m-pop" id="mPop">
+        <span class="m-pop-title" data-i18n="m_title">移动端下载</span>
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZCd1qfEJzDF0wJ6vVFg3WQf-QeQIjNwACCyMAAkWI6FcCA6Hs1_s1CD0E.png" alt="移动端二维码">
+        <small data-i18n="m_note">移动端下载</small>
+      </div>
+    <div class="lang-pop" id="langPop">
+        <button class="lang-item cur" data-lang="zh">中文</button>
+        <button class="lang-item" data-lang="tw">繁體中文</button>
+        <button class="lang-item" data-lang="en">English</button>
+        <button class="lang-item" data-lang="ja">日本語</button>
+        <button class="lang-item" data-lang="ko">한국어</button>
+        <button class="lang-item" data-lang="es">Español</button>
+      </div>
+    <!-- 外观设置悬浮窗 -->
+<div class="look-pop" id="lookPop">
+  <button class="tp-item" data-i="0" style="--c:#8f96f9;--tint:rgba(139,148,247,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="m12 2.6 2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.3l-5.8 2.9 1.1-6.4L2.7 9.3l6.4-.9Z"/></svg></span><span data-i18n="theme_aurora">极光紫霞</span></button>
+  <button class="tp-item" data-i="1" style="--c:#4ade80;--tint:rgba(74,222,128,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M7 3h10l5 7-10 11L2 10Z"/><path d="M2 10h20M7 3l5 7 5-7" stroke="rgba(255,255,255,.4)" stroke-width="1" fill="none" stroke-linejoin="round"/></svg></span><span data-i18n="theme_ocean">深海琉璃</span></button>
+  <button class="tp-item" data-i="2" style="--c:#fb923c;--tint:rgba(251,146,60,.16)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 3C18 5 20 12 16 19 9 18 5 11 7 4 9 3 11 3 12 3Z"/></svg></span><span data-i18n="theme_amber">琥珀暮光</span></button>
+  <button class="tp-item" data-i="3" style="--c:#0b1020;--tint:rgba(11,16,32,.12)"><span class="tp-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2.5 14.2 9.8 21.5 12l-7.3 2.2L12 21.5 9.8 14.2 2.5 12l7.3-2.2Z"/></svg></span><span data-i18n="theme_dark">暗夜模式</span></button>
+  <div class="look-sep"></div>
+  <button class="look-perf" id="lookPerf"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg><span class="look-perf-main"><span id="lookPerfState">节能模式 · 已关闭</span><small data-i18n="perf_desc">关闭特效 · 保留流畅基础体验</small></span></button>
+</div>
+<!-- 二维码悬浮窗(移动端下载 + QQ 群) -->
+<div class="qr-pop" id="qrPop">
+  <div class="qr-tabs">
+    <button class="qr-tab active" data-q="m"><span data-i18n="qr_tab_m">移动端下载</span></button>
+    <button class="qr-tab" data-q="q"><span data-i18n="qr_tab_q">QQ 群</span></button>
+  </div>
+  <div class="qr-imgs" id="qrImgs">
+    <div class="qr-pane show" data-q="m">
+      <img id="qrM" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZCd1qfEJzDF0wJ6vVFg3WQf-QeQIjNwACCyMAAkWI6FcCA6Hs1_s1CD0E.png" alt="移动端下载">
+    </div>
+    <div class="qr-pane" data-q="q">
+      <img id="qrQ" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-mJqezETEdhmnMoucEwbiIyjhXm4bgACeioAAmsm2FcKDclIeIoVyz0E.png" alt="QQ 群">
+      <span class="qr-name" data-i18n="qq_title">KE Expanse 官方交流群</span>
+    </div>
+  </div>
+</div>
+<!-- 安卓扫码下载弹层 -->
+<div class="qr-modal" id="qrModal">
+  <div class="qr-modal-box">
+    <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZCd1qfEJzDF0wJ6vVFg3WQf-QeQIjNwACCyMAAkWI6FcCA6Hs1_s1CD0E.png" alt="安卓下载二维码">
+    <p data-i18n="qr_scan_tip">手机扫码,立即下载 KE Expanse</p>
+    <button class="qr-modal-close" id="qrModalClose">关闭</button>
+  </div>
+</div>
+<!-- 性能提示浮层 -->
+<div class="perf-tip" id="perfTip">
+  <span class="pt-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></span>
+  <div class="pt-txt"><b><span data-i18n="perf_tip_t">检测到设备性能不足</span></b><span data-i18n="perf_tip_d">当前帧率较低,切换节能模式可让页面更流畅。</span></div>
+  <div class="pt-btns">
+    <button class="pt-btn" id="perfYes">开启节能</button>
+    <button class="pt-btn ghost" id="perfNo">忽略</button>
+  </div>
+</div>
+
+<!-- 移动端快捷下载首屏 -->
+<div class="m-dl" id="mDl">
+  <div class="m-dl-tools">
+    <button class="m-dl-tool" id="mDlLang" aria-label="切换语言"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+    <button class="m-dl-tool" id="mDlLook" aria-label="切换外观"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></button>
+    <button class="m-dl-tool" id="mDlQr" aria-label="QQ 群二维码"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14h1M14 20h1M17 17v4M21 17v1"/></svg></button>
+  </div>
+  <div class="m-dl-inner">
+    <img class="m-dl-logo th-def" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KE Expanse"><img class="m-dl-logo th-ocean" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png" alt="KE Expanse"><img class="m-dl-logo th-amber" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png" alt="KE Expanse">
+    <h1 class="m-dl-hero"><span data-i18n="hero_t1">现代化图形化编辑器</span><br><span class="m-dl-grad" data-i18n="hero_t2">为生态而生</span><span class="m-dl-hand" data-i18n="hero_t3">for creators</span></h1>
+    <a class="m-dl-btn" id="mDlAndroid" href="https://code.pgrm.run/localcdn/2/app-debug.apk" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="m_android">安卓下载</span></a>
+    <button class="m-dl-btn ios" id="mDlIos" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c.7-1 2-1.4 3-1 1 .5 1.5 1.5 1.4 2.6-.9.4-2 .4-3 .3-.5-.7-.9-1.3-1.4-1.9Z"/><path d="M16.5 8.2c1.9 2 2.8 4.5 2.4 7.1-.5 3.3-2.8 5.7-6 5.7h-1.8c-3.2 0-5.5-2.4-6-5.7-.4-2.6.5-5.1 2.4-7.1.3-.3.7-.4 1.1-.3.8.2 1.6.2 2.4 0 .9-.2 1.8-.2 2.7 0 .8.2 1.7.2 2.4 0 .4-.1.8 0 1.1.3Z"/></svg><span data-i18n="m_ios">iOS 下载</span></button>
+    <button class="m-dl-btn ghost" id="mDlEnter" type="button"><span data-i18n="m_detail">查看详细介绍</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+  </div>
+</div>
+<!-- 移动端:回到下载页按钮(右下角) -->
+<button class="m-back-btn" id="mBackBtn" aria-label="回到下载页"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M10 13h.01M14 13h.01M10 17h4"/></svg><span data-i18n="m_back">下载</span></button>
+
+<script>  /* 运行环境:file:// 协议为本地,其余为线上 */
+  var RUN_ENV = 'CDN';
+  try { if (window.location && window.location.protocol === 'file:') RUN_ENV = 'LOCAL'; } catch (e) {}
+  try { document.documentElement.setAttribute('data-env', RUN_ENV); } catch (e) {}
+
+
+(function () {
+  'use strict';
+
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+
+  /* ---------- WebGL 检测:不支持则降级为轻量模式(CPU 渲染不卡,下载不受影响) ---------- */
+  var noWebGL = false;
+  try {
+    var wcv = document.createElement('canvas');
+    noWebGL = !(window.WebGLRenderingContext && (wcv.getContext('webgl') || wcv.getContext('experimental-webgl')));
+  } catch (e) { noWebGL = true; }
+  var liteMode = noWebGL;
+  try { if (localStorage.getItem('knexpanse-lite') === '1') liteMode = true; } catch (e) {}
+  if (liteMode) document.body.classList.add('lite-mode');
+
+  /* ---------- 主题专属资源 ---------- */
+  var LOGO_DEFAULT = 'https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png';
+  var ASSETS = {
+    ocean: {
+      logo: 'https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bxqex-f48DQB9KHbT3TmnzNbl3KkgACuSkAAmsm2FdW3ccZ-jHpOz0E.png',
+      term: 'https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-btqex9uP0t1sJIePCyRgejEZyY-CwACuCkAAmsm2FdierBKhSg5SD0E.png'
+    },
+    amber: {
+      logo: 'https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-a1qex5VEVbErertv1lJE8qisUClCQACqSkAAmsm2Fcb-FJiIZXGQz0E.png',
+      term: 'https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-aVqex2-qT9U9N0WXwYbWtRIiTqZ8QACnSkAAmsm2Fec5-j2b9AlCz0E.png'
+    }
+  };
+
+  /* ---------- 图片降级 ---------- */
+  function setupImgFallback(imgId, fallbackId, fbDisplay) {
+    var img = document.getElementById(imgId);
+    var fb = document.getElementById(fallbackId);
+    if (!img) return;
+    function failed() { img.style.display = 'none'; if (fb) { fb.classList.add('show'); fb.style.display = fbDisplay || 'flex'; } }
+    img.addEventListener('error', failed);
+    if (img.complete && img.naturalWidth === 0) { failed(); }
+  }
+  setupImgFallback('logoImg', 'logoMark', 'flex');
+  setupImgFallback('footerLogo', 'footerMark', 'inline-flex');
+  setupImgFallback('titleLogoImg');
+  setupImgFallback('bgPhotoOcean');
+  setupImgFallback('bgPhotoAmber');
+  setupImgFallback('bgPhotoDark');
+  /* 主题专属图:CSS 按主题显示;加载失败则隐藏自身 */
+  $$('.th-ocean, .th-amber, .term-img').forEach(function (img) {
+    img.addEventListener('error', function () { this.style.display = 'none'; });
+  });
+  /* 终端两张图都失败时降级为自绘 SVG */
+  var termImgs = $$('.term-img');
+  var termFallback = $('#termFallback');
+  termImgs.forEach(function (img) {
+    img.addEventListener('error', function () {
+      if (termImgs.every(function (x) { return x.style.display === 'none'; })) termFallback.classList.add('show');
     });
-});
-{% endif %}
+  });
+
+  /* ---------- 主题切换:高模糊遮罩 + 大 logo ---------- */
+  function themeTransition(targetLogo) {
+    var layer = $('#burstLayer');
+    layer.innerHTML = '';
+    /* 高模糊遮罩 */
+    var veil = document.createElement('div');
+    veil.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,.05);backdrop-filter:blur(28px) saturate(140%);-webkit-backdrop-filter:blur(28px) saturate(140%);box-shadow:inset 0 0 120px rgba(0,0,0,.28);opacity:0;transition:opacity .55s ease;z-index:1;';
+    layer.appendChild(veil);
+    /* 中央容器(绝对居中) */
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;';
+    layer.appendChild(wrap);
+    var logo = document.createElement('img');
+    logo.src = targetLogo || LOGO_DEFAULT;
+    logo.style.cssText = 'width:104px;height:104px;object-fit:contain;transform:scale(.2) rotate(-35deg);opacity:0;transition:transform .8s cubic-bezier(.34,1.56,.64,1),opacity .3s;filter:drop-shadow(0 0 30px var(--accent-glow));z-index:2;';
+    wrap.appendChild(logo);
+    /* 圆形波形光环 */
+    var ring = document.createElement('span');
+    ring.style.cssText = 'position:absolute;left:50%;top:50%;width:190px;height:190px;margin:-95px 0 0 -95px;border-radius:50%;border:1.5px solid var(--accent-1);box-shadow:0 0 44px var(--accent-glow),inset 0 0 30px var(--accent-glow);transform:scale(.3);opacity:0;transition:all .9s cubic-bezier(.22,.61,.36,1);z-index:1;';
+    layer.appendChild(ring);
+    requestAnimationFrame(function () { veil.style.opacity = '1'; });
+    setTimeout(function () {
+      logo.style.transform = 'scale(1) rotate(0)';
+      logo.style.opacity = '1';
+      ring.style.transform = 'scale(1)';
+      ring.style.opacity = '.9';
+    }, 80);
+    setTimeout(function () {
+      logo.style.transform = 'scale(2.2) rotate(12deg)';
+      logo.style.opacity = '0';
+      ring.style.transform = 'scale(1.9)';
+      ring.style.opacity = '0';
+      veil.style.opacity = '0';
+    }, 1000);
+    setTimeout(function () { layer.innerHTML = ''; }, 1700);
+  }
+
+  /* ---------- 主题 ---------- */
+  var THEMES = [
+    { cls: 'theme-aurora', name: '极光紫霞', icon: 'circles', anim: 'drift',   logo: LOGO_DEFAULT, term: ASSETS.ocean.term },
+    { cls: 'theme-ocean',  name: '深海琉璃', icon: 'gem',     anim: 'drift',   logo: ASSETS.ocean.logo, term: ASSETS.ocean.term },
+    { cls: 'theme-amber',  name: '琥珀暮光', icon: 'leaf',    anim: 'drift',   logo: ASSETS.amber.logo, term: ASSETS.amber.term },
+    { cls: 'dark-mode',    name: '暗夜模式', icon: 'star4',   anim: 'twinkle', logo: LOGO_DEFAULT, term: ASSETS.amber.term }
+  ];
+  var THEME_ICON = {
+    circles: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>',
+    gem:     '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 3h10l5 7-10 11L2 10Z"/><path d="M2 10h20M7 3l5 7 5-7M12 10v11" stroke="rgba(255,255,255,.4)" stroke-width="1.1" fill="none" stroke-linejoin="round"/></svg>',
+    leaf:    '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 3C18 5 20 12 16 19 9 18 5 11 7 4 9 3 11 3 12 3Z"/><path d="M12 3c0 6 0 11-2 16" stroke="rgba(255,255,255,.4)" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg>',
+    star4:   '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.5 14.2 9.8 21.5 12l-7.3 2.2L12 21.5 9.8 14.2 2.5 12l7.3-2.2Z"/></svg>'
+  };
+  var savedIdx = parseInt(localStorage.getItem('knexpanse-theme'), 10);
+  var curIdx = isNaN(savedIdx) ? 0 : Math.max(0, Math.min(THEMES.length - 1, savedIdx));
+  var themeFade = $('#themeFade');
+  var themePop = $('#themePop');
+  var themeToggle = $('#themeToggle');
+
+  function applyTheme(i) {
+    if (typeof i === 'number') curIdx = i;
+    document.body.classList.remove('theme-aurora', 'theme-ocean', 'theme-amber', 'dark-mode');
+    var t = THEMES[curIdx];
+    if (t.cls) document.body.classList.add(t.cls);
+    /* 悬浮窗勾选标记优先同步(logo/终端图由 CSS 按主题驱动,不依赖 JS) */
+    $$('.tp-item').forEach(function (it) { it.classList.toggle('cur', parseInt(it.dataset.i, 10) === curIdx); });
+    try { spawnParticles(t); } catch (e) {}
+    try { localStorage.setItem('knexpanse-theme', String(curIdx)); } catch (e) {}
+  }
+
+  var popTimer = null;
+  /* 悬浮窗打开期间锁定导航栏按钮:鼠标从悬浮窗移出扫过任何按钮都不会误触 */
+  var unlockBtnId = null;
+  function anyPopOpen() {
+    return !!document.querySelector('.theme-pop.show,.qq-pop.show,.perf-pop.show,.m-pop.show,.lang-pop.show,.look-pop.show,.qr-pop.show');
+  }
+  /* 悬浮窗互斥守卫:其它悬浮窗打开期间,本悬浮窗的打开请求直接忽略(鼠标扫过不切换) */
+  function otherPopOpen(exceptSel) {
+    var sels = ['.theme-pop.show','.qq-pop.show','.perf-pop.show','.m-pop.show','.lang-pop.show','.look-pop.show','.qr-pop.show'];
+    if (exceptSel) sels = sels.filter(function (s) { return s !== exceptSel; });
+    return !!document.querySelector(sels.join(','));
+  }
+  function syncNavLock() {
+    if (isMobileUA) return;
+    var locked = anyPopOpen();
+    ['qrBtn','lookBtn','langBtn','themeToggle','qqBtn','perfBtn','mbtn'].forEach(function (id) {
+      var b = document.getElementById(id);
+      /* 当前打开的悬浮窗对应按钮免锁,否则 pointer-events 切换会触发 mouseleave 循环抽搐 */
+      if (b) b.style.pointerEvents = (locked && id !== unlockBtnId) ? 'none' : '';
+    });
+  }
+  function posPop(pop, btn) {
+    if (!pop || !btn) return;
+    var r = btn.getBoundingClientRect();
+    var pw = pop.offsetWidth || 220;
+    /* 悬浮窗在按钮正下方(右缘对齐),避免溢出屏幕左侧 */
+    var left = r.right - pw;
+    if (left < 10) left = 10;
+    pop.style.left = left + 'px';
+    pop.style.top = (r.bottom + 12) + 'px';
+    pop.style.right = 'auto';
+  }
+  /* pop-open 已弃用(更多菜单已移除),保留空实现兼容旧调用 */
+  function syncPopOpen() { header.classList.remove('pop-open'); }
+  function showPop() { if (!isMobileUA && otherPopOpen('.theme-pop.show')) return; clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); perfPop.classList.remove('show'); clearTimeout(perfTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(themePop, themeToggle); themePop.classList.add('show'); unlockBtnId = 'themeToggle'; syncNavLock(); }
+  function hidePop() { popTimer = setTimeout(function () { themePop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
+  /* 按钮悬停 200ms 才打开悬浮窗:鼠标扫过相邻按钮不误触 */
+  var themeOpenT = null;
+  themeToggle.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(themeOpenT); themeOpenT = setTimeout(showPop, 300); });
+  themeToggle.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(themeOpenT); hidePop(); });
+  themePop.addEventListener('mouseenter', showPop);
+  themePop.addEventListener('mouseleave', hidePop);
+  /* QQ 群悬浮窗 */
+  var qqBtn = $('#qqBtn');
+  var qqPop = $('#qqPop');
+  var qqTimer = null;
+  function showQq() { if (!isMobileUA && otherPopOpen('.qq-pop.show')) return; clearTimeout(qqTimer); themePop.classList.remove('show'); clearTimeout(popTimer); perfPop.classList.remove('show'); clearTimeout(perfTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(qqPop, qqBtn); qqPop.classList.add('show'); unlockBtnId = 'qqBtn'; syncNavLock(); }
+  function hideQq() { qqTimer = setTimeout(function () { qqPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
+  var qqOpenT = null;
+  qqBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(qqOpenT); qqOpenT = setTimeout(showQq, 300); });
+  qqBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(qqOpenT); hideQq(); });
+  qqPop.addEventListener('mouseenter', showQq);
+  qqPop.addEventListener('mouseleave', hideQq);
+  $$('.tp-item').forEach(function (it) {
+    it.addEventListener('click', function () {
+      var i = parseInt(it.dataset.i, 10);
+      if (i === curIdx) { themePop.classList.remove('show'); unlockBtnId = null; syncNavLock(); return; }
+      /* 先收 QQ 悬浮窗,再切换主题 */
+      qqPop.classList.remove('show'); clearTimeout(qqTimer);
+      /* 立即同步主题,再播动画(动画使用目标主题的 logo) */
+      themeFade.style.opacity = '.5';
+      applyTheme(i);
+      themeTransition(THEMES[i].logo);
+      setTimeout(function () { themeFade.style.opacity = '0'; }, 340);
+      themePop.classList.remove('show');
+      unlockBtnId = null;
+      syncNavLock();
+    });
+  });
+
+  /* ---------- 背景粒子(按主题:落叶/绿叶/闪烁星) ---------- */
+  var particlesBox = $('#particles');
+  function spawnParticles(theme) {
+    if (document.body.classList.contains('lite-mode')) return;
+    particlesBox.innerHTML = '';
+    var svg = THEME_ICON[theme.icon] || THEME_ICON.circles;
+    var count = theme.anim === 'twinkle' ? 16 : (theme.cls === 'theme-amber' ? 8 : 12);
+    for (var i = 0; i < count; i++) {
+      var el = document.createElement('div');
+      el.innerHTML = svg;
+      var s = el.firstChild;
+      if (theme.anim === 'twinkle') {
+        s.style.left = (3 + Math.random() * 94) + '%';
+        s.style.top = (3 + Math.random() * 94) + '%';
+        s.style.animation = 'twinkle ' + (2 + Math.random() * 2.5).toFixed(2) + 's ease-in-out ' + (Math.random() * 3).toFixed(2) + 's infinite';
+        var sz1 = 10 + Math.random() * 14;
+        s.style.width = sz1 + 'px';
+        s.style.height = sz1 + 'px';
+      } else {
+        s.style.left = (Math.random() * 94) + '%';
+        s.style.animation = ['drift1', 'drift2', 'drift3'][i % 3] + ' ' + (9 + Math.random() * 14).toFixed(1) + 's linear ' + (Math.random() * 8).toFixed(1) + 's infinite';
+        var sz2 = 14 + Math.random() * 18;
+        s.style.width = sz2 + 'px';
+        s.style.height = sz2 + 'px';
+      }
+      particlesBox.appendChild(s);
+    }
+  }
+  function spawnOne(theme) {
+    var el = document.createElement('div');
+    el.innerHTML = THEME_ICON[theme.icon] || THEME_ICON.circles;
+    var s = el.firstChild;
+    if (theme.anim === 'twinkle') {
+      s.style.left = (3 + Math.random() * 94) + '%';
+      s.style.top = (3 + Math.random() * 94) + '%';
+      s.style.animation = 'twinkle ' + (2 + Math.random() * 2.5).toFixed(2) + 's ease-in-out ' + (Math.random() * 3).toFixed(2) + 's infinite';
+      var sz1 = 10 + Math.random() * 14;
+      s.style.width = sz1 + 'px';
+      s.style.height = sz1 + 'px';
+    } else {
+      s.style.left = (Math.random() * 94) + '%';
+      s.style.animation = ['drift1', 'drift2', 'drift3'][Math.floor(Math.random() * 3)] + ' ' + (9 + Math.random() * 14).toFixed(1) + 's linear ' + (Math.random() * 8).toFixed(1) + 's infinite';
+      var sz2 = 14 + Math.random() * 18;
+      s.style.width = sz2 + 'px';
+      s.style.height = sz2 + 'px';
+    }
+    particlesBox.appendChild(s);
+  }
+  particlesBox.addEventListener('pointerover', function (e) { var s = e.target.closest('svg'); if (s) s.classList.add('glow'); });
+  particlesBox.addEventListener('pointerout', function (e) { var s = e.target.closest('svg'); if (s) s.classList.remove('glow'); });
+  particlesBox.addEventListener('click', function (e) {
+    var s = e.target.closest('svg');
+    if (!s) return;
+    s.classList.add('burst');
+    var theme = THEMES[curIdx];
+    var that = s;
+    setTimeout(function () { that.remove(); spawnOne(theme); }, 500);
+  });
+
+  /* ---------- 导航 ---------- */
+  var header = $('#header');
+  var hamburger = $('#hamburgerBtn');
+  $$('a[data-scroll]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      closeMenu();
+    });
+  });
+  function closeMenu() {
+    if (!header.classList.contains('menu-open')) return;
+    /* 节能模式:无动画,立即收起 */
+    if (document.body.classList.contains('lite-mode')) {
+      header.classList.remove('menu-open'); header.classList.remove('closing');
+      header.style.height = ''; hamburger.setAttribute('aria-expanded', 'false');
+      return;
+    }
+    header.classList.add('closing');
+    header.style.height = '60px';
+    setTimeout(function () {
+      header.classList.remove('menu-open');
+      header.classList.remove('closing');
+      header.style.height = '';
+      hamburger.setAttribute('aria-expanded', 'false');
+      header.classList.add('nav-reveal');
+      setTimeout(function () { header.classList.remove('nav-reveal'); }, 620);
+    }, 460);
+  }
+  hamburger.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (header.classList.contains('menu-open')) { closeMenu(); return; }
+    /* 打开菜单前收起已开悬浮窗,避免并存 */
+    if (isMobileUA) { [qrPop, lookPop, langPop].forEach(function (p) { if (p) p.classList.remove('show'); }); }
+    header.classList.add('hiding-nav');
+    if (document.body.classList.contains('lite-mode')) {
+      /* 节能模式:无动画延迟,但等一帧布局后再取高度(立即读 scrollHeight 会算错) */
+      header.classList.remove('hiding-nav'); header.classList.add('menu-open');
+      hamburger.setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          header.style.height = header.scrollHeight + 'px';
+        });
+      });
+      return;
+    }
+    setTimeout(function () {
+      header.classList.remove('hiding-nav');
+      header.classList.add('menu-open');
+      hamburger.setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          header.style.height = header.scrollHeight + 'px';
+        });
+      });
+    }, 220);
+  });
+  document.addEventListener('click', function (e) { if (header.classList.contains('menu-open') && !e.target.closest('header, .theme-pop, .qq-pop, .perf-pop, .m-pop, .lang-pop, .look-pop, .qr-pop')) closeMenu(); });
+  window.addEventListener('resize', function () { if (window.innerWidth > 1040) { header.style.height = ''; closeMenu(); } });
+
+  /* ---------- 导航"更多"收纳菜单(hover 展开,点击也可) ---------- */
+  var navMoreBtn = $('#navMoreBtn');
+  var navMoreMenu = $('#navMoreMenu');
+  var navMoreWrap = $('.nav-more-wrap');
+  var navMoreT = null;
+  function openNavMore() {
+    if (!navMoreMenu) return;
+    clearTimeout(navMoreT);
+    navMoreMenu.classList.add('show');
+    if (navMoreBtn) navMoreBtn.setAttribute('aria-expanded', 'true');
+    if (header) header.classList.add('more-open');
+  }
+  function closeNavMore() {
+    if (!navMoreMenu) return;
+    navMoreT = setTimeout(function () {
+      navMoreMenu.classList.remove('show');
+      if (navMoreBtn) navMoreBtn.setAttribute('aria-expanded', 'false');
+      if (header) header.classList.remove('more-open');
+    }, 180);
+  }
+  if (navMoreWrap) {
+    navMoreWrap.addEventListener('mouseenter', function () { clearTimeout(navMoreT); openNavMore(); });
+    navMoreWrap.addEventListener('mouseleave', closeNavMore);
+  }
+  if (navMoreBtn) {
+    navMoreBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (navMoreMenu && navMoreMenu.classList.contains('show')) closeNavMore();
+      else openNavMore();
+    });
+  }
+
+  var backTop = $('#backTop');
+  window.addEventListener('scroll', function () {
+    header.classList.toggle('scrolled', window.scrollY > 30);
+    backTop.classList.toggle('show', window.scrollY > 520);
+  }, { passive: true });
+  backTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  /* ---------- 节能模式按钮 + 性能监测 ---------- */
+  var perfBtn = $('#perfBtn');
+  var perfTip = $('#perfTip');
+  var perfPop = $('#perfPop');
+  var perfPopState = $('#perfPopState');
+  function perfPopSync() {
+    var on = document.body.classList.contains('lite-mode');
+    var d = I18N || {};
+    var s = on ? (d.perf_state_on || {}) : (d.perf_state_off || {});
+    perfPopState.textContent = s[curLang] || (on ? '节能模式 · 已开启' : '节能模式 · 已关闭');
+    perfPopState.classList.toggle('off', !on);
+  }
+  function setLite(on) {
+    document.body.classList.toggle('lite-mode', on);
+    perfBtn.classList.toggle('lite', on);
+    try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
+    if (on) {
+      particlesBox.innerHTML = '';
+      toast(I18N.toast_perf_on ? I18N.toast_perf_on[curLang] : '已开启节能模式,特效已精简');
+    } else {
+      toast(I18N.toast_perf_off ? I18N.toast_perf_off[curLang] : '已关闭节能模式');
+      spawnParticles(THEMES[curIdx]);
+    }
+    perfPopSync();
+  }
+  perfBtn.addEventListener('click', function () {
+    setLite(!document.body.classList.contains('lite-mode'));
+  }, { passive: true });
+  if (document.body.classList.contains('lite-mode')) perfBtn.classList.add('lite');
+  var perfTimer = null;
+  function showPerfPop() { if (!isMobileUA && otherPopOpen('.perf-pop.show')) return; clearTimeout(perfTimer); themePop.classList.remove('show'); clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); mPop.classList.remove('show'); clearTimeout(mTimer); langPop.classList.remove('show'); clearTimeout(langTimer); posPop(perfPop, perfBtn); perfPopSync(); perfPop.classList.add('show'); unlockBtnId = 'perfBtn'; syncNavLock(); }
+  function hidePerfPop() { perfTimer = setTimeout(function () { perfPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
+  var perfOpenT = null;
+  perfBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(perfOpenT); perfOpenT = setTimeout(showPerfPop, 300); });
+  perfBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(perfOpenT); hidePerfPop(); });
+  perfPop.addEventListener('mouseenter', showPerfPop);
+  perfPop.addEventListener('mouseleave', hidePerfPop);
+  perfPopSync();
+
+  /* ---------- 移动端下载按钮 + 悬浮窗(与其余悬浮窗互斥) ---------- */
+  var mbtn = $('#mbtn');
+  var mPop = $('#mPop');
+  var mTimer = null;
+  function showMPop() {
+    if (!isMobileUA && otherPopOpen('.m-pop.show')) return;
+    clearTimeout(mTimer);
+    themePop.classList.remove('show'); clearTimeout(popTimer);
+    qqPop.classList.remove('show'); clearTimeout(qqTimer);
+    perfPop.classList.remove('show'); clearTimeout(perfTimer);
+    posPop(mPop, mbtn); mPop.classList.add('show'); unlockBtnId = 'mbtn'; syncNavLock();
+  }
+  function hideMPop() { mTimer = setTimeout(function () { mPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
+  var mOpenT = null;
+  mbtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(mOpenT); mOpenT = setTimeout(showMPop, 300); });
+  mbtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(mOpenT); hideMPop(); });
+  mPop.addEventListener('mouseenter', showMPop);
+  mPop.addEventListener('mouseleave', hideMPop);
+
+  /* ---------- 移动端快捷下载首屏 ---------- */
+  var mDl = $('#mDl');
+  var isMobileUA = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MQQBrowser/i.test(navigator.userAgent);
+  function mDlOpen() {
+    mDl.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    /* 折叠屏/节能:起始页只保留自身,主内容先不渲染,点"查看详细介绍"再加载 */
+    document.body.classList.add('m-boot');
+    window.scrollTo(0, 0);
+    mDl.scrollTop = 0;
+  }
+  function mDlOff() {
+    mDl.classList.remove('show');
+    document.body.style.overflow = '';
+    document.body.classList.remove('m-boot');
+    /* 查看详细介绍:直接进主页(不刷新,否则会弹回起始页) */
+    window.scrollTo(0, 0);
+  }
+  if (isMobileUA) {
+    document.body.classList.add('mobile');
+    /* 市场页:移动端直接进入市场,不自动弹出下载首屏 */
+  }
+  /* 移动端:悬浮窗改点击交互,禁用 hover 打开 */
+  var hoverPop = !isMobileUA;
+  /* 查看详细介绍:进入主页 */
+  if ($('#mDlEnter')) $('#mDlEnter').addEventListener('click', mDlOff);
+  if ($('#mDlIos')) $('#mDlIos').addEventListener('click', function () { toast(I18N.dl_ios_tip ? I18N.dl_ios_tip[curLang] : 'iOS 版正在研发中,敬请期待'); });
+  /* 市场页不显示"回到下载页"按钮(下载首屏仅移动端悬浮窗入口) */
+  /* ---------- 语言系统(5 语言) ---------- */
+  var I18N = {
+    nav_market:{zh:'插件市场',en:'Plugins',ja:'プラグイン',ko:'플러그인',es:'Plugins',tw:'插件市場'},
+    nav_community:{zh:'编程社区',en:'Coding Community',ja:'プログラミングコミュニティ',ko:'코딩 커뮤니티',es:'Comunidad de Código',tw:'編程社區'},
+    nav_changelog:{zh:'更新记录',en:'Changelog',ja:'更新履歴',ko:'업데이트 내역',es:'Registro',tw:'更新記錄'},
+    nav_team:{zh:'制作团队',en:'Team',ja:'制作チーム',ko:'제작 팀',es:'Equipo',tw:'製作團隊'},
+    nav_download:{zh:'下载',en:'Download',ja:'ダウンロード',ko:'다운로드',es:'Descargar',tw:'下載'},
+    nav_more:{zh:'更多',en:'More',ja:'もっと見る',ko:'더보기',es:'Más',tw:'更多'},
+    menu_title:{zh:'导航菜单',en:'Menu',ja:'メニュー',ko:'메뉴',es:'Menú',tw:'導航菜單'},
+    more_title:{zh:'更多功能',en:'More Features',ja:'その他の機能',ko:'추가 기능',es:'Más Funciones',tw:'更多功能'},
+    badge_v130:{zh:'全新 v1.3.0',en:'New v1.3.0',ja:'新 v1.3.0',ko:'새 v1.3.0',es:'Nuevo v1.3.0',tw:'全新 v1.3.0'},
+    hero_t1:{zh:'现代化图形化编辑器',en:'Modern Visual Editor',ja:'モダンなビジュアルエディタ',ko:'모던 비주얼 에디터',es:'Editor Visual Moderno',tw:'現代化圖形化編輯器'},
+    hero_t2:{zh:'为生态而生',en:'Built for the Ecosystem',ja:'エコシステムのために',ko:'생태계를 위해',es:'Hecho para el Ecosistema',tw:'為生態而生'},
+    hero_t3:{zh:'for creators',en:'for creators',ja:'クリエイターへ',ko:'크리에이터를 위해',es:'para creadores',tw:'for creators'},
+    hero_desc:{zh:'高性能可扩展的图形化编程软件,为开发者提供简单而高效的方式来创建和分发游戏。',en:'A high-performance, extensible visual programming tool to create and publish games simply and efficiently.',ja:'高性能で拡張可能なビジュアルプログラミングソフト。ゲームを簡単・効率的に作成・配信できます。',ko:'고성능 확장 가능한 비주얼 프로그래밍 도구로, 게임을 간단하고 효율적으로 제작·배포할 수 있습니다.',es:'Software de programación visual de alto rendimiento y extensible, para crear y publicar juegos de forma sencilla y eficiente.',tw:'高性能可擴展的圖形化編程軟件,為開發者提供簡單而高效的方式來創建和分發游戏。'},
+    btn_dl:{zh:'立即下载',en:'Download Now',ja:'今すぐダウンロード',ko:'지금 다운로드',es:'Descargar Ahora',tw:'立即下載'},
+    btn_docs:{zh:'开发文档',en:'Docs',ja:'ドキュメント',ko:'문서',es:'Documentación',tw:'開發文档'},
+    btn_more:{zh:'其他产品',en:'More Products',ja:'他の製品',ko:'다른 제품',es:'Otros Productos',tw:'其他产品'},
+    term_title:{zh:'拥抱 KE Expanse',en:'Embrace KE Expanse',ja:'KE Expanse を抱きしめよう',ko:'KE Expanse를 안아보세요',es:'Abraza KE Expanse',tw:'擁抱 KE Expanse'},
+    why_title:{zh:'为什么选择 ',en:'Why Choose ',ja:'選ばれる理由 ',ko:'선택하는 이유 ',es:'¿Por qué ',tw:'為什么選擇 '},
+    core_sub:{zh:'核心能力',en:'Core Powers',ja:'コア機能',ko:'핵심 기능',es:'Poderes Clave',tw:'核心能力'},
+    ext_sub:{zh:'为创作加速',en:'Speed Up Creation',ja:'創作を加速',ko:'창작을 가속',es:'Acelera tu Creación',tw:'為創作加速'},
+    st_title:{zh:'项目数据',en:'Project Data',ja:'プロジェクトデータ',ko:'프로젝트 데이터',es:'Datos del Proyecto',tw:'項目數據'},
+    st_grad:{zh:'实时数据',en:'Live Data',ja:'リアルタイムデータ',ko:'실시간 데이터',es:'Datos en vivo',tw:'實時數據'},
+    st_live:{zh:'数据实时更新中',en:'Live Updating',ja:'リアルタイム更新中',ko:'실시간 업데이트 중',es:'Actualización en vivo',tw:'數據實時更新中'},
+    step_t1:{zh:'三步开启 ',en:'Start in 3 Steps ',ja:'3ステップで開始 ',ko:'3단계로 시작 ',es:'Empieza en 3 pasos ',tw:'三步開啟 '},
+    step_sub:{zh:'创作之旅',en:'Creation Journey',ja:'創作の旅',ko:'창작 여정',es:'Viaje Creativo',tw:'創作之旅'},
+    dl_title:{zh:'立即开始创作',en:'Start Creating Now',ja:'今すぐ創作開始',ko:'지금 바로 창작',es:'Empieza a Crear',tw:'立即開始創作'},
+    footer_note:{zh:'用热爱创造无限可能',en:'Creating with passion',ja:'情熱で無限の可能性を',ko:'열정으로 무한한 가능성을',es:'Creando con pasión',tw:'用熱愛創造無限可能'},
+    qq_title:{zh:'KE Expanse 官方交流群',en:'KE Expanse Official Group',ja:'KE Expanse 公式コミュニティ',ko:'KE Expanse 공식 커뮤니티',es:'Grupo Oficial KE Expanse',tw:'KE Expanse 官方交流群'},
+    m_title:{zh:'移动端下载',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil'},
+    m_note:{zh:'移动端下载',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil',tw:'移動端下載'},
+    perf_desc:{zh:'关闭特效 · 保留流畅基础体验',en:'Disable effects · Keep smooth basics',ja:'エフェクトOFF · 快適な基本体験を維持',ko:'효과 OFF · 부드러운 기본 경험 유지',es:'Desactivar efectos · Base fluida',tw:'關閉特效 · 保留流暢基礎體驗'},
+    perf_tip_t:{zh:'检测到设备性能不足',en:'Low Performance Detected',ja:'デバイスの性能不足を検出',ko:'기기 성능 부족 감지',es:'Rendimiento bajo detectado',tw:'檢測到設备性能不足'},
+    perf_tip_d:{zh:'当前帧率较低,切换节能模式可让页面更流畅。',en:'FPS is low. Power-saving mode will make the page smoother.',ja:'フレームレートが低いです。省エネモードでページが快適になります。',ko:'프레임이 낮습니다. 절전 모드를 켜면 페이지가 부드러워집니다.',es:'FPS bajo. El modo ahorro hará la página más fluida.',tw:'当前幀率較低,切換節能模式可讓頁面更流暢。'},
+  };
+
+  var I18N_EXTRA = {
+    why_sub:{zh:'专为创造者打造的现代图形化编程平台',en:'A modern visual programming platform built for creators',ja:'クリエイターのためのモダンなビジュアルプログラミングプラットフォーム',ko:'크리에이터를 위한 모던 비주얼 프로그래밍 플랫폼',es:'Una plataforma moderna de programación visual para creadores',tw:'專為創造者打造的現代圖形化編程平台'},
+    feat_draw_title:{zh:'高性能绘制',en:'High-Perf Rendering',ja:'ハイパフォーマンス描画',ko:'고성능 렌더링',es:'Renderizado de Alto Rendimiento',tw:'高性能繪製'},
+    feat_draw_desc:{zh:'GPU 硬件加速,复杂场景依旧丝滑流畅,告别卡顿掉帧。',en:'GPU hardware acceleration keeps complex scenes buttery smooth, no more lag or frame drops.',ja:'GPUハードウェアアクセラレーションで複雑なシーンも滑らかに。カクつき・フレーム落ちを解消。',ko:'GPU 하드웨어 가속으로 복잡한 장면도 매끄럽게, 끊김과 프레임 드롭이 없습니다.',es:'Aceleración por GPU: escenas complejas fluidas, sin lag ni caídas de fotogramas.',tw:'GPU 硬件加速,復杂場景依旧丝滑流暢,告別卡顿掉幀。'},
+    feat_draw_li1:{zh:'GPU 加速 · 120 FPS',en:'GPU Accel · 120 FPS',ja:'GPU加速 · 120FPS',ko:'GPU 가속 · 120FPS',es:'GPU · 120 FPS',tw:'GPU 加速 · 120 FPS'},
+    feat_draw_li2:{zh:'矢量画布 · 无限缩放',en:'Vector Canvas · Infinite Zoom',ja:'ベクターキャンバス · 無限ズーム',ko:'벡터 캔버스 · 무한 줌',es:'Lienzo vectorial · Zoom infinito',tw:'矢量画佈 · 無限缩放'},
+    feat_draw_li3:{zh:'多图层管理',en:'Multi-Layer Management',ja:'多レイヤー管理',ko:'다중 레이어 관리',es:'Gestión multicapa',tw:'多圖层管理'},
+    feat_draw_li4:{zh:'实时性能监控',en:'Live Performance Monitor',ja:'リアルタイム性能モニタ',ko:'실시간 성능 모니터',es:'Monitor de rendimiento en vivo',tw:'實時性能监控'},
+    feat_draw_chip1:{zh:'GPU 加速',en:'GPU Accel',ja:'GPU加速',ko:'GPU 가속',es:'GPU',tw:'GPU 加速'},
+    feat_draw_chip2:{zh:'120 FPS',en:'120 FPS',ja:'120FPS',ko:'120FPS',es:'120 FPS',tw:'120 FPS'},
+    feat_vis_title:{zh:'可视化编程',en:'Visual Coding',ja:'ビジュアルプログラミング',ko:'비주얼 프로그래밍',es:'Programación Visual',tw:'可視化編程'},
+    feat_vis_desc:{zh:'零门槛节点编辑,拖拽连线即写代码,创意不被语法束缚。',en:'Zero-threshold node editing: drag and connect to code. Creativity is never limited by syntax.',ja:'ハードルゼロのノード編集。ドラッグで配線してコードを書く。構文に縛られない発想を。',ko:'진입 장벽 없는 노드 편집, 드래그 연결만으로 코딩. 구문에 얽매이지 않는 창의성.',es:'Edición de nodos sin curva de aprendizaje: arrastra y conecta para programar.',tw:'零門槛節點編輯,拖拽连線即写代碼,創意不被語法束缚。'},
+    feat_vis_li1:{zh:'拖拽连线 · 逻辑清晰',en:'Drag & Connect · Clear Logic',ja:'ドラッグ配線 · わかりやすいロジック',ko:'드래그 연결 · 명확한 로직',es:'Arrastrar y conectar · Lógica clara',tw:'拖拽连線 · 邏輯清晰'},
+    feat_vis_li2:{zh:'实时运行调试',en:'Live Run & Debug',ja:'リアルタイム実行・デバッグ',ko:'실시간 실행·디버그',es:'Ejecución y depuración en vivo',tw:'實時运行调试'},
+    feat_vis_li3:{zh:'逻辑模板库',en:'Logic Template Library',ja:'ロジックテンプレートライブラリ',ko:'로직 템플릿 라이브러리',es:'Biblioteca de plantillas lógicas',tw:'邏輯模板庫'},
+    feat_vis_li4:{zh:'断点排查',en:'Breakpoint Inspection',ja:'ブレークポイント調査',ko:'중단점 검사',es:'Inspección con puntos de interrupción',tw:'断點排查'},
+    feat_vis_chip1:{zh:'拖拽连线',en:'Drag & Drop',ja:'ドラッグ&ドロップ',ko:'드래그 앤 드롭',es:'Arrastrar y soltar',tw:'拖拽连線'},
+    feat_vis_chip2:{zh:'零代码',en:'No-Code',ja:'ノーコード',ko:'노코드',es:'Sin código',tw:'零代碼'},
+    feat_plug_title:{zh:'插件生态',en:'Plugin Ecosystem',ja:'プラグインエコシステム',ko:'플러그인 생태계',es:'Ecosistema de Plugins',tw:'插件生態'},
+    feat_plug_desc:{zh:'开放 JS 插件系统,官方与社区共建,一站式获取工具素材。',en:'Open JS plugin system co-built with the community — tools and assets in one place.',ja:'オープンなJSプラグインシステム。公式とコミュニティが協力、ツールと素材をワンストップで。',ko:'개방형 JS 플러그인 시스템, 공식과 커뮤니티가 함께 구축해 도구와 자료를 한곳에서.',es:'Sistema abierto de plugins JS, construido con la comunidad, con herramientas y recursos en un solo lugar.',tw:'開放 JS 插件系统,官方与社区共建,一站式获取工具素材。'},
+    feat_plug_li1:{zh:'JS 扩展接口',en:'JS Extension API',ja:'JS拡張インターフェース',ko:'JS 확장 인터페이스',es:'API de extensión JS',tw:'JS 擴展接口'},
+    feat_plug_li2:{zh:'官方插件市场',en:'Official Plugin Market',ja:'公式プラグインマーケット',ko:'공식 플러그인 마켓',es:'Mercado oficial de plugins',tw:'官方插件市場'},
+    feat_plug_li3:{zh:'一键安装即用',en:'One-Click Install',ja:'ワンクリックで即インストール',ko:'원클릭 즉시 설치',es:'Instalación con un clic',tw:'一鍵安裝即用'},
+    feat_plug_li4:{zh:'上千款素材模板',en:'1000+ Assets & Templates',ja:'1000点以上の素材・テンプレート',ko:'천 개 이상의 에셋·템플릿',es:'+1000 recursos y plantillas',tw:'上千款素材模板'},
+    feat_plug_chip1:{zh:'JS 扩展',en:'JS Ext.',ja:'JS拡張',ko:'JS 확장',es:'Ext. JS',tw:'JS 擴展'},
+    feat_plug_chip2:{zh:'社区共建',en:'Community',ja:'コミュニティ',ko:'커뮤니티',es:'Comunidad',tw:'社区共建'},
+    feat_dist_title:{zh:'快速分发',en:'Quick Distribution',ja:'高速配信',ko:'빠른 배포',es:'Distribución Rápida',tw:'快速分發'},
+    feat_dist_desc:{zh:'云存档 + 一键打包,Windows 一键分发,Mac / Linux 版研发中。',en:'Cloud saves + one-click packaging. One-click distribution for Windows; Mac / Linux in development.',ja:'クラウド保存+ワンクリックパッケージ。Windowsはワンクリック配信、Mac / Linux版は開発中。',ko:'클라우드 저장 + 원클릭 패키징. Windows 원클릭 배포, Mac/Linux는 개발 중.',es:'Guardado en la nube + empaquetado en un clic. Distribución para Windows; Mac/Linux en desarrollo.',tw:'雲存档 + 一鍵打包,Windows 一鍵分發,Mac / Linux 版研發中。'},
+    feat_dist_li1:{zh:'云端存档 · 无缝切换',en:'Cloud Saves · Seamless Switch',ja:'クラウド保存 · シームレス切替',ko:'클라우드 저장 · 원활한 전환',es:'Guardado en la nube · Cambio fluido',tw:'雲端存档 · 無缝切換'},
+    feat_dist_li2:{zh:'Windows 一键打包',en:'Windows One-Click Pack',ja:'Windowsワンクリックパッケージ',ko:'Windows 원클릭 패키징',es:'Empaquetado Windows en un clic',tw:'Windows 一鍵打包'},
+    feat_dist_li3:{zh:'发布即上线',en:'Publish & Go Live',ja:'公開すれば即リリース',ko:'게시 즉시 서비스',es:'Publicar y lanzar',tw:'發佈即上線'},
+    feat_dist_li4:{zh:'链接一键分享',en:'One-Click Share Link',ja:'ワンクリック共有リンク',ko:'원클릭 공유 링크',es:'Compartir con un clic',tw:'链接一鍵分享'},
+    feat_dist_chip1:{zh:'云存档',en:'Cloud Save',ja:'クラウド保存',ko:'클라우드 저장',es:'Nube',tw:'雲存档'},
+    feat_more:{zh:'了解更多',en:'Learn More',ja:'詳しく見る',ko:'더 알아보기',es:'Saber más',tw:'了解更多'},
+    core_sub2:{zh:'从节点搭建到多端导出,一条龙完成创作',en:'From node building to multi-platform export — create end to end',ja:'ノード構築から多端末エクスポートまで、創作を一気通貫で',ko:'노드 제작부터 멀티 플랫폼 내보내기까지 한 번에',es:'Del ensamblado de nodos a la exportación multiplataforma, todo en uno',tw:'从節點搭建到多端導出,一條龙完成創作'},
+    slide1_title:{zh:'节点式编程',en:'Node-Based Coding',ja:'ノードベースプログラミング',ko:'노드 기반 코딩',es:'Programación por Nodos',tw:'節點式編程'},
+    slide1_desc:{zh:'可视化节点构建游戏逻辑,拖拽连线即写代码,结构一目了然。',en:'Build game logic with visual nodes — drag and connect, structure at a glance.',ja:'ビジュアルノードでゲームロジックを構築。ドラッグ配線でコードが書け、構造が一目瞭然。',ko:'비주얼 노드로 게임 로직 구성, 드래그 연결로 코딩, 구조가 한눈에.',es:'Construye la lógica del juego con nodos visuales: arrastra y conecta, estructura clara.',tw:'可視化節點構建游戏邏輯,拖拽连線即写代碼,結構一目了然。'},
+    slide1_li1:{zh:'拖拽连线 · 所见即所得',en:'Drag & Connect · WYSIWYG',ja:'ドラッグ配線 · 見たままの結果',ko:'드래그 연결 · 위지위그',es:'Arrastrar y conectar · WYSIWYG',tw:'拖拽连線 · 所見即所得'},
+    slide1_li2:{zh:'逻辑分支清晰',en:'Clear Logic Branches',ja:'わかりやすい分岐構造',ko:'명확한 로직 분기',es:'Ramas lógicas claras',tw:'邏輯分支清晰'},
+    slide1_chip2:{zh:'实时调试',en:'Live Debug',ja:'リアルタイムデバッグ',ko:'실시간 디버그',es:'Depuración en vivo',tw:'實時调试'},
+    slide2_title:{zh:'实时预览',en:'Live Preview',ja:'リアルタイムプレビュー',ko:'실시간 미리보기',es:'Vista Previa en Vivo',tw:'實時預覽'},
+    slide2_desc:{zh:'所见即所得,修改即时生效,边改边玩,快速迭代。',en:'WYSIWYG with instant updates — tweak and play, iterate fast.',ja:'見たままの結果。変更が即反映され、遊びながら素早く反復。',ko:'위지위그, 수정 즉시 반영, 만들면서 바로 플레이, 빠른 반복.',es:'WYSIWYG con cambios instantáneos: ajusta, juega e itera rápido.',tw:'所見即所得,修改即時生效,边改边玩,快速迭代。'},
+    slide2_li1:{zh:'修改即时生效',en:'Instant Updates',ja:'変更即反映',ko:'수정 즉시 반영',es:'Cambios instantáneos',tw:'修改即時生效'},
+    slide2_li2:{zh:'分屏同步运行',en:'Split-Screen Sync Run',ja:'分割画面で同期実行',ko:'분할 화면 동기 실행',es:'Ejecución sincronizada en dos pantallas',tw:'分屏同步运行'},
+    slide2_chip2:{zh:'即时刷新',en:'Live Refresh',ja:'即時リフレッシュ',ko:'즉시 새로고침',es:'Actualización en vivo',tw:'即時刷新'},
+    slide3_title:{zh:'可扩展架构',en:'Extensible Architecture',ja:'拡張可能なアーキテクチャ',ko:'확장 가능한 아키텍처',es:'Arquitectura Extensible',tw:'可擴展架構'},
+    slide3_desc:{zh:'模块化设计,开放 JS 扩展接口,社区共建无限可能。',en:'Modular design with an open JS extension API — endless possibilities with the community.',ja:'モジュール設計とオープンなJS拡張IF。コミュニティと無限の可能性を。',ko:'모듈식 설계와 개방형 JS 확장 인터페이스, 커뮤니티와 무한한 가능성.',es:'Diseño modular con API de extensión JS abierta: posibilidades infinitas con la comunidad.',tw:'模塊化設計,開放 JS 擴展接口,社区共建無限可能。'},
+    slide3_li1:{zh:'模块化内核',en:'Modular Core',ja:'モジュール化されたコア',ko:'모듈식 코어',es:'Núcleo modular',tw:'模塊化內核'},
+    slide3_li2:{zh:'开放 API 自定义',en:'Open API Customization',ja:'オープンAPIでカスタム',ko:'개방형 API 커스터마이즈',es:'Personalización con API abierta',tw:'開放 API 自定义'},
+    slide3_chip2:{zh:'模块化',en:'Modular',ja:'モジュール式',ko:'모듈식',es:'Modular',tw:'模塊化'},
+    slide4_title:{zh:'多平台导出',en:'Multi-Platform Export',ja:'マルチプラットフォーム出力',ko:'멀티 플랫폼 내보내기',es:'Exportación Multiplataforma',tw:'多平台導出'},
+    slide4_desc:{zh:'一键导出多平台格式,Windows / macOS / Linux 全覆盖。',en:'One-click export to multiple platforms: Windows / macOS / Linux.',ja:'ワンクリックで多形式出力。Windows / macOS / Linux 完全対応。',ko:'원클릭 멀티 플랫폼 내보내기, Windows/macOS/Linux 전부 지원.',es:'Exportación en un clic a varias plataformas: Windows / macOS / Linux.',tw:'一鍵導出多平台格式,Windows / macOS / Linux 全覆盖。'},
+    slide4_li1:{zh:'Windows 导出',en:'Windows Export',ja:'Windows出力',ko:'Windows 내보내기',es:'Exportar a Windows',tw:'Windows 導出'},
+    slide4_li2:{zh:'包体体积优化',en:'Package Size Optimization',ja:'パッケージ最適化',ko:'패키지 용량 최적화',es:'Optimización de tamaño',tw:'包體體积優化'},
+    slide4_chip1:{zh:'win · mac · linux',en:'win · mac · linux',ja:'win · mac · linux',ko:'win · mac · linux',es:'win · mac · linux',tw:'win · mac · linux'},
+    ext_sub2:{zh:'社区精选扩展,一键安装即用 · 自动轮播',en:'Community-picked extensions, one-click install · auto-rotating',ja:'コミュニティ厳選の拡張。ワンクリックで即利用 · 自動巡回',ko:'커뮤니티 선별 확장, 원클릭 설치 · 자동 회전',es:'Extensiones seleccionadas por la comunidad, instalación en un clic · rotación automática',tw:'社区精選擴展,一鍵安裝即用 · 自動輪播'},
+    ext1_title:{zh:'粒子特效扩展包',en:'Particle FX Pack',ja:'パーティクルエフェクトパック',ko:'파티클 이펙트 팩',es:'Paquete de Partículas',tw:'粒子特效擴展包'},
+    ext1_author:{zh:'by @KnitStudio · 130k 安装',en:'by @KnitStudio · 130k installs',ja:'by @KnitStudio · 13万インストール',ko:'by @KnitStudio · 13만 설치',es:'por @KnitStudio · 130k instalaciones',tw:'by @KnitStudio · 130k 安裝'},
+    ext1_desc:{zh:'上百种粒子效果,一键为场景添加爆炸、烟尘、星光与魔法光效。',en:'Hundreds of particle effects: explosions, smoke, stardust and magic glows in one click.',ja:'100種類以上のパーティクル効果。爆発・煙・星屑・魔法エフェクトをワンクリックで。',ko:'수백 가지 파티클 효과, 폭발·연기·별빛·마법 광효과를 원클릭으로.',es:'Cientos de efectos de partículas: explosiones, humo, polvo de estrellas y brillos mágicos.',tw:'上百種粒子效果,一鍵為場景添加爆炸、烟尘、星光与魔法光效。'},
+    ext2_title:{zh:'UI 界面素材库',en:'UI Assets Library',ja:'UI素材ライブラリ',ko:'UI 에셋 라이브러리',es:'Biblioteca de Assets UI',tw:'UI 界面素材庫'},
+    ext2_author:{zh:'by @MixUI · 96k 安装',en:'by @MixUI · 96k installs',ja:'by @MixUI · 9.6万インストール',ko:'by @MixUI · 9.6만 설치',es:'por @MixUI · 96k instalaciones',tw:'by @MixUI · 96k 安裝'},
+    ext2_desc:{zh:'精致按钮、面板、进度条等 200+ 组件模板,拖拽即用,统一风格。',en:'200+ component templates: buttons, panels, progress bars — drag and use, consistent style.',ja:'ボタン・パネル・プログレスバーなど200+のコンポーネント。ドラッグですぐ使えて統一感も。',ko:'버튼, 패널, 진행바 등 200+ 컴포넌트 템플릿, 드래그로 즉시 사용.',es:'+200 plantillas: botones, paneles, barras de progreso — arrastra y usa.',tw:'精致按钮、面板、進度條等 200+ 組件模板,拖拽即用,统一风格。'},
+    ext3_title:{zh:'数据可视化工具',en:'Data Visualization Tools',ja:'データ可視化ツール',ko:'데이터 시각화 도구',es:'Herramientas de Visualización',tw:'數據可視化工具'},
+    ext3_author:{zh:'by @DataLab · 74k 安装',en:'by @DataLab · 74k installs',ja:'by @DataLab · 7.4万インストール',ko:'by @DataLab · 7.4만 설치',es:'por @DataLab · 74k instalaciones',tw:'by @DataLab · 74k 安裝'},
+    ext3_desc:{zh:'图表节点与仪表盘模板,让游戏数据流动起来,复盘一目了然。',en:'Chart nodes and dashboard templates — make game data flow and reviews crystal clear.',ja:'チャートノードとダッシュボードで、ゲームデータを見える化し振り返りも一目瞭然。',ko:'차트 노드와 대시보드 템플릿으로 게임 데이터를 시각화, 분석이 한눈에.',es:'Nodos de gráficos y plantillas de panel: visualiza datos del juego y analiza con claridad.',tw:'圖表節點与仪表盤模板,讓游戏數據流動起來,復盤一目了然。'},
+    ext_view:{zh:'查看',en:'View',ja:'見る',ko:'보기',es:'Ver',tw:'查看'},
+    ext_market:{zh:'进入正式插件市场',en:'Go to Plugin Market',ja:'公式プラグインマーケットへ',ko:'공식 플러그인 마켓으로',es:'Ir al Mercado de Plugins',tw:'進入正式插件市場'},
+    dl_sub:{zh:'选择你的平台,下载 KE Expanse 桌面版',en:'Choose your platform and download KE Expanse desktop',ja:'プラットフォームを選んで KE Expanse デスクトップ版をダウンロード',ko:'플랫폼을 선택하고 KE Expanse 데스크톱을 다운로드하세요',es:'Elige tu plataforma y descarga KE Expanse para escritorio',tw:'選擇你的平台,下載 KE Expanse 桌面版'},
+    dl_win:{zh:'Windows',en:'Windows',ja:'Windows',ko:'Windows',es:'Windows',tw:'Windows'},
+    dl_win_ver:{zh:'KE Expanse v1.3.0 · 64位 exe',en:'KE Expanse v1.3.0 · 64-bit exe',ja:'KE Expanse v1.3.0 · 64bit exe',ko:'KE Expanse v1.3.0 · 64비트 exe',es:'KE Expanse v1.3.0 · exe 64 bits',tw:'KE Expanse v1.3.0 · 64位 exe'},
+    dl_mac:{zh:'macOS',en:'macOS',ja:'macOS',ko:'macOS',es:'macOS',tw:'macOS'},
+    dl_mac_ver:{zh:'Apple Silicon / Intel · 研发中',en:'Apple Silicon / Intel · In Development',ja:'Apple Silicon / Intel · 開発中',ko:'Apple Silicon / Intel · 개발 중',es:'Apple Silicon / Intel · En desarrollo',tw:'Apple Silicon / Intel · 研發中'},
+    dl_linux:{zh:'Linux',en:'Linux',ja:'Linux',ko:'Linux',es:'Linux',tw:'Linux'},
+    dl_linux_ver:{zh:'AppImage / deb · 研发中',en:'AppImage / deb · In Development',ja:'AppImage / deb · 開発中',ko:'AppImage / deb · 개발 중',es:'AppImage / deb · En desarrollo',tw:'AppImage / deb · 研發中'},
+    dl_go:{zh:'下载',en:'Download',ja:'ダウンロード',ko:'다운로드',es:'Descargar',tw:'下載'},
+    dl_soon:{zh:'即将推出',en:'Coming Soon',ja:'近日公開',ko:'출시 예정',es:'Próximamente',tw:'即將推出'},
+    m_slogan:{zh:'轻松享受编程创意',en:'Enjoy coding creativity with ease',ja:'プログラミングの創造を気軽に楽しもう',ko:'코딩 창의성을 가볍게 즐기세요',es:'Disfruta la creatividad al programar',tw:'輕鬆享受編程創意'},
+    m_android:{zh:'安卓下载',en:'Android Download',ja:'Android ダウンロード',ko:'Android 다운로드',es:'Descargar Android',tw:'安卓下載'},
+    m_ios:{zh:'iOS 下载',en:'iOS Download',ja:'iOS ダウンロード',ko:'iOS 다운로드',es:'Descargar iOS',tw:'iOS 下載'},
+    m_qq:{zh:'加入 QQ 群',en:'Join QQ Group',ja:'QQグループに参加',ko:'QQ 그룹 가입',es:'Unirse al grupo QQ',tw:'加入 QQ 群'},
+    m_detail:{zh:'查看详细介绍',en:'View Details',ja:'詳細を見る',ko:'상세 보기',es:'Ver detalles',tw:'查看詳細介紹'},
+    m_back:{zh:'下载',en:'Download',ja:'ダウンロード',ko:'다운로드',es:'Descargar',tw:'下載'},
+    perf_badge:{zh:'▶ 运行中 · 120 FPS',en:'▶ Running · 120 FPS',ja:'▶ 実行中 · 120FPS',ko:'▶ 실행 중 · 120FPS',es:'▶ En ejecución · 120 FPS',tw:'▶ 运行中 · 120 FPS'},
+
+    toast_coming:{zh:' 版正在研发中,敬请期待',en:' version is in development, stay tuned',ja:' 版は開発中です。お楽しみに',ko:' 버전은 개발 중입니다. 기대해 주세요',es:' versión en desarrollo, estad atentos',tw:' 版正在研發中,敬请期待'},
+    toast_perf_on:{zh:'已开启节能模式,特效已精简',en:'Battery saver on, effects reduced',ja:'省エネモードをオンにしました',ko:'절전 모드를 켰습니다',es:'Modo ahorro activado',tw:'已開啟節能模式,特效已精簡'},
+    toast_perf_off:{zh:'已关闭节能模式',en:'Battery saver off',ja:'省エネモードをオフにしました',ko:'절전 모드를 껐습니다',es:'Modo ahorro desactivado',tw:'已關閉節能模式'},
+    toast_doc:{zh:'开发文档页面即将上线,敬请期待',en:'Dev docs coming soon, stay tuned',ja:'開発ドキュメントは近日公開予定',ko:'개발 문서가 곧 공개됩니다',es:'Documentación próximamente',tw:'開發文檔頁面即將上線,敬請期待'},
+    toast_more:{zh:'更多产品敬请期待',en:'More products coming soon',ja:'その他の製品は近日公開',ko:'더 많은 제품이 곧 출시됩니다',es:'Más productos próximamente',tw:'更多產品敬請期待'},
+  };
+  Object.keys(I18N_EXTRA).forEach(function (k) { I18N[k] = I18N_EXTRA[k]; });
+  var I18N_QR = {
+    qr_tab_m:{zh:'移动端下载',tw:'移動端下載',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil'},
+    qr_tab_q:{zh:'QQ 群',tw:'QQ 群',en:'QQ Group',ja:'QQグループ',ko:'QQ 그룹',es:'Grupo QQ'}
+  };
+  Object.keys(I18N_QR).forEach(function (k) { I18N[k] = I18N_QR[k]; });
+  var I18N_PAGE = {
+    dl_m_title:{zh:'移动端下载',tw:'移動端下載',en:'Mobile Download',ja:'モバイルダウンロード',ko:'모바일 다운로드',es:'Descarga Móvil'},
+    dl_android:{zh:'安卓下载',tw:'安卓下載',en:'Android Download',ja:'Android ダウンロード',ko:'Android 다운로드',es:'Descargar Android'},
+    dl_ios:{zh:'iOS · 正在研发',tw:'iOS · 正在研發',en:'iOS · In Development',ja:'iOS · 開発中',ko:'iOS · 개발 중',es:'iOS · En desarrollo'},
+    dl_ios_tip:{zh:'iOS 版正在研发中,敬请期待',tw:'iOS 版正在研發中,敬請期待',en:'iOS version is in development, stay tuned',ja:'iOS版は開発中です。お楽しみに',ko:'iOS 버전은 개발 중입니다. 기대해 주세요',es:'La versión iOS está en desarrollo, estad atentos'},
+    fl_title:{zh:'友情链接',tw:'友情連結',en:'Friends',ja:'リンク',ko:'링크',es:'Enlaces'},
+    cr_title:{zh:'制作团队',tw:'製作團隊',en:'Credits',ja:'制作チーム',ko:'제작 팀',es:'Créditos'}
+  };
+  Object.keys(I18N_PAGE).forEach(function (k) { I18N[k] = I18N_PAGE[k]; });
+  var I18N_CR = {
+    cr_role_0:{zh:'创始人 & 核心开发',tw:'創始人 & 核心開發',en:'Founder & Core Dev',ja:'創始者 & コア開発',ko:'창립자 & 핵심 개발',es:'Fundador y Dev Core'},
+    cr_desc_0:{zh:'KNExpanse 项目发起人,构思产品整体框架,负责核心功能开发,决定项目后续更新方向。',tw:'KNExpanse 專案發起人,構思產品整體框架,負責核心功能開發,決定專案後續更新方向。',en:'Founder of KNExpanse, designed the overall product framework, leads core development and sets future update direction.',ja:'KNExpanseの発起人。製品全体の枠組みを設計し、コア開発を担当、今後の更新方針を決定。',ko:'KNExpanse 창립자, 제품 전체 프레임워크 설계, 핵심 개발 담당, 향후 업데이트 방향 결정.',es:'Fundador de KNExpanse, diseñó el marco general, lidera el desarrollo core y define la dirección futura.'},
+    cr_role_1:{zh:'前后端 + JS 开发',tw:'前後端 + JS 開發',en:'Full-Stack + JS Dev',ja:'フルスタック + JS開発',ko:'풀스택 + JS 개발',es:'Full-stack + Dev JS'},
+    cr_desc_1:{zh:'包揽前端页面、后端服务和数据库相关开发,搭建私有化云平台,保障云端功能稳定不掉线。',tw:'包攬前端頁面、後端服務和資料庫相關開發,搭建私有化雲平台,保障雲端功能穩定不掉線。',en:'Owns frontend, backend and database development; built the private cloud platform to keep cloud features stable.',ja:'フロントエンド・バックエンド・DB開発を担当。プライベートクラウドを構築し安定運用を実現。',ko:'프론트엔드, 백엔드, DB 개발 담당, 프라이빗 클라우드 플랫폼 구축.',es:'Desarrollo frontend, backend y BD; construyó la plataforma cloud privada estable.'},
+    cr_role_2:{zh:'UI 设计',tw:'UI 設計',en:'UI Design',ja:'UIデザイン',ko:'UI 디자인',es:'Diseño UI'},
+    cr_desc_2:{zh:'大名鼎鼎的 Vibecoding 之神(bushi)!全权负责界面视觉与交互设计,敲定页面布局、动画效果,打造整套项目视觉风格。',tw:'大名鼎鼎的 Vibecoding 之神(bushi)!全權負責介面視覺與互動設計,敲定頁面佈局、動畫效果,打造整套專案視覺風格。',en:'The legendary Vibecoding god (bushi)! Owns all visual & interaction design, page layout, animations and the whole visual identity.',ja:'伝説のVibecodingの神(bushi)!UI/UXデザイン、レイアウト、アニメーションなど全体のビジュアルを統括。',ko:'전설의 Vibecoding 신(bushi)! UI/UX 디자인, 레이아웃, 애니메이션 등 전체 비주얼 담당.',es:'El legendario dios del Vibecoding (bushi). Dueño del diseño visual, interacciones, layout y animaciones.'},
+    cr_role_3:{zh:'特别感谢',tw:'特別感謝',en:'Special Thanks',ja:'特別協力',ko:'특별 감사',es:'Agradecimiento Especial'},
+    cr_desc_3:{zh:'开发过程中交流技术,提供思路与指导,给予项目支持。',tw:'開發過程中交流技術,提供思路與指導,給予專案支持。',en:'Shared technical insights and guidance throughout development, and gave the project great support.',ja:'開発中の技術交流やアドバイス、プロジェクトへの多大なサポート。',ko:'개발 과정에서 기술 교류, 아이디어와 지도 제공, 프로젝트 지원.',es:'Compartió ideas y guía técnica durante el desarrollo, y apoyó el proyecto.'},
+    fl_0:{zh:'点猫科技',tw:'點貓科技',en:'Codemao',ja:'CodeMao',ko:'Codemao',es:'Codemao'},
+    fl_1:{zh:'KNHX工作室',tw:'KNHX工作室',en:'KNHX Studio',ja:'KNHXスタジオ',ko:'KNHX 스튜디오',es:'KNHX Studio'},
+    fl_2:{zh:'CatCode',tw:'CatCode',en:'CatCode',ja:'CatCode',ko:'CatCode',es:'CatCode'},
+    qr_scan_tip:{zh:'手机扫码,立即下载 KE Expanse',tw:'手機掃碼,立即下載 KE Expanse',en:'Scan with your phone to download KE Expanse now',ja:'スマホでQRコードを読み取り、今すぐKE Expanseをダウンロード',ko:'휴대폰으로 QR코드를 스캔해 KE Expanse를 바로 다운로드하세요',es:'Escanea con tu móvil y descarga KE Expanse ahora'}
+  };
+  Object.keys(I18N_CR).forEach(function (k) { I18N[k] = I18N_CR[k]; });
+  var I18N_NEW = {
+    theme_aurora:{zh:'极光紫霞',en:'Aurora Violet',ja:'オーロラ紫',ko:'오로라 바이올렛',es:'Aurora Violeta',tw:'极光紫霞'},
+    theme_ocean:{zh:'深海琉璃',en:'Deep Sea Glass',ja:'深海ガラス',ko:'심해 글라스',es:'Vidrio de Mar Profundo',tw:'深海琉璃'},
+    theme_amber:{zh:'琥珀暮光',en:'Amber Twilight',ja:'アンバー黄昏',ko:'앰버 황혼',es:'Crepúsculo Ámbar',tw:'琥珀暮光'},
+    theme_dark:{zh:'暗夜模式',en:'Dark Mode',ja:'ダークモード',ko:'다크 모드',es:'Modo Oscuro',tw:'暗夜模式'},
+    perf_state_on:{zh:'节能模式 · 已开启',en:'Power Saving · ON',ja:'省エネモード · オン',ko:'절전 모드 · 켜짐',es:'Ahorro · Activado',tw:'節能模式 · 已開啟'},
+    perf_state_off:{zh:'节能模式 · 已关闭',en:'Power Saving · OFF',ja:'省エネモード · オフ',ko:'절전 모드 · 꺼짐',es:'Ahorro · Desactivado',tw:'節能模式 · 已關閉'},
+    core_title:{zh:'强大编辑器',en:'Powerful Editor',ja:'パワフルエディタ',ko:'강력한 에디터',es:'Editor Poderoso',tw:'強大編輯器'},
+    ext_title:{zh:'优秀扩展',en:'Featured Extensions',ja:'注目の拡張機能',ko:'우수 확장 기능',es:'Extensiones Destacadas',tw:'優秀擴展'},
+    st_sub:{zh:'核心指标一览 · 实时更新',en:'Core metrics · live updates',ja:'主要指標 · リアルタイム更新',ko:'핵심 지표 · 실시간 업데이트',es:'Métricas clave · actualización en vivo',tw:'核心指標一覽 · 實時更新'},
+    st_dev_label:{zh:'活跃开发者',en:'Active Developers',ja:'アクティブ開発者',ko:'활성 개발자',es:'Desarrolladores Activos',tw:'活跃開發者'},
+    st_dev_s1:{zh:'周新增',en:'Weekly New',ja:'週間新規',ko:'주간 신규',es:'Nuevos/Semana',tw:'周新增'},
+    st_dev_s2:{zh:'月活跃',en:'Monthly Active',ja:'月間アクティブ',ko:'월간 활성',es:'Activos/Mes',tw:'月活跃'},
+    st_dev_s3:{zh:'覆盖地区',en:'Regions Covered',ja:'カバー地域',ko:'커버 지역',es:'Regiones Cubiertas',tw:'覆盖地区'},
+    st_proj_label:{zh:'项目创建',en:'Projects Created',ja:'プロジェクト作成数',ko:'프로젝트 생성',es:'Proyectos Creados',tw:'項目創建'},
+    st_proj_s1:{zh:'周创建',en:'Weekly Created',ja:'週間作成',ko:'주간 생성',es:'Creados/Semana',tw:'周創建'},
+    st_proj_s2:{zh:'累计下载',en:'Total Downloads',ja:'累計ダウンロード',ko:'누적 다운로드',es:'Descargas Totales',tw:'累計下載'},
+    st_proj_s3:{zh:'模板库',en:'Template Library',ja:'テンプレート数',ko:'템플릿 라이브러리',es:'Biblioteca de Plantillas',tw:'模板庫'},
+    st_upt_label:{zh:'发布帖子',en:'Posts Published',ja:'投稿数',ko:'게시물 수',es:'Publicaciones',tw:'發布帖子'},
+    st_upt_s1:{zh:'今日发布',en:'Today',ja:'今日の投稿',ko:'오늘의 게시물',es:'Hoy',tw:'今日發布'},
+    st_upt_s2:{zh:'本周热度',en:'This Week',ja:'今週の投稿',ko:'이번 주 게시물',es:'Esta Semana',tw:'本週熱度'},
+    st_upt_s3:{zh:'累计点赞',en:'Total Likes',ja:'総いいね',ko:'누적 좋아요',es:'Me Gusta Totales',tw:'累計點讚'},
+    step1_title:{zh:'下载安装',en:'Download & Install',ja:'ダウンロードしてインストール',ko:'다운로드 및 설치',es:'Descargar e Instalar',tw:'下載安裝'},
+    step1_desc:{zh:'选择平台版本,一键安装强大编辑器,即装即用。',en:'Choose your platform, install the powerful editor in one click, ready to go.',ja:'プラットフォームを選んでワンクリックインストール。すぐに使えます。',ko:'플랫폼을 선택하고 원클릭 설치, 바로 사용 가능.',es:'Elige tu plataforma, instala el editor en un clic y listo.',tw:'選擇平台版本,一鍵安裝強大編輯器,即裝即用。'},
+    step2_title:{zh:'拖拽创作',en:'Drag to Create',ja:'ドラッグで創作',ko:'드래그로 창작',es:'Crea Arrastrando',tw:'拖拽創作'},
+    step2_desc:{zh:'内置组件库,拖拽搭建场景与逻辑,创意即刻成型。',en:'Built-in component library — drag to build scenes and logic, ideas take shape instantly.',ja:'内蔵コンポーネントでドラッグするだけでシーンとロジックを構築。',ko:'내장 컴포넌트 라이브러리로 드래그만으로 장면과 로직 구성.',es:'Biblioteca integrada: arrastra para construir escenas y lógica al instante.',tw:'內置組件庫,拖拽搭建場景与邏輯,創意即刻成型。'},
+    step3_title:{zh:'发布分发',en:'Publish & Distribute',ja:'公開・配信',ko:'게시 및 배포',es:'Publicar y Distribuir',tw:'發佈分發'},
+    step3_desc:{zh:'一键导出多平台工程,云分发触达全球玩家。',en:'One-click export to multiple platforms, cloud distribution reaches players worldwide.',ja:'ワンクリックで多形式出力。クラウド配信で世界中のプレイヤーへ。',ko:'원클릭 멀티 플랫폼 내보내기, 클라우드 배포로 전 세계 플레이어에게.',es:'Exporta en un clic y distribuye por la nube a jugadores de todo el mundo.',tw:'一鍵導出多平台工程,雲分發触达全球玩家。'},
+    step2_chip1:{zh:'组件库',en:'Components',ja:'コンポーネント',ko:'컴포넌트',es:'Componentes',tw:'組件庫'},
+    step2_chip2:{zh:'可视化逻辑',en:'Visual Logic',ja:'ビジュアルロジック',ko:'비주얼 로직',es:'Lógica Visual',tw:'可視化邏輯'},
+    step3_chip1:{zh:'多平台',en:'Multi-Platform',ja:'マルチプラットフォーム',ko:'멀티 플랫폼',es:'Multiplataforma',tw:'多平台'},
+    step3_chip2:{zh:'云分发',en:'Cloud Distribution',ja:'クラウド配信',ko:'클라우드 배포',es:'Distribución en la Nube',tw:'雲分發'}
+  };
+  Object.keys(I18N_NEW).forEach(function (k) { I18N[k] = I18N_NEW[k]; });
+  var I18N_MK = {
+    mk_badge:{zh:'插件市场',tw:'插件市場',en:'Plugin Market',ja:'プラグインマーケット',ko:'플러그인 마켓',es:'Mercado de Plugins'},
+    mk_sub:{zh:'market',tw:'market',en:'market',ja:'market',ko:'market',es:'market'},
+    mk_more:{zh:'更多',tw:'更多',en:'More',ja:'もっと見る',ko:'더보기',es:'Más'},
+    mk_t1:{zh:'发现优秀插件',tw:'發現優秀插件',en:'Discover Great Plugins',ja:'素晴らしいプラグインを見つける',ko:'훌륭한 플러그인 발견',es:'Descubre Grandes Plugins'},
+    mk_t2:{zh:'为创作加速',tw:'為創作加速',en:'Speed Up Creation',ja:'創作を加速',ko:'창작을 가속',es:'Acelera tu Creación'},
+    mk_t3:{zh:'plugins',en:'plugins',ja:'plugins',ko:'plugins',es:'plugins',tw:'plugins'},
+    mk_desc:{zh:'搜索并安装社区精选插件,一键为 KE Expanse 添加强大能力,让创作更进一步。',tw:'搜索並安裝社區精選插件,一鍵為 KE Expanse 添加强大能力,讓創作更進一步。',en:'Search and install community-picked plugins to supercharge KE Expanse and take your creations further.',ja:'コミュニティ厳選のプラグインを検索・インストールして、KE Expanse の可能性を広げよう。',ko:'커뮤니티 선별 플러그인을 검색하고 설치해 KE Expanse를 더 강력하게.',es:'Busca e instala plugins seleccionados por la comunidad para potenciar KE Expanse.'},
+    mk_ph:{zh:'搜索插件名称 / 标签 / 作者',tw:'搜索插件名稱 / 標籤 / 作者',en:'Search by name / tag / author',ja:'名前 / タグ / 作者で検索',ko:'이름 / 태그 / 작성자 검색',es:'Buscar por nombre / etiqueta / autor'},
+    mk_empty:{zh:'没有找到匹配的插件',tw:'沒有找到匹配的插件',en:'No matching plugins found',ja:'一致するプラグインが見つかりません',ko:'일치하는 플러그인이 없습니다',es:'No se encontraron plugins'},
+    mk_prev:{zh:'上一页',tw:'上一頁',en:'Prev',ja:'前へ',ko:'이전',es:'Anterior'},
+    mk_next:{zh:'下一页',tw:'下一頁',en:'Next',ja:'次へ',ko:'다음',es:'Siguiente'},
+    mk_dl:{zh:'下载',tw:'下載',en:'Download',ja:'ダウンロード',ko:'다운로드',es:'Descargar'},
+    mk_workpool:{zh:'作品池',tw:'作品池',en:'Works',ja:'作品',ko:'작품',es:'Trabajos'},
+    mk_dev:{zh:'开发者中心',tw:'開發者中心',en:'Developer Center',ja:'開発者センター',ko:'개발자 센터',es:'Centro de Desarrolladores'},
+    mk_storage:{zh:'我的存储',tw:'我的存儲',en:'My Storage',ja:'マイストレージ',ko:'내 저장소',es:'Mi Almacenamiento'},
+    mk_home:{zh:'首页',tw:'首頁',en:'Home',ja:'ホーム',ko:'홈',es:'Inicio'},
+    mk_discover:{zh:'发现',tw:'發現',en:'Discover',ja:'発見',ko:'발견',es:'Descubrir'},
+    mk_team:{zh:'团队',tw:'團隊',en:'Team',ja:'チーム',ko:'팀',es:'Equipo'},
+    mk_forum:{zh:'论坛',tw:'論壇',en:'Forum',ja:'フォーラム',ko:'포럼',es:'Foro'},
+    mk_appdl:{zh:'应用下载',tw:'應用下載',en:'App Downloads',ja:'アプリダウンロード',ko:'앱 다운로드',es:'Descargas'},
+    mk_login:{zh:'登录',tw:'登錄',en:'Login',ja:'ログイン',ko:'로그인',es:'Iniciar sesión'},
+    mk_latest:{zh:'最新',tw:'最新',en:'Latest',ja:'最新',ko:'최신',es:'Recientes'},
+    mk_hot:{zh:'最热',tw:'最熱',en:'Hot',ja:'人気',ko:'인기',es:'Populares'},
+    mk_top:{zh:'评分最高',tw:'評分最高',en:'Top Rated',ja:'高評価',ko:'최고 평점',es:'Mejor Valorados'},
+    mk_like:{zh:'最多赞',tw:'最多讚',en:'Most Liked',ja:'最多いいね',ko:'좋아요 많은',es:'Más Gustados'},
+    mk_fav:{zh:'最多收藏',tw:'最多收藏',en:'Most Favorited',ja:'最多ブックマーク',ko:'저장 많은',es:'Más Favoritos'},
+    mk_coin:{zh:'最多投币',tw:'最多投幣',en:'Most Coins',ja:'最多コイン',ko:'코인 많은',es:'Más Monedas'},
+    mk_comment:{zh:'最多评论',tw:'最多評論',en:'Most Comments',ja:'最多コメント',ko:'댓글 많은',es:'Más Comentarios'},
+    mk_all:{zh:'全部',tw:'全部',en:'All',ja:'すべて',ko:'전체',es:'Todos'},
+    mk_filter:{zh:'筛选',tw:'篩選',en:'Filter',ja:'絞り込み',ko:'필터',es:'Filtrar'}
+  };
+  Object.keys(I18N_MK).forEach(function (k) { I18N[k] = I18N_MK[k]; });
+  var LANGS = ['zh','tw','en','ja','ko','es'];
+  var curLang = 'zh';
+  try { var lsLang = localStorage.getItem('knexpanse-lang'); if (LANGS.indexOf(lsLang) >= 0) curLang = lsLang; } catch (e) {}
+  function applyLang() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n');
+      var t = I18N[k];
+      if (t && t[curLang]) el.textContent = t[curLang];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-ph');
+      var t = I18N[k];
+      if (t && t[curLang]) el.setAttribute('placeholder', t[curLang]);
+    });
+    $$('.lang-item').forEach(function (it) { it.classList.toggle('cur', it.dataset.lang === curLang); });
+    document.documentElement.lang = curLang === 'zh' ? 'zh-CN' : (curLang === 'tw' ? 'zh-TW' : curLang);
+    /* 插件已加载时,按当前语言重渲染(名称/标签实时翻译) */
+    if (typeof allPlugins !== 'undefined' && allPlugins.length && typeof renderMarket === 'function') renderMarket();
+  }
+  applyLang();
+  var langBtn = $('#langBtn');
+  var langPop = $('#langPop');
+  var langTimer = null;
+  var qrModal = $('#qrModal');
+  var dlAndroidBtn = $('#dlAndroidBtn');
+  if (dlAndroidBtn) dlAndroidBtn.addEventListener('click', function () {
+    if (isMobileUA) {
+      /* 移动端:直接跳下载链接,不做扫码 */
+      window.open('https://code.pgrm.run/localcdn/2/app-debug.apk', '_blank');
+    } else if (qrModal) {
+      qrModal.classList.add('show');
+    }
+  });
+  if (qrModal) qrModal.addEventListener('click', function (e) { if (e.target === qrModal || e.target.id === 'qrModalClose') qrModal.classList.remove('show'); });
+  var qrBtn = $('#qrBtn'), qrPop = $('#qrPop'), qrTimer = null, qrAutoT = null;
+  var lookBtn = $('#lookBtn'), lookPop = $('#lookPop'), lookTimer = null;
+  function hideQrPop() { clearTimeout(qrAutoT); qrTimer = setTimeout(function () { qrPop.classList.remove('show'); unlockBtnId = null; syncNavLock(); }, 250); }
+  function hideLookPop() { lookTimer = setTimeout(function () { lookPop.classList.remove('show'); unlockBtnId = null; syncNavLock(); }, 250); }
+  function perfSyncLook() {
+    var on = document.body.classList.contains('lite-mode');
+    var d = I18N || {};
+    var s = on ? (d.perf_state_on || {}) : (d.perf_state_off || {});
+    var el = $('#lookPerfState');
+    if (el) el.textContent = s[curLang] || (on ? '节能模式 · 已开启' : '节能模式 · 已关闭');
+    $('#lookPerf').classList.toggle('on', on);
+  }
+  function showQr(btn) {
+    if (!isMobileUA && otherPopOpen('.qr-pop.show')) return;
+    clearTimeout(qrTimer);
+    clearTimeout(qrAutoT);
+    langPop.classList.remove('show'); clearTimeout(langTimer);
+    lookPop.classList.remove('show'); clearTimeout(lookTimer);
+    /* 移动端:二维码二级菜单只保留 QQ 群码(不展示移动端下载码) */
+    if (isMobileUA) {
+      $$('.qr-tab').forEach(function (x) { x.classList.toggle('active', x.dataset.q === 'q'); });
+      $$('.qr-pane').forEach(function (p) { p.classList.toggle('show', p.dataset.q === 'q'); });
+    }
+    posPop(qrPop, btn || qrBtn); qrPop.classList.add('show'); unlockBtnId = 'qrBtn'; syncNavLock();
+    /* 移动端:悬浮窗显示后再算容器高度(display:none 时 offsetHeight 为 0,框就塌了) */
+    if (isMobileUA) {
+      var qrImgsBox2 = $('#qrImgs');
+      var qrActivePane2 = $('.qr-pane.show');
+      if (qrImgsBox2 && qrActivePane2) qrImgsBox2.style.height = qrActivePane2.offsetHeight + 'px';
+    }
+    /* 桌面 hover:鼠标离开悬浮窗 1.2s 后自动关闭,防止残留 */
+    qrAutoT = setTimeout(function () {
+      if (hoverPop && !qrPop.matches(':hover') && !qrBtn.matches(':hover')) {
+        qrPop.classList.remove('show'); unlockBtnId = null; syncNavLock();
+      }
+    }, 1200);
+  }
+  function showLook(btn) {
+    if (!isMobileUA && otherPopOpen('.look-pop.show')) return;
+    clearTimeout(lookTimer);
+    langPop.classList.remove('show'); clearTimeout(langTimer);
+    qrPop.classList.remove('show'); clearTimeout(qrTimer); clearTimeout(qrAutoT);
+    perfSyncLook();
+    posPop(lookPop, btn || lookBtn); lookPop.classList.add('show'); unlockBtnId = 'lookBtn'; syncNavLock();
+  }
+  var qrOpenT = null, lookOpenT = null;
+  qrBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(qrOpenT); qrOpenT = setTimeout(showQr, 300); });
+  qrBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(qrOpenT); hideQrPop(); });
+  qrPop.addEventListener('mouseenter', function () { if (!hoverPop) return; showQr(); });
+  qrPop.addEventListener('mouseleave', function () { if (!hoverPop) return; hideQrPop(); });
+  lookBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(lookOpenT); lookOpenT = setTimeout(showLook, 300); });
+  lookBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(lookOpenT); hideLookPop(); });
+  lookPop.addEventListener('mouseenter', function () { if (!hoverPop) return; showLook(); });
+  lookPop.addEventListener('mouseleave', function () { if (!hoverPop) return; hideLookPop(); });
+  /* 移动端:悬浮窗点击交互——点按钮弹出二级菜单,点选项/外部关闭 */
+  if (isMobileUA) {
+    var closeAllPops = function () {
+      [qrPop, lookPop, langPop].forEach(function (p) {
+        if (p && p.classList.contains('show')) {
+          p.classList.remove('show');
+        }
+      });
+      unlockBtnId = null;
+    };
+    qrBtn.addEventListener('click', function (e) { e.stopPropagation(); if (qrPop.classList.contains('show')) { hideQrPop(); } else { closeAllPops(); showQr(); } });
+    lookBtn.addEventListener('click', function (e) { e.stopPropagation(); if (lookPop.classList.contains('show')) { hideLookPop(); } else { closeAllPops(); showLook(); } });
+    langBtn.addEventListener('click', function (e) { e.stopPropagation(); if (langPop.classList.contains('show')) { hideLang(); } else { closeAllPops(); showLang(); } });
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('header')) return;
+      closeAllPops(); syncNavLock();
+    });
+    /* 首屏工具按钮:语言/外观/二维码(在开启页也能切换) */
+    var mDlLangBtn = $('#mDlLang'), mDlLookBtn = $('#mDlLook'), mDlQrBtn = $('#mDlQr');
+    if (mDlLangBtn) mDlLangBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showLang(mDlLangBtn); });
+    if (mDlLookBtn) mDlLookBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showLook(mDlLookBtn); });
+    if (mDlQrBtn) mDlQrBtn.addEventListener('click', function (e) { e.stopPropagation(); closeAllPops(); showQr(mDlQrBtn); });
+    /* 部分移动 WebView 会吞 click,改用 touchstart 打开(阻止默认行为防双触发) */
+    if ('ontouchstart' in window) {
+      [
+        { btn: 'qrBtn', pop: 'qrPop', open: showQr, close: hideQrPop },
+        { btn: 'lookBtn', pop: 'lookPop', open: showLook, close: hideLookPop },
+        { btn: 'langBtn', pop: 'langPop', open: showLang, close: hideLang }
+      ].forEach(function (item) {
+        var btnEl = $(item.btn), popEl = $(item.pop);
+        if (!btnEl) return;
+        btnEl.addEventListener('touchstart', function (e) {
+          e.preventDefault(); e.stopPropagation();
+          if (popEl.classList.contains('show')) item.close();
+          else { closeAllPops(); item.open(); }
+        }, { passive: false });
+      });
+      [
+        { btn: 'mDlLang', open: showLang, anchor: mDlLangBtn },
+        { btn: 'mDlLook', open: showLook, anchor: mDlLookBtn },
+        { btn: 'mDlQr', open: showQr, anchor: mDlQrBtn }
+      ].forEach(function (item) {
+        var btnEl = $(item.btn);
+        if (!btnEl) return;
+        btnEl.addEventListener('touchstart', function (e) {
+          e.preventDefault(); e.stopPropagation();
+          closeAllPops(); item.open(item.anchor);
+        }, { passive: false });
+      });
+    }
+  }
+  $$('.qr-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var q = tab.dataset.q;
+      $$('.qr-tab').forEach(function (x) { x.classList.toggle('active', x === tab); });
+      $$('.qr-pane').forEach(function (p) { p.classList.toggle('show', p.dataset.q === q); });
+      var imgs = $('#qrImgs');
+      var ap = $('.qr-pane.show');
+      if (imgs && ap) imgs.style.height = ap.offsetHeight + 'px';
+    });
+  });
+  $('#lookPerf').addEventListener('click', function () {
+    setLite(!document.body.classList.contains('lite-mode'));
+    perfSyncLook();
+  });
+  function showLang(btn) {
+    if (!isMobileUA && otherPopOpen('.lang-pop.show')) return;
+    clearTimeout(langTimer);
+    themePop.classList.remove('show'); clearTimeout(popTimer);
+    qqPop.classList.remove('show'); clearTimeout(qqTimer);
+    perfPop.classList.remove('show'); clearTimeout(perfTimer);
+    mPop.classList.remove('show'); clearTimeout(mTimer);
+    lookPop.classList.remove('show'); clearTimeout(lookTimer);
+    qrPop.classList.remove('show'); clearTimeout(qrTimer); clearTimeout(qrAutoT);
+    posPop(langPop, btn || langBtn); langPop.classList.add('show'); unlockBtnId = 'langBtn'; syncNavLock();
+  }
+  function hideLang() { langTimer = setTimeout(function () { langPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
+  var langOpenT = null;
+  langBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(langOpenT); langOpenT = setTimeout(showLang, 300); });
+  langBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(langOpenT); hideLang(); });
+  langPop.addEventListener('mouseenter', function () { if (!hoverPop) return; showLang(); });
+  langPop.addEventListener('mouseleave', function () { if (!hoverPop) return; hideLang(); });
+  $$('.lang-item').forEach(function (it) {
+    it.addEventListener('click', function () {
+      curLang = it.dataset.lang;
+      try { localStorage.setItem('knexpanse-lang', curLang); } catch (e) {}
+      applyLang();
+      it.classList.add('popped');
+      setTimeout(function () { it.classList.remove('popped'); }, 320);
+      setTimeout(function () { langPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 180);
+    });
+  });
+  /* 实时 FPS 监测:帧率持续偏低(约 55 以下连续 2 个采样窗口 ≈ 4 秒)且未开节能且未忽略过 → 询问是否切换 */
+  var fpsLowCount = 0;
+  var perfDismissed = false;
+  try { perfDismissed = localStorage.getItem('knexpanse-perf-dismiss') === '1'; } catch (e) {}
+  function fpsWindow() {
+    if (document.body.classList.contains('lite-mode')) { fpsLowCount = 0; return; }
+    var frames = 0, start = performance.now();
+    function probe() {
+      frames++;
+      if (performance.now() - start < 2000) { requestAnimationFrame(probe); return; }
+      var fps = frames / ((performance.now() - start) / 1000);
+      if (fps < 55) {
+        fpsLowCount++;
+        if (fpsLowCount >= 2 && !perfDismissed) perfTip.classList.add('show');
+      } else {
+        fpsLowCount = 0;
+      }
+      setTimeout(fpsWindow, 400);
+    }
+    requestAnimationFrame(probe);
+  }
+  setTimeout(fpsWindow, 1500);
+  $('#perfYes').addEventListener('click', function () {
+    perfTip.classList.remove('show');
+    setLite(true);
+  });
+  $('#perfNo').addEventListener('click', function () {
+    perfTip.classList.remove('show');
+    perfDismissed = true;
+    try { localStorage.setItem('knexpanse-perf-dismiss', '1'); } catch (e) {}
+  });
+
+  var parallaxLayers = $$('.parallax');
+  var bgLayer = $('#bgLayer');
+  var pTick = false;
+  function updateParallax() {
+    var y = window.scrollY;
+    parallaxLayers.forEach(function (w) { w.style.transform = 'translateY(' + (y * parseFloat(w.dataset.speed)).toFixed(1) + 'px)'; });
+    particlesBox.style.transform = 'translateY(' + (y * -0.05).toFixed(1) + 'px)';
+    pTick = false;
+  }
+  window.addEventListener('scroll', function () { if (!pTick) { requestAnimationFrame(updateParallax); pTick = true; } }, { passive: true });
+  if (!('ontouchstart' in window)) {
+    var bgTick = false;
+    document.addEventListener('mousemove', function (e) {
+      var mx = (e.clientX / window.innerWidth - 0.5) * 2;
+      var my = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (!bgTick) {
+        requestAnimationFrame(function () {
+          bgLayer.style.marginLeft = (mx * -8) + 'px';
+          bgLayer.style.marginTop = (my * -8) + 'px';
+          bgTick = false;
+        });
+        bgTick = true;
+      }
+    }, { passive: true });
+  }
+
+  var glow = $('#cursorGlow');
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) { glow.style.display = 'none'; }
+  else {
+    document.addEventListener('mousemove', function (e) { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; }, { passive: true });
+    document.addEventListener('mouseleave', function () { glow.style.opacity = '0'; });
+    document.addEventListener('mouseenter', function () { glow.style.opacity = '1'; });
+  }
+
+  /* ---------- 全局悬浮 ---------- */
+  function bindTilt(el, maxDeg) {
+    /* rAF 节流:每帧最多读取一次布局(几何会随滚动变化,不缓存) */
+    var pending = false;
+    el.addEventListener('mousemove', function (e) {
+      if (document.body.classList.contains('lite-mode')) return;
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(function () {
+        pending = false;
+        var r = el.getBoundingClientRect();
+        var rx = ((e.clientY - r.top) / r.height - 0.5) * -maxDeg;
+        var ry = ((e.clientX - r.left) / r.width - 0.5) * maxDeg;
+        el.style.setProperty('--rx', rx.toFixed(2) + 'deg');
+        el.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+      });
+    }, { passive: true });
+    el.addEventListener('mouseleave', function () { el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg'); }, { passive: true });
+  }
+  /* 始终绑定 tilt(节能模式下由 CSS 强制压住,开头卡片除外),切回标准模式立即生效 */
+  $$('.card').forEach(function (c) { bindTilt(c, 9); });
+  $$('.btn').forEach(function (b) { bindTilt(b, 6); });
+
+  /* ---------- 涟漪 ---------- */
+  $$('.btn, .icon-btn, .ft-tab, .carousel-dots button, .tp-item, .dl-col, .ext-install').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      var r = btn.getBoundingClientRect();
+      var size = Math.max(r.width, r.height);
+      var span = document.createElement('span');
+      span.className = 'ripple';
+      span.style.width = span.style.height = size + 'px';
+      span.style.left = (e.clientX - r.left - size / 2) + 'px';
+      span.style.top = (e.clientY - r.top - size / 2) + 'px';
+      btn.appendChild(span);
+      setTimeout(function () { span.remove(); }, 700);
+    });
+  });
+
+  /* ---------- 滚动入场(每次回视口重播,延迟移除防边缘抽搐) ---------- */
+  var revealObs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        clearTimeout(en.target._rt);
+        en.target.classList.add('in');
+      } else {
+        clearTimeout(en.target._rt);
+        en.target._rt = setTimeout(function () { en.target.classList.remove('in'); }, 420);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -3% 0px' });
+  $$('.reveal').forEach(function (el) { revealObs.observe(el); });
+
+  /* ---------- 插件市场 API 接入(列表 /app/api/knmk?page=1;失败自动降级为内置示例) ---------- */
+  var MARKET_BASE = 'https://code.pgrm.run';
+  var MARKET_URL = MARKET_BASE + '/mk/kn';
+  var PLUGINS = [];
+  var EXT_ICONS = [
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15c-1.6-2.1-2.2-4.6-1.7-7.1 2.6-.4 5.2.2 7.3 1.7-.4 2.6-1.1 4.8-2.6 6.2"/><path d="M9.3 12.8c-3.1 1.6-4.6 3.6-5.1 7.1 3.5-.5 5.6-2 7.2-5.1"/><circle cx="14.7" cy="9.3" r="1.2" fill="currentColor" stroke="none"/></svg>',
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>',
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>'
+  ];
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  /* 插件名/标签多语言映射(API 返回中文,语言切换时实时翻译) */
+  var PLUGIN_L10N = {
+    '帧率统计器': { zh: '帧率统计器', tw: '幀率統計器', en: 'FPS Monitor', ja: 'FPSモニター', ko: 'FPS 모니터', es: 'Monitor de FPS' },
+    'MDUI': { zh: 'MDUI', tw: 'MDUI', en: 'MDUI', ja: 'MDUI', ko: 'MDUI', es: 'MDUI' },
+    '源码云空间': { zh: '源码云空间', tw: '源碼雲空間', en: 'Source Cloud', ja: 'ソースクラウド', ko: '소스 클라우드', es: 'Nube de Código' }
+  };
+  var TAG_L10N = {
+    '官方': { zh: '官方', tw: '官方', en: 'Official', ja: '公式', ko: '공식', es: 'Oficial' },
+    '数据存储': { zh: '数据存储', tw: '數據存儲', en: 'Data Storage', ja: 'データ保存', ko: '데이터 저장', es: 'Almacenamiento' }
+  };
+  function l10nName(name) {
+    var m = PLUGIN_L10N[name];
+    return (m && m[curLang]) ? m[curLang] : name;
+  }
+  function l10nTag(tag) {
+    var m = TAG_L10N[tag];
+    return (m && m[curLang]) ? m[curLang] : tag;
+  }
+  /* 统一 GET 请求:fetch 优先(有 AbortController 则 4s 超时;没有则直接请求),fetch 不可用回退 XMLHttpRequest */
+  function apiGet(url) {
+    return new Promise(function (resolve, reject) {
+      try {
+        if (window.fetch) {
+          var opts = {}, ctrl = null, timer = null;
+          if (window.AbortController) { ctrl = new AbortController(); opts.signal = ctrl.signal; }
+          timer = setTimeout(function () { if (ctrl) ctrl.abort(); reject(new Error('timeout')); }, 4000);
+          window.fetch(url, opts).then(function (r) {
+            clearTimeout(timer);
+            if (!r.ok) { reject(new Error('HTTP ' + r.status)); return; }
+            resolve(r);
+          }, function (e) { clearTimeout(timer); reject(e); });
+        } else if (window.XMLHttpRequest) {
+          var xhr = new window.XMLHttpRequest();
+          xhr.open('GET', url, true);
+          xhr.timeout = 4000;
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve({ json: function () { return JSON.parse(xhr.responseText); }, text: function () { return xhr.responseText; } });
+            } else { reject(new Error('HTTP ' + xhr.status)); }
+          };
+          xhr.onerror = function () { reject(new Error('network')); };
+          xhr.ontimeout = function () { reject(new Error('timeout')); };
+          xhr.send();
+        } else { reject(new Error('no-request')); }
+      } catch (e) { reject(e); }
+    });
+  }
+  /* ---------- 占位提示 ---------- */
+  function toast(msg) {
+    document.querySelectorAll('[data-toast]').forEach(function (old) {
+      old.style.opacity = '0';
+      old.style.transform = 'translateX(-50%) translateY(8px)';
+      setTimeout(function () { old.remove(); }, 240);
+    });
+    var t = document.createElement('div');
+    t.setAttribute('data-toast', '1');
+    t.className = 'toast';
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;left:50%;bottom:34px;transform:translateX(-50%);background:var(--glass-strong);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--text-1);padding:11px 22px;border-radius:30px;font-size:14px;box-shadow:var(--shadow),inset 0 1px 0 var(--glass-hi-top);z-index:9999;opacity:0;transition:opacity .3s,transform .3s;';
+    document.body.appendChild(t);
+    requestAnimationFrame(function () { t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(-8px)'; });
+    setTimeout(function () {
+      t.style.opacity = '0'; t.style.transform = 'translateX(-50%)';
+      setTimeout(function () { t.remove(); }, 350);
+    }, 2200);
+  }
+  /* ---------- 插件市场:加载 + 排序 + 搜索 + 分页 ---------- */
+  var PER_PAGE = 12;
+  var allPlugins = [];
+  var filteredPlugins = [];
+  var curPage = 1;
+  var curQuery = '';
+  var curSort = 'latest';
+  var curFilter = 'all';
+
+  function loadMarket() {
+    /* 接口 search 参数不过滤,循环拉取全部页,本地过滤 */
+    var page = 1;
+    var totalPages = 1;
+    function fetchPage() {
+      return apiGet(MARKET_BASE + '/app/api/knmk?page=' + page)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data && data.plugins && data.plugins.length) allPlugins = allPlugins.concat(data.plugins);
+          if (data && data.total_pages > totalPages) totalPages = data.total_pages;
+          if (page < totalPages) { page++; return fetchPage(); }
+        });
+    }
+    fetchPage()
+      .then(function () { buildFilterMenu(); renderMarket(); })
+      .catch(function () { buildFilterMenu(); renderMarket(); /* 接口不可用时显示空态 */ });
+  }
+
+  /* 排序:仅使用 API 提供的字段(id=最新,rating=评分) */
+  function sortPlugins(list) {
+    var arr = list.slice();
+    switch (curSort) {
+      case 'top': /* 评分最高 */
+        arr.sort(function (a, b) { return (b.rating || 0) - (a.rating || 0); });
+        break;
+      case 'all': /* 全部:保持接口顺序 */
+        break;
+      default: /* 最新:按 id 倒序 */
+        arr.sort(function (a, b) { return (b.id || 0) - (a.id || 0); });
+    }
+    return arr;
+  }
+
+  /* 筛选菜单:从已加载插件的标签动态生成 */
+  function buildFilterMenu() {
+    var menu = $('#mkFilterMenu');
+    if (!menu) return;
+    var tagSet = [];
+    allPlugins.forEach(function (p) {
+      (p.tags || []).forEach(function (t) {
+        if (tagSet.indexOf(t) < 0) tagSet.push(t);
+      });
+    });
+    var html = '<button class="mk-menu-item cur" data-filter="all" type="button"><span>' + (I18N.mk_all ? I18N.mk_all[curLang] : '全部') + '</span></button>';
+    tagSet.forEach(function (t) {
+      html += '<button class="mk-menu-item" data-filter="' + escHtml(t) + '" type="button"><span>' + escHtml(l10nTag(t)) + '</span></button>';
+    });
+    menu.innerHTML = html;
+    /* 绑定筛选项 */
+    $$('.mk-menu-item[data-filter]', menu).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var f = b.getAttribute('data-filter');
+        curFilter = f;
+        $$('.mk-menu-item[data-filter]', menu).forEach(function (x) { x.classList.toggle('cur', x === b); });
+        var lbl = $('#mkFilterLabel');
+        if (lbl) lbl.textContent = b.textContent;
+        closeMkMenus();
+        renderMarket();
+      });
+    });
+  }
+
+  function applyMarketFilter() {
+    var q = (curQuery || '').trim().toLowerCase();
+    filteredPlugins = allPlugins.filter(function (p) {
+      if (q) {
+        var name = (p.name || '').toLowerCase();
+        var author = (p.author || '').toLowerCase();
+        var tags = (p.tags || []).join(' ').toLowerCase();
+        if (name.indexOf(q) < 0 && author.indexOf(q) < 0 && tags.indexOf(q) < 0) return false;
+      }
+      if (curFilter !== 'all') {
+        if ((p.tags || []).indexOf(curFilter) < 0) return false;
+      }
+      return true;
+    });
+    filteredPlugins = sortPlugins(filteredPlugins);
+    curPage = 1;
+  }
+
+  function renderMarket() {
+    var grid = $('#mkGrid');
+    var empty = $('#mkEmpty');
+    var pager = $('#mkPager');
+    if (!grid) return;
+    applyMarketFilter();
+    var total = filteredPlugins.length;
+    var totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+    if (curPage > totalPages) curPage = totalPages;
+    var start = (curPage - 1) * PER_PAGE;
+    var pageItems = filteredPlugins.slice(start, start + PER_PAGE);
+
+    if (!total) {
+      grid.innerHTML = '';
+      if (empty) empty.style.display = 'flex';
+      if (pager) pager.style.display = 'none';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    var cards = pageItems.map(function (p, i) {
+      var icon = EXT_ICONS[i % EXT_ICONS.length];
+      var tags = (p.tags || []).slice(0, 3).map(function (t) { return '<span class="mk-tag">' + escHtml(l10nTag(t)) + '</span>'; }).join('');
+      var rating = (p.rating != null ? Number(p.rating).toFixed(1) : '5.0');
+      var dlUrl = p.download_url ? (MARKET_BASE + p.download_url) : MARKET_URL;
+      return '<div class="mk-card card" data-id="' + escHtml(p.id) + '">' +
+        '<div class="mk-ico">' + icon + '</div>' +
+        '<div class="mk-body">' +
+        '<h3>' + escHtml(l10nName(p.name)) + '</h3>' +
+        '<p class="mk-author">by @' + escHtml(p.author) + '</p>' +
+        '<div class="mk-tags">' + tags + '</div>' +
+        '<div class="mk-foot">' +
+        '<span class="mk-rate">★ ' + rating + '</span>' +
+        '<span class="mk-actions">' +
+        '<a class="mk-dl" href="' + dlUrl + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg><span>' + (I18N.mk_dl ? I18N.mk_dl[curLang] : '下载') + '</span></a>' +
+        '<button class="mk-view" data-id="' + escHtml(p.id) + '"><span>' + (I18N.ext_view ? I18N.ext_view[curLang] : '查看') + '</span></button>' +
+        '</span></div>' +
+        '</div></div>';
+    }).join('');
+    grid.innerHTML = cards;
+
+    if (pager) {
+      pager.style.display = totalPages > 1 ? 'flex' : 'none';
+      var info = $('#mkInfo');
+      if (info) info.textContent = curPage + ' / ' + totalPages;
+      var prev = $('#mkPrev'), next = $('#mkNext');
+      if (prev) prev.disabled = curPage <= 1;
+      if (next) next.disabled = curPage >= totalPages;
+    }
+
+    /* 卡片点击 → 详情页;查看按钮 → 详情页;下载是 <a> 直接跳 */
+    $$('.mk-card').forEach(function (c) {
+      c.addEventListener('click', function () {
+        var id = c.getAttribute('data-id');
+        if (id != null) window.open(MARKET_BASE + '/mk/kn/plugin/' + encodeURIComponent(id), '_blank', 'noopener');
+        else window.open(MARKET_URL, '_blank', 'noopener');
+      });
+    });
+    $$('.mk-view').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var id = b.getAttribute('data-id');
+        if (id != null) window.open(MARKET_BASE + '/mk/kn/plugin/' + encodeURIComponent(id), '_blank', 'noopener');
+        else window.open(MARKET_URL, '_blank', 'noopener');
+      });
+    });
+    /* 重新绑定 tilt(动态卡片) */
+    $$('.mk-card').forEach(function (c) { bindTilt(c, 8); });
+  }
+
+  var mkInput = $('#mkInput');
+  if (mkInput) {
+    var mkDebounce = null;
+    mkInput.addEventListener('input', function () {
+      clearTimeout(mkDebounce);
+      var v = this.value;
+      mkDebounce = setTimeout(function () { curQuery = v; renderMarket(); }, 200);
+    });
+  }
+  var mkPrev = $('#mkPrev'), mkNext = $('#mkNext');
+  if (mkPrev) mkPrev.addEventListener('click', function () { if (curPage > 1) { curPage--; renderMarket(); } });
+  if (mkNext) mkNext.addEventListener('click', function () { var tp = Math.max(1, Math.ceil(filteredPlugins.length / PER_PAGE)); if (curPage < tp) { curPage++; renderMarket(); } });
+  /* 排序/筛选 二级菜单交互 */
+  var mkSortBtn = $('#mkSortBtn'), mkSortMenu = $('#mkSortMenu');
+  var mkFilterBtn = $('#mkFilterBtn'), mkFilterMenu = $('#mkFilterMenu');
+  function closeMkMenus() {
+    [mkSortMenu, mkFilterMenu].forEach(function (m) { if (m) m.classList.remove('show'); });
+    if (mkSortBtn) mkSortBtn.setAttribute('aria-expanded', 'false');
+    if (mkFilterBtn) mkFilterBtn.setAttribute('aria-expanded', 'false');
+  }
+  function toggleMkMenu(btn, menu) {
+    if (!btn || !menu) return;
+    var willOpen = !menu.classList.contains('show');
+    closeMkMenus();
+    if (willOpen) {
+      menu.classList.add('show');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  }
+  if (mkSortBtn) mkSortBtn.addEventListener('click', function (e) { e.stopPropagation(); toggleMkMenu(mkSortBtn, mkSortMenu); });
+  if (mkFilterBtn) mkFilterBtn.addEventListener('click', function (e) { e.stopPropagation(); toggleMkMenu(mkFilterBtn, mkFilterMenu); });
+  /* 排序菜单项 */
+  $$('.mk-menu-item[data-sort]', mkSortMenu).forEach(function (b) {
+    b.addEventListener('click', function () {
+      var s = b.getAttribute('data-sort');
+      curSort = s;
+      $$('.mk-menu-item[data-sort]', mkSortMenu).forEach(function (x) { x.classList.toggle('cur', x === b); });
+      var lbl = $('#mkSortLabel');
+      if (lbl) lbl.textContent = b.textContent;
+      closeMkMenus();
+      renderMarket();
+    });
+  });
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.mk-pop-wrap')) closeMkMenus();
+  });
+  loadMarket();
+  /* ---------- 启动 ---------- */
+  /* 预加载全部主题资源,切换时即时显示 */
+  try {
+    [LOGO_DEFAULT, ASSETS.ocean.logo, ASSETS.amber.logo, ASSETS.ocean.term, ASSETS.amber.term].forEach(function (u) {
+      var im = new Image();
+      im.src = u;
+    });
+  } catch (e) {}
+  applyTheme();
+})();
 </script>
 </body>
 </html>
