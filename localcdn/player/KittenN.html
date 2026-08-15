@@ -138,6 +138,99 @@
 			e: function(workText, authChar) { return window.keauth.encrypt(workText, authChar); }
 		};
 	</script>
+	<script>
+		// o 参数：扩展加载器互斥加载
+		//   o=1 -> KEloader.js（KE 扩展加载器）
+		//   o=2 -> cue.user.js（CUELoader 扩展加载器）
+		// 两个加载器不可同时加载
+		// v 参数：base64 编码的扩展 URL 数组文本，如 [url1,url2]，解析后逐个 fetch 并调用当前加载器安装
+		(function(){
+			var _params = new URLSearchParams(location.search);
+			var _o = _params.get('o');
+			var _v = _params.get('v');
+
+			if (_o !== '1' && _o !== '2') return;
+
+			// 记录当前加载的扩展加载器，互斥保证只加载一个
+			window.__EXT_LOADER__ = _o === '1' ? 'KE' : 'CUE';
+
+			// v 参数存在：无痕模式——扩展安装一次性，不持久化到 localStorage，下次不残留
+			if (_v) window.__KE_EPHEMERAL__ = true;
+
+			// cue.user.js 依赖 <meta name="env"> 判定环境，否则在 127.0.0.1 上 env 无匹配分支会卡死
+			// 本 bundle 是 KittenN player（chunk 729），对应 env=kn-p
+			if (_o === '2') {
+				var _meta = document.createElement('meta');
+				_meta.name = 'env';
+				_meta.content = 'kn-p';
+				document.head.appendChild(_meta);
+			}
+
+			var _loader = _o === '1' ? 'KEloader.js' : 'cue.user.js';
+			var _installedUrls = {};
+
+			function _inject(){
+				var s = document.createElement('script');
+				s.src = '/app/player/' + _loader;
+				s.onload = function(){ _waitLoader(_installFromV); };
+				document.body.appendChild(s);
+			}
+
+			// 解析 v 参数：base64 -> [url1,url2,...]
+			function _parseV(){
+				if (!_v) return [];
+				try {
+					var text = decodeURIComponent(atob(_v));
+					var m = text.match(/^\[(.*)\]$/s);
+					if (!m) return [];
+					return m[1].split(',').map(function(u){ return u.trim(); }).filter(function(u){ return !!u; });
+				} catch(e) { return []; }
+			}
+
+			// 等待加载器就绪后，逐个安装 v 参数指定的扩展
+			function _installFromV(){
+				var urls = _parseV();
+				if (!urls.length) return;
+				var i = 0;
+				function next(){
+					if (i >= urls.length) return;
+					var url = urls[i++];
+					if (_installedUrls[url]) { next(); return; }
+					_installedUrls[url] = true;
+					try {
+						fetch(url).then(function(r){ return r.text(); }).then(function(code){
+							if (_o === '1') {
+								// 无痕安装：tempInstall 不写 localStorage
+								if (window.KE && window.KE.tempInstall) window.KE.tempInstall(code);
+								else if (window.KE && window.KE.install) window.KE.install(code);
+							} else {
+								if (window.CUE_INSTALL) window.CUE_INSTALL(code);
+							}
+							next();
+						}).catch(function(){ next(); });
+					} catch(e) { next(); }
+				}
+				next();
+			}
+
+			// 等待加载器就绪：KE 等 window.KE，cue 等 window.heart（main 完成）后才安装 v 扩展
+			function _waitLoader(cb){
+				var _ready = function(){
+					if (_o === '1') return window.KE && window.KE.install;
+					return window.CUE_INSTALL && window.heart;
+				};
+				if (_ready()) { cb(); return; }
+				setTimeout(function(){ _waitLoader(cb); }, 100);
+			}
+
+			// 等主 bundle 初始化 webpackChunkneko 后再注入，保证能抓到 webpack require
+			function _whenReady(){
+				if (window.webpackChunkneko) { _inject(); return; }
+				setTimeout(_whenReady, 100);
+			}
+			_whenReady();
+		})();
+	</script>
 	<script defer="defer" src="/app/player/main.b0815b57.js"></script>
 	<link href="/app/player/main.47f9e29f.css" rel="stylesheet">
 </head>

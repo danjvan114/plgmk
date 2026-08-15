@@ -12,6 +12,7 @@
   var heart = null;
   var extMap = {};
   var EXT_PREFIX = 'ext_';
+  var tempInstallMode = false;
 
   // ==================== 工具 ====================
   function log() {
@@ -221,7 +222,8 @@
   function grabRequire() {
     try {
       if (!window.webpackChunkneko || typeof window.webpackChunkneko.push !== 'function') return;
-      window.webpackChunkneko.push([[6729], {
+      // KittenN player bundle: chunk 729 注入模块 6729 抓取 webpack require
+      window.webpackChunkneko.push([[729], {
         6729: function (m, e, r) { webpackReq = r; }
       }]);
     } catch (e) {}
@@ -829,7 +831,7 @@
     styleAppend('.ke-open-btn{cursor:pointer;}');
     return refreshToolbox().then(function () {
       log('installed', ext.type, ext.title);
-      persistExt(ext.type, code);
+      if (!tempInstallMode) persistExt(ext.type, code);
       if (!window.__KE_STARTUP__) toastOk('导入成功：' + (ext.title || ext.type));
       return true;
     }).catch(function (e) {
@@ -872,7 +874,8 @@
     } catch (e) {}
     var list = [];
     try {
-      if (window.localStorage) {
+      // 无痕模式（v 参数）：跳过 localStorage 持久化扩展，避免上一次列表残留
+      if (window.localStorage && !window.__KE_EPHEMERAL__) {
         var saved = [];
         try { saved = JSON.parse(localStorage.getItem('KE_EXT_LIST') || '[]') || []; } catch (e) { saved = []; }
         for (var i = 0; i < saved.length; i++) {
@@ -1885,6 +1888,12 @@
   // ====================API ====================
   window.KE = {
     install: install,
+    tempInstall: function (code) {
+      tempInstallMode = true;
+      return Promise.resolve(install(code)).finally(function () {
+        tempInstallMode = false;
+      });
+    },
     uninstall: uninstall,
     list: function () { return Object.keys(extMap); },
     panel: openPanel,
