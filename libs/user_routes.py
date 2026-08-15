@@ -212,6 +212,18 @@ def register_user_routes():
             return redirect(url_for('user_profile', username=user.username))
         return redirect(url_for('login'))
 
+    @app.route('/user/set_avatar', methods=['POST'])
+    def user_set_avatar():
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        avatar = request.form.get('avatar', '').strip()[:500]
+        user = User.query.get(session['user'])
+        if user:
+            user.avatar = avatar
+            db.session.commit()
+            return redirect(url_for('user_profile', username=user.username))
+        return redirect(url_for('login'))
+
     @app.route('/u/<username>/wall', methods=['POST'])
     def post_wall_message(username):
         """发布留言到用户主页留言墙"""
