@@ -32,7 +32,7 @@ class ReplyDB:
     """回复记录数据库管理"""
     
     def __init__(self):
-        self.conn = sqlite3.connect(DB_FILE)
+        self.conn = sqlite3.connect(DB_FILE, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
         self._init_db()
     
