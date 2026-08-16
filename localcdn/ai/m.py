@@ -121,7 +121,7 @@ class ConfigManager:
             "max_context_tokens": DEFAULT_MAX_CONTEXT_TOKENS,
             "max_reply_tokens": DEFAULT_MAX_REPLY_TOKENS,
             "max_post_tokens": DEFAULT_MAX_POST_TOKENS,
-            "system_prompt": "你是一个友好的论坛助手，帮助回答用户问题。请用简洁、友好的语气回复。",
+            "system_prompt": "我是一个KE AI助手，在论坛中活跃。我会以幽默风趣的方式回复大家，让论坛充满欢乐！",
             "auto_reply": {
                 "enabled": False,
                 "check_interval": 60,
@@ -629,14 +629,12 @@ class AIForumAssistant:
                 conn = sqlite3.connect(forum_db_path)
                 conn.row_factory = sqlite3.Row
                 
-                # 获取最新帖子
+                # 获取今天的帖子（从当前时间往回巡检）
+                today_start = datetime.now().strftime('%Y-%m-%d 00:00:00')
                 latest_posts = conn.execute(
-                    "SELECT id, title, forum_id FROM posts WHERE status = 'active' ORDER BY id DESC LIMIT 20"
+                    "SELECT id, title, forum_id, content FROM posts WHERE status = 'active' AND created_at >= ? ORDER BY id DESC LIMIT 50",
+                    (today_start,)
                 ).fetchall()
-                
-                commented_ids = self.config.config['auto_reply'].get('last_commented_post_ids', [])
-                replied_reply_ids = self.config.config['auto_reply'].get('replied_reply_ids', [])
-                processed_post_ids = self.config.config['auto_reply'].get('processed_post_ids', [])
                 
                 for post in latest_posts:
                     # 检查AI是否已经在这个帖子下评论过
@@ -647,7 +645,7 @@ class AIForumAssistant:
                     
                     if not ai_comment:
                         # AI还没评论过，留默认评论
-                        if post['id'] not in commented_ids:
+                        if not self.config.reply_db.is_commented(post['id']):
                             self.ui.draw_text(10, 21, f"新帖子: {post['title']} - 正在留默认评论...")
                             
                             default_comment = self.config.config['auto_reply']['default_comment']
@@ -655,16 +653,14 @@ class AIForumAssistant:
                             
                             if success:
                                 self.ui.draw_text(10, 22, f"已留评论: {default_comment[:30]}...")
-                                commented_ids.append(post['id'])
-                                self.config.config['auto_reply']['last_commented_post_ids'] = commented_ids[-500:]
-                                self.config.save()
+                                self.config.reply_db.mark_commented(post['id'])
                             else:
                                 self.ui.draw_text(10, 22, f"评论失败: {msg}")
                             
                             time.sleep(2)
                     else:
                         # AI已经评论过，检查是否有新的回复
-                        if post['id'] in processed_post_ids:
+                        if self.config.reply_db.is_processed(post['id']):
                             continue  # 已经处理过这个帖子的回复，跳过
                         
                         # 查找所有回复AI评论的用户回复
@@ -673,39 +669,42 @@ class AIForumAssistant:
                             (ai_comment['id'], self.get_username_from_token())
                         ).fetchall()
                         
-                        new_replies = [r for r in replies_to_ai if r['id'] not in replied_reply_ids]
+                        new_replies = [r for r in replies_to_ai if not self.config.reply_db.is_replied(r['id'])]
                         
                         if new_replies:
                             # 有新的用户回复，触发AI回复
+                            # 收集所有未回复的评论作为上下文
+                            all_user_replies = []
                             for reply in new_replies:
-                                self.ui.draw_text(10, 21, f"有人回复AI: {reply['username']} - {reply['content'][:30]}...")
-                                
-                                # 构建对话上下文 - 重点是用户的回复内容
-                                messages = [
-                                    {"role": "system", "content": self.ai_client.system_prompt},
-                                    {"role": "user", "content": f"用户 {reply['username']} 回复了你的评论：\n\n{reply['content']}\n\n请生成一个友好的回复:"}
-                                ]
-                                
-                                success, result = self.ai_client.chat(messages, max_tokens=self.ai_client.max_reply_tokens)
+                                all_user_replies.append(f"{reply['username']}: {reply['content']}")
+                            
+                            # 构建对话上下文 - 包含帖子内容和所有用户评论
+                            post_content = post.get('content', '')[:500] if post.get('content') else ''
+                            context_msg = f"帖子标题: {post['title']}\n帖子内容: {post_content}\n\n"
+                            context_msg += "用户评论:\n" + "\n".join(all_user_replies)
+                            context_msg += "\n\n请以幽默的方式回复这些用户："
+                            
+                            messages = [
+                                {"role": "system", "content": self.ai_client.system_prompt},
+                                {"role": "user", "content": context_msg}
+                            ]
+                            
+                            success, result = self.ai_client.chat(messages, max_tokens=self.ai_client.max_reply_tokens)
+                            if success:
+                                # 回复该帖子
+                                success, msg = self.forum_api.reply_post(post['id'], result)
                                 if success:
-                                    # 回复该帖子
-                                    success, msg = self.forum_api.reply_post(post['id'], result)
-                                    if success:
-                                        self.ui.draw_text(10, 22, f"AI已回复: {result[:50]}...")
-                                        replied_reply_ids.append(reply['id'])
-                                        self.config.config['auto_reply']['replied_reply_ids'] = replied_reply_ids[-500:]
-                                        self.config.save()
-                                    else:
-                                        self.ui.draw_text(10, 22, f"回复失败: {msg}")
+                                    self.ui.draw_text(10, 22, f"AI已回复: {result[:50]}...")
+                                    # 标记所有评论为已回复
+                                    for reply in new_replies:
+                                        self.config.reply_db.mark_replied(reply['id'], post['id'], reply['user_id'])
                                 else:
-                                    self.ui.draw_text(10, 22, f"AI生成失败: {result}")
-                                
-                                time.sleep(3)
+                                    self.ui.draw_text(10, 22, f"回复失败: {msg}")
+                            else:
+                                self.ui.draw_text(10, 22, f"AI生成失败: {result}")
                             
                             # 标记这个帖子已经处理过回复
-                            processed_post_ids.append(post['id'])
-                            self.config.config['auto_reply']['processed_post_ids'] = processed_post_ids[-500:]
-                            self.config.save()
+                            self.config.reply_db.mark_processed(post['id'])
                 
                 conn.close()
                 
