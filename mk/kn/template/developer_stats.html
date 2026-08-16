@@ -52,6 +52,8 @@ body { font-family:'Inter','PingFang SC','Microsoft YaHei',system-ui,-apple-syst
 a { color:inherit; text-decoration:none; }
 button { font-family:inherit; }
 body.lite-mode * { animation:none !important; transition:none !important; }
+body.lite-mode * { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+body.lite-mode .topnav { background:var(--glass-strong) !important; box-shadow:inset 0 1px 0 var(--hi-top), var(--shadow); }
 body.lite-mode .glass, body.lite-mode .card { background:var(--glass-strong); backdrop-filter:none; -webkit-backdrop-filter:none; }
 /* ========== 顶栏 ========== */
 .topnav { position:fixed; top:14px; left:50%; transform:translateX(-50%); width:min(94%,1100px); height:58px; display:flex; align-items:center; gap:12px; padding:0 16px; border-radius:40px; background:var(--glass-nav); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:inset 0 1px 0 var(--hi-top), inset 0 -1px 0 var(--hi-bot), var(--shadow); z-index:1000; }
@@ -148,7 +150,6 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#ea580c); c
   .stats-grid { grid-template-columns:1fr 1fr; }
 }
 
-
 .plugin-item { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:10px; }
 .plugin-item:last-child { border-bottom:none; }
 .plugin-info h3 { margin-bottom:4px; font-size:15.5px; }
@@ -174,34 +175,64 @@ input[type="file"]:hover { border-color:var(--accent-1); background:var(--glass-
 input[type="file"]:focus { outline:none; box-shadow:0 0 0 3px var(--accent-glow); }
 input[type="file"]::file-selector-button { border:none; padding:8px 16px; border-radius:14px; background:var(--glass-tint-2); color:var(--accent-1); font-weight:700; font-size:13px; font-family:inherit; cursor:pointer; margin-right:10px; transition:background .3s,transform .3s cubic-bezier(.34,1.56,.64,1); }
 input[type="file"]::file-selector-button:hover { background:var(--glass-tint); transform:scale(1.05); }
+
+/* ===== 语言切换弹窗(参照插件市场) ===== */
+.lang-wrap { position:relative; display:flex; }
+.lang-pop { position:fixed; top:0; right:0; min-width:132px; z-index:5000; padding:8px; border-radius:16px; background:var(--glass-strong); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--hi-top), inset 0 -1px 0 var(--hi-bot), var(--shadow); opacity:0; transform:translateY(8px) scale(.92); pointer-events:none; visibility:hidden; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1),visibility .3s; }
+.lang-pop.show { opacity:1; transform:none; pointer-events:auto; visibility:visible; }
+.lang-item { display:block; width:100%; border:none; cursor:pointer; background:transparent; color:var(--text-2); font-size:13px; font-weight:700; font-family:inherit; text-align:left; padding:8px 12px; border-radius:10px; transition:background .25s,color .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
+.lang-item:hover { background:var(--glass-tint); color:var(--accent-1); transform:translateX(3px); }
+.lang-item.cur { color:var(--accent-1); background:var(--glass-tint); }
+.lang-item.cur::after { content:"\2713"; float:right; font-weight:800; }
+/* ===== 移动端菜单 ===== */
+.menu-btn { display:none !important; }
+@media (max-width:768px) {
+  .menu-btn { display:flex !important; }
+  .topnav .nav-links { position:fixed; top:82px; left:3%; right:3%; display:none; flex-direction:column; gap:4px; padding:10px; border-radius:18px; background:var(--glass-strong); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); box-shadow:inset 0 1px 0 var(--hi-top), var(--shadow-hover); z-index:1500; max-height:60vh; overflow-y:auto; }
+  .topnav .nav-links.open { display:flex; }
+  .topnav .nav-links a { padding:12px 16px; border-radius:12px; font-size:14.5px; width:100%; }
+}
+
+
+/* 移动端:禁用卡牌悬浮/浮起(触摸设备无 hover,防止 sticky-hover 残留) */
+@media (hover:none) {
+  .card:hover, .stat-card:hover, .stat-item:hover, .mk-card:hover, .btn:hover,
+  .guide:hover, .plugin-box:hover, .plugin-item:hover, .detail-hero:hover, .stars:hover,
+  .mdui-tab-item:hover, .nav-links a:hover, .fl-link:hover, .dl-m-btn:hover, .cr-tab:hover, .ext-install:hover {
+    --ty:0 !important; transform:none !important;
+  }
+}
+
 </style>
+<link rel="stylesheet" href="global.css">
 </head>
-<body class="theme-light">
-<header class="topnav"><a class="logo" href="/mk/kn"><img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="Logo"><span>KE 插件市场</span></a><div class="nav-links"><a href="/mk/kn">插件市场</a><a href="/dev/kn">开发者中心</a><a href="/mk/kn/developer/stats" class="active">我的统计</a></div><div class="head-space"></div><button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg></button><button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button></header>
+<body class="theme-light" data-page="dev-stats">
+<script src="./theme.js"></script>
+<header class="topnav"><a class="logo" href="/mk/kn"><img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="Logo"><span data-i18n="mk_logo">插件市场</span></a><div class="nav-links"><a href="/mk/kn" data-i18n="mk_market">插件市场</a><a href="/dev/kn" data-i18n="mk_dev">开发者中心</a><a href="/mk/kn/developer/stats" class="active" data-i18n="mk_stats">我的统计</a></div><div class="head-space"></div><button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg></button><button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button><button class="icon-btn" id="langBtn" title="切换语言" aria-label="切换语言"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button><button class="icon-btn menu-btn" id="menuToggle" title="菜单" aria-label="菜单" style="display:none"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></header>
 <div class="main-box">
 
-<h1 class="page-title">开发者统计 - {{ session.user }}</h1>
+<h1 class="page-title"><span data-i18n="dev_stats">开发者统计</span> - {{ session.user }}</h1>
 <div class="stats-grid" style="margin-top:20px">
-<div class="stat-card"><div class="stat-value">{{ plugins|length }}</div><div class="stat-label">发布插件数</div></div>
-<div class="stat-card"><div class="stat-value">{{ total_downloads }}</div><div class="stat-label">总下载次数</div></div>
-<div class="stat-card"><div class="stat-value">{{ "%.1f"|format(avg_rating) }}</div><div class="stat-label">平均评分</div></div>
+<div class="stat-card"><div class="stat-value">{{ plugins|length }}</div><div class="stat-label" data-i18n="pub_cnt">发布插件数</div></div>
+<div class="stat-card"><div class="stat-value">{{ total_downloads }}</div><div class="stat-label" data-i18n="total_dl_times">总下载次数</div></div>
+<div class="stat-card"><div class="stat-value">{{ "%.1f"|format(avg_rating) }}</div><div class="stat-label" data-i18n="avg_rate">平均评分</div></div>
 </div>
 <div class="card">
-<h2 style="font-size:18px;margin-bottom:16px">我的插件</h2>
+<h2 style="font-size:18px;margin-bottom:16px" data-i18n="my_plugins">我的插件</h2>
 {% if plugins %}
 {% for plugin in plugins %}
 <div class="plugin-item">
 <div class="plugin-info"><h3>{{ plugin.name }}</h3><p>{{ plugin.author }} · {{ plugin.version }}</p></div>
-<div class="plugin-stats"><div>{{ plugin.downloads }} 下载</div><div>★ {{ "%.1f"|format(plugin.rating) }}</div></div>
+<div class="plugin-stats"><div><span data-i18n="dl_label">下载: </span>{{ plugin.downloads }}</div><div>★ {{ "%.1f"|format(plugin.rating) }}</div></div>
 <div class="plugin-actions">
-<a href="/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}" class="btn sm ghost">查看</a>
-<a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn sm ghost">编辑</a>
-<a href="/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}" class="btn sm {{ 'danger' if plugin.status == 'active' else 'success' }}">{{ '下架' if plugin.status == 'active' else '上架' }}</a>
+<a href="/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}" class="btn sm ghost"><span data-i18n="view">查看</span></a>
+<a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn sm ghost"><span data-i18n="edit">编辑</span></a>
+<a href="/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}" class="btn sm {{ 'danger' if plugin.status == 'active' else 'success' }}"><span data-i18n-status="shelf">{{ '下架' if plugin.status == 'active' else '上架' }}</span></a>
 </div>
 </div>
 {% endfor %}
 {% else %}
-<p style="text-align:center;color:var(--text-3);padding:20px">暂无插件</p>
+<p style="text-align:center;color:var(--text-3);padding:20px" data-i18n="no_plugin_short">暂无插件</p>
 {% endif %}
 </div>
 
@@ -210,7 +241,7 @@ input[type="file"]::file-selector-button:hover { background:var(--glass-tint); t
 /* ===== 双主题(白/黑) ===== */
 (function () {
   var cur = 'light';
-  try { var s = localStorage.getItem('kn-tool-theme'); if (s === 'light' || s === 'dark') cur = s; } catch (e) {}
+  try { var s = localStorage.getItem('knexpanse-theme'); if (s === null || s === '') s = localStorage.getItem('kn-tool-theme'); if (s === 'dark' || s === '3') cur = 'dark'; else if (s === 'light' || s === '0' || s === '1' || s === '2') cur = 'light'; } catch (e) {}
   document.body.classList.remove('theme-light', 'theme-dark');
   document.body.classList.add('theme-' + cur);
   var btn = document.getElementById('themeBtn');
@@ -218,24 +249,24 @@ input[type="file"]::file-selector-button:hover { background:var(--glass-tint); t
     cur = cur === 'light' ? 'dark' : 'light';
     document.body.classList.remove('theme-light', 'theme-dark');
     document.body.classList.add('theme-' + cur);
-    try { localStorage.setItem('kn-tool-theme', cur); } catch (e) {}
+    try { localStorage.setItem('knexpanse-theme', cur === 'dark' ? '3' : '0'); } catch (e) {}
   });
   /* ===== 节能模式 ===== */
   var lite = false;
-  try { lite = localStorage.getItem('kn-tool-lite') === '1'; } catch (e) {}
+  try { lite = localStorage.getItem('knexpanse-lite') === '1'; } catch (e) {}
   var liteBtn = document.getElementById('liteBtn');
   function setLite(on) {
     document.body.classList.toggle('lite-mode', on);
     if (liteBtn) liteBtn.classList.toggle('active', on);
-    try { localStorage.setItem('kn-tool-lite', on ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
   }
   setLite(lite);
   if (liteBtn) liteBtn.addEventListener('click', function () { setLite(!document.body.classList.contains('lite-mode')); });
 })();
 
-
 /* ===== 悬浮卡片:鼠标跟随倾斜(tilt) ===== */
 function bindTilt(el, maxDeg) {
+  if (/Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MQQBrowser/i.test(navigator.userAgent)) return;
   if (!el || el._tiltDone) return;
   el._tiltDone = true;
   var DEG = maxDeg || 8;
@@ -254,28 +285,103 @@ function bindTilt(el, maxDeg) {
   });
 }
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.card, .stat-card, .stat-item').forEach(function (el) { bindTilt(el, 8); });
+  document.querySelectorAll('.card, .stat-card, .stat-item, .plugin-item').forEach(function (el) { bindTilt(el, 8); });
 });
 
-/* ===== 访问提示通知(仅移动端,只提示不禁用) ===== */
-(function () {
-  var ua = navigator.userAgent || '';
-  var isMobile = /Android|iPhone|iPad|iPod|Windows Phone|Mobile|Mobi/i.test(ua);
-  if (!isMobile) return;
-  function showNotice() {
-    var el = document.createElement('div');
-    el.style.cssText = 'position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(24px);max-width:88vw;background:rgba(22,28,52,.88);color:#fff;padding:13px 22px;border-radius:16px;font-size:13.5px;line-height:1.65;font-weight:600;box-shadow:0 22px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:99999;opacity:0;transition:opacity .4s,transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;';
-    el.textContent = '提示：当前网页不支持右键复制和粘贴，移动端未做适配，可能存在浏览问题，请使用桌面端访问。';
-    document.body.appendChild(el);
-    requestAnimationFrame(function () { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)'; });
-    setTimeout(function () {
-      el.style.opacity = '0'; el.style.transform = 'translateX(-50%) translateY(24px)';
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
-    }, 6500);
-  }
-  if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(showNotice, 900);
-  else window.addEventListener('load', function () { setTimeout(showNotice, 900); });
-})();
 </script>
-</body>
+
+<div class="lang-pop" id="langPop">
+  <button class="lang-item cur" data-lang="zh">中文</button>
+  <button class="lang-item" data-lang="tw">繁體中文</button>
+  <button class="lang-item" data-lang="en">English</button>
+  <button class="lang-item" data-lang="ja">日本語</button>
+  <button class="lang-item" data-lang="ko">한국어</button>
+  <button class="lang-item" data-lang="es">Español</button>
+</div>
+<script>
+/* ===== 语言切换(参照插件市场) ===== */
+(function () {
+  var LANGS = ['zh','tw','en','ja','ko','es'];
+  var curLang = 'zh';
+  try { var lsLang = localStorage.getItem('knexpanse-lang'); if (LANGS.indexOf(lsLang) >= 0) curLang = lsLang; } catch (e) {}
+  var I18N = {"mk_logo": {"zh": "插件市场", "tw": "插件市場", "en": "Plugin Market", "ja": "プラグインマーケット", "ko": "플러그인 마켓", "es": "Mercado de Plugins"}, "mk_home": {"zh": "首页", "tw": "首頁", "en": "Home", "ja": "ホーム", "ko": "홈", "es": "Inicio"}, "mk_market": {"zh": "插件市场", "tw": "插件市場", "en": "Plugin Market", "ja": "プラグインマーケット", "ko": "플러그인 마켓", "es": "Mercado de Plugins"}, "mk_dev": {"zh": "开发者中心", "tw": "開發者中心", "en": "Developer Center", "ja": "開発者センター", "ko": "개발자 센터", "es": "Centro de Desarrolladores"}, "mk_admin": {"zh": "插件管理", "tw": "插件管理", "en": "Plugin Admin", "ja": "プラグイン管理", "ko": "플러그인 관리", "es": "Gestión de Plugins"}, "mk_users": {"zh": "用户管理", "tw": "用戶管理", "en": "User Admin", "ja": "ユーザー管理", "ko": "사용자 관리", "es": "Gestión de Usuarios"}, "mk_logout": {"zh": "退出", "tw": "退出", "en": "Logout", "ja": "ログアウト", "ko": "로그아웃", "es": "Cerrar Sesión"}, "mk_stats": {"zh": "我的统计", "tw": "我的統計", "en": "My Stats", "ja": "マイ統計", "ko": "내 통계", "es": "Mis Estadísticas"}, "ok": {"zh": "确定", "tw": "確定", "en": "OK", "ja": "確定", "ko": "확인", "es": "Aceptar"}, "cancel": {"zh": "取消", "tw": "取消", "en": "Cancel", "ja": "キャンセル", "ko": "취소", "es": "Cancelar"}, "save": {"zh": "保存修改", "tw": "保存修改", "en": "Save Changes", "ja": "変更を保存", "ko": "변경 저장", "es": "Guardar Cambios"}, "delete": {"zh": "删除", "tw": "刪除", "en": "Delete", "ja": "削除", "ko": "삭제", "es": "Eliminar"}, "edit": {"zh": "编辑", "tw": "編輯", "en": "Edit", "ja": "編集", "ko": "편집", "es": "Editar"}, "view": {"zh": "查看", "tw": "查看", "en": "View", "ja": "見る", "ko": "보기", "es": "Ver"}, "username": {"zh": "用户名", "tw": "用戶名", "en": "Username", "ja": "ユーザー名", "ko": "사용자 이름", "es": "Usuario"}, "password": {"zh": "密码", "tw": "密碼", "en": "Password", "ja": "パスワード", "ko": "비밀번호", "es": "Contraseña"}, "role": {"zh": "角色", "tw": "角色", "en": "Role", "ja": "役割", "ko": "역할", "es": "Rol"}, "user_role": {"zh": "普通用户", "tw": "普通用戶", "en": "User", "ja": "一般ユーザー", "ko": "일반 사용자", "es": "Usuario"}, "dev_role": {"zh": "开发者", "tw": "開發者", "en": "Developer", "ja": "開発者", "ko": "개발자", "es": "Desarrollador"}, "admin_role": {"zh": "管理员", "tw": "管理員", "en": "Admin", "ja": "管理者", "ko": "관리자", "es": "Administrador"}, "username_ph": {"zh": "请输入用户名", "tw": "請輸入用戶名", "en": "Enter username", "ja": "ユーザー名を入力", "ko": "사용자 이름 입력", "es": "Ingresa el usuario"}, "password_ph": {"zh": "请输入密码", "tw": "請輸入密碼", "en": "Enter password", "ja": "パスワードを入力", "ko": "비밀번호 입력", "es": "Ingresa la contraseña"}, "new_pass_ph": {"zh": "请输入新密码", "tw": "請輸入新密碼", "en": "Enter new password", "ja": "新しいパスワードを入力", "ko": "새 비밀번호 입력", "es": "Ingresa la nueva contraseña"}, "status_on": {"zh": "启用", "tw": "啟用", "en": "Active", "ja": "有効", "ko": "활성", "es": "Activo"}, "status_off": {"zh": "禁用", "tw": "禁用", "en": "Disabled", "ja": "無効", "ko": "비활성", "es": "Inactivo"}, "on_shelf": {"zh": "上架", "tw": "上架", "en": "Publish", "ja": "公開", "ko": "게시", "es": "Publicar"}, "off_shelf": {"zh": "下架", "tw": "下架", "en": "Unpublish", "ja": "非公開", "ko": "비공개", "es": "Retirar"}, "dev_stats": {"zh": "开发者统计", "tw": "開發者統計", "en": "Developer Stats", "ja": "開発者統計", "ko": "개발자 통계", "es": "Estadísticas del Dev"}, "pub_cnt": {"zh": "发布插件数", "tw": "發佈插件數", "en": "Published Plugins", "ja": "公開プラグイン数", "ko": "게시 플러그인 수", "es": "Plugins Publicados"}, "total_dl_times": {"zh": "总下载次数", "tw": "總下載次數", "en": "Total Downloads", "ja": "総DL回数", "ko": "총 다운로드 횟수", "es": "Descargas Totales"}, "avg_rate": {"zh": "平均评分", "tw": "平均評分", "en": "Avg Rating", "ja": "平均評価", "ko": "평균 평점", "es": "Calificación Promedio"}, "my_plugins": {"zh": "我的插件", "tw": "我的插件", "en": "My Plugins", "ja": "マイプラグイン", "ko": "내 플러그인", "es": "Mis Plugins"}, "dl_label": {"zh": "下载: ", "tw": "下載: ", "en": "Downloads: ", "ja": "DL数: ", "ko": "다운로드: ", "es": "Descargas: "}, "no_plugin_short": {"zh": "暂无插件", "tw": "暫無插件", "en": "No plugins yet", "ja": "プラグインがありません", "ko": "플러그인이 없습니다", "es": "Sin plugins"}};
+  function applyLang() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n');
+      var t = I18N[k];
+      if (t && t[curLang]) el.textContent = t[curLang];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-ph');
+      var t = I18N[k];
+      if (t && t[curLang]) el.setAttribute('placeholder', t[curLang]);
+    });
+    document.querySelectorAll('.lang-item').forEach(function (it) { it.classList.toggle('cur', it.dataset.lang === curLang); });
+    document.documentElement.lang = curLang === 'zh' ? 'zh-CN' : (curLang === 'tw' ? 'zh-TW' : curLang);
+    renderLangDynamic(curLang, I18N);
+  }
+  /* 动态状态文本(启用/禁用/上架/下架),按当前文本内容判断 */
+  function renderLangDynamic(lang, I18N) {
+    document.querySelectorAll('[data-i18n-status]').forEach(function (el) {
+      var type = el.getAttribute('data-i18n-status') || 'active';
+      var t = el.textContent.trim();
+      var key;
+      if (type === 'shelf') {
+        key = (t.indexOf('上架') >= 0) ? 'on_shelf' : 'off_shelf';
+      } else {
+        key = (t.indexOf('启用') >= 0 || t.indexOf('啟用') >= 0) ? 'status_on' : 'status_off';
+      }
+      if (I18N[key] && I18N[key][lang]) el.textContent = I18N[key][lang];
+    });
+  }
+  function posLangPop(btn) {
+    var pop = document.getElementById('langPop');
+    if (!pop || !btn) return;
+    var r = btn.getBoundingClientRect();
+    pop.style.top = (r.bottom + 10) + 'px';
+    pop.style.right = Math.max(10, window.innerWidth - r.right) + 'px';
+  }
+  function showLang() {
+    var pop = document.getElementById('langPop');
+    if (!pop) return;
+    posLangPop(document.getElementById('langBtn'));
+    pop.classList.add('show');
+  }
+  function hideLang() {
+    var pop = document.getElementById('langPop');
+    if (pop) pop.classList.remove('show');
+  }
+  var langBtn = document.getElementById('langBtn');
+  if (langBtn) {
+    langBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var pop = document.getElementById('langPop');
+      if (pop && pop.classList.contains('show')) hideLang(); else showLang();
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var pop = document.getElementById('langPop');
+    if (pop && pop.classList.contains('show') && !e.target.closest('#langBtn') && !e.target.closest('#langPop')) hideLang();
+    var nl = document.querySelector('.nav-links');
+    if (nl && nl.classList.contains('open') && !e.target.closest('.topnav')) nl.classList.remove('open');
+  });
+  document.querySelectorAll('.lang-item').forEach(function (it) {
+    it.addEventListener('click', function () {
+      curLang = it.dataset.lang;
+      try { localStorage.setItem('knexpanse-lang', curLang); } catch (e) {}
+      applyLang();
+      setTimeout(hideLang, 150);
+    });
+  });
+  var menuToggle = document.getElementById('menuToggle');
+  if (menuToggle) {
+    menuToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var nl = document.querySelector('.nav-links');
+      if (nl) nl.classList.toggle('open');
+    });
+  }
+  applyLang();
+})();
+</script></body>
 </html>

@@ -344,9 +344,6 @@ header.scrolled { background:var(--glass-card); }
 .nav-links a:active { transform:scale(.94); }
 @media (max-width:900px) {
 
-
-
-
 }
 .nav-right { display:flex; gap:10px; align-items:center; position:relative; }
 .icon-btn { width:40px; height:40px; border-radius:50%; border:none; cursor:pointer; background:var(--glass-nav); color:var(--text-2); backdrop-filter:blur(12px) saturate(170%); -webkit-backdrop-filter:blur(12px) saturate(170%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); display:flex; align-items:center; justify-content:center; transition:transform .5s cubic-bezier(.34,1.56,.64,1),background .3s,box-shadow .3s,color .3s; }
@@ -677,8 +674,6 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   header.menu-open .nav-links > a:nth-child(4) { animation-delay:.15s; }
   header.menu-open .nav-links > .nav-dl { animation-delay:.25s; }
 
-
-
   @keyframes navItemIn { from { opacity:0; transform:translateX(26px) scale(.92); } to { opacity:1; transform:none; } }
   /* 收起:菜单项文字慢慢消失 */
   @keyframes navItemOut { to { opacity:0; transform:translateX(-12px); } }
@@ -738,8 +733,6 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   .st-ring { width:76px; height:76px; }
   .st-ring svg { width:76px; height:76px; }
   .st-sub-row span { font-size:12.5px; }
-
-
 
   body.dark-mode .st-col { background:rgba(255,255,255,.10); }
   .stack { min-height:420px; }
@@ -805,7 +798,6 @@ body.dark-mode .st-col, body.dark-mode .st-col.cur {
   -webkit-backdrop-filter:none !important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(255,255,255,.03);
 }
-
 
 /** ===== 环境独立样式 =====
  * 由 JS 自动识别:file:// 协议 → html[data-env="LOCAL"];其余(线上/CDN)→ html[data-env="CDN"]
@@ -982,20 +974,214 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
 .offline-tip { color:var(--danger); font-weight:700; font-size:14px; }
 .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:0 0 18px; }
 .stat-item.card { padding:22px 14px; text-align:center; border-radius:20px; }
-</style>
-</head>
-<body class="theme-aurora">
-<div id="particles"></div>
 
-<div class="mdui-toolbar mdui-color-teal" style="position:fixed;top:0;left:0;right:0;z-index:99;">
+/* ===== 顶部导航栏(参照插件市场 header 悬浮胶囊) ===== */
+.mdui-toolbar.mdui-color-teal {
+  position:fixed; top:14px; left:50%; transform:translateX(-50%);
+  width:min(94%,1200px); height:60px; min-height:60px; border-radius:60px;
+  padding:0 16px 0 10px; margin:0;
+  background:var(--glass-nav) !important;
+  backdrop-filter:blur(6px) saturate(160%); -webkit-backdrop-filter:blur(6px) saturate(160%);
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+  color:var(--text-1);
+  display:flex; align-items:center; gap:8px;
+  z-index:1000;
+}
+.mdui-toolbar .mdui-btn-icon { width:40px; height:40px; border-radius:50%; color:var(--text-2); flex:none; transition:color .25s,background .3s,transform .5s cubic-bezier(.34,1.56,.64,1); }
+.mdui-toolbar .mdui-btn-icon:hover { background:var(--glass-tint); color:var(--accent-1); transform:scale(1.08); }
+.mdui-toolbar .mdui-typo-title { color:var(--text-1); font-size:17px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0; }
+.mdui-toolbar-spacer { flex:1; }
+.mdui-toolbar .icon-btn { width:40px; height:40px; }
+/* ===== Tab 导航(参照插件市场 nav-links 胶囊) ===== */
+.mdui-tab-container { background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; border-radius:0; margin:0 0 20px; box-shadow:none; overflow:visible; }
+.mdui-tab { display:flex; gap:8px; padding:2px 0; border-bottom:none; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; }
+.mdui-tab::-webkit-scrollbar { display:none; }
+.mdui-tab .mdui-tab-indicator { display:none !important; }
+.mdui-tab-item { flex:none; min-width:auto; padding:10px 22px; border-radius:30px; font-size:14px; font-weight:700; color:var(--text-2); background:var(--glass-tint); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); transition:color .25s,background .3s,box-shadow .3s,transform .5s cubic-bezier(.34,1.56,.64,1); overflow:hidden; }
+.mdui-tab-item:hover { color:var(--accent-1); background:var(--glass-tint-2); transform:translateY(-2px) scale(1.05); }
+.mdui-tab-item:active { transform:scale(.94); }
+.mdui-tab-item.active { color:var(--accent-1); background:var(--glass-tint-2); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 0 14px var(--accent-glow); }
+.mdui-tab-item.active::after { display:none; }
+.mdui-tab-item i { margin-right:6px; font-size:15px; vertical-align:-2px; }
+/* Tab 切换动画:丝滑弹性 */
+.tab-content.active { animation:tabIn .45s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes tabIn { from { opacity:0; transform:translateY(12px) scale(.985); } to { opacity:1; transform:none; } }
+/* 节能模式:导航栏实心、无动画 */
+body.lite-mode .mdui-toolbar.mdui-color-teal { background:var(--solid-glass) !important; backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.lite-mode .mdui-tab-item { background:var(--solid-glass); }
+body.lite-mode .mdui-tab-item:hover, body.lite-mode .mdui-tab-item.active, body.lite-mode .mdui-tab-item:active { transform:none !important; box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot); }
+/* 移动端 */
+@media (max-width:768px) {
+  .mdui-toolbar.mdui-color-teal { width:94%; padding:0 12px 0 6px; }
+  .mdui-toolbar .mdui-typo-title { font-size:15px; }
+  .mdui-tab { gap:6px; }
+  .mdui-tab-item { padding:9px 16px; font-size:13px; }
+  .mdui-tab-item i { margin-right:4px; }
+}
+
+
+/* 移动端:禁用卡牌悬浮/浮起(触摸设备无 hover,防止 sticky-hover 残留) */
+@media (hover:none) {
+  .card:hover, .stat-card:hover, .stat-item:hover, .mk-card:hover, .btn:hover,
+  .guide:hover, .plugin-box:hover, .plugin-item:hover, .detail-hero:hover, .stars:hover,
+  .mdui-tab-item:hover, .nav-links a:hover, .fl-link:hover, .dl-m-btn:hover, .cr-tab:hover, .ext-install:hover {
+    --ty:0 !important; transform:none !important;
+  }
+}
+
+
+/* ===== 详情页液态玻璃 UI v3 ===== */
+/* 顶部导航栏:居中(HTML 已去内联 left/right) + 不裁剪 + 液态玻璃 */
+.mdui-toolbar.mdui-color-teal {
+  position:fixed; top:14px; left:50% !important; right:auto !important;
+  transform:translateX(-50%);
+  width:min(94%,1200px); height:60px; min-height:60px; border-radius:60px;
+  padding:0 18px; margin:0;
+  background:var(--glass-nav) !important;
+  backdrop-filter:blur(6px) saturate(160%); -webkit-backdrop-filter:blur(6px) saturate(160%);
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+  color:var(--text-1);
+  display:flex; align-items:center; gap:8px;
+  overflow:visible !important;
+  z-index:1000;
+}
+.mdui-toolbar .mdui-btn-icon { width:40px; height:40px; border-radius:50%; color:var(--text-2); flex:none; transition:color .25s,background .3s,transform .5s cubic-bezier(.34,1.56,.64,1); }
+.mdui-toolbar .mdui-btn-icon:hover { background:var(--glass-tint); color:var(--accent-1); transform:scale(1.08); }
+.mdui-toolbar .mdui-typo-title { color:var(--text-1); font-size:17px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0; }
+.mdui-toolbar-spacer { flex:1; }
+/* Tab 导航:居中圆角毛玻璃容器 + 内部导航胶囊(参照插件市场 nav-links) */
+.mdui-tab-container {
+  background:var(--glass-card);
+  backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-radius:20px; padding:8px; margin:0 auto 20px; max-width:660px;
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+  overflow:visible;
+}
+.mdui-tab { display:flex; justify-content:center; gap:4px; padding:0; border-bottom:none; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; }
+.mdui-tab::-webkit-scrollbar { display:none; }
+.mdui-tab .mdui-tab-indicator { display:none !important; }
+.mdui-tab-item {
+  flex:none; min-width:auto; padding:9px 20px; border-radius:30px;
+  font-size:14px; font-weight:700; color:var(--text-2);
+  background:transparent; box-shadow:none;
+  transition:color .25s,background .3s,box-shadow .3s,transform .45s cubic-bezier(.34,1.56,.64,1);
+  overflow:hidden;
+}
+.mdui-tab-item:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateY(-1px); }
+.mdui-tab-item:active { transform:scale(.95); }
+.mdui-tab-item.active { color:var(--accent-1); background:var(--glass-tint-2); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 0 12px var(--accent-glow); }
+.mdui-tab-item.active::after { display:none; }
+.mdui-tab-item i { margin-right:6px; font-size:15px; vertical-align:-2px; }
+.mdui-tab-item .mdui-ripple-wave { display:none !important; }
+/* Tab 内容:退场动画 -> 进场动画 */
+.tab-content { display:none; padding:20px 24px; }
+.tab-content.active { display:block; animation:tabIn .42s cubic-bezier(.34,1.56,.64,1) both; }
+.tab-content.out { display:block; animation:tabOut .22s ease both; }
+@keyframes tabIn { from { opacity:0; transform:translateY(12px) scale(.985); } to { opacity:1; transform:none; } }
+@keyframes tabOut { from { opacity:1; transform:none; } to { opacity:0; transform:translateY(-10px) scale(.985); } }
+/* 下载/评分按钮:统一紫色液态玻璃(去掉绿/橙) */
+.detail-actions .btn.success, .detail-actions .btn.warn {
+  color:var(--accent-1);
+  background:var(--glass-tint);
+  backdrop-filter:blur(14px) saturate(170%); -webkit-backdrop-filter:blur(14px) saturate(170%);
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 10px 24px var(--accent-glow);
+}
+.detail-actions .btn.success:hover, .detail-actions .btn.warn:hover {
+  background:var(--glass-tint-2);
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 16px 34px var(--accent-glow);
+}
+/* 统计卡(下载次数/评分/评价数):液态玻璃 */
+.stat-item.card {
+  background:var(--glass-card);
+  backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+  border:1px solid rgba(255,255,255,.08);
+}
+.stat-item.card .stat-value { color:var(--accent-1); }
+/* 区块标题竖条:液态玻璃胶囊(白色高光,去渐变) */
+.sec-bar {
+  width:4px; height:18px; border-radius:4px;
+  background:var(--glass-tint-2);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.06);
+}
+/* 插件名:去渐变描边 -> 液态玻璃纯色 + 白色高光 */
+.detail-hero .page-title {
+  background:none; -webkit-background-clip:initial; background-clip:initial;
+  -webkit-text-fill-color:initial; color:var(--text-1);
+  text-shadow:0 1px 0 rgba(255,255,255,.38);
+}
+body.dark-mode .detail-hero .page-title { text-shadow:0 1px 0 rgba(255,255,255,.10); }
+/* 卡片顶部描边:渐变 -> 白色高光(液态玻璃) */
+.card::before { background:linear-gradient(90deg,rgba(255,255,255,.5),rgba(255,255,255,.08),transparent); }
+/* 节能模式 */
+body.lite-mode .mdui-toolbar.mdui-color-teal { background:var(--solid-glass) !important; backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.lite-mode .mdui-tab-container { background:var(--solid-glass); backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.lite-mode .mdui-tab-item { background:transparent; }
+body.lite-mode .mdui-tab-item.active { background:var(--glass-tint-2); }
+body.lite-mode .mdui-tab-item:hover, body.lite-mode .mdui-tab-item.active, body.lite-mode .mdui-tab-item:active { transform:none !important; }
+body.lite-mode .stat-item.card { background:var(--solid-glass); border:none; }
+body.lite-mode .detail-actions .btn.success, body.lite-mode .detail-actions .btn.warn { background:var(--grad-btn); color:#fff; }
+/* 移动端 */
+@media (max-width:768px) {
+  .mdui-toolbar.mdui-color-teal { width:94%; padding:0 12px 0 6px; }
+  .mdui-toolbar .mdui-typo-title { font-size:15px; }
+  .mdui-tab-container { max-width:100%; padding:6px; }
+  .mdui-tab { gap:2px; }
+  .mdui-tab-item { padding:8px 14px; font-size:13px; }
+  .mdui-tab-item i { margin-right:4px; }
+  .tab-content { padding:16px; }
+}
+
+
+/* ===== 详情页专项 v4 ===== */
+/* 导航栏 Logo */
+.pd-nav-logo { height:32px; width:auto; border-radius:8px; flex:none; display:block; }
+.mdui-toolbar .mdui-typo-title { color:var(--text-1); font-size:17px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0; }
+/* Tab 容器:参数与顶部全局导航栏背景保持一致(glass-nav + blur6px + 胶囊圆角) */
+.mdui-tab-container {
+  background:var(--glass-nav);
+  backdrop-filter:blur(6px) saturate(160%); -webkit-backdrop-filter:blur(6px) saturate(160%);
+  border-radius:60px; padding:8px 12px; margin:0 auto 22px; max-width:700px;
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+  overflow:visible;
+}
+.mdui-tab { display:flex; justify-content:center; gap:4px; padding:0; border-bottom:none; overflow:visible; }
+.mdui-tab-item {
+  flex:none; min-width:auto; padding:10px 22px; border-radius:30px;
+  font-size:14px; font-weight:700; color:var(--text-2);
+  background:transparent; box-shadow:none;
+  transition:color .25s,background .3s,box-shadow .3s,transform .45s var(--ease-pop);
+  overflow:visible;
+}
+.mdui-tab-item:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateY(-2px) scale(1.06); }
+.mdui-tab-item:active { transform:scale(.95); }
+.mdui-tab-item.active { color:var(--accent-1); background:var(--glass-tint-2); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 0 12px var(--accent-glow); }
+.mdui-tab-item.active::after { display:none; }
+.mdui-tab-item i { margin-right:6px; font-size:15px; vertical-align:-2px; }
+/* 全站 Q弹缓动统一(详情页元素) */
+.detail-hero, .stat-item.card, .detail-actions .btn, .meta-badge, .gallery-image, .sec-title {
+  transition:transform .45s var(--ease-pop), box-shadow .45s var(--ease-pop), background .3s, color .3s;
+}
+/* 内容区块尺寸变化平滑 */
+.tab-content.active { animation:tabIn .45s var(--ease-pop) both; }
+
+</style>
+<link rel="stylesheet" href="global.css">
+</head>
+<body class="theme-aurora" data-page="plugin-detail">
+<script src="./theme.js"></script>
+
+<div class="mdui-toolbar mdui-color-teal" style="position:fixed;z-index:1000;">
         <a class="mdui-ripple mdui-btn-icon" onclick="goBack()">
             <i class="mdui-icon material-icons">arrow_back</i>
         </a>
-        <span class="mdui-typo-title">{{ plugin.name }}</span>
+        <img class="pd-nav-logo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse"><span class="mdui-typo-title" data-i18n="mk_logo">插件市场</span>
         <div class="mdui-toolbar-spacer"></div>
         <div class="nav-right">
           <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"></button>
           <button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button>
+          <button class="icon-btn" id="langBtn" title="切换语言" aria-label="切换语言"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+
         </div>
 
         
@@ -1022,10 +1208,10 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
 <!-- MDUI Tab 组件 -->
 <div class="mdui-tab-container">
   <div class="mdui-tab">
-    <button class="mdui-tab-item mdui-ripple active" data-tab="overview"><i class="mdui-icon material-icons">info</i>概览</button>
-    <button class="mdui-tab-item mdui-ripple" data-tab="preview"><i class="mdui-icon material-icons">visibility</i>预览</button>
-    <button class="mdui-tab-item mdui-ripple" data-tab="description"><i class="mdui-icon material-icons">description</i>描述</button>
-    <button class="mdui-tab-item mdui-ripple" data-tab="stats"><i class="mdui-icon material-icons">all_inclusive</i>统计</button>
+    <button class="mdui-tab-item active" data-tab="overview"><i class="mdui-icon material-icons">info</i><span data-i18n="pd_tab_overview">概览</span></button>
+    <button class="mdui-tab-item" data-tab="preview"><i class="mdui-icon material-icons">visibility</i><span data-i18n="pd_tab_preview">预览</span></button>
+    <button class="mdui-tab-item" data-tab="description"><i class="mdui-icon material-icons">description</i><span data-i18n="pd_tab_desc">描述</span></button>
+    <button class="mdui-tab-item" data-tab="stats"><i class="mdui-icon material-icons">all_inclusive</i><span data-i18n="pd_tab_stats">统计</span></button>
   </div>
   
   <!-- 概览 Tab -->
@@ -1034,12 +1220,12 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
       <div class="detail-main">
         {% if plugin.ttmp4_url %}
         <div class="detail-sec">
-          <h2 class="sec-title"><span class="sec-bar"></span>预览</h2>
+          <h2 class="sec-title"><span class="sec-bar"></span><span data-i18n="pd_tab_preview">预览</span></h2>
           <div class="ttmp4-container"><iframe class="ttmp4-iframe" src="{{ plugin.ttmp4_url }}" sandbox="allow-scripts allow-same-origin allow-popups" allowfullscreen></iframe></div>
         </div>
         {% elif plugin.images and plugin.images|length > 0 %}
         <div class="detail-sec">
-          <h2 class="sec-title"><span class="sec-bar"></span>插件预览</h2>
+          <h2 class="sec-title"><span class="sec-bar"></span><span data-i18n="pd_sec_plug_preview">插件预览</span></h2>
           <div class="image-gallery">
         {% for img in plugin.images %}
         {% if img.url %}<img src="{{ img.url }}" class="gallery-image" onclick="openImage('{{ img.url }}')" alt="插件图片">{% endif %}
@@ -1049,28 +1235,28 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
         {% endif %}
         
         <div class="detail-sec">
-          <h2 class="sec-title"><span class="sec-bar"></span>插件描述</h2>
+          <h2 class="sec-title"><span class="sec-bar"></span><span data-i18n="pd_sec_plug_desc">插件描述</span></h2>
           <p class="detail-desc">{{ plugin.description|e }}</p>
         </div>
       </div>
       
       <div class="detail-sidebar">
         <div class="stats">
-          <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label">下载次数</div></div>
-          <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label">评分</div></div>
-          <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count }}</div><div class="stat-label">评价数</div></div>
+          <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label" data-i18n="pd_stat_dl">下载次数</div></div>
+          <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label" data-i18n="pd_stat_rate">评分</div></div>
+          <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count }}</div><div class="stat-label" data-i18n="pd_stat_cnt">评价数</div></div>
         </div>
         
         <div class="detail-actions">
         {% if plugin.status == 'active' %}
-        <a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn success"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>立即下载</a>
+        <a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn success"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg><span data-i18n="pd_dl_now">立即下载</span></a>
         <a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}{% if compact_mode %}?c=1{% endif %}" class="btn warn">评分</a>
         {% else %}
-        <span class="offline-tip">插件已下架</span>
+        <span class="offline-tip" data-i18n="pd_offline">插件已下架</span>
         {% endif %}
         {% if is_owner and not compact_mode %}
-        <a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn ghost">更新插件</a>
-        <a href="javascript:void(0)" onclick="confirmDelete()" class="btn danger">擦除插件</a>
+        <a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn ghost"><span data-i18n="pd_update">更新插件</span></a>
+        <a href="javascript:void(0)" onclick="confirmDelete()" class="btn danger"><span data-i18n="pd_delete">擦除插件</span></a>
         {% endif %}
         </div>
       </div>
@@ -1088,7 +1274,7 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
     {% endfor %}
     </div>
     {% else %}
-    <p style="text-align:center;color:var(--text-3);padding:40px 0;">暂无预览内容</p>
+    <p style="text-align:center;color:var(--text-3);padding:40px 0;" data-i18n="pd_no_preview">暂无预览内容</p>
     {% endif %}
   </div>
   
@@ -1100,9 +1286,9 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
   <!-- 统计 Tab -->
   <div class="tab-content" id="tab-stats">
     <div class="stats" style="grid-template-columns:repeat(3,1fr);">
-      <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label">下载次数</div></div>
-      <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label">评分</div></div>
-      <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count }}</div><div class="stat-label">评价数</div></div>
+      <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label" data-i18n="pd_stat_dl">下载次数</div></div>
+      <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label" data-i18n="pd_stat_rate">评分</div></div>
+      <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count }}</div><div class="stat-label" data-i18n="pd_stat_cnt">评价数</div></div>
     </div>
   </div>
 </div>
@@ -1121,7 +1307,7 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
     { cls:'dark-mode',    name:'暗夜模式', icon:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg>' }
   ];
   var saved = null;
-  try { saved = localStorage.getItem('kn-tool-theme'); } catch (e) {}
+  try { saved = localStorage.getItem('knexpanse-theme'); if (saved === null || saved === '') saved = localStorage.getItem('kn-tool-theme'); } catch (e) {}
   var curIdx = 0;
   if (saved === 'light') curIdx = 0;
   else if (saved === 'dark') curIdx = 3;
@@ -1131,21 +1317,19 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
     document.body.classList.remove('theme-aurora', 'theme-ocean', 'theme-amber', 'dark-mode');
     document.body.classList.add(THEMES[curIdx].cls);
     if (themeBtn) { themeBtn.innerHTML = THEMES[curIdx].icon; themeBtn.title = THEMES[curIdx].name; }
-    try { localStorage.setItem('kn-tool-theme', String(curIdx)); } catch (e) {}
-    try { spawnParticles(); } catch (e) {}
+    try { localStorage.setItem('knexpanse-theme', String(curIdx)); } catch (e) {}
   }
   
   if (themeBtn) themeBtn.addEventListener('click', function () { curIdx = (curIdx === 0) ? 3 : 0; applyTheme(); });
   /* ===== 节能模式 ===== */
   var liteOn = false;
-  try { liteOn = localStorage.getItem('kn-tool-lite') === '1'; } catch (e) {}
+  try { liteOn = localStorage.getItem('knexpanse-lite') === '1'; } catch (e) {}
   var liteBtn = document.getElementById('liteBtn');
   function setLite(on) {
     document.body.classList.toggle('lite-mode', on);
     if (liteBtn) liteBtn.classList.toggle('active', on);
-    try { localStorage.setItem('kn-tool-lite', on ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
     toast(on ? '已开启节能模式，特效已精简' : '已关闭节能模式');
-    try { spawnParticles(); } catch (e) {}
   }
   if (liteBtn) liteBtn.addEventListener('click', function () { setLite(!document.body.classList.contains('lite-mode')); });
   /* ===== toast ===== */
@@ -1161,26 +1345,6 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
     clearTimeout(toastT);
     toastT = setTimeout(function () { toastEl.style.opacity = '0'; toastEl.style.transform = 'translateX(-50%) translateY(20px)'; }, 2200);
   }
-  /* ===== 背景粒子(按主题,节能关闭) ===== */
-  var pBox = document.getElementById('particles');
-  var PT_ICONS = [
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>',
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 3h10l5 7-10 11L2 10Z"/></svg>',
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3C18 5 20 12 16 19 9 18 5 11 7 4 9 3 11 3 12 3Z"/></svg>',
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2.5 14.2 9.8 21.5 12l-7.3 2.2L12 21.5 9.8 14.2 2.5 12l7.3-2.2Z"/></svg>'
-  ];
-  function spawnParticles() {
-    if (!pBox) return;
-    pBox.innerHTML = '';
-    if (document.body.classList.contains('lite-mode')) return;
-    var arr = THEMES[curIdx].cls === 'dark-mode' ? [3] : (THEMES[curIdx].cls === 'theme-ocean' ? [1, 3] : (THEMES[curIdx].cls === 'theme-amber' ? [2, 3] : [0, 3]));
-    for (var i = 0; i < 14; i++) {
-      var s = document.createElement('span');
-      s.innerHTML = PT_ICONS[arr[i % arr.length]];
-      s.style.cssText = 'left:' + (Math.random() * 96 + 1) + '%;opacity:' + (0.2 + Math.random() * 0.4) + ';animation:drift' + (i % 3 + 1) + ' ' + (11 + Math.random() * 14) + 's linear ' + (Math.random() * 8) + 's infinite;';
-      pBox.appendChild(s);
-    }
-  }
   /* ===== 启动 ===== */
   applyTheme();
   setLite(liteOn);
@@ -1190,19 +1354,32 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
 (function() {
   var tabBtns = document.querySelectorAll('.mdui-tab-item');
   var tabContents = document.querySelectorAll('.tab-content');
-  
+  var switching = false;
+
   tabBtns.forEach(function(btn) {
     btn.addEventListener('click', function() {
       var tabId = this.getAttribute('data-tab');
-      
-      // 移除所有 active 状态
-      tabBtns.forEach(function(b) { b.classList.remove('active'); });
-      tabContents.forEach(function(c) { c.classList.remove('active'); });
-      
-      // 激活当前 tab
-      this.classList.add('active');
+      var cur = document.querySelector('.tab-content.active');
       var target = document.getElementById('tab-' + tabId);
-      if (target) target.classList.add('active');
+      if (!target || target === cur || switching) return;
+      switching = true;
+
+      // 按钮 active 即时切换(无抽搐)
+      tabBtns.forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+
+      // 旧内容退场动画 -> 新内容进场动画
+      if (cur) {
+        cur.classList.add('out');
+        setTimeout(function() {
+          cur.classList.remove('active', 'out');
+          target.classList.add('active');
+          switching = false;
+        }, 220);
+      } else {
+        target.classList.add('active');
+        switching = false;
+      }
     });
   });
 })();
@@ -1225,6 +1402,7 @@ function confirmDelete() {
 
 /* ===== 悬浮卡片:鼠标跟随倾斜(tilt) ===== */
 function bindTilt(el, maxDeg) {
+  if (/Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MQQBrowser/i.test(navigator.userAgent)) return;
   if (!el || el._tiltDone) return;
   el._tiltDone = true;
   var DEG = maxDeg || 8;
@@ -1246,25 +1424,76 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.card, .stat-item, .cc-feature, .cc-terminal, .cc-show-img, .cc-qr').forEach(function (el) { bindTilt(el, 14); });
 });
 
-/* ===== 访问提示通知(仅移动端,只提示不禁用) ===== */
-(function () {
-  var ua = navigator.userAgent || '';
-  var isMobile = /Android|iPhone|iPad|iPod|Windows Phone|Mobile|Mobi/i.test(ua);
-  if (!isMobile) return;
-  function showNotice() {
-    var el = document.createElement('div');
-    el.style.cssText = 'position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(24px);max-width:88vw;background:rgba(22,28,52,.88);color:#fff;padding:13px 22px;border-radius:16px;font-size:13.5px;line-height:1.65;font-weight:600;box-shadow:0 22px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:99999;opacity:0;transition:opacity .4s,transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;';
-    el.textContent = '提示：当前网页不支持右键复制和粘贴，移动端未做适配，可能存在浏览问题，请使用桌面端访问。';
-    document.body.appendChild(el);
-    requestAnimationFrame(function () { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)'; });
-    setTimeout(function () {
-      el.style.opacity = '0'; el.style.transform = 'translateX(-50%) translateY(24px)';
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
-    }, 6500);
-  }
-  if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(showNotice, 900);
-  else window.addEventListener('load', function () { setTimeout(showNotice, 900); });
-})();
 </script>
-</body>
+
+<div class="lang-pop" id="langPop">
+  <button class="lang-item cur" data-lang="zh">中文</button>
+  <button class="lang-item" data-lang="tw">繁體中文</button>
+  <button class="lang-item" data-lang="en">English</button>
+  <button class="lang-item" data-lang="ja">日本語</button>
+  <button class="lang-item" data-lang="ko">한국어</button>
+  <button class="lang-item" data-lang="es">Español</button>
+</div>
+<script>
+/* ===== 语言切换(参照插件市场) ===== */
+(function () {
+  var LANGS = ['zh','tw','en','ja','ko','es'];
+  var curLang = 'zh';
+  try { var lsLang = localStorage.getItem('knexpanse-lang'); if (LANGS.indexOf(lsLang) >= 0) curLang = lsLang; } catch (e) {}
+  var I18N = {"mk_logo": {"zh": "插件市场", "tw": "插件市場", "en": "Plugin Market", "ja": "プラグインマーケット", "ko": "플러그인 마켓", "es": "Mercado de Plugins"}, "pd_tab_overview": {"zh": "概览", "tw": "概覽", "en": "Overview", "ja": "概要", "ko": "개요", "es": "Resumen"}, "pd_tab_preview": {"zh": "预览", "tw": "預覽", "en": "Preview", "ja": "プレビュー", "ko": "미리보기", "es": "Vista Previa"}, "pd_tab_desc": {"zh": "描述", "tw": "描述", "en": "Description", "ja": "説明", "ko": "설명", "es": "Descripción"}, "pd_tab_stats": {"zh": "统计", "tw": "統計", "en": "Stats", "ja": "統計", "ko": "통계", "es": "Estadísticas"}, "pd_sec_plug_preview": {"zh": "插件预览", "tw": "插件預覽", "en": "Plugin Preview", "ja": "プラグインプレビュー", "ko": "플러그인 미리보기", "es": "Vista Previa del Plugin"}, "pd_sec_plug_desc": {"zh": "插件描述", "tw": "插件描述", "en": "Plugin Description", "ja": "プラグイン説明", "ko": "플러그인 설명", "es": "Descripción del Plugin"}, "pd_stat_dl": {"zh": "下载次数", "tw": "下載次數", "en": "Downloads", "ja": "ダウンロード数", "ko": "다운로드 수", "es": "Descargas"}, "pd_stat_rate": {"zh": "评分", "tw": "評分", "en": "Rating", "ja": "評価", "ko": "평점", "es": "Calificación"}, "pd_stat_cnt": {"zh": "评价数", "tw": "評價數", "en": "Reviews", "ja": "レビュー数", "ko": "리뷰 수", "es": "Reseñas"}, "pd_dl_now": {"zh": "立即下载", "tw": "立即下載", "en": "Download Now", "ja": "今すぐダウンロード", "ko": "지금 다운로드", "es": "Descargar Ahora"}, "pd_offline": {"zh": "插件已下架", "tw": "插件已下架", "en": "Plugin Removed", "ja": "プラグインは削除されました", "ko": "플러그인이 내려갔습니다", "es": "Plugin Retirado"}, "pd_update": {"zh": "更新插件", "tw": "更新插件", "en": "Update Plugin", "ja": "プラグインを更新", "ko": "플러그인 업데이트", "es": "Actualizar Plugin"}, "pd_delete": {"zh": "擦除插件", "tw": "擦除插件", "en": "Erase Plugin", "ja": "プラグインを消去", "ko": "플러그인 삭제", "es": "Borrar Plugin"}, "pd_no_preview": {"zh": "暂无预览内容", "tw": "暫無預覽內容", "en": "No preview available", "ja": "プレビューはありません", "ko": "미리보기가 없습니다", "es": "Sin vista previa"}};
+  function applyLang() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n');
+      var t = I18N[k];
+      if (t && t[curLang]) el.textContent = t[curLang];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-ph');
+      var t = I18N[k];
+      if (t && t[curLang]) el.setAttribute('placeholder', t[curLang]);
+    });
+    document.querySelectorAll('.lang-item').forEach(function (it) { it.classList.toggle('cur', it.dataset.lang === curLang); });
+    document.documentElement.lang = curLang === 'zh' ? 'zh-CN' : (curLang === 'tw' ? 'zh-TW' : curLang);
+    if (typeof renderLangDynamic === 'function') renderLangDynamic(curLang, I18N);
+  }
+  function posLangPop(btn) {
+    var pop = document.getElementById('langPop');
+    if (!pop || !btn) return;
+    var r = btn.getBoundingClientRect();
+    pop.style.top = (r.bottom + 10) + 'px';
+    pop.style.right = Math.max(10, window.innerWidth - r.right) + 'px';
+  }
+  function showLang() {
+    var pop = document.getElementById('langPop');
+    if (!pop) return;
+    posLangPop(document.getElementById('langBtn'));
+    pop.classList.add('show');
+  }
+  function hideLang() {
+    var pop = document.getElementById('langPop');
+    if (pop) pop.classList.remove('show');
+  }
+  var langBtn = document.getElementById('langBtn');
+  if (langBtn) {
+    langBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var pop = document.getElementById('langPop');
+      if (pop && pop.classList.contains('show')) hideLang(); else showLang();
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var pop = document.getElementById('langPop');
+    if (pop && pop.classList.contains('show') && !e.target.closest('#langBtn') && !e.target.closest('#langPop')) hideLang();
+  });
+  document.querySelectorAll('.lang-item').forEach(function (it) {
+    it.addEventListener('click', function () {
+      curLang = it.dataset.lang;
+      try { localStorage.setItem('knexpanse-lang', curLang); } catch (e) {}
+      applyLang();
+      setTimeout(hideLang, 150);
+    });
+  });
+  applyLang();
+})();
+</script></body>
 </html>

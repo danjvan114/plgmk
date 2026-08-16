@@ -52,6 +52,8 @@ body { font-family:'Inter','PingFang SC','Microsoft YaHei',system-ui,-apple-syst
 a { color:inherit; text-decoration:none; }
 button { font-family:inherit; }
 body.lite-mode * { animation:none !important; transition:none !important; }
+body.lite-mode * { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+body.lite-mode .topnav { background:var(--glass-strong) !important; box-shadow:inset 0 1px 0 var(--hi-top), var(--shadow); }
 body.lite-mode .glass, body.lite-mode .card { background:var(--glass-strong); backdrop-filter:none; -webkit-backdrop-filter:none; }
 /* ========== 顶栏 ========== */
 .topnav { position:fixed; top:14px; left:50%; transform:translateX(-50%); width:min(94%,1100px); height:58px; display:flex; align-items:center; gap:12px; padding:0 16px; border-radius:40px; background:var(--glass-nav); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:inset 0 1px 0 var(--hi-top), inset 0 -1px 0 var(--hi-bot), var(--shadow); z-index:1000; }
@@ -148,7 +150,6 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#ea580c); c
   .stats-grid { grid-template-columns:1fr 1fr; }
 }
 
-
 .role-admin { color:var(--danger); }
 .role-developer { color:var(--warn); }
 .role-user { color:var(--accent-1); }
@@ -171,25 +172,55 @@ input[type="file"]:hover { border-color:var(--accent-1); background:var(--glass-
 input[type="file"]:focus { outline:none; box-shadow:0 0 0 3px var(--accent-glow); }
 input[type="file"]::file-selector-button { border:none; padding:8px 16px; border-radius:14px; background:var(--glass-tint-2); color:var(--accent-1); font-weight:700; font-size:13px; font-family:inherit; cursor:pointer; margin-right:10px; transition:background .3s,transform .3s cubic-bezier(.34,1.56,.64,1); }
 input[type="file"]::file-selector-button:hover { background:var(--glass-tint); transform:scale(1.05); }
+
+/* ===== 语言切换弹窗(参照插件市场) ===== */
+.lang-wrap { position:relative; display:flex; }
+.lang-pop { position:fixed; top:0; right:0; min-width:132px; z-index:5000; padding:8px; border-radius:16px; background:var(--glass-strong); backdrop-filter:blur(34px) saturate(190%); -webkit-backdrop-filter:blur(34px) saturate(190%); box-shadow:inset 0 1px 0 var(--hi-top), inset 0 -1px 0 var(--hi-bot), var(--shadow); opacity:0; transform:translateY(8px) scale(.92); pointer-events:none; visibility:hidden; transition:opacity .3s,transform .45s cubic-bezier(.34,1.56,.64,1),visibility .3s; }
+.lang-pop.show { opacity:1; transform:none; pointer-events:auto; visibility:visible; }
+.lang-item { display:block; width:100%; border:none; cursor:pointer; background:transparent; color:var(--text-2); font-size:13px; font-weight:700; font-family:inherit; text-align:left; padding:8px 12px; border-radius:10px; transition:background .25s,color .25s,transform .35s cubic-bezier(.34,1.56,.64,1); }
+.lang-item:hover { background:var(--glass-tint); color:var(--accent-1); transform:translateX(3px); }
+.lang-item.cur { color:var(--accent-1); background:var(--glass-tint); }
+.lang-item.cur::after { content:"\2713"; float:right; font-weight:800; }
+/* ===== 移动端菜单 ===== */
+.menu-btn { display:none !important; }
+@media (max-width:768px) {
+  .menu-btn { display:flex !important; }
+  .topnav .nav-links { position:fixed; top:82px; left:3%; right:3%; display:none; flex-direction:column; gap:4px; padding:10px; border-radius:18px; background:var(--glass-strong); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); box-shadow:inset 0 1px 0 var(--hi-top), var(--shadow-hover); z-index:1500; max-height:60vh; overflow-y:auto; }
+  .topnav .nav-links.open { display:flex; }
+  .topnav .nav-links a { padding:12px 16px; border-radius:12px; font-size:14.5px; width:100%; }
+}
+
+
+/* 移动端:禁用卡牌悬浮/浮起(触摸设备无 hover,防止 sticky-hover 残留) */
+@media (hover:none) {
+  .card:hover, .stat-card:hover, .stat-item:hover, .mk-card:hover, .btn:hover,
+  .guide:hover, .plugin-box:hover, .plugin-item:hover, .detail-hero:hover, .stars:hover,
+  .mdui-tab-item:hover, .nav-links a:hover, .fl-link:hover, .dl-m-btn:hover, .cr-tab:hover, .ext-install:hover {
+    --ty:0 !important; transform:none !important;
+  }
+}
+
 </style>
+<link rel="stylesheet" href="global.css">
 </head>
-<body class="theme-light">
-<header class="topnav"><a class="logo" href="/mk/kn"><img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="Logo"><span>KE 插件市场</span></a><div class="nav-links"><a href="/mk/kn">插件市场</a><a href="/mk/kn/admin">插件管理</a><a href="/op/user" class="active">用户管理</a><a href="/logout">退出</a></div><div class="head-space"></div><button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg></button><button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button></header>
+<body class="theme-light" data-page="admin-users">
+<script src="./theme.js"></script>
+<header class="topnav"><a class="logo" href="/mk/kn"><img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="Logo"><span data-i18n="mk_logo">插件市场</span></a><div class="nav-links"><a href="/mk/kn" data-i18n="mk_market">插件市场</a><a href="/mk/kn/admin" data-i18n="mk_admin">插件管理</a><a href="/op/user" class="active" data-i18n="mk_users">用户管理</a><a href="/logout" data-i18n="mk_logout">退出</a></div><div class="head-space"></div><button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg></button><button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button><button class="icon-btn" id="langBtn" title="切换语言" aria-label="切换语言"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button><button class="icon-btn menu-btn" id="menuToggle" title="菜单" aria-label="菜单" style="display:none"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></header>
 <div class="main-box">
 
 <div class="card">
-<h1 class="page-title" style="margin-bottom:20px">用户管理</h1>
+<h1 class="page-title" style="margin-bottom:20px" data-i18n="mk_users">用户管理</h1>
 <div class="table-wrap">
 <table class="table">
-<thead><tr><th>用户名</th><th>角色</th><th>操作</th></tr></thead>
+<thead><tr><th data-i18n="username">用户名</th><th data-i18n="role">角色</th><th data-i18n="col_act">操作</th></tr></thead>
 <tbody>
 {% for username, info in users.items() %}
 <tr>
 <td>{{ username }}</td>
 <td><span class="tag role-{{ info.role }}">{{ {'admin':'管理员','developer':'开发者','user':'普通用户'}[info.role] }}</span></td>
 <td>
-<button class="btn sm ghost" onclick="showEditModal('{{ username }}', '{{ info.role }}')">编辑</button>
-<a href="/op/user/delete/{{ username }}" class="btn sm danger" onclick="return confirm('确定删除用户？')">删除</a>
+<button class="btn sm ghost" onclick="showEditModal('{{ username }}', '{{ info.role }}')"><span data-i18n="edit">编辑</span></button>
+<a href="/op/user/delete/{{ username }}" class="btn sm danger" onclick="return confirm('确定删除用户？')"><span data-i18n="delete">删除</span></a>
 </td>
 </tr>
 {% endfor %}
@@ -197,23 +228,23 @@ input[type="file"]::file-selector-button:hover { background:var(--glass-tint); t
 </table>
 </div>
 <div style="border-top:1px solid var(--border);margin-top:24px;padding-top:24px">
-<h2 style="font-size:18px;margin-bottom:16px">添加用户</h2>
+<h2 style="font-size:18px;margin-bottom:16px" data-i18n="add_user">添加用户</h2>
 <form action="/op/user/add" method="post" style="max-width:380px">
-<div class="form-group"><label>用户名</label><input type="text" name="username" required placeholder="请输入用户名"></div>
-<div class="form-group"><label>密码</label><input type="password" name="password" required placeholder="请输入密码"></div>
-<div class="form-group"><label>角色</label><select name="role"><option value="user">普通用户</option><option value="developer">开发者</option><option value="admin">管理员</option></select></div>
-<button type="submit" class="btn success">添加用户</button>
+<div class="form-group"><label data-i18n="username">用户名</label><input type="text" name="username" required placeholder="请输入用户名" data-i18n-ph="username_ph"></div>
+<div class="form-group"><label data-i18n="password">密码</label><input type="password" name="password" required placeholder="请输入密码" data-i18n-ph="password_ph"></div>
+<div class="form-group"><label data-i18n="role">角色</label><select name="role"><option value="user" data-i18n="user_role">普通用户</option><option value="developer" data-i18n="dev_role">开发者</option><option value="admin" data-i18n="admin_role">管理员</option></select></div>
+<button type="submit" class="btn success"><span data-i18n="add_user">添加用户</span></button>
 </form>
 </div>
 </div>
 <div class="modal" id="editModal"><div class="modal-box">
-<h3>编辑用户</h3>
+<h3 data-i18n="edit_user">编辑用户</h3>
 <form action="" method="post" id="editForm">
-<div class="form-group"><label>新密码（留空则不修改）</label><input type="password" name="password" placeholder="请输入新密码"></div>
-<div class="form-group"><label>角色</label><select name="role"><option value="user">普通用户</option><option value="developer">开发者</option><option value="admin">管理员</option></select></div>
+<div class="form-group"><label data-i18n="new_pass_hint">新密码（留空则不修改）</label><input type="password" name="password" placeholder="请输入新密码" data-i18n-ph="new_pass_ph"></div>
+<div class="form-group"><label data-i18n="role">角色</label><select name="role"><option value="user" data-i18n="user_role">普通用户</option><option value="developer" data-i18n="dev_role">开发者</option><option value="admin" data-i18n="admin_role">管理员</option></select></div>
 <div style="display:flex;gap:10px;margin-top:8px">
-<button type="submit" class="btn" style="flex:1">保存修改</button>
-<button type="button" class="btn ghost" style="flex:1" onclick="closeModal()">取消</button>
+<button type="submit" class="btn" style="flex:1"><span data-i18n="save">保存修改</span></button>
+<button type="button" class="btn ghost" style="flex:1" onclick="closeModal()"><span data-i18n="cancel">取消</span></button>
 </div>
 </form>
 </div></div>
@@ -223,7 +254,7 @@ input[type="file"]::file-selector-button:hover { background:var(--glass-tint); t
 /* ===== 双主题(白/黑) ===== */
 (function () {
   var cur = 'light';
-  try { var s = localStorage.getItem('kn-tool-theme'); if (s === 'light' || s === 'dark') cur = s; } catch (e) {}
+  try { var s = localStorage.getItem('knexpanse-theme'); if (s === null || s === '') s = localStorage.getItem('kn-tool-theme'); if (s === 'dark' || s === '3') cur = 'dark'; else if (s === 'light' || s === '0' || s === '1' || s === '2') cur = 'light'; } catch (e) {}
   document.body.classList.remove('theme-light', 'theme-dark');
   document.body.classList.add('theme-' + cur);
   var btn = document.getElementById('themeBtn');
@@ -231,21 +262,20 @@ input[type="file"]::file-selector-button:hover { background:var(--glass-tint); t
     cur = cur === 'light' ? 'dark' : 'light';
     document.body.classList.remove('theme-light', 'theme-dark');
     document.body.classList.add('theme-' + cur);
-    try { localStorage.setItem('kn-tool-theme', cur); } catch (e) {}
+    try { localStorage.setItem('knexpanse-theme', cur === 'dark' ? '3' : '0'); } catch (e) {}
   });
   /* ===== 节能模式 ===== */
   var lite = false;
-  try { lite = localStorage.getItem('kn-tool-lite') === '1'; } catch (e) {}
+  try { lite = localStorage.getItem('knexpanse-lite') === '1'; } catch (e) {}
   var liteBtn = document.getElementById('liteBtn');
   function setLite(on) {
     document.body.classList.toggle('lite-mode', on);
     if (liteBtn) liteBtn.classList.toggle('active', on);
-    try { localStorage.setItem('kn-tool-lite', on ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
   }
   setLite(lite);
   if (liteBtn) liteBtn.addEventListener('click', function () { setLite(!document.body.classList.contains('lite-mode')); });
 })();
-
 
 function showEditModal(username, role) {
   document.getElementById('editForm').action = '/op/user/edit/' + username;
@@ -256,6 +286,7 @@ function closeModal() { document.getElementById('editModal').classList.remove('a
 
 /* ===== 悬浮卡片:鼠标跟随倾斜(tilt) ===== */
 function bindTilt(el, maxDeg) {
+  if (/Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MQQBrowser/i.test(navigator.userAgent)) return;
   if (!el || el._tiltDone) return;
   el._tiltDone = true;
   var DEG = maxDeg || 8;
@@ -277,25 +308,100 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.card, .stat-card, .stat-item').forEach(function (el) { bindTilt(el, 8); });
 });
 
-/* ===== 访问提示通知(仅移动端,只提示不禁用) ===== */
-(function () {
-  var ua = navigator.userAgent || '';
-  var isMobile = /Android|iPhone|iPad|iPod|Windows Phone|Mobile|Mobi/i.test(ua);
-  if (!isMobile) return;
-  function showNotice() {
-    var el = document.createElement('div');
-    el.style.cssText = 'position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(24px);max-width:88vw;background:rgba(22,28,52,.88);color:#fff;padding:13px 22px;border-radius:16px;font-size:13.5px;line-height:1.65;font-weight:600;box-shadow:0 22px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:99999;opacity:0;transition:opacity .4s,transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;';
-    el.textContent = '提示：当前网页不支持右键复制和粘贴，移动端未做适配，可能存在浏览问题，请使用桌面端访问。';
-    document.body.appendChild(el);
-    requestAnimationFrame(function () { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)'; });
-    setTimeout(function () {
-      el.style.opacity = '0'; el.style.transform = 'translateX(-50%) translateY(24px)';
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
-    }, 6500);
-  }
-  if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(showNotice, 900);
-  else window.addEventListener('load', function () { setTimeout(showNotice, 900); });
-})();
 </script>
-</body>
+
+<div class="lang-pop" id="langPop">
+  <button class="lang-item cur" data-lang="zh">中文</button>
+  <button class="lang-item" data-lang="tw">繁體中文</button>
+  <button class="lang-item" data-lang="en">English</button>
+  <button class="lang-item" data-lang="ja">日本語</button>
+  <button class="lang-item" data-lang="ko">한국어</button>
+  <button class="lang-item" data-lang="es">Español</button>
+</div>
+<script>
+/* ===== 语言切换(参照插件市场) ===== */
+(function () {
+  var LANGS = ['zh','tw','en','ja','ko','es'];
+  var curLang = 'zh';
+  try { var lsLang = localStorage.getItem('knexpanse-lang'); if (LANGS.indexOf(lsLang) >= 0) curLang = lsLang; } catch (e) {}
+  var I18N = {"mk_logo": {"zh": "插件市场", "tw": "插件市場", "en": "Plugin Market", "ja": "プラグインマーケット", "ko": "플러그인 마켓", "es": "Mercado de Plugins"}, "mk_home": {"zh": "首页", "tw": "首頁", "en": "Home", "ja": "ホーム", "ko": "홈", "es": "Inicio"}, "mk_market": {"zh": "插件市场", "tw": "插件市場", "en": "Plugin Market", "ja": "プラグインマーケット", "ko": "플러그인 마켓", "es": "Mercado de Plugins"}, "mk_dev": {"zh": "开发者中心", "tw": "開發者中心", "en": "Developer Center", "ja": "開発者センター", "ko": "개발자 센터", "es": "Centro de Desarrolladores"}, "mk_admin": {"zh": "插件管理", "tw": "插件管理", "en": "Plugin Admin", "ja": "プラグイン管理", "ko": "플러그인 관리", "es": "Gestión de Plugins"}, "mk_users": {"zh": "用户管理", "tw": "用戶管理", "en": "User Admin", "ja": "ユーザー管理", "ko": "사용자 관리", "es": "Gestión de Usuarios"}, "mk_logout": {"zh": "退出", "tw": "退出", "en": "Logout", "ja": "ログアウト", "ko": "로그아웃", "es": "Cerrar Sesión"}, "mk_stats": {"zh": "我的统计", "tw": "我的統計", "en": "My Stats", "ja": "マイ統計", "ko": "내 통계", "es": "Mis Estadísticas"}, "ok": {"zh": "确定", "tw": "確定", "en": "OK", "ja": "確定", "ko": "확인", "es": "Aceptar"}, "cancel": {"zh": "取消", "tw": "取消", "en": "Cancel", "ja": "キャンセル", "ko": "취소", "es": "Cancelar"}, "save": {"zh": "保存修改", "tw": "保存修改", "en": "Save Changes", "ja": "変更を保存", "ko": "변경 저장", "es": "Guardar Cambios"}, "delete": {"zh": "删除", "tw": "刪除", "en": "Delete", "ja": "削除", "ko": "삭제", "es": "Eliminar"}, "edit": {"zh": "编辑", "tw": "編輯", "en": "Edit", "ja": "編集", "ko": "편집", "es": "Editar"}, "view": {"zh": "查看", "tw": "查看", "en": "View", "ja": "見る", "ko": "보기", "es": "Ver"}, "username": {"zh": "用户名", "tw": "用戶名", "en": "Username", "ja": "ユーザー名", "ko": "사용자 이름", "es": "Usuario"}, "password": {"zh": "密码", "tw": "密碼", "en": "Password", "ja": "パスワード", "ko": "비밀번호", "es": "Contraseña"}, "role": {"zh": "角色", "tw": "角色", "en": "Role", "ja": "役割", "ko": "역할", "es": "Rol"}, "user_role": {"zh": "普通用户", "tw": "普通用戶", "en": "User", "ja": "一般ユーザー", "ko": "일반 사용자", "es": "Usuario"}, "dev_role": {"zh": "开发者", "tw": "開發者", "en": "Developer", "ja": "開発者", "ko": "개발자", "es": "Desarrollador"}, "admin_role": {"zh": "管理员", "tw": "管理員", "en": "Admin", "ja": "管理者", "ko": "관리자", "es": "Administrador"}, "username_ph": {"zh": "请输入用户名", "tw": "請輸入用戶名", "en": "Enter username", "ja": "ユーザー名を入力", "ko": "사용자 이름 입력", "es": "Ingresa el usuario"}, "password_ph": {"zh": "请输入密码", "tw": "請輸入密碼", "en": "Enter password", "ja": "パスワードを入力", "ko": "비밀번호 입력", "es": "Ingresa la contraseña"}, "new_pass_ph": {"zh": "请输入新密码", "tw": "請輸入新密碼", "en": "Enter new password", "ja": "新しいパスワードを入力", "ko": "새 비밀번호 입력", "es": "Ingresa la nueva contraseña"}, "status_on": {"zh": "启用", "tw": "啟用", "en": "Active", "ja": "有効", "ko": "활성", "es": "Activo"}, "status_off": {"zh": "禁用", "tw": "禁用", "en": "Disabled", "ja": "無効", "ko": "비활성", "es": "Inactivo"}, "on_shelf": {"zh": "上架", "tw": "上架", "en": "Publish", "ja": "公開", "ko": "게시", "es": "Publicar"}, "off_shelf": {"zh": "下架", "tw": "下架", "en": "Unpublish", "ja": "非公開", "ko": "비공개", "es": "Retirar"}, "col_act": {"zh": "操作", "tw": "操作", "en": "Actions", "ja": "操作", "ko": "작업", "es": "Acciones"}, "add_user": {"zh": "添加用户", "tw": "添加用戶", "en": "Add User", "ja": "ユーザー追加", "ko": "사용자 추가", "es": "Añadir Usuario"}, "edit_user": {"zh": "编辑用户", "tw": "編輯用戶", "en": "Edit User", "ja": "ユーザー編集", "ko": "사용자 편집", "es": "Editar Usuario"}, "new_pass_hint": {"zh": "新密码（留空则不修改）", "tw": "新密碼（留空則不修改）", "en": "New Password (leave blank to keep)", "ja": "新パスワード（空欄で変更なし）", "ko": "새 비밀번호 (비우면 유지)", "es": "Nueva Contraseña (vacío = sin cambios)"}};
+  function applyLang() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n');
+      var t = I18N[k];
+      if (t && t[curLang]) el.textContent = t[curLang];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-ph');
+      var t = I18N[k];
+      if (t && t[curLang]) el.setAttribute('placeholder', t[curLang]);
+    });
+    document.querySelectorAll('.lang-item').forEach(function (it) { it.classList.toggle('cur', it.dataset.lang === curLang); });
+    document.documentElement.lang = curLang === 'zh' ? 'zh-CN' : (curLang === 'tw' ? 'zh-TW' : curLang);
+    renderLangDynamic(curLang, I18N);
+  }
+  /* 动态状态文本(启用/禁用/上架/下架),按当前文本内容判断 */
+  function renderLangDynamic(lang, I18N) {
+    document.querySelectorAll('[data-i18n-status]').forEach(function (el) {
+      var type = el.getAttribute('data-i18n-status') || 'active';
+      var t = el.textContent.trim();
+      var key;
+      if (type === 'shelf') {
+        key = (t.indexOf('上架') >= 0) ? 'on_shelf' : 'off_shelf';
+      } else {
+        key = (t.indexOf('启用') >= 0 || t.indexOf('啟用') >= 0) ? 'status_on' : 'status_off';
+      }
+      if (I18N[key] && I18N[key][lang]) el.textContent = I18N[key][lang];
+    });
+  }
+  function posLangPop(btn) {
+    var pop = document.getElementById('langPop');
+    if (!pop || !btn) return;
+    var r = btn.getBoundingClientRect();
+    pop.style.top = (r.bottom + 10) + 'px';
+    pop.style.right = Math.max(10, window.innerWidth - r.right) + 'px';
+  }
+  function showLang() {
+    var pop = document.getElementById('langPop');
+    if (!pop) return;
+    posLangPop(document.getElementById('langBtn'));
+    pop.classList.add('show');
+  }
+  function hideLang() {
+    var pop = document.getElementById('langPop');
+    if (pop) pop.classList.remove('show');
+  }
+  var langBtn = document.getElementById('langBtn');
+  if (langBtn) {
+    langBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var pop = document.getElementById('langPop');
+      if (pop && pop.classList.contains('show')) hideLang(); else showLang();
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var pop = document.getElementById('langPop');
+    if (pop && pop.classList.contains('show') && !e.target.closest('#langBtn') && !e.target.closest('#langPop')) hideLang();
+    var nl = document.querySelector('.nav-links');
+    if (nl && nl.classList.contains('open') && !e.target.closest('.topnav')) nl.classList.remove('open');
+  });
+  document.querySelectorAll('.lang-item').forEach(function (it) {
+    it.addEventListener('click', function () {
+      curLang = it.dataset.lang;
+      try { localStorage.setItem('knexpanse-lang', curLang); } catch (e) {}
+      applyLang();
+      setTimeout(hideLang, 150);
+    });
+  });
+  var menuToggle = document.getElementById('menuToggle');
+  if (menuToggle) {
+    menuToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var nl = document.querySelector('.nav-links');
+      if (nl) nl.classList.toggle('open');
+    });
+  }
+  applyLang();
+})();
+</script></body>
 </html>

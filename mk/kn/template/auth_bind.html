@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>设置用户名</title>
-<link rel="stylesheet" href="/localcdn/project/ked/styles.css">
-<link rel="stylesheet" href="/localcdn/project/ked/env.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="env.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 <style>
 /* ===== 官网基础样式(内嵌,自包含) ===== */
@@ -342,9 +342,6 @@ header.scrolled { background:var(--glass-card); }
 .nav-links a:active { transform:scale(.94); }
 @media (max-width:900px) {
 
-
-
-
 }
 .nav-right { display:flex; gap:10px; align-items:center; position:relative; }
 .icon-btn { width:40px; height:40px; border-radius:50%; border:none; cursor:pointer; background:var(--glass-nav); color:var(--text-2); backdrop-filter:blur(12px) saturate(170%); -webkit-backdrop-filter:blur(12px) saturate(170%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot); display:flex; align-items:center; justify-content:center; transition:transform .5s cubic-bezier(.34,1.56,.64,1),background .3s,box-shadow .3s,color .3s; }
@@ -675,8 +672,6 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   header.menu-open .nav-links > a:nth-child(4) { animation-delay:.15s; }
   header.menu-open .nav-links > .nav-dl { animation-delay:.25s; }
 
-
-
   @keyframes navItemIn { from { opacity:0; transform:translateX(26px) scale(.92); } to { opacity:1; transform:none; } }
   /* 收起:菜单项文字慢慢消失 */
   @keyframes navItemOut { to { opacity:0; transform:translateX(-12px); } }
@@ -736,8 +731,6 @@ header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55
   .st-ring { width:76px; height:76px; }
   .st-ring svg { width:76px; height:76px; }
   .st-sub-row span { font-size:12.5px; }
-
-
 
   body.dark-mode .st-col { background:rgba(255,255,255,.10); }
   .stack { min-height:420px; }
@@ -803,7 +796,6 @@ body.dark-mode .st-col, body.dark-mode .st-col.cur {
   -webkit-backdrop-filter:none !important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(255,255,255,.03);
 }
-
 
 /** ===== 环境独立样式 =====
  * 由 JS 自动识别:file:// 协议 → html[data-env="LOCAL"];其余(线上/CDN)→ html[data-env="CDN"]
@@ -893,7 +885,6 @@ body.lite-mode .btn.warn { background:linear-gradient(135deg,#f59e0b,#d97706); c
   .search { width:140px; }
 }
 
-
 /* ===== 悬浮卡片(tilt 鼠标跟随)补充 ===== */
 .stat-item, .cc-feature, .cc-terminal, .cc-show-img, .cc-qr { transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)); transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .4s,background .3s; will-change:transform; }
 .stat-item:hover, .cc-feature:hover, .cc-show-img:hover, .cc-qr:hover { --ty:-5px; box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); }
@@ -909,36 +900,49 @@ body.dark-mode .theme-menu { background:rgba(24,30,58,.92); box-shadow:inset 0 1
 .tm-dot { width:16px; height:16px; border-radius:50%; box-shadow:0 3px 8px rgba(0,0,0,.22); flex:none; }
 .tm-check { margin-left:auto; opacity:0; transition:opacity .25s,transform .3s cubic-bezier(.34,1.56,.64,1); }
 .theme-menu-item.cur .tm-check { opacity:1; transform:scale(1); }
+
+/* 移动端:禁用卡牌悬浮/浮起(触摸设备无 hover,防止 sticky-hover 残留) */
+@media (hover:none) {
+  .card:hover, .stat-card:hover, .stat-item:hover, .mk-card:hover, .btn:hover,
+  .guide:hover, .plugin-box:hover, .plugin-item:hover, .detail-hero:hover, .stars:hover,
+  .mdui-tab-item:hover, .nav-links a:hover, .fl-link:hover, .dl-m-btn:hover, .cr-tab:hover, .ext-install:hover {
+    --ty:0 !important; transform:none !important;
+  }
+}
+
 </style>
+<link rel="stylesheet" href="global.css">
 </head>
-<body class="theme-aurora">
-<div id="particles"></div>
+<body class="theme-aurora" data-page="auth-bind">
+<script src="./theme.js"></script>
 <header>
   <div class="nav-left">
-    <a class="logo" href="/mk/kn"><img class="logo-img" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse"><span>KE 插件市场</span></a>
-    <nav class="nav-links"><a href="/mk/kn">插件市场</a></nav>
+    <a class="logo" href="/mk/kn"><img class="logo-img" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse"><span data-i18n="mk_logo">插件市场</span></a>
+    <nav class="nav-links"><a href="/mk/kn" data-i18n="mk_market">插件市场</a></nav>
   </div>
   <div class="nav-right">
     <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"></button>
     <button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button>
+    <button class="icon-btn" id="langBtn" title="切换语言" aria-label="切换语言"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+
   </div>
 </header>
 <main class="page-box">
 <div class="card" style="max-width:min(94%,1100px);margin:0 auto;padding:54px">
-<h1 class="page-title" style="text-align:center">设置用户名</h1>
-<p class="page-sub" style="text-align:center">外部账号已验证，请设置插件市场用户名</p>
+<h1 class="page-title" style="text-align:center" data-i18n="ab_title">设置用户名</h1>
+<p class="page-sub" style="text-align:center" data-i18n="ab_sub">外部账号已验证，请设置插件市场用户名</p>
 <form method="post" action="/auth/bind" style="max-width:600px;margin:0 auto" novalidate onsubmit="return checkBindForm()">
 <input type="hidden" name="uuid" value="{{ uuid }}">
-<div class="form-group"><label>用户名</label><input type="text" name="username" required placeholder="请输入用户名（字母数字下划线）"></div>
-<button type="submit" class="btn block btn-lg">完成绑定</button>
+<div class="form-group"><label data-i18n="lg_user">用户名</label><input type="text" name="username" required placeholder="请输入用户名（字母数字下划线）" data-i18n-ph="ab_user_ph"></div>
+<button type="submit" class="btn block btn-lg" data-i18n="ab_submit">完成绑定</button>
 </form>
-<div class="tip">用户名设置后不可修改，请谨慎选择</div>
+<div class="tip" data-i18n="ab_tip">用户名设置后不可修改，请谨慎选择</div>
 </div>
 <div class="modal" id="errorModal">
 <div class="modal-box">
 <div class="m-icon"><svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></div>
 <p id="errorMessage"></p>
-<button class="btn" onclick="closeModal()">确定</button>
+<button class="btn" onclick="closeModal()" data-i18n="ok">确定</button>
 </div>
 </div>
 </main>
@@ -953,7 +957,7 @@ body.dark-mode .theme-menu { background:rgba(24,30,58,.92); box-shadow:inset 0 1
     { cls:'dark-mode',    name:'暗夜模式', icon:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg>' }
   ];
   var saved = null;
-  try { saved = localStorage.getItem('kn-tool-theme'); } catch (e) {}
+  try { saved = localStorage.getItem('knexpanse-theme'); if (saved === null || saved === '') saved = localStorage.getItem('kn-tool-theme'); } catch (e) {}
   var curIdx = 0;
   if (saved === 'light') curIdx = 0;
   else if (saved === 'dark') curIdx = 3;
@@ -963,20 +967,18 @@ body.dark-mode .theme-menu { background:rgba(24,30,58,.92); box-shadow:inset 0 1
     document.body.classList.remove('theme-aurora', 'theme-ocean', 'theme-amber', 'dark-mode');
     document.body.classList.add(THEMES[curIdx].cls);
     if (themeBtn) { themeBtn.innerHTML = THEMES[curIdx].icon; themeBtn.title = THEMES[curIdx].name; }
-    try { localStorage.setItem('kn-tool-theme', String(curIdx)); } catch (e) {}
-    try { spawnParticles(); } catch (e) {}
+    try { localStorage.setItem('knexpanse-theme', String(curIdx)); } catch (e) {}
   }
   if (themeBtn) themeBtn.addEventListener('click', function () { curIdx = (curIdx === 0) ? 3 : 0; applyTheme(); });
   /* ===== 节能模式 ===== */
   var liteOn = false;
-  try { liteOn = localStorage.getItem('kn-tool-lite') === '1'; } catch (e) {}
+  try { liteOn = localStorage.getItem('knexpanse-lite') === '1'; } catch (e) {}
   var liteBtn = document.getElementById('liteBtn');
   function setLite(on) {
     document.body.classList.toggle('lite-mode', on);
     if (liteBtn) liteBtn.classList.toggle('active', on);
-    try { localStorage.setItem('kn-tool-lite', on ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
     toast(on ? '已开启节能模式，特效已精简' : '已关闭节能模式');
-    try { spawnParticles(); } catch (e) {}
   }
   if (liteBtn) liteBtn.addEventListener('click', function () { setLite(!document.body.classList.contains('lite-mode')); });
   /* ===== toast ===== */
@@ -992,26 +994,6 @@ body.dark-mode .theme-menu { background:rgba(24,30,58,.92); box-shadow:inset 0 1
     clearTimeout(toastT);
     toastT = setTimeout(function () { toastEl.style.opacity = '0'; toastEl.style.transform = 'translateX(-50%) translateY(20px)'; }, 2200);
   }
-  /* ===== 背景粒子(按主题,节能关闭) ===== */
-  var pBox = document.getElementById('particles');
-  var PT_ICONS = [
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>',
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 3h10l5 7-10 11L2 10Z"/></svg>',
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3C18 5 20 12 16 19 9 18 5 11 7 4 9 3 11 3 12 3Z"/></svg>',
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2.5 14.2 9.8 21.5 12l-7.3 2.2L12 21.5 9.8 14.2 2.5 12l7.3-2.2Z"/></svg>'
-  ];
-  function spawnParticles() {
-    if (!pBox) return;
-    pBox.innerHTML = '';
-    if (document.body.classList.contains('lite-mode')) return;
-    var arr = THEMES[curIdx].cls === 'dark-mode' ? [3] : (THEMES[curIdx].cls === 'theme-ocean' ? [1, 3] : (THEMES[curIdx].cls === 'theme-amber' ? [2, 3] : [0, 3]));
-    for (var i = 0; i < 14; i++) {
-      var s = document.createElement('span');
-      s.innerHTML = PT_ICONS[arr[i % arr.length]];
-      s.style.cssText = 'left:' + (Math.random() * 96 + 1) + '%;opacity:' + (0.2 + Math.random() * 0.4) + ';animation:drift' + (i % 3 + 1) + ' ' + (11 + Math.random() * 14) + 's linear ' + (Math.random() * 8) + 's infinite;';
-      pBox.appendChild(s);
-    }
-  }
   /* ===== 启动 ===== */
   applyTheme();
   setLite(liteOn);
@@ -1024,6 +1006,7 @@ var _errMsg = "{{ error|e if error else '' }}";
 
 /* ===== 悬浮卡片:鼠标跟随倾斜(tilt) ===== */
 function bindTilt(el, maxDeg) {
+  if (/Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MQQBrowser/i.test(navigator.userAgent)) return;
   if (!el || el._tiltDone) return;
   el._tiltDone = true;
   var DEG = maxDeg || 8;
@@ -1045,27 +1028,6 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.card, .stat-item, .cc-feature, .cc-terminal, .cc-show-img, .cc-qr').forEach(function (el) { bindTilt(el, 14); });
 });
 
-
-/* ===== 访问提示通知(仅移动端,只提示不禁用) ===== */
-(function () {
-  var ua = navigator.userAgent || '';
-  var isMobile = /Android|iPhone|iPad|iPod|Windows Phone|Mobile|Mobi/i.test(ua);
-  if (!isMobile) return;
-  function showNotice() {
-    var el = document.createElement('div');
-    el.style.cssText = 'position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(24px);max-width:88vw;background:rgba(22,28,52,.88);color:#fff;padding:13px 22px;border-radius:16px;font-size:13.5px;line-height:1.65;font-weight:600;box-shadow:0 22px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:99999;opacity:0;transition:opacity .4s,transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;';
-    el.textContent = '提示：当前网页不支持右键复制和粘贴，移动端未做适配，可能存在浏览问题，请使用桌面端访问。';
-    document.body.appendChild(el);
-    requestAnimationFrame(function () { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)'; });
-    setTimeout(function () {
-      el.style.opacity = '0'; el.style.transform = 'translateX(-50%) translateY(24px)';
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 600);
-    }, 6500);
-  }
-  if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(showNotice, 900);
-  else window.addEventListener('load', function () { setTimeout(showNotice, 900); });
-})();
-
 /* ===== 表单校验:玻璃 toast 替代原生提示 ===== */
 function checkBindForm() {
   var u = document.querySelector('input[name="username"]');
@@ -1083,6 +1045,83 @@ function checkBindForm() {
   }
   return true;
 }
+</script>
+
+<div class="lang-pop" id="langPop">
+  <button class="lang-item cur" data-lang="zh">中文</button>
+  <button class="lang-item" data-lang="tw">繁體中文</button>
+  <button class="lang-item" data-lang="en">English</button>
+  <button class="lang-item" data-lang="ja">日本語</button>
+  <button class="lang-item" data-lang="ko">한국어</button>
+  <button class="lang-item" data-lang="es">Español</button>
+</div>
+
+<script>
+/* ===== 语言切换(参照插件市场) ===== */
+(function () {
+  var LANGS = ['zh','tw','en','ja','ko','es'];
+  var curLang = 'zh';
+  try { var lsLang = localStorage.getItem('knexpanse-lang'); if (LANGS.indexOf(lsLang) >= 0) curLang = lsLang; } catch (e) {}
+  var I18N = {"mk_logo": {"zh": "插件市场", "tw": "插件市場", "en": "Plugin Market", "ja": "プラグインマーケット", "ko": "플러그인 마켓", "es": "Mercado de Plugins"}, "mk_market": {"zh": "插件市场", "tw": "插件市場", "en": "Plugin Market", "ja": "プラグインマーケット", "ko": "플러그인 마켓", "es": "Mercado de Plugins"}, "ok": {"zh": "确定", "tw": "確定", "en": "OK", "ja": "確定", "ko": "확인", "es": "Aceptar"}, "cancel": {"zh": "取消", "tw": "取消", "en": "Cancel", "ja": "キャンセル", "ko": "취소", "es": "Cancelar"}, "save": {"zh": "保存修改", "tw": "保存修改", "en": "Save Changes", "ja": "変更を保存", "ko": "변경 저장", "es": "Guardar Cambios"}, "ab_title": {"zh": "设置用户名", "tw": "設置用戶名", "en": "Set Username", "ja": "ユーザー名を設定", "ko": "사용자 이름 설정", "es": "Establecer Usuario"}, "ab_sub": {"zh": "外部账号已验证，请设置插件市场用户名", "tw": "外部賬號已驗證，請設置插件市場用戶名", "en": "External account verified. Set your plugin market username", "ja": "外部アカウントを確認しました。プラグインマーケットのユーザー名を設定してください", "ko": "외부 계정이 확인되었습니다. 플러그인 마켓 사용자 이름을 설정하세요", "es": "Cuenta verificada. Establece tu nombre de usuario"}, "lg_user": {"zh": "用户名", "tw": "用戶名", "en": "Username", "ja": "ユーザー名", "ko": "사용자 이름", "es": "Usuario"}, "ab_user_ph": {"zh": "请输入用户名（字母数字下划线）", "tw": "請輸入用戶名（字母數字下劃線）", "en": "Enter username (letters, numbers, underscore)", "ja": "ユーザー名を入力（英数字・アンダースコア）", "ko": "사용자 이름 입력 (영문, 숫자, 밑줄)", "es": "Ingresa el usuario (letras, números, guion bajo)"}, "ab_submit": {"zh": "完成绑定", "tw": "完成綁定", "en": "Complete Binding", "ja": "バインド完了", "ko": "바인딩 완료", "es": "Completar Vinculación"}, "ab_tip": {"zh": "用户名设置后不可修改，请谨慎选择", "tw": "用戶名設置後不可修改，請謹慎選擇", "en": "Username cannot be changed after setting", "ja": "ユーザー名は設定後に変更できません", "ko": "사용자 이름은 설정 후 변경할 수 없습니다", "es": "El nombre no se puede cambiar después"}};
+  function applyLang() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n');
+      var t = I18N[k];
+      if (t && t[curLang]) el.textContent = t[curLang];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-ph');
+      var t = I18N[k];
+      if (t && t[curLang]) el.setAttribute('placeholder', t[curLang]);
+    });
+    document.querySelectorAll('[data-i18n-val]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-val');
+      var t = I18N[k];
+      if (t && t[curLang]) el.value = t[curLang];
+    });
+    document.querySelectorAll('.lang-item').forEach(function (it) { it.classList.toggle('cur', it.dataset.lang === curLang); });
+    document.documentElement.lang = curLang === 'zh' ? 'zh-CN' : (curLang === 'tw' ? 'zh-TW' : curLang);
+    if (typeof renderLangDynamic === 'function') renderLangDynamic(curLang, I18N);
+  }
+  function posLangPop(btn) {
+    var pop = document.getElementById('langPop');
+    if (!pop || !btn) return;
+    var r = btn.getBoundingClientRect();
+    pop.style.top = (r.bottom + 10) + 'px';
+    pop.style.right = Math.max(10, window.innerWidth - r.right) + 'px';
+  }
+  function showLang() {
+    var pop = document.getElementById('langPop');
+    if (!pop) return;
+    posLangPop(document.getElementById('langBtn'));
+    pop.classList.add('show');
+  }
+  function hideLang() {
+    var pop = document.getElementById('langPop');
+    if (pop) pop.classList.remove('show');
+  }
+  var langBtn = document.getElementById('langBtn');
+  if (langBtn) {
+    langBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var pop = document.getElementById('langPop');
+      if (pop && pop.classList.contains('show')) hideLang(); else showLang();
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var pop = document.getElementById('langPop');
+    if (pop && pop.classList.contains('show') && !e.target.closest('#langBtn') && !e.target.closest('#langPop')) hideLang();
+  });
+  document.querySelectorAll('.lang-item').forEach(function (it) {
+    it.addEventListener('click', function () {
+      curLang = it.dataset.lang;
+      try { localStorage.setItem('knexpanse-lang', curLang); } catch (e) {}
+      applyLang();
+      setTimeout(hideLang, 150);
+    });
+  });
+  applyLang();
+})();
 </script>
 </body>
 </html>
