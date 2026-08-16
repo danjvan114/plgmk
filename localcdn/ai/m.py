@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-AI 论坛助手 - 基于智谱 AI GLM-4-Flash 模型
-支持自动回复、定时发帖、设置等功能
-使用 CMD 终端绘制界面，遥控器式操作
-"""
+
 
 import os
 import sys
@@ -26,9 +22,85 @@ DEFAULT_MAX_REPLY_TOKENS = 1000
 DEFAULT_MAX_POST_TOKENS = 2000
 CONFIG_DIR = os.path.join(os.path.dirname(__file__), "config")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "ai_assistant.json")
+DB_FILE = os.path.join(CONFIG_DIR, "ai_assistant.db")
 
 # 确保配置目录存在
 os.makedirs(CONFIG_DIR, exist_ok=True)
+
+
+class ReplyDB:
+    """回复记录数据库管理"""
+    
+    def __init__(self):
+        self.conn = sqlite3.connect(DB_FILE)
+        self.conn.row_factory = sqlite3.Row
+        self._init_db()
+    
+    def _init_db(self):
+        """初始化数据库表"""
+        cursor = self.conn.cursor()
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS replied_replies (
+            reply_id INTEGER PRIMARY KEY,
+            post_id INTEGER NOT NULL,
+            user_id TEXT NOT NULL,
+            replied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS commented_posts (
+            post_id INTEGER PRIMARY KEY,
+            commented_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS processed_posts (
+            post_id INTEGER PRIMARY KEY,
+            processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+        self.conn.commit()
+    
+    def is_replied(self, reply_id):
+        """检查是否已回复"""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT 1 FROM replied_replies WHERE reply_id = ?", (reply_id,))
+        return cursor.fetchone() is not None
+    
+    def mark_replied(self, reply_id, post_id, user_id):
+        """标记已回复"""
+        cursor = self.conn.cursor()
+        cursor.execute("INSERT OR IGNORE INTO replied_replies (reply_id, post_id, user_id) VALUES (?, ?, ?)",
+                      (reply_id, post_id, user_id))
+        self.conn.commit()
+    
+    def is_commented(self, post_id):
+        """检查是否已评论"""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT 1 FROM commented_posts WHERE post_id = ?", (post_id,))
+        return cursor.fetchone() is not None
+    
+    def mark_commented(self, post_id):
+        """标记已评论"""
+        cursor = self.conn.cursor()
+        cursor.execute("INSERT OR IGNORE INTO commented_posts (post_id) VALUES (?)", (post_id,))
+        self.conn.commit()
+    
+    def is_processed(self, post_id):
+        """检查是否已处理"""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT 1 FROM processed_posts WHERE post_id = ?", (post_id,))
+        return cursor.fetchone() is not None
+    
+    def mark_processed(self, post_id):
+        """标记已处理"""
+        cursor = self.conn.cursor()
+        cursor.execute("INSERT OR IGNORE INTO processed_posts (post_id) VALUES (?)", (post_id,))
+        self.conn.commit()
+    
+    def close(self):
+        """关闭数据库连接"""
+        self.conn.close()
 
 
 class ConfigManager:
@@ -36,6 +108,7 @@ class ConfigManager:
     
     def __init__(self):
         self.config = self.load_config()
+        self.reply_db = ReplyDB()
     
     def load_config(self):
         """加载配置"""
@@ -44,8 +117,7 @@ class ConfigManager:
             "api_key": DEFAULT_API_KEY,
             "model": DEFAULT_MODEL,
             "server": DEFAULT_SERVER,
-            "forum_user": "",
-            "forum_password": "",
+            "forum_token": "",
             "max_context_tokens": DEFAULT_MAX_CONTEXT_TOKENS,
             "max_reply_tokens": DEFAULT_MAX_REPLY_TOKENS,
             "max_post_tokens": DEFAULT_MAX_POST_TOKENS,
@@ -55,7 +127,9 @@ class ConfigManager:
                 "check_interval": 60,
                 "last_check_time": 0,
                 "last_commented_post_ids": [],
-                "default_comment": "我来看看~ 有什么可以帮大家的吗？"
+                "default_comment": "我来看看~ 有什么可以帮大家的吗？",
+                "replied_reply_ids": [],
+                "processed_post_ids": []
             },
             "auto_comment": {
                 "enabled": False,
@@ -97,8 +171,7 @@ class ForumAPI:
     
     def __init__(self, config):
         self.server = config["server"]
-        self.user = config["forum_user"]
-        self.password = config["forum_password"]
+        self.token = config["forum_token"]  # 使用长期token
         self.session = requests.Session()
         self.logged_in = False
     
@@ -165,16 +238,21 @@ class ForumAPI:
             return False, []
     
     def reply_post(self, post_id, content):
-        """回复帖子"""
-        # 确保已登录
-        success, msg = self.ensure_login()
-        if not success:
-            return False, f"登录失败: {msg}"
-        
+        """回复帖子（使用长期token）"""
         try:
+            headers = {
+                "Authorization": f"Bearer {self.token}",
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "content": content
+            }
+            
             resp = self.session.post(
                 f"{self.server}/forum/reply/{post_id}",
-                json={"content": content},
+                json=data,
+                headers=headers,
                 timeout=10
             )
             if resp.status_code == 200:
@@ -185,16 +263,23 @@ class ForumAPI:
             return False, f"回复异常: {str(e)}"
     
     def create_post(self, forum_id, title, content):
-        """创建帖子"""
-        # 确保已登录
-        success, msg = self.ensure_login()
-        if not success:
-            return False, f"登录失败: {msg}", 0
-        
+        """创建帖子（使用长期token）"""
         try:
+            headers = {
+                "Authorization": f"Bearer {self.token}",
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "forum_id": forum_id,
+                "title": title,
+                "content": content
+            }
+            
             resp = self.session.post(
                 f"{self.server}/forum/new",
-                json={"forum_id": forum_id, "title": title, "content": content},
+                json=data,
+                headers=headers,
                 timeout=10
             )
             if resp.status_code == 200:
@@ -363,6 +448,13 @@ class AIForumAssistant:
         self.auto_comment_running = False
         self.scheduled_post_running = False
     
+    def get_username_from_token(self):
+        """从token中提取用户名"""
+        token = self.config.config.get('forum_token', '')
+        if ':' in token:
+            return token.split(':', 1)[0]
+        return token  # 如果不是用户名:密码格式，直接返回token
+    
     def init_clients(self):
         """初始化客户端"""
         self.forum_api = ForumAPI(self.config.config)
@@ -370,7 +462,7 @@ class AIForumAssistant:
     
     def check_user_config(self):
         """检查用户配置"""
-        if not self.config.config["forum_user"] or not self.config.config["forum_password"]:
+        if not self.config.config["forum_token"]:
             return False
         return True
     
@@ -381,29 +473,27 @@ class AIForumAssistant:
         
         self.ui.draw_text(10, 5, "欢迎使用 AI 论坛助手！请先完成以下配置：")
         
-        self.ui.draw_text(10, 8, "1. 论坛服务器地址")
-        server = self.ui.input_text(10, 9, "服务器: ", self.config.config["server"])
+        self.ui.draw_text(10, 7, "1. 论坛服务器地址")
+        server = self.ui.input_text(10, 8, "服务器: ", self.config.config["server"])
         if server is not None:
             self.config.config["server"] = server
         
-        self.ui.draw_text(10, 11, "2. 论坛账号")
-        user = self.ui.input_text(10, 12, "用户名: ")
-        if user is not None:
-            self.config.config["forum_user"] = user
+        self.ui.draw_text(10, 10, "2. 论坛长期Token")
+        self.ui.draw_text(10, 11, "说明: 在论坛用户管理页面点击'获取Token'按钮获取")
         
-        pwd = self.ui.input_text(10, 13, "密码: ")
-        if pwd is not None:
-            self.config.config["forum_password"] = pwd
+        token = self.ui.input_text(10, 12, "Token: ")
+        if token is not None:
+            self.config.config["forum_token"] = token
         
-        self.ui.draw_text(10, 15, "3. API 配置")
-        api_key = self.ui.input_text(10, 16, "API Key: ", self.config.config["api_key"])
+        self.ui.draw_text(10, 14, "3. API 配置（智谱AI）")
+        api_key = self.ui.input_text(10, 15, "API Key: ", self.config.config["api_key"])
         if api_key is not None:
             self.config.config["api_key"] = api_key
         
         self.config.save()
         self.init_clients()
         
-        self.ui.draw_text(10, 18, "配置已保存！按 Enter 继续...")
+        self.ui.draw_text(10, 17, "配置已保存！按 Enter 继续...")
         while self.ui.get_key() != "ENTER":
             pass
     
@@ -421,7 +511,7 @@ class AIForumAssistant:
             self.ui.clear()
             self.ui.draw_box(5, 2, 60, 15, "AI 论坛助手 - 主菜单")
             self.ui.draw_text(10, 5, f"服务器: {self.config.config['server']}")
-            self.ui.draw_text(10, 6, f"用户: {self.config.config['forum_user']}")
+            self.ui.draw_text(10, 6, f"Token: {self.config.config['forum_token'][:20]}...")
             self.ui.draw_text(10, 7, f"模型: {self.config.config['model']}")
             
             status = []
@@ -545,54 +635,55 @@ class AIForumAssistant:
                 ).fetchall()
                 
                 commented_ids = self.config.config['auto_reply'].get('last_commented_post_ids', [])
+                replied_reply_ids = self.config.config['auto_reply'].get('replied_reply_ids', [])
+                processed_post_ids = self.config.config['auto_reply'].get('processed_post_ids', [])
                 
                 for post in latest_posts:
                     # 检查AI是否已经在这个帖子下评论过
                     ai_comment = conn.execute(
                         "SELECT id, content FROM responses WHERE post_id = ? AND user_id = ? AND status = 'active' ORDER BY id ASC LIMIT 1",
-                        (post['id'], self.config.config['forum_user'])
+                        (post['id'], self.get_username_from_token())
                     ).fetchone()
                     
                     if not ai_comment:
                         # AI还没评论过，留默认评论
-                        self.ui.draw_text(10, 21, f"新帖子: {post['title']} - 正在留默认评论...")
-                        
-                        default_comment = self.config.config['auto_reply']['default_comment']
-                        success, msg = self.forum_api.reply_post(post['id'], default_comment)
-                        
-                        if success:
-                            self.ui.draw_text(10, 22, f"已留评论: {default_comment[:30]}...")
-                            commented_ids.append(post['id'])
-                            self.config.config['auto_reply']['last_commented_post_ids'] = commented_ids[-100:]
-                            self.config.save()
-                        else:
-                            self.ui.draw_text(10, 22, f"评论失败: {msg}")
-                        
-                        time.sleep(2)
+                        if post['id'] not in commented_ids:
+                            self.ui.draw_text(10, 21, f"新帖子: {post['title']} - 正在留默认评论...")
+                            
+                            default_comment = self.config.config['auto_reply']['default_comment']
+                            success, msg = self.forum_api.reply_post(post['id'], default_comment)
+                            
+                            if success:
+                                self.ui.draw_text(10, 22, f"已留评论: {default_comment[:30]}...")
+                                commented_ids.append(post['id'])
+                                self.config.config['auto_reply']['last_commented_post_ids'] = commented_ids[-500:]
+                                self.config.save()
+                            else:
+                                self.ui.draw_text(10, 22, f"评论失败: {msg}")
+                            
+                            time.sleep(2)
                     else:
-                        # AI已经评论过，检查是否有人回复AI的评论
+                        # AI已经评论过，检查是否有新的回复
+                        if post['id'] in processed_post_ids:
+                            continue  # 已经处理过这个帖子的回复，跳过
+                        
+                        # 查找所有回复AI评论的用户回复
                         replies_to_ai = conn.execute(
-                            "SELECT id, user_id, username, content, created_at FROM responses WHERE parent_id = ? AND user_id != ? AND status = 'active' ORDER BY id DESC LIMIT 5",
-                            (ai_comment['id'], self.config.config['forum_user'])
+                            "SELECT id, user_id, username, content, created_at FROM responses WHERE parent_id = ? AND user_id != ? AND status = 'active' ORDER BY id ASC",
+                            (ai_comment['id'], self.get_username_from_token())
                         ).fetchall()
                         
-                        if replies_to_ai:
-                            # 有人回复了AI的评论，触发AI回复
-                            latest_reply = replies_to_ai[0]
-                            self.ui.draw_text(10, 21, f"有人回复AI: {latest_reply['username']} - {latest_reply['content'][:30]}...")
-                            
-                            # 获取帖子信息
-                            post_info = conn.execute(
-                                "SELECT title, content FROM posts WHERE id = ?",
-                                (post['id'],)
-                            ).fetchone()
-                            
-                            if post_info:
-                                # 构建对话上下文
+                        new_replies = [r for r in replies_to_ai if r['id'] not in replied_reply_ids]
+                        
+                        if new_replies:
+                            # 有新的用户回复，触发AI回复
+                            for reply in new_replies:
+                                self.ui.draw_text(10, 21, f"有人回复AI: {reply['username']} - {reply['content'][:30]}...")
+                                
+                                # 构建对话上下文 - 重点是用户的回复内容
                                 messages = [
                                     {"role": "system", "content": self.ai_client.system_prompt},
-                                    {"role": "assistant", "content": ai_comment['content']},
-                                    {"role": "user", "content": f"{latest_reply['username']} 回复: {latest_reply['content']}\n\n帖子标题: {post_info['title']}\n帖子内容: {post_info['content'][:200]}\n\n请生成一个友好的回复:"}
+                                    {"role": "user", "content": f"用户 {reply['username']} 回复了你的评论：\n\n{reply['content']}\n\n请生成一个友好的回复:"}
                                 ]
                                 
                                 success, result = self.ai_client.chat(messages, max_tokens=self.ai_client.max_reply_tokens)
@@ -601,12 +692,20 @@ class AIForumAssistant:
                                     success, msg = self.forum_api.reply_post(post['id'], result)
                                     if success:
                                         self.ui.draw_text(10, 22, f"AI已回复: {result[:50]}...")
+                                        replied_reply_ids.append(reply['id'])
+                                        self.config.config['auto_reply']['replied_reply_ids'] = replied_reply_ids[-500:]
+                                        self.config.save()
                                     else:
                                         self.ui.draw_text(10, 22, f"回复失败: {msg}")
                                 else:
                                     self.ui.draw_text(10, 22, f"AI生成失败: {result}")
                                 
                                 time.sleep(3)
+                            
+                            # 标记这个帖子已经处理过回复
+                            processed_post_ids.append(post['id'])
+                            self.config.config['auto_reply']['processed_post_ids'] = processed_post_ids[-500:]
+                            self.config.save()
                 
                 conn.close()
                 
@@ -714,7 +813,7 @@ class AIForumAssistant:
                         # 检查是否已经评论过
                         existing = conn.execute(
                             "SELECT id FROM responses WHERE post_id = ? AND user_id = ? AND status = 'active'",
-                            (post['id'], self.config.config['forum_user'])
+                            (post['id'], self.get_username_from_token())
                         ).fetchone()
                         
                         if not existing:
@@ -954,18 +1053,17 @@ class AIForumAssistant:
     def account_settings(self):
         """账号设置"""
         self.ui.clear()
-        self.ui.draw_box(5, 2, 60, 12, "论坛账号设置")
+        self.ui.draw_box(5, 2, 60, 12, "论坛Token设置")
         
-        user = self.ui.input_text(10, 5, "用户名: ", self.config.config["forum_user"])
-        if user is not None:
-            self.config.config["forum_user"] = user
+        self.ui.draw_text(10, 5, "说明: 在论坛用户管理页面点击'获取Token'按钮获取")
         
-        pwd = self.ui.input_text(10, 7, "密码: ", self.config.config["forum_password"])
-        if pwd is not None:
-            self.config.config["forum_password"] = pwd
+        token = self.ui.input_text(10, 7, "长期Token: ", self.config.config["forum_token"])
+        if token is not None:
+            self.config.config["forum_token"] = token
+            self.forum_api = ForumAPI(self.config.config)
         
         self.config.save()
-        self.ui.draw_text(10, 10, "账号设置已保存！")
+        self.ui.draw_text(10, 10, "Token设置已保存！")
         time.sleep(1)
     
     def api_settings(self):

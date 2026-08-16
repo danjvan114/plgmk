@@ -352,11 +352,33 @@ def register_user_routes():
         
         user = User.query.get(session['user'])
         if not user or user.role != 'admin':
-            return redirect(url_for('login'))
+            return redirect(url_for('index'))
         
-        delete_user = User.query.get(username)
-        if delete_user and delete_user.username != session['user']:
-            db.session.delete(delete_user)
+        if username == session['user']:
+            return redirect(url_for('admin_users'))
+        
+        target_user = User.query.get(username)
+        if target_user:
+            db.session.delete(target_user)
             db.session.commit()
         
         return redirect(url_for('admin_users'))
+
+    @app.route('/op/user/token/<username>', methods=['POST'])
+    def admin_get_user_token(username):
+        """获取用户长期Token（仅管理员）"""
+        if 'user' not in session:
+            return jsonify({'success': False, 'message': '请先登录'}), 401
+        
+        admin_user = User.query.get(session['user'])
+        if not admin_user or admin_user.role != 'admin':
+            return jsonify({'success': False, 'message': '无权限'}), 403
+        
+        target_user = User.query.get(username)
+        if not target_user:
+            return jsonify({'success': False, 'message': '用户不存在'}), 404
+        
+        # 生成格式为 用户名:密码 的长期token
+        token = f"{target_user.username}:{target_user.password}"
+        
+        return jsonify({'success': True, 'token': token, 'message': '获取成功'})
