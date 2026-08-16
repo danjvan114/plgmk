@@ -679,7 +679,7 @@ class AIForumAssistant:
                                 all_user_replies.append(f"{reply['username']}: {reply['content']}")
                             
                             # 构建对话上下文 - 包含帖子内容和所有用户评论
-                            post_content = post.get('content', '')[:500] if post.get('content') else ''
+                            post_content = str(post['content'])[:500] if post['content'] else ''
                             context_msg = f"帖子标题: {post['title']}\n帖子内容: {post_content}\n\n"
                             context_msg += "用户评论:\n" + "\n".join(all_user_replies)
                             context_msg += "\n\n请以幽默的方式回复这些用户："
