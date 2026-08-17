@@ -191,6 +191,15 @@ body.lite-mode #themeBtn svg { transition:none !important; }
   background:var(--glass-tint-2) !important;
   color:var(--accent-1) !important;
   box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 8px 20px var(--accent-glow) !important;
+  transform:translateY(-2px) scale(1.03) !important;
+}
+/* 成功/警告/危险按钮:hover 统一补 Q弹上浮动效(原只有背景变化) */
+.btn.success:hover, .btn.warn:hover, .btn.danger:hover,
+.detail-actions .btn.success:hover, .detail-actions .btn.warn:hover {
+  transform:translateY(-2px) scale(1.03) !important;
+}
+@media (hover:none) {
+  .btn.ghost:hover, .btn.success:hover, .btn.warn:hover, .btn.danger:hover { transform:none !important; }
 }
 
 /* ---------- 全局交互动效补全:统一 Q弹弹性过渡(缺失补全) ---------- */

@@ -911,10 +911,348 @@ body.dark-mode .theme-menu { background:rgba(24,30,58,.92); box-shadow:inset 0 1
 }
 
 </style>
-<link rel="stylesheet" href="global.css">
+<style>
+/* ===== 全站通用样式(内嵌自包含,不依赖外部 global.css) ===== */
+/* ============================================================
+   KN Expanse 全站通用样式 global.css
+   液态玻璃 UI · 双主题(极光紫霞白天 / 暗夜黑夜) · Q弹缓动
+   背景规范 · 节能模式 · 移动端适配
+   ============================================================ */
+
+/* ---------- 双主题变量(仅两套:极光紫霞=白天, 暗夜=黑夜) ---------- */
+:root, body.theme-aurora, body.theme-light {
+  --bg-base:#eef1f8;
+  --orb-a:rgba(107,114,245,.10); --orb-b:rgba(155,124,247,.08); --orb-c:rgba(96,165,250,.06);
+  --accent-1:#6b72f5; --accent-2:#9b7cf7; --accent-3:#60a5fa;
+  --accent-glow:rgba(107,114,245,.30);
+  --grad-btn:linear-gradient(135deg,#6b72f5,#8a6df0);
+  --grad-title:linear-gradient(115deg,#5b63e8,#8a6df0 55%,#4f8ee0);
+  --grad-eng-a:rgba(139,148,247,.95); --grad-eng-b:rgba(181,164,249,.95);
+  --glass-nav:rgba(255,255,255,.18);
+  --glass-card:rgba(255,255,255,.09);
+  --solid-glass:#ffffff;
+  --glass-strong:rgba(255,255,255,.18);
+  --glass-tint:rgba(107,114,245,.10);
+  --glass-tint-2:rgba(107,114,245,.20);
+  --glass-hi-top:rgba(255,255,255,.55);
+  --glass-hi-bot:rgba(0,0,0,.07);
+  --shadow:0 8px 30px rgba(42,54,94,.08);
+  --shadow-hover:0 26px 64px rgba(42,54,94,.20);
+  --text-1:#1d2238; --text-2:#4a5270; --text-3:#7c83a2;
+  --border:rgba(0,0,0,.07);
+  --footer-glow:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.14) 55%, rgba(255,255,255,.20));
+}
+body.dark-mode, body.theme-dark {
+  --bg-base:#0a0d1a;
+  --orb-a:rgba(129,140,248,.09); --orb-b:rgba(167,139,250,.07); --orb-c:rgba(56,189,248,.05);
+  --accent-1:#818cf8; --accent-2:#a78bfa; --accent-3:#22d3ee;
+  --accent-glow:rgba(129,140,248,.42);
+  --grad-btn:linear-gradient(135deg,#6d7cf6,#9370f2);
+  --grad-title:linear-gradient(115deg,#93a2ff,#a78bfa 55%,#4ed3ee);
+  --grad-eng-a:rgba(165,180,252,.95); --grad-eng-b:rgba(199,184,253,.95);
+  --glass-nav:rgba(255,255,255,.16);
+  --glass-card:rgba(255,255,255,.06);
+  --solid-glass:#1a2038;
+  --glass-strong:rgba(255,255,255,.12);
+  --glass-tint:rgba(129,140,248,.14);
+  --glass-tint-2:rgba(129,140,248,.26);
+  --glass-hi-top:rgba(255,255,255,.16);
+  --glass-hi-bot:rgba(0,0,0,.28);
+  --shadow:0 8px 30px rgba(0,0,0,.45);
+  --shadow-hover:0 26px 64px rgba(0,0,0,.6);
+  --text-1:#e8eaf4; --text-2:#a9aec5; --text-3:#8b92ad;
+  --border:rgba(255,255,255,.09);
+  --footer-glow:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.07) 55%, rgba(12,17,38,.55));
+}
+
+/* ---------- 全站统一参数 ---------- */
+:root {
+  --ease-pop: cubic-bezier(.34,1.56,.64,1);   /* Q弹缓动(全站标准) */
+  --ease-smooth: cubic-bezier(.4,0,.2,1);
+  --radius:18px;
+  --radius-sm:12px;
+  --radius-pill:60px;
+}
+
+/* ---------- 基础 ---------- */
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; overflow-x:hidden; }
+body {
+  font-family:'Inter','PingFang SC','Microsoft YaHei',system-ui,-apple-system,'Segoe UI',sans-serif;
+  background:var(--bg-base); color:var(--text-1);
+  overflow-x:hidden; line-height:1.6; min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .55s ease,color .55s ease;
+}
+a { color:inherit; text-decoration:none; }
+button { font-family:inherit; }
+:focus-visible { outline:2px solid var(--accent-1); outline-offset:2px; border-radius:6px; }
+
+/* ---------- 背景规范(全站统一) ---------- */
+/* 删除星星/圆点粒子动态特效 */
+#particles, .bg-layer .parallax, .bg-layer .bg-orb { display:none !important; }
+/* 暗夜模式:专属深色背景图(伪元素层,opacity 淡入淡出实现双向平滑过渡) */
+body::before {
+  content:''; position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bBqex51ZLwNxuT2IIs05FTlykLbJAACrCkAAmsm2FcLH3kvBfcaWz0E.jpg') center/cover fixed;
+  opacity:0; transition:opacity .55s ease;
+}
+body.dark-mode::before, body.theme-dark::before { opacity:1; }
+/* 白天模式:右下角紫色圆形装饰(最底层,不遮挡UI) */
+body:not(.dark-mode):not(.theme-dark)::after {
+  content:''; position:fixed; right:-8%; bottom:-12%;
+  width:52vw; height:52vw; max-width:660px; max-height:660px;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 50%, rgba(107,114,245,.20), rgba(155,124,247,.10) 46%, transparent 70%);
+  filter:blur(18px); pointer-events:none; z-index:-1;
+}
+
+/* ---------- 通用液态玻璃组件 ---------- */
+.glass {
+  background:var(--glass-card);
+  backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+}
+.glass-btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:10px 22px; border:none; border-radius:30px; cursor:pointer;
+  font-size:14px; font-weight:700; color:var(--accent-1);
+  background:var(--glass-tint);
+  backdrop-filter:blur(14px) saturate(170%); -webkit-backdrop-filter:blur(14px) saturate(170%);
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 10px 24px var(--accent-glow);
+  transition:transform .45s var(--ease-pop), background .3s, box-shadow .3s, color .3s;
+}
+.glass-btn:hover { background:var(--glass-tint-2); transform:translateY(-2px) scale(1.03); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 16px 34px var(--accent-glow); }
+.glass-btn:active { transform:scale(.95); }
+
+/* ---------- 节能模式:关闭全部过渡与悬浮,液态玻璃转实心 ---------- */
+body.lite-mode * { transition:none !important; animation:none !important; }
+body.lite-mode * { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+body.lite-mode .glass, body.lite-mode .card, body.lite-mode .stat-card,
+body.lite-mode .icon-btn, body.lite-mode .topnav, body.lite-mode .mdui-toolbar,
+body.lite-mode .mdui-tab-container, body.lite-mode .lang-pop, body.lite-mode .mk-search,
+body.lite-mode .mk-dl, body.lite-mode .search {
+  background:var(--solid-glass) !important;
+}
+/* 按钮:实心底色 + 主题原色文字(保证对比度可读) */
+body.lite-mode .btn, body.lite-mode .glass-btn, body.lite-mode .mk-view {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot) !important;
+}
+body.lite-mode .btn.ghost { background:var(--solid-glass) !important; color:var(--text-2) !important; }
+body.lite-mode .btn.danger { background:var(--glass-tint-2) !important; color:var(--danger) !important; }
+body.lite-mode .btn.success, body.lite-mode .btn.warn { background:var(--glass-tint-2) !important; color:var(--accent-1) !important; }
+body.lite-mode .mk-dl, body.lite-mode .mk-view { color:var(--accent-1) !important; }
+body.lite-mode .card:hover, body.lite-mode .stat-card:hover,
+body.lite-mode .glass-btn:hover, body.lite-mode .btn:hover { transform:none !important; --ty:0 !important; }
+
+/* ---------- 移动端:禁用卡片鼠标倾斜悬浮 ---------- */
+@media (hover:none) {
+  .card:hover, .stat-card:hover, .stat-item:hover, .mk-card:hover, .btn:hover,
+  .guide:hover, .plugin-box:hover, .plugin-item:hover, .detail-hero:hover, .stars:hover,
+  .mdui-tab-item:hover, .nav-links a:hover, .fl-link:hover, .dl-m-btn:hover, .cr-tab:hover,
+  .ext-install:hover, .glass-btn:hover {
+    --ty:0 !important; transform:none !important;
+  }
+}
+
+/* ---------- 全站统一页脚(参照编辑器下载官网:分割线 + 毛玻璃,非圆角卡片) ---------- */
+.site-footer {
+  position:relative; z-index:1;
+  margin-top:60px; padding:44px 20px 50px;
+  text-align:center; color:var(--text-3);
+  /* 液态提亮背景:渐变铺满横线下方整片可视区域(非狭小容器) */
+  background:var(--footer-glow);
+  backdrop-filter:blur(12px) saturate(170%); -webkit-backdrop-filter:blur(12px) saturate(170%);
+  border-top:1px solid var(--glass-hi-bot);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transform:translateZ(0);   /* 独立合成层,避免滚动重绘抖动 */
+  will-change:transform;
+}
+.site-footer .sf-brand { display:inline-flex; align-items:center; gap:8px; font-weight:700; color:var(--text-2); }
+.site-footer .sf-logo { height:22px; width:auto; vertical-align:middle; }
+.site-footer .sf-note { margin-top:10px; color:var(--text-3); font-size:13px; }
+.site-footer .sf-links { margin-top:12px; display:flex; justify-content:center; align-items:center; gap:10px; font-size:13px; flex-wrap:wrap; }
+.site-footer .sf-links a { color:var(--text-3); text-decoration:none; transition:color .25s,transform .35s var(--ease-pop); display:inline-block; }
+.site-footer .sf-links a:hover { color:var(--accent-1); transform:translateY(-1px); }
+.site-footer .sf-sep { color:var(--text-3); opacity:.5; }
+body.lite-mode .site-footer { background:var(--solid-glass) !important; backdrop-filter:none; -webkit-backdrop-filter:none; }
+@media (max-width:768px) {
+  .site-footer { padding:30px 16px 36px; margin-top:40px; }
+}
+
+/* ---------- 粘性页脚布局:内容短时吸附底部,内容长时跟随末尾 ---------- */
+/* 内容容器自然高度;页脚 flex:1 占满横线下方全部剩余可视区域,提亮背景铺满,无底色断层 */
+body { display:flex; flex-direction:column; min-height:100vh; }
+body > main, body > .main-box, body > .doc-main { flex:0 1 auto; width:100%; }
+body > footer, footer.site-footer { flex:1 0 auto; }
+
+/* ---------- 主题按钮图标:太阳/月亮双态(theme.js 切换 .dark) ---------- */
+#themeBtn { position:relative; }
+#themeBtn svg { position:absolute; inset:0; margin:auto; transition:opacity .3s,transform .4s var(--ease-pop); }
+#themeBtn .ic-moon { opacity:0; transform:rotate(-90deg) scale(.6); }
+#themeBtn.dark .ic-sun { opacity:0; transform:rotate(90deg) scale(.6); }
+#themeBtn.dark .ic-moon { opacity:1; transform:none; }
+body.lite-mode #themeBtn svg { transition:none !important; }
+
+/* ---------- ghost 按钮:常态保留基础可视样式,悬浮增强(禁止全透明) ---------- */
+.btn.ghost {
+  background:var(--glass-tint) !important;
+  color:var(--text-2) !important;
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot) !important;
+}
+.btn.ghost:hover {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 8px 20px var(--accent-glow) !important;
+  transform:translateY(-2px) scale(1.03) !important;
+}
+/* 成功/警告/危险按钮:hover 统一补 Q弹上浮动效(原只有背景变化) */
+.btn.success:hover, .btn.warn:hover, .btn.danger:hover,
+.detail-actions .btn.success:hover, .detail-actions .btn.warn:hover {
+  transform:translateY(-2px) scale(1.03) !important;
+}
+@media (hover:none) {
+  .btn.ghost:hover, .btn.success:hover, .btn.warn:hover, .btn.danger:hover { transform:none !important; }
+}
+
+/* ---------- 全局交互动效补全:统一 Q弹弹性过渡(缺失补全) ---------- */
+.btn, .icon-btn, a.btn, .glass-btn, .mk-dl, .mk-view, .mk-pop-btn,
+.pd-tab, .pd-back, .pd-nav-tools .icon-btn, .nav-links a, .ft-tab, .cr-tab,
+.fl-link, .chip, .tag, .sf-links a, .gallery-image, .stat-item.card,
+.mk-tag, .tp-item, .badge-btn, .carousel-nav, .ext-install, .mk-card,
+.term, .cc-feature, .cc-terminal, .cc-show-img, .cc-qr, .dl-m-btn, .m-dl-btn,
+.offline-tip, .search, .community-search, .post-item, .menu-btn, .hamburger {
+  transition:transform .45s var(--ease-pop), background .3s, color .3s, box-shadow .3s;
+}
+@media (hover:none) {
+  .btn:hover, .icon-btn:hover, a.btn:hover, .glass-btn:hover, .mk-dl:hover,
+  .mk-view:hover, .mk-pop-btn:hover, .pd-tab:hover, .pd-back:hover,
+  .nav-links a:hover, .ft-tab:hover, .cr-tab:hover, .fl-link:hover,
+  .chip:hover, .tag:hover, .gallery-image:hover, .stat-item.card:hover,
+  .mk-tag:hover, .badge-btn:hover, .ext-install:hover { transform:none !important; --ty:0 !important; }
+}
+
+</style>
 </head>
 <body class="theme-aurora" data-page="auth-bind">
-<script src="theme.js"></script>
+<script>
+/* ===== 全站主题脚本(内嵌自包含,不依赖外部 theme.js) ===== */
+/* ============================================================
+   KN Expanse 全站统一主题脚本 theme.js
+   双主题(极光紫霞白天/暗夜黑夜) · localStorage 实时同步
+   主题/节能按钮事件委托 · 节能模式 · 移动端检测
+   所有页面共用此脚本,不依赖页面内嵌逻辑
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var KEY_THEME = 'knexpanse-theme';
+  var KEY_LITE = 'knexpanse-lite';
+
+  function read(key) {
+    try { return localStorage.getItem(key) || ''; } catch (e) { return ''; }
+  }
+  function write(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) {}
+  }
+
+  /* 当前是否暗夜:3 或 dark(兼容旧数据) */
+  function curIsDark() {
+    var t = read(KEY_THEME);
+    return t === '3' || t === 'dark';
+  }
+  function curLite() { return read(KEY_LITE) === '1'; }
+
+  function isToolPage(body) {
+    return body.classList.contains('theme-light') || body.classList.contains('theme-dark');
+  }
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MQQBrowser/i.test(navigator.userAgent);
+  }
+
+  /* 应用主题/节能到 body,并同步按钮状态 */
+  function apply() {
+    var body = document.body;
+    if (!body) return;
+    var dark = curIsDark();
+    body.classList.remove('theme-aurora', 'theme-ocean', 'theme-amber', 'dark-mode', 'theme-light', 'theme-dark');
+    if (isToolPage(body)) {
+      body.classList.add(dark ? 'theme-dark' : 'theme-light');
+    } else {
+      body.classList.add(dark ? 'dark-mode' : 'theme-aurora');
+    }
+    body.classList.toggle('lite-mode', curLite());
+    body.classList.toggle('mobile', isMobile());
+    syncBtns(body, dark);
+  }
+
+  /* 节能按钮高亮同步 */
+  function syncBtns(body, dark) {
+    var lite = document.getElementById('liteBtn');
+    if (lite) lite.classList.toggle('active', body.classList.contains('lite-mode'));
+    var tb = document.getElementById('themeBtn');
+    if (tb) {
+      tb.classList.toggle('dark', dark);
+      tb.setAttribute('title', dark ? '切换到白天' : '切换到黑夜');
+    }
+  }
+
+  /* 切换主题(白天<->黑夜) */
+  function toggleTheme() {
+    var dark = curIsDark();
+    write(KEY_THEME, dark ? '0' : '3');
+    apply();
+  }
+  /* 切换节能 */
+  function toggleLite() {
+    write(KEY_LITE, curLite() ? '0' : '1');
+    apply();
+    var msg = curLite() ? '已开启节能模式' : '已关闭节能模式';
+    showToast(msg);
+  }
+
+  /* 轻量 toast(节能切换提示) */
+  var toastEl = null, toastT = null;
+  function showToast(msg) {
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.style.cssText = 'position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:var(--glass-strong);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);color:var(--text-1);padding:11px 22px;border-radius:30px;font-size:13.5px;font-weight:600;box-shadow:inset 0 1px 0 var(--glass-hi-top),var(--shadow-hover);opacity:0;transition:opacity .3s,transform .35s cubic-bezier(.34,1.56,.64,1);z-index:5000;pointer-events:none;';
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = msg;
+    requestAnimationFrame(function () { toastEl.style.opacity = '1'; toastEl.style.transform = 'translateX(-50%) translateY(0)'; });
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { toastEl.style.opacity = '0'; toastEl.style.transform = 'translateX(-50%) translateY(20px)'; }, 2000);
+  }
+
+  /* 初始化 */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', apply);
+  } else {
+    apply();
+  }
+
+  /* 多页面主题实时同步:其他页面修改主题/节能时本页即时跟随 */
+  window.addEventListener('storage', function (e) {
+    if (e.key === KEY_THEME || e.key === KEY_LITE) apply();
+  });
+
+  /* 按钮事件委托(全站统一):不依赖页面内嵌逻辑 */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('#themeBtn');
+    if (t) {
+      /* 插件市场用主题菜单选择,不拦截;其余页面直接切换 */
+      if (!document.getElementById('themePop')) toggleTheme();
+      return;
+    }
+    t = e.target.closest('#liteBtn');
+    if (t) { toggleLite(); return; }
+  });
+})();
+
+</script>
 <header>
   <div class="nav-left">
     <a class="logo" href="/mk/kn"><img class="logo-img" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse"><span data-i18n="mk_logo">插件市场</span></a>
