@@ -1165,29 +1165,200 @@ body.lite-mode .detail-actions .btn.success, body.lite-mode .detail-actions .btn
 /* 内容区块尺寸变化平滑 */
 .tab-content.active { animation:tabIn .45s var(--ease-pop) both; }
 
+
+/* ===== 详情页专项 v5 ===== */
+/* 导航栏:缩小间距,返回按钮液态玻璃化 */
+.mdui-toolbar.mdui-color-teal { padding:0 12px 0 6px; gap:6px; }
+.mdui-toolbar .mdui-btn-icon {
+  width:38px; height:38px; border-radius:50%;
+  background:var(--glass-tint);
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot);
+  color:var(--text-2);
+}
+.mdui-toolbar .mdui-btn-icon:hover { background:var(--glass-tint-2); color:var(--accent-1); transform:scale(1.06); }
+.mdui-toolbar .mdui-typo-title { margin-left:2px; font-size:16px; }
+/* 内容卡片圆角:缩小弧度,避免过度圆润 */
+.detail-hero, .card, .stat-item.card, .mdui-tab-container, .image-gallery .gallery-image, .ttmp4-container {
+  border-radius:14px !important;
+}
+/* 内容切换:平滑高度过渡 */
+.mdui-tab-container { transition:height .35s var(--ease-pop); overflow:hidden; }
+
+
+/* ===== 详情页顶部导航栏 + Tab 彻底重做 v7 ===== */
+/* --- 独立圆形悬浮返回按钮(不捆绑导航栏) --- */
+.pd-back {
+  position:fixed; top:16px; left:16px; z-index:2100;
+  width:46px; height:46px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text-2);
+  background:var(--glass-nav);
+  backdrop-filter:blur(14px) saturate(170%); -webkit-backdrop-filter:blur(14px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+  transition:transform .45s var(--ease-pop), background .3s, color .3s, box-shadow .3s;
+}
+.pd-back:hover { color:var(--accent-1); background:var(--glass-tint-2); transform:translateY(-2px) scale(1.1); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 12px 26px var(--accent-glow); }
+.pd-back:active { transform:scale(.92); }
+body.lite-mode .pd-back { background:var(--solid-glass) !important; backdrop-filter:none; -webkit-backdrop-filter:none; }
+/* --- 顶部导航栏主体(液态玻璃,与返回按钮分离) --- */
+.pd-navbar {
+  position:fixed; top:14px; left:50%; transform:translateX(-50%);
+  width:min(94%,1200px); height:60px; min-height:60px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 10px 0 18px; border-radius:60px;
+  background:var(--glass-nav);
+  backdrop-filter:blur(6px) saturate(160%); -webkit-backdrop-filter:blur(6px) saturate(160%);
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+  z-index:2000;
+}
+.pd-nav-brand { display:flex; align-items:center; gap:10px; text-decoration:none; min-width:0; }
+.pd-nav-logo { height:30px; width:auto; border-radius:8px; flex:none; display:block; }
+.pd-nav-title { font-size:16px; font-weight:800; color:var(--text-1); white-space:nowrap; }
+.pd-nav-tools { display:flex; align-items:center; gap:8px; flex:none; }
+body.lite-mode .pd-navbar { background:var(--solid-glass) !important; backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.lite-mode .pd-navbar .icon-btn { background:var(--glass-tint-2) !important; color:var(--accent-1) !important; }
+/* --- 独立 Tab 导航栏(与内容卡片完全分层) --- */
+.pd-tabbar {
+  display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;
+  max-width:700px; margin:0 auto 24px; padding:8px 12px;
+  border-radius:60px;
+  background:var(--glass-nav);
+  backdrop-filter:blur(6px) saturate(160%); -webkit-backdrop-filter:blur(6px) saturate(160%);
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+}
+.pd-tab {
+  flex:none; display:inline-flex; align-items:center; gap:6px;
+  padding:9px 20px; border:none; border-radius:30px; cursor:pointer;
+  font-size:14px; font-weight:700; font-family:inherit; color:var(--text-2);
+  background:transparent; box-shadow:none;
+  transition:color .25s,background .3s,box-shadow .3s,transform .45s var(--ease-pop);
+}
+.pd-tab:hover { color:var(--accent-1); background:var(--glass-tint); transform:translateY(-2px) scale(1.05); }
+.pd-tab:active { transform:scale(.94); }
+.pd-tab.active { color:var(--accent-1); background:var(--glass-tint-2); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 0 12px var(--accent-glow); }
+.pd-tab i { font-size:15px; }
+body.lite-mode .pd-tabbar { background:var(--solid-glass) !important; backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.lite-mode .pd-tab.active { background:var(--glass-tint-2); }
+body.lite-mode .pd-tab:hover, body.lite-mode .pd-tab.active, body.lite-mode .pd-tab:active { transform:none !important; }
+/* --- 内容区:左右堆叠切换(严格参照下载页【制作团队】cr-card) --- */
+.pd-content {
+  position:relative; margin:0 auto;
+  /* 固定渲染容器区域:初始化时锁定为全部面板最大高度,切换时高度不变,杜绝重排抖动 */
+}
+.pd-pane {
+  position:absolute; left:0; right:0; top:0;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transform:perspective(1000px) translateX(var(--x,64px)) rotateY(var(--ry,10deg)) scale(var(--sc,.97));
+  transform-origin:center center;   /* 全状态轴心统一,避免切换跳变 */
+  transition:transform .6s cubic-bezier(.22,.61,.36,1), opacity .45s ease, visibility .45s;
+  will-change:transform,opacity;
+  backface-visibility:hidden;
+}
+.pd-pane.active {
+  opacity:1; visibility:visible; pointer-events:auto;
+  transform:perspective(1000px) translateX(0) rotateY(0) scale(1);
+  z-index:10;
+}
+.pd-pane.leaving {
+  opacity:0; visibility:visible; pointer-events:none;
+  z-index:5;
+}
+body.lite-mode .pd-pane { transition:none !important; }
+/* 移动端 */
+@media (max-width:768px) {
+  .pd-back { top:12px; left:12px; width:42px; height:42px; }
+  .pd-navbar { width:94%; padding:0 8px 0 12px; }
+  .pd-nav-logo { height:26px; }
+  .pd-nav-title { font-size:14.5px; }
+  .pd-nav-tools { gap:6px; }
+  .pd-tabbar { max-width:100%; padding:6px 8px; }
+  .pd-tab { padding:8px 14px; font-size:13px; }
+  .pd-tab i { font-size:14px; }
+  .pd-pane { --x:44px; }
+}
+
+.tab-content.active { opacity:1; visibility:visible; transform:none; pointer-events:auto; z-index:2; }
+.tab-content.leaving { opacity:0; visibility:visible; transform:translateX(-56px); pointer-events:none; z-index:1; }
+@media (max-width:768px) {
+  .tab-content { padding:16px; transform:translateX(40px); }
+  .tab-content.leaving { transform:translateX(-40px); }
+}
+
+
+/* ===== 详情页移动端强化 v8 ===== */
+@media (max-width:768px) {
+  /* 导航栏整体右移让位返回按钮(返回按钮 12-54px,导航栏从 70px 起,不再遮挡) */
+  .pd-navbar { left:70px; right:12px; width:auto; transform:none; padding:0 6px 0 10px; }
+  .pd-nav-logo { height:24px; border-radius:7px; }
+  .pd-nav-title { font-size:13px; max-width:34vw; overflow:hidden; text-overflow:ellipsis; }
+  .pd-nav-tools { gap:4px; }
+  .pd-nav-tools .icon-btn { width:36px; height:36px; }
+  /* 概览卡片移动端适配(防横向溢出) */
+  .detail-hero { padding:16px 16px 14px; }
+  .page-title { font-size:20px; word-break:break-word; }
+  .detail-main, .detail-sidebar, .detail-sec { min-width:0; }
+  .detail-sec { padding:14px 16px; }
+  .detail-sidebar .stats { gap:8px; }
+  .ttmp4-container { height:240px; }
+  .image-gallery { grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); }
+  .meta-badge { font-size:11.5px; padding:3px 9px; }
+  .detail-actions .btn { min-width:0; padding:11px 14px; font-size:13.5px; }
+}
+
+
+/* ===== 详情页 v9:移动端概览卡片独立排版(非缩放) + 遮挡修复 ===== */
+/* 返回按钮遮挡修复:扩大到 900px(平板/窄窗导航栏也让位) */
+@media (max-width:900px) {
+  .pd-navbar { left:70px; right:14px; width:auto; transform:none; }
+  .pd-nav-logo { height:26px; }
+  .pd-nav-title { font-size:14px; max-width:40vw; overflow:hidden; text-overflow:ellipsis; }
+}
+@media (max-width:768px) {
+  /* --- 概览卡片:移动端独立排版(标题→统计→操作→预览→描述,非缩放) --- */
+  .detail-layout { display:flex; flex-direction:column; gap:14px; }
+  .detail-main { order:2; width:100%; }
+  .detail-sidebar { order:1; position:static; display:flex; flex-direction:column; gap:14px; width:100%; }
+  /* 统计条:横向三格玻璃卡 */
+  .detail-sidebar .stats { grid-template-columns:repeat(3,1fr); gap:10px; }
+  .detail-sidebar .stat-item.card {
+    padding:16px 6px; border-radius:16px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  }
+  .detail-sidebar .stat-value { font-size:20px; line-height:1.2; }
+  .detail-sidebar .stat-label { font-size:11.5px; }
+  /* 操作按钮:全宽大触控目标 */
+  .detail-actions { flex-direction:column; gap:10px; }
+  .detail-actions .btn { width:100%; min-height:50px; font-size:15px; }
+  /* 预览/描述区块 */
+  .detail-sec { padding:16px; }
+  .sec-title { font-size:15px; }
+  /* 标题卡 */
+  .detail-hero { padding:18px 16px 14px; }
+  .detail-hero .page-title { font-size:21px; }
+  .detail-hero .meta { gap:6px; }
+}
+
 </style>
 <link rel="stylesheet" href="global.css">
 </head>
 <body class="theme-aurora" data-page="plugin-detail">
 <script src="./theme.js"></script>
 
-<div class="mdui-toolbar mdui-color-teal" style="position:fixed;z-index:1000;">
-        <a class="mdui-ripple mdui-btn-icon" onclick="goBack()">
-            <i class="mdui-icon material-icons">arrow_back</i>
-        </a>
-        <img class="pd-nav-logo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse"><span class="mdui-typo-title" data-i18n="mk_logo">插件市场</span>
-        <div class="mdui-toolbar-spacer"></div>
-        <div class="nav-right">
-          <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"></button>
-          <button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button>
-          <button class="icon-btn" id="langBtn" title="切换语言" aria-label="切换语言"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+<!-- 独立圆形悬浮返回按钮(不捆绑导航栏) -->
+<a class="pd-back" href="javascript:void(0)" onclick="goBack()" aria-label="返回"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></a>
 
-        </div>
-
-        
-      
-</div>
-  
+<!-- 顶部导航栏主体(液态玻璃,与返回按钮分离) -->
+<header class="pd-navbar">
+  <a class="pd-nav-brand" href="/mk/kn">
+    <img class="pd-nav-logo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse">
+    <span class="pd-nav-title" data-i18n="mk_logo">插件市场</span>
+  </a>
+  <div class="pd-nav-tools">
+    <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"><svg class="ic-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="ic-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg></button>
+    <button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button>
+    <button class="icon-btn" id="langBtn" title="切换语言" aria-label="切换语言"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+  </div>
+</header>
 
 <main class="page-box">
 <div class="content-wrapper">
@@ -1205,17 +1376,18 @@ body.lite-mode .detail-actions .btn.success, body.lite-mode .detail-actions .btn
   <div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
 </div>
 
-<!-- MDUI Tab 组件 -->
-<div class="mdui-tab-container">
-  <div class="mdui-tab">
-    <button class="mdui-tab-item active" data-tab="overview"><i class="mdui-icon material-icons">info</i><span data-i18n="pd_tab_overview">概览</span></button>
-    <button class="mdui-tab-item" data-tab="preview"><i class="mdui-icon material-icons">visibility</i><span data-i18n="pd_tab_preview">预览</span></button>
-    <button class="mdui-tab-item" data-tab="description"><i class="mdui-icon material-icons">description</i><span data-i18n="pd_tab_desc">描述</span></button>
-    <button class="mdui-tab-item" data-tab="stats"><i class="mdui-icon material-icons">all_inclusive</i><span data-i18n="pd_tab_stats">统计</span></button>
-  </div>
-  
-  <!-- 概览 Tab -->
-  <div class="tab-content active" id="tab-overview">
+<!-- 独立 Tab 导航栏(与下方内容卡片完全分层、互不捆绑) -->
+<nav class="pd-tabbar">
+    <button class="pd-tab active" data-tab="overview"><i class="mdui-icon material-icons">info</i><span data-i18n="pd_tab_overview">概览</span></button>
+    <button class="pd-tab" data-tab="preview"><i class="mdui-icon material-icons">visibility</i><span data-i18n="pd_tab_preview">预览</span></button>
+    <button class="pd-tab" data-tab="description"><i class="mdui-icon material-icons">description</i><span data-i18n="pd_tab_desc">描述</span></button>
+    <button class="pd-tab" data-tab="stats"><i class="mdui-icon material-icons">all_inclusive</i><span data-i18n="pd_tab_stats">统计</span></button>
+</nav>
+
+<!-- 内容区:左右堆叠切换(严格参照下载页【制作团队】) -->
+<div class="pd-content">
+  <!-- 概览 -->
+  <div class="pd-pane active" id="tab-overview">
     <div class="detail-layout">
       <div class="detail-main">
         {% if plugin.ttmp4_url %}
@@ -1263,8 +1435,8 @@ body.lite-mode .detail-actions .btn.success, body.lite-mode .detail-actions .btn
     </div>
   </div>
   
-  <!-- 预览 Tab -->
-  <div class="tab-content" id="tab-preview">
+  <!-- 预览 -->
+  <div class="pd-pane" id="tab-preview">
     {% if plugin.ttmp4_url %}
     <div class="ttmp4-container"><iframe class="ttmp4-iframe" src="{{ plugin.ttmp4_url }}" sandbox="allow-scripts allow-same-origin allow-popups" allowfullscreen></iframe></div>
     {% elif plugin.images and plugin.images|length > 0 %}
@@ -1278,13 +1450,13 @@ body.lite-mode .detail-actions .btn.success, body.lite-mode .detail-actions .btn
     {% endif %}
   </div>
   
-  <!-- 描述 Tab -->
-  <div class="tab-content" id="tab-description">
+  <!-- 描述 -->
+  <div class="pd-pane" id="tab-description">
     <p class="detail-desc">{{ plugin.description|e }}</p>
   </div>
   
-  <!-- 统计 Tab -->
-  <div class="tab-content" id="tab-stats">
+  <!-- 统计 -->
+  <div class="pd-pane" id="tab-stats">
     <div class="stats" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label" data-i18n="pd_stat_dl">下载次数</div></div>
       <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label" data-i18n="pd_stat_rate">评分</div></div>
@@ -1298,41 +1470,8 @@ body.lite-mode .detail-actions .btn.success, body.lite-mode .detail-actions .btn
 </main>
 
 <script>
-/* ===== 4主题循环切换(与下载页完全一致) ===== */
+/* ===== toast(主题/节能由 theme.js 统一管理) ===== */
 (function () {
-  var THEMES = [
-    { cls:'theme-aurora', name:'极光紫霞', icon:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>' },
-    { cls:'theme-ocean',  name:'深海琉璃', icon:'<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 3h10l5 7-10 11L2 10Z"/></svg>' },
-    { cls:'theme-amber',  name:'琥珀暮光', icon:'<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 3C18 5 20 12 16 19 9 18 5 11 7 4 9 3 11 3 12 3Z"/></svg>' },
-    { cls:'dark-mode',    name:'暗夜模式', icon:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg>' }
-  ];
-  var saved = null;
-  try { saved = localStorage.getItem('knexpanse-theme'); if (saved === null || saved === '') saved = localStorage.getItem('kn-tool-theme'); } catch (e) {}
-  var curIdx = 0;
-  if (saved === 'light') curIdx = 0;
-  else if (saved === 'dark') curIdx = 3;
-  else { var n = parseInt(saved, 10); if (!isNaN(n)) curIdx = Math.max(0, Math.min(3, n)); }
-  var themeBtn = document.getElementById('themeBtn');
-  function applyTheme() {
-    document.body.classList.remove('theme-aurora', 'theme-ocean', 'theme-amber', 'dark-mode');
-    document.body.classList.add(THEMES[curIdx].cls);
-    if (themeBtn) { themeBtn.innerHTML = THEMES[curIdx].icon; themeBtn.title = THEMES[curIdx].name; }
-    try { localStorage.setItem('knexpanse-theme', String(curIdx)); } catch (e) {}
-  }
-  
-  if (themeBtn) themeBtn.addEventListener('click', function () { curIdx = (curIdx === 0) ? 3 : 0; applyTheme(); });
-  /* ===== 节能模式 ===== */
-  var liteOn = false;
-  try { liteOn = localStorage.getItem('knexpanse-lite') === '1'; } catch (e) {}
-  var liteBtn = document.getElementById('liteBtn');
-  function setLite(on) {
-    document.body.classList.toggle('lite-mode', on);
-    if (liteBtn) liteBtn.classList.toggle('active', on);
-    try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
-    toast(on ? '已开启节能模式，特效已精简' : '已关闭节能模式');
-  }
-  if (liteBtn) liteBtn.addEventListener('click', function () { setLite(!document.body.classList.contains('lite-mode')); });
-  /* ===== toast ===== */
   var toastEl = null, toastT = null;
   function toast(msg) {
     if (!toastEl) {
@@ -1345,41 +1484,77 @@ body.lite-mode .detail-actions .btn.success, body.lite-mode .detail-actions .btn
     clearTimeout(toastT);
     toastT = setTimeout(function () { toastEl.style.opacity = '0'; toastEl.style.transform = 'translateX(-50%) translateY(20px)'; }, 2200);
   }
-  /* ===== 启动 ===== */
-  applyTheme();
-  setLite(liteOn);
+  window.toast = toast;
 })();
 
-/* ===== MDUI Tab 切换(不刷新页面) ===== */
+/* ===== 内容切换:左右堆叠(参照下载页【制作团队】cr-card) ===== */
 (function() {
-  var tabBtns = document.querySelectorAll('.mdui-tab-item');
-  var tabContents = document.querySelectorAll('.tab-content');
-  var switching = false;
+  var tabs = document.querySelectorAll('.pd-tab');
+  var panes = document.querySelectorAll('.pd-pane');
+  var box = document.querySelector('.pd-content');
+  var cur = 0, switching = false;
 
-  tabBtns.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var tabId = this.getAttribute('data-tab');
-      var cur = document.querySelector('.tab-content.active');
-      var target = document.getElementById('tab-' + tabId);
-      if (!target || target === cur || switching) return;
-      switching = true;
+  function paneHeight(p) { return p ? p.scrollHeight : 0; }
 
-      // 按钮 active 即时切换(无抽搐)
-      tabBtns.forEach(function(b) { b.classList.remove('active'); });
-      this.classList.add('active');
+  /* 固定渲染容器高度:取全部面板最大高度,一次锁定,切换时永不变化 */
+  function lockHeight() {
+    if (!box) return;
+    var maxH = 0;
+    panes.forEach(function (p) { maxH = Math.max(maxH, paneHeight(p)); });
+    box.style.height = maxH + 'px';
+  }
 
-      // 旧内容退场动画 -> 新内容进场动画
-      if (cur) {
-        cur.classList.add('out');
-        setTimeout(function() {
-          cur.classList.remove('active', 'out');
-          target.classList.add('active');
-          switching = false;
-        }, 220);
+  /* 渲染堆叠状态:当前居中,其余按左右两侧偏移+旋转+缩放(轴心统一 center) */
+  function render() {
+    var n = panes.length;
+    panes.forEach(function(p, k) {
+      p.classList.toggle('active', k === cur);
+      if (k === cur) {
+        p.style.setProperty('--x', '0px');
+        p.style.setProperty('--ry', '0deg');
+        p.style.setProperty('--sc', '1');
+        p.style.zIndex = 10;
       } else {
-        target.classList.add('active');
-        switching = false;
+        var side = k < cur ? -1 : 1;
+        var d = Math.abs(k - cur);
+        p.style.setProperty('--x', (side * (64 + d * 36)) + 'px');
+        p.style.setProperty('--ry', (side * d * 8).toFixed(1) + 'deg');
+        p.style.setProperty('--sc', (1 - d * 0.05).toFixed(3));
+        p.style.zIndex = 10 - d;
       }
+    });
+    tabs.forEach(function(t, k) { t.classList.toggle('active', k === cur); });
+  }
+
+  /* 初始化:锁定固定高度(全部面板最大值) + 初始渲染 */
+  lockHeight();
+  window.addEventListener('resize', lockHeight);
+  render();
+
+  function go(i) {
+    if (i === cur || switching || i < 0 || i >= panes.length) return;
+    switching = true;
+    var old = panes[cur];
+    cur = i;
+    var target = panes[cur];
+    /* 高度已固定,不做任何高度修改;仅切换面板类名触发左右堆叠动画 */
+    old.classList.add('leaving');
+    old.classList.remove('active');
+    target.classList.add('active');
+    render();
+    setTimeout(function () {
+      old.classList.remove('leaving');
+      switching = false;
+    }, 560);
+  }
+
+  /* 绑定点击:data-tab 为字符串标识(overview/preview/...),按 id 定位面板索引 */
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      var key = t.getAttribute('data-tab');
+      var target = document.getElementById('tab-' + key);
+      var idx = Array.prototype.indexOf.call(panes, target);
+      if (idx >= 0) go(idx);
     });
   });
 })();
@@ -1495,5 +1670,15 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   applyLang();
 })();
-</script></body>
+</script>
+<footer class="site-footer">
+  <div class="sf-brand"><img class="sf-logo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse" loading="lazy"><span>KN Expanse</span></div>
+  <p class="sf-note">用热爱创造无限可能</p>
+  <div class="sf-links">
+    <a href="https://www.codemao.cn/" target="_blank" rel="noopener">点猫科技</a><span class="sf-sep">·</span>
+    <a href="/" target="_blank" rel="noopener">KNHX工作室</a><span class="sf-sep">·</span>
+    <a href="/app/ccvue" target="_blank" rel="noopener">CatCode</a>
+  </div>
+</footer>
+</body>
 </html>

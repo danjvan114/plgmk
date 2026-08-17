@@ -25,6 +25,7 @@
   --shadow-hover:0 26px 64px rgba(42,54,94,.20);
   --text-1:#1d2238; --text-2:#4a5270; --text-3:#7c83a2;
   --border:rgba(0,0,0,.07);
+  --footer-glow:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.14) 55%, rgba(255,255,255,.20));
 }
 body.dark-mode, body.theme-dark {
   --bg-base:#0a0d1a;
@@ -46,6 +47,7 @@ body.dark-mode, body.theme-dark {
   --shadow-hover:0 26px 64px rgba(0,0,0,.6);
   --text-1:#e8eaf4; --text-2:#a9aec5; --text-3:#8b92ad;
   --border:rgba(255,255,255,.09);
+  --footer-glow:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.07) 55%, rgba(12,17,38,.55));
 }
 
 /* ---------- 全站统一参数 ---------- */
@@ -65,7 +67,7 @@ body {
   background:var(--bg-base); color:var(--text-1);
   overflow-x:hidden; line-height:1.6; min-height:100vh;
   -webkit-font-smoothing:antialiased;
-  transition:background .5s ease,color .5s ease;
+  transition:background-color .55s ease,color .55s ease;
 }
 a { color:inherit; text-decoration:none; }
 button { font-family:inherit; }
@@ -74,11 +76,13 @@ button { font-family:inherit; }
 /* ---------- 背景规范(全站统一) ---------- */
 /* 删除星星/圆点粒子动态特效 */
 #particles, .bg-layer .parallax, .bg-layer .bg-orb { display:none !important; }
-/* 暗夜模式:专属深色背景图(最底层,不遮挡UI) */
-body.dark-mode, body.theme-dark {
-  background-image:url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bBqex51ZLwNxuT2IIs05FTlykLbJAACrCkAAmsm2FcLH3kvBfcaWz0E.jpg');
-  background-size:cover; background-position:center; background-attachment:fixed;
+/* 暗夜模式:专属深色背景图(伪元素层,opacity 淡入淡出实现双向平滑过渡) */
+body::before {
+  content:''; position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY-bBqex51ZLwNxuT2IIs05FTlykLbJAACrCkAAmsm2FcLH3kvBfcaWz0E.jpg') center/cover fixed;
+  opacity:0; transition:opacity .55s ease;
 }
+body.dark-mode::before, body.theme-dark::before { opacity:1; }
 /* 白天模式:右下角紫色圆形装饰(最底层,不遮挡UI) */
 body:not(.dark-mode):not(.theme-dark)::after {
   content:''; position:fixed; right:-8%; bottom:-12%;
@@ -109,13 +113,22 @@ body:not(.dark-mode):not(.theme-dark)::after {
 /* ---------- 节能模式:关闭全部过渡与悬浮,液态玻璃转实心 ---------- */
 body.lite-mode * { transition:none !important; animation:none !important; }
 body.lite-mode * { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
-body.lite-mode .glass, body.lite-mode .glass-btn,
-body.lite-mode .card, body.lite-mode .btn, body.lite-mode .stat-card,
+body.lite-mode .glass, body.lite-mode .card, body.lite-mode .stat-card,
 body.lite-mode .icon-btn, body.lite-mode .topnav, body.lite-mode .mdui-toolbar,
-body.lite-mode .mdui-tab-container, body.lite-mode .lang-pop {
+body.lite-mode .mdui-tab-container, body.lite-mode .lang-pop, body.lite-mode .mk-search,
+body.lite-mode .mk-dl, body.lite-mode .search {
   background:var(--solid-glass) !important;
 }
-body.lite-mode .glass-btn { background:var(--grad-btn) !important; color:#fff !important; }
+/* 按钮:实心底色 + 主题原色文字(保证对比度可读) */
+body.lite-mode .btn, body.lite-mode .glass-btn, body.lite-mode .mk-view {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot) !important;
+}
+body.lite-mode .btn.ghost { background:var(--solid-glass) !important; color:var(--text-2) !important; }
+body.lite-mode .btn.danger { background:var(--glass-tint-2) !important; color:var(--danger) !important; }
+body.lite-mode .btn.success, body.lite-mode .btn.warn { background:var(--glass-tint-2) !important; color:var(--accent-1) !important; }
+body.lite-mode .mk-dl, body.lite-mode .mk-view { color:var(--accent-1) !important; }
 body.lite-mode .card:hover, body.lite-mode .stat-card:hover,
 body.lite-mode .glass-btn:hover, body.lite-mode .btn:hover { transform:none !important; --ty:0 !important; }
 
@@ -127,4 +140,72 @@ body.lite-mode .glass-btn:hover, body.lite-mode .btn:hover { transform:none !imp
   .ext-install:hover, .glass-btn:hover {
     --ty:0 !important; transform:none !important;
   }
+}
+
+/* ---------- 全站统一页脚(参照编辑器下载官网:分割线 + 毛玻璃,非圆角卡片) ---------- */
+.site-footer {
+  position:relative; z-index:1;
+  margin-top:60px; padding:44px 20px 50px;
+  text-align:center; color:var(--text-3);
+  /* 液态提亮背景:渐变铺满横线下方整片可视区域(非狭小容器) */
+  background:var(--footer-glow);
+  backdrop-filter:blur(12px) saturate(170%); -webkit-backdrop-filter:blur(12px) saturate(170%);
+  border-top:1px solid var(--glass-hi-bot);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transform:translateZ(0);   /* 独立合成层,避免滚动重绘抖动 */
+  will-change:transform;
+}
+.site-footer .sf-brand { display:inline-flex; align-items:center; gap:8px; font-weight:700; color:var(--text-2); }
+.site-footer .sf-logo { height:22px; width:auto; vertical-align:middle; }
+.site-footer .sf-note { margin-top:10px; color:var(--text-3); font-size:13px; }
+.site-footer .sf-links { margin-top:12px; display:flex; justify-content:center; align-items:center; gap:10px; font-size:13px; flex-wrap:wrap; }
+.site-footer .sf-links a { color:var(--text-3); text-decoration:none; transition:color .25s,transform .35s var(--ease-pop); display:inline-block; }
+.site-footer .sf-links a:hover { color:var(--accent-1); transform:translateY(-1px); }
+.site-footer .sf-sep { color:var(--text-3); opacity:.5; }
+body.lite-mode .site-footer { background:var(--solid-glass) !important; backdrop-filter:none; -webkit-backdrop-filter:none; }
+@media (max-width:768px) {
+  .site-footer { padding:30px 16px 36px; margin-top:40px; }
+}
+
+/* ---------- 粘性页脚布局:内容短时吸附底部,内容长时跟随末尾 ---------- */
+/* 内容容器自然高度;页脚 flex:1 占满横线下方全部剩余可视区域,提亮背景铺满,无底色断层 */
+body { display:flex; flex-direction:column; min-height:100vh; }
+body > main, body > .main-box, body > .doc-main { flex:0 1 auto; width:100%; }
+body > footer, footer.site-footer { flex:1 0 auto; }
+
+/* ---------- 主题按钮图标:太阳/月亮双态(theme.js 切换 .dark) ---------- */
+#themeBtn { position:relative; }
+#themeBtn svg { position:absolute; inset:0; margin:auto; transition:opacity .3s,transform .4s var(--ease-pop); }
+#themeBtn .ic-moon { opacity:0; transform:rotate(-90deg) scale(.6); }
+#themeBtn.dark .ic-sun { opacity:0; transform:rotate(90deg) scale(.6); }
+#themeBtn.dark .ic-moon { opacity:1; transform:none; }
+body.lite-mode #themeBtn svg { transition:none !important; }
+
+/* ---------- ghost 按钮:常态保留基础可视样式,悬浮增强(禁止全透明) ---------- */
+.btn.ghost {
+  background:var(--glass-tint) !important;
+  color:var(--text-2) !important;
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot) !important;
+}
+.btn.ghost:hover {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 8px 20px var(--accent-glow) !important;
+}
+
+/* ---------- 全局交互动效补全:统一 Q弹弹性过渡(缺失补全) ---------- */
+.btn, .icon-btn, a.btn, .glass-btn, .mk-dl, .mk-view, .mk-pop-btn,
+.pd-tab, .pd-back, .pd-nav-tools .icon-btn, .nav-links a, .ft-tab, .cr-tab,
+.fl-link, .chip, .tag, .sf-links a, .gallery-image, .stat-item.card,
+.mk-tag, .tp-item, .badge-btn, .carousel-nav, .ext-install, .mk-card,
+.term, .cc-feature, .cc-terminal, .cc-show-img, .cc-qr, .dl-m-btn, .m-dl-btn,
+.offline-tip, .search, .community-search, .post-item, .menu-btn, .hamburger {
+  transition:transform .45s var(--ease-pop), background .3s, color .3s, box-shadow .3s;
+}
+@media (hover:none) {
+  .btn:hover, .icon-btn:hover, a.btn:hover, .glass-btn:hover, .mk-dl:hover,
+  .mk-view:hover, .mk-pop-btn:hover, .pd-tab:hover, .pd-back:hover,
+  .nav-links a:hover, .ft-tab:hover, .cr-tab:hover, .fl-link:hover,
+  .chip:hover, .tag:hover, .gallery-image:hover, .stat-item.card:hover,
+  .mk-tag:hover, .badge-btn:hover, .ext-install:hover { transform:none !important; --ty:0 !important; }
 }

@@ -186,7 +186,6 @@ input[type="file"]::file-selector-button:hover { background:var(--glass-tint); t
   .topnav .nav-links a { padding:12px 16px; border-radius:12px; font-size:14.5px; width:100%; }
 }
 
-
 /* 移动端:禁用卡牌悬浮/浮起(触摸设备无 hover,防止 sticky-hover 残留) */
 @media (hover:none) {
   .card:hover, .stat-card:hover, .stat-item:hover, .mk-card:hover, .btn:hover,
@@ -241,31 +240,6 @@ input[type="file"]::file-selector-button:hover { background:var(--glass-tint); t
 
 </div>
 <script>
-/* ===== 双主题(白/黑) ===== */
-(function () {
-  var cur = 'light';
-  try { var s = localStorage.getItem('knexpanse-theme'); if (s === null || s === '') s = localStorage.getItem('kn-tool-theme'); if (s === 'dark' || s === '3') cur = 'dark'; else if (s === 'light' || s === '0' || s === '1' || s === '2') cur = 'light'; } catch (e) {}
-  document.body.classList.remove('theme-light', 'theme-dark');
-  document.body.classList.add('theme-' + cur);
-  var btn = document.getElementById('themeBtn');
-  if (btn) btn.addEventListener('click', function () {
-    cur = cur === 'light' ? 'dark' : 'light';
-    document.body.classList.remove('theme-light', 'theme-dark');
-    document.body.classList.add('theme-' + cur);
-    try { localStorage.setItem('knexpanse-theme', cur === 'dark' ? '3' : '0'); } catch (e) {}
-  });
-  /* ===== 节能模式 ===== */
-  var lite = false;
-  try { lite = localStorage.getItem('knexpanse-lite') === '1'; } catch (e) {}
-  var liteBtn = document.getElementById('liteBtn');
-  function setLite(on) {
-    document.body.classList.toggle('lite-mode', on);
-    if (liteBtn) liteBtn.classList.toggle('active', on);
-    try { localStorage.setItem('knexpanse-lite', on ? '1' : '0'); } catch (e) {}
-  }
-  setLite(lite);
-  if (liteBtn) liteBtn.addEventListener('click', function () { setLite(!document.body.classList.contains('lite-mode')); });
-})();
 
 function toggleSelectAll() {
   document.querySelectorAll('input[name="plugin_ids"]').forEach(function (cb) { cb.checked = document.getElementById('selectAll').checked; });
@@ -391,5 +365,15 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   applyLang();
 })();
-</script></body>
+</script>
+<footer class="site-footer">
+  <div class="sf-brand"><img class="sf-logo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse" loading="lazy"><span>KN Expanse</span></div>
+  <p class="sf-note">用热爱创造无限可能</p>
+  <div class="sf-links">
+    <a href="https://www.codemao.cn/" target="_blank" rel="noopener">点猫科技</a><span class="sf-sep">·</span>
+    <a href="/" target="_blank" rel="noopener">KNHX工作室</a><span class="sf-sep">·</span>
+    <a href="/app/ccvue" target="_blank" rel="noopener">CatCode</a>
+  </div>
+</footer>
+</body>
 </html>
