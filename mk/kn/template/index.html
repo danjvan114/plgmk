@@ -988,6 +988,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     <button class="icon-btn" id="themeToggle" aria-label="切换主题" title="切换主题">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.4-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/></svg>
     </button>
+    <button class="icon-btn" id="liteBtn" title="节能模式" aria-label="节能模式"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5c2.6 1.2 4.4 3.5 5.2 6.6l.6 2.4h-4.6l-1.4 8h-4.6l-1.4-8H3.7l.6-2.4c.8-3.1 2.6-5.4 5.2-6.6L12 2.2Z"/><path d="M9.2 9h5.6"/></svg></button>
     <button class="icon-btn" id="lookBtn" aria-label="外观设置" style="display:none">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7.5 16.5 4h-1.2a2.8 2.8 0 0 1-6.6 0H7.5L4 7.5l2.6 2.2 1-1.1V20h8.8V8.6l1 1.1Z"/></svg>
     </button>
@@ -1049,7 +1050,7 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
 
 <footer class="site-footer">
   <div class="sf-brand">
-    <img class="sf-logo th-def" id="footerLogo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse" loading="lazy">
+    <img style="height:22px;width:auto" class="sf-logo th-def" id="footerLogo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse" loading="lazy">
     <span>KN Expanse</span>
   </div>
   <p class="sf-note"><span data-i18n="footer_note">用热爱创造无限可能</span></p>
@@ -1279,6 +1280,14 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
     $$('.tp-item').forEach(function (it) { it.classList.toggle('cur', parseInt(it.dataset.i, 10) === curIdx); });
     try { localStorage.setItem('knexpanse-theme', String(curIdx)); } catch (e) {}
   }
+
+  /* 多页面主题实时同步:其他页面切换主题/节能时本页跟随(theme.js 之外的双保险) */
+  window.addEventListener('storage', function (e) {
+    if (e.key === 'knexpanse-theme') {
+      var v = parseInt(e.newValue, 10);
+      if (!isNaN(v)) { var idx = (v === 1 || v === 2) ? 0 : v; if (idx !== curIdx) applyTheme(idx); }
+    }
+  });
 
   var popTimer = null;
   /* 悬浮窗打开期间锁定导航栏按钮:鼠标从悬浮窗移出扫过任何按钮都不会误触 */
