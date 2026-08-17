@@ -71,7 +71,7 @@
         .empty-tip{background:#fff;border:1px dashed #ddd;border-radius:10px;text-align:center;color:#999;padding:40px;font-size:14px}
         .user-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
         .user-item{background:#fff;border:1px solid #eee;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
-        .user-item:hover{box-shadow:0 6px 16px rgba(0,0,0,.08);transform:translateY(-2px)}
+        
         .user-item-avatar{width:44px;height:44px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#4caf50;overflow:hidden;flex-shrink:0}
         .user-item-avatar img{width:100%;height:100%;object-fit:cover}
         .pagination{display:flex;justify-content:center;gap:8px;margin-top:24px}
@@ -220,7 +220,7 @@
                 {% if followers %}
                 <div class="user-list">
                     {% for f in followers %}
-                    <div class="user-item" onclick="location.href='/u/{{ f.username|e }}'">
+                    <div class="user-item mdui-ripple" onclick="location.href='/u/{{ f.username|e }}'">
                         <div class="user-item-avatar">{% if users.get(f.username, {}).get('avatar') %}<img src="{{ users[f.username]['avatar']|e }}" alt="头像">{% elif users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
                         <div style="font-weight:600">{{ f.username|e }}</div>
                     </div>
