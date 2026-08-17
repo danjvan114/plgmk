@@ -36,7 +36,7 @@ def render_root_template(template_name, **kwargs):
     kwargs['markets'] = MARKETS
     from .config import User
     kwargs['users'] = {u.username: {'role': u.role, 'qq': u.qq or '', 'reg_time': u.reg_time or '',
-                                    'bio': u.bio or '', 'banner': u.banner or ''} for u in User.query.all()}
+                                    'bio': u.bio or '', 'banner': u.banner or '', 'avatar': u.avatar or ''} for u in User.query.all()}
     return template.render(**kwargs)
 
 def render_user_profile_template(template_name, **kwargs):
@@ -47,7 +47,7 @@ def render_user_profile_template(template_name, **kwargs):
     kwargs['markets'] = MARKETS
     from .config import User
     kwargs['users'] = {u.username: {'role': u.role, 'qq': u.qq or '', 'reg_time': u.reg_time or '',
-                                    'bio': u.bio or '', 'banner': u.banner or ''} for u in User.query.all()}
+                                    'bio': u.bio or '', 'banner': u.banner or '', 'avatar': u.avatar or ''} for u in User.query.all()}
     return template.render(**kwargs)
 
 def allowed_file(filename, allowed_extensions):

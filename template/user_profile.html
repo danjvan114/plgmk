@@ -107,7 +107,9 @@
         </div>
         <div class="profile-card">
             <div class="profile-avatar">
-                {% if profile_user.qq %}
+                {% if profile_user.avatar %}
+                <img src="{{ profile_user.avatar|e }}" alt="头像">
+                {% elif profile_user.qq %}
                 <img src="https://q1.qlogo.cn/g?b=qq&nk={{ profile_user.qq }}&s=640" alt="头像">
                 {% else %}
                 <img src="https://static.codemao.cn/FjCi6RLz1-HB5C47m7M_0gZqJNDG" alt="默认头像">
@@ -219,7 +221,7 @@
                 <div class="user-list">
                     {% for f in followers %}
                     <div class="user-item" onclick="location.href='/u/{{ f.username|e }}'">
-                        <div class="user-item-avatar">{% if users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
+                        <div class="user-item-avatar">{% if users.get(f.username, {}).get('avatar') %}<img src="{{ users[f.username]['avatar']|e }}" alt="头像">{% elif users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
                         <div style="font-weight:600">{{ f.username|e }}</div>
                     </div>
                     {% endfor %}
@@ -293,7 +295,7 @@
                     {% for m in wall_messages %}
                     <div class="wall-item" id="wall-{{ m.id }}">
                         <div class="from-user">
-                            <span class="wall-author-avatar">{% if users.get(m.from_user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[m.from_user]['qq'] }}&s=100" alt="头像">{% else %}{{ m.from_user[:1].upper() }}{% endif %}</span>
+                            <span class="wall-author-avatar">{% if users.get(m.from_user, {}).get('avatar') %}<img src="{{ users[m.from_user]['avatar']|e }}" alt="头像">{% elif users.get(m.from_user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[m.from_user]['qq'] }}&s=100" alt="头像">{% else %}{{ m.from_user[:1].upper() }}{% endif %}</span>
                             {{ m.from_user|e }}
                             <span class="time">{{ m.created_at }}</span>
                             {% if session.user and (session.user == m.from_user or session.user == profile_user.username) %}
@@ -455,12 +457,19 @@
     <div class="mdui-dialog" id="edit-profile-dialog">
         <div class="mdui-dialog-title">编辑个人资料</div>
         <div class="mdui-dialog-content">
+            <form id="edit-avatar-form" method="post" action="/user/set_avatar" style="margin-bottom:16px">
+                <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">自定义头像 URL（优先于 QQ 头像）</label>
+                    <input class="mdui-textfield-input" type="text" name="avatar" placeholder="输入图片外链，留空则使用 QQ 头像" value="{{ profile_user.avatar }}" maxlength="500">
+                </div>
+                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存头像</button>
+            </form>
             <form id="edit-qq-form" method="post" action="/user/set_qq" style="margin-bottom:16px">
                 <div class="mdui-textfield">
                     <label class="mdui-textfield-label">QQ号（设置头像/头图）</label>
                     <input class="mdui-textfield-input" type="text" name="qq" placeholder="输入QQ号" value="{{ profile_user.qq }}" maxlength="20">
                 </div>
-                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存头像</button>
+                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存 QQ 头像</button>
             </form>
             <form id="edit-bio-form" method="post" action="/user/set_bio" style="margin-bottom:16px">
                 <div class="mdui-textfield">

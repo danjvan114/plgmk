@@ -42,10 +42,18 @@ class User(db.Model):
     reg_time = db.Column(db.String(20), default='')
     bio = db.Column(db.String(500), default='')
     banner = db.Column(db.String(500), default='')
+    avatar = db.Column(db.String(500), default='')
     
     def to_dict(self):
-        return {'username': self.username, 'password': self.password, 'role': self.role, 'qq': self.qq, 'reg_time': self.reg_time, 'bio': self.bio, 'banner': self.banner}
+        return {'username': self.username, 'password': self.password, 'role': self.role, 'qq': self.qq, 'reg_time': self.reg_time, 'bio': self.bio, 'banner': self.banner, 'avatar': self.avatar}
 
+    @property
+    def avatar_url(self):
+        if self.avatar:
+            return self.avatar
+        base = 'https://q1.qlogo.cn/g?b=qq&nk={q}&s=100'
+        return base.format(q=self.qq) if self.qq else ''
+    
     @property
     def qq_avatar_url(self):
         base = 'https://q1.qlogo.cn/g?b=qq&nk={q}&s=100'

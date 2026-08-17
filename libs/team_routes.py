@@ -245,7 +245,8 @@ def register_team_routes():
                                 'role_name': role_name.get(m['role'], m['role']),
                                 'work_count': cnt_map.get(m['username'], 0),
                                 'qq': (u.qq if u else '') or '',
-                                'avatar_url': (u.qq_avatar_url if u else ''),
+                                'avatar': (u.avatar if u else '') or '',
+                                'avatar_url': (u.avatar_url if u else ''),
                                 'joined_at': m['joined_at']})
         members_html = _fragment('_members.html', members=member_rows,
                                  is_admin=is_admin, created_by=t['created_by'])
@@ -659,7 +660,8 @@ def register_team_routes():
                                 'role_name': role_name.get(m['role'], m['role']),
                                 'work_count': cnt_map.get(m['username'], 0),
                                 'qq': (u.qq if u else '') or '',
-                                'avatar_url': (u.qq_avatar_url if u else ''),
+                                'avatar': (u.avatar if u else '') or '',
+                                'avatar_url': (u.avatar_url if u else ''),
                                 'joined_at': m['joined_at']})
         html = _fragment('_members.html', members=member_rows, is_admin=is_admin,
                          created_by=t['created_by'])

@@ -89,6 +89,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </td>
 <td>
 <button class="btn mdui-ripple" onclick="showEditModal('{{ username }}', '{{ info.role }}')">编辑</button>
+<button class="btn btn-success mdui-ripple" onclick="getToken('{{ username }}')">获取Token</button>
 <a href="/op/user/delete/{{ username }}" class="btn btn-danger mdui-ripple" onclick="return confirm('确定删除用户？')">删除</a>
 </td>
 </tr>
@@ -151,6 +152,21 @@ function showEditModal(username, role) {
 }
 function closeModal() {
     document.getElementById('editModal').classList.remove('active');
+}
+function getToken(username) {
+    fetch(`/op/user/token/${username}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(`用户 "${username}" 的长期Token：\n\n${data.token}\n\n请妥善保存此Token！`);
+        } else {
+            alert('获取Token失败：' + data.message);
+        }
+    })
+    .catch(err => alert('请求失败：' + err));
 }
 </script>
 </body>

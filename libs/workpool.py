@@ -1430,8 +1430,29 @@ def register_workpool_routes():
     @app.route('/forum/reply/<int:post_id>', methods=['POST'])
     def forum_reply(post_id):
         """跟帖（支持 parent_id 二级回复）"""
-        if 'user' not in session:
+        # 支持特权API调用（AI助手）
+        is_api_call = False
+        api_username = None
+        auth_header = request.headers.get('Authorization', '')
+        if auth_header.startswith('Bearer '):
+            api_key = auth_header[7:]
+            # 检查是否是长期token（用户名:密码格式）
+            from .config import User
+            if ':' in api_key:
+                username, password = api_key.split(':', 1)
+                user = User.query.filter_by(username=username).first()
+                if user and user.password == password:
+                    is_api_call = True
+                    api_username = username
+            # 也支持API Key方式
+            elif api_key == app.config.get('AI_ASSISTANT_API_KEY', '137e33a723df4028beddc06850b8cb1a.IowCYALy5ZDsFR4T'):
+                is_api_call = True
+                api_username = request.form.get('api_username') or (request.get_json() or {}).get('api_username', 'AI助手')
+        
+        if not is_api_call and 'user' not in session:
             return jsonify({'success': False, 'message': '请先登录'}), 401
+        
+        username = api_username if is_api_call else session['user']
         data = request.get_json() or {}
         content = sanitize_work_text(data.get('content', ''))
         parent_id = int(data.get('parent_id') or 0)
@@ -1450,23 +1471,23 @@ def register_workpool_routes():
         else:
             target = None
         conn.execute("INSERT INTO responses (post_id, parent_id, user_id, username, content) VALUES (?, ?, ?, ?, ?)",
-                     (post_id, parent_id, session['user'], session['user'], content))
+                     (post_id, parent_id, username, username, content))
         conn.execute("UPDATE posts SET comment_count = comment_count + 1 WHERE id = ?", (post_id,))
         conn.commit()  # 提交回复 + 评论计数（forum.db）
-        if parent_id and target and target['user_id'] != session['user']:
+        if parent_id and target and target['user_id'] != username:
             try:
                 mconn = get_main_db()
                 mconn.execute("INSERT INTO messages (to_user, from_user, msg_type, content, work_id) VALUES (?, ?, 'reply', ?, 0)",
-                              (target['user_id'], session['user'], '用户 %s 回复了你在《%s 的帖子》里的跟帖' % (session['user'], post['author'])))
+                              (target['user_id'], username, '用户 %s 回复了你在《%s 的帖子》里的跟帖' % (username, post['author'])))
                 mconn.commit()
                 mconn.close()
             except Exception:
                 pass
-        elif not parent_id and post['author'] != session['user']:
+        elif not parent_id and post['author'] != username:
             try:
                 mconn = get_main_db()
                 mconn.execute("INSERT INTO messages (to_user, from_user, msg_type, content, work_id) VALUES (?, ?, 'reply', ?, 0)",
-                              (post['author'], session['user'], '用户 %s 回复了你的帖子' % session['user']))
+                              (post['author'], username, '用户 %s 回复了你的帖子' % username))
                 mconn.commit()
                 mconn.close()
             except Exception:
