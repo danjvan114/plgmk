@@ -1,121 +1,196 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">       
-    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猫の世界</title>
-    <link rel="icon" href="logo.png">
+    <title>编程猫社区</title>
+    <!-- MDUI2 样式与JS -->
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    <!-- Material Design Icons 图标库 -->
+    
     <style>
-        /* 全局重置与基础样式 */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f7;
-            padding-top: 60px;
+            background-color: #fff9e8;
         }
-        a { color: #2196F3; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-
-        /* 图片背景 */
-        .background-image {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: url('/localcdn/gzs/bk.png') center/cover no-repeat;
-            opacity: 1;
-            transition: opacity 0.5s ease;
-        }
-        .background-image.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .background-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        /* 主容器，控制最大宽度并居中 */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* 导航栏 - 固定定位，避免布局错位 */
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background-color: rgba(26, 26, 26, 0.9);
-            color: white;
-            padding: 0 20px;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 60px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .nav-brand {
+        /* 顶部导航栏 */
+        .header-nav {
+            background-color: #5BAF5E;
             display: flex;
             align-items: center;
+            padding: 12px 20px;
+            gap: 24px;
+            height: 100%;
+            position: relative;
+            z-index: 10;
+        }
+        .logo-text {
+            color: #ffffff;
+            font-size: 24px;
             font-weight: bold;
-            font-size: 1.3em;
         }
-        .nav-brand img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            margin-right: 10px;
+        .nav-menu a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 12px;
+            font-size: 16px;
+            height: 100%;
         }
-        .nav-links {
+        .nav-menu a.active {
+            background-color: #b3e29d;
+            padding:10px 6px;
+        }
+        .header-right {
+            margin-left: auto;
             display: flex;
-            list-style: none;
+            align-items: center;
+            gap:16px;
         }
-        .nav-links li { margin-left: 20px; }
-        .nav-links a {
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+        .create-btn {
+            background-color:#ed3b3b;
+            color:white;
+            border:none;
+            padding:8px 22px;
+            font-size:16px;
+            border-radius:2px;
         }
-        .nav-links a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+        /* Banner轮播区域 */
+        .banner-wrap {
+            margin: 0 auto;
+            width: 60%;
+            height: 340px;
+            background-size: cover;
+            background-position: center;
+            position:relative;
+            transition: background-image 0.4s ease-in-out;
+        }
+        .banner-arrow {
+            position:absolute;
+            top:50%;
+            transform:translateY(-50%);
+            width:40px;
+            height:40px;
+            border-radius:50%;
+            background:rgba(255,255,255,0.6);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            z-index: 2;
+        }
+        .arrow-left { left:24px; }
+        .arrow-right { right:24px; }
+
+        /* 轮播小圆点 */
+        .dots-wrap{
+            position:absolute;
+            bottom:12px;
+            left:50%;
+            transform: translateX(-50%);
+            display:flex;
+            gap:8px;
+            z-index:2;
+        }
+        .dot{
+            width:10px;
+            height:10px;
+            border-radius:50%;
+            background:rgba(255,255,255,0.4);
+            cursor:pointer;
+        }
+        .dot.active{
+            background:#ffffff;
+        }
+
+        /* 右侧侧边栏 */
+        .side-card {
+            position:absolute;
+            top:80px;
+            right:24px;
+            width:220px;
+            background:#fff;
+            border-radius:2px;
+            overflow:hidden;
+            z-index:5;
+        }
+        .side-item {
+            padding:10px 14px;
+        }
+        .side-item:nth-child(1){background:#FFD8B1;}
+        
+        .side-item:nth-child(2){background:#FFF2AF;}
+        .side-item:nth-child(3){background:#d3d8ff;}
+        .side-item:nth-child(4){background:#b4e8b4;}
+        .side-item:nth-child(5){background:#c6e2ff;}
+        /* 创作教程模块 */
+        .container {
+            max-width:1280px;
+            margin:20px auto;
+            padding:0 20px;
+        }
+        .section-title-row {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:16px;
+        }
+        .section-title {
+            font-size:18px;
+            font-weight:bold;
+            display:flex;
+            align-items:center;
+            gap:8px;
+            border-bottom: none;
             text-decoration: none;
         }
-
-        /* 页头区域 */
-        .page-header {
-            text-align: center;
-            padding: 60px 20px;
-            margin-bottom: 30px;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        .more-link {
+            color:#ff9900;
+            text-decoration:none;
         }
-        .logo-main {
-            width: 150px;
-            height: 150px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        .course-list {
+            display:flex;
+            gap:24px;
         }
-
-        /* 下载区域 */
+        .course-card {
+            width:32%;
+            background:#fff;
+            border-radius:6px;
+            overflow:hidden;
+        }
+        .course-img {
+            width:100%;
+            height:220px;
+            object-fit:cover;
+        }
+        .course-info {
+            padding:12px;
+        }
+        .course-name {
+            font-size:16px;
+            margin-bottom:4px;
+        }
+        .course-desc {
+            font-size:13px;
+            color:#777;
+        }
+        .slide-right-btn {
+            align-self:center;
+            width:40px;
+            height:40px;
+            border-radius:50%;
+            background:rgba(0,0,0,0.1);
+            border:none;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
         .section {
             background-color: white;
             padding: 25px;
@@ -124,30 +199,9 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.05);
         }
         .section h2 { margin-bottom: 20px; color: #1a1a1a; }
-        .btn {
-            display: inline-block;
-            background-color: #2196F3;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            margin: 5px 10px 5px 0;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
+        .a2 {
+            height: 100%;
         }
-        .btn:hover {
-            background-color: #0b7dda;
-            text-decoration: none;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
-        }
-        .btn-secondary {
-            background-color: #666;
-        }
-        .btn-secondary:hover { background-color: #555; }
-
-        /* 项目网格 - 使用CSS Grid，布局更稳健 */
         .projects-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -160,6 +214,8 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
         }
 
         
@@ -181,112 +237,185 @@
             font-size: 0.95em;
         }
 
-        /* 页脚 */
-        .footer {
-            background-color: #1a1a1a;
-            color: #aaa;
-            text-align: center;
-            padding: 20px;
-            margin-top: 50px;
-        }
-
-        /* 移动端适配 */
-        @media (max-width: 768px) {
-            .container { padding: 15px; }
-            .navbar { padding: 0 15px; }
-            .nav-links { display: none; }
-            .projects-grid { grid-template-columns: 1fr; }
-            .page-header { padding: 40px 15px; }
-            .logo-main { width: 120px; height: 120px; }
-        }
     </style>
 </head>
 <body>
-    <!-- 图片背景 -->
-    <div class="background-image" id="backgroundImage">
-        <div class="background-overlay"></div>
+    <!--导航栏-->
+    <div class="header-nav">
+        <div class="logo-text">KNHX</div>
+        <div class="nav-menu">
+            <a class="a2 active mdui-ripple" href="#">首页</a>
+            
+            <a class="a2 mdui-ripple" href="/workpool">发现</a>
+            <a class="a2 mdui-ripple" href="/team">工作室</a>
+            <a class="a2 mdui-ripple" href="/forum">论坛</a>
+            <a class="a2 mdui-ripple" href="/mk/kn">市场</a>
+            
+            <a class="a2" href="/app/kn/d">下载</a>
+            
+        </div>
+        
+    </div>
+    <div style="height: 30px;"></div>
+    <!-- Banner -->
+    <div class="banner-wrap" id="banner">
+        <div class="banner-arrow arrow-left" id="btnPrev">
+            <i class="mdi mdi-chevron-left mdi-24px"></i>
+        </div>
+        <div class="banner-arrow arrow-right" id="btnNext">
+            <i class="mdi mdi-chevron-right mdi-24px"></i>
+        </div>
+        <div class="dots-wrap" id="dotsWrap"></div>
+        <!--右侧侧边栏卡片-->
+        
     </div>
 
-    <!-- 导航栏 -->
-    <nav class="navbar">
-        <div class="nav-brand">
-            <img src="/localcdn/gzs/logo.png" alt="工作室图标">
-            <a href="/" style="color: white; text-decoration: none;">KNHX</a>
-        </div>
-        <ul class="nav-links">
-            <li class="mdui-ripple"><a style="font-size: 1.4em;" href="/">首页</a></li>
-            <li class="mdui-ripple"><a style="font-size: 1.4em;" href="/about">关于</a></li>
-            <li class="mdui-ripple"><a style="font-size: 1.4em;" href="/contact">联系我们</a></li>
-        </ul>
-    </nav>
-
-    <!-- 页面主内容 -->
-    <main class="container">
-        <!-- 页头与Logo -->
-        <header class="page-header">
-            <a >
-                <img src="/localcdn/gzs/logo.png" alt="KNHX 工作室主标志" class="logo-main">
-            </a>
-            <h1>欢迎来到 KNHX 工作室</h1>
-            <p>我们专注于创意设计和创新解决方案</p>
-        </header>
-
-        <!-- 项目展示区域 -->
-        <section class="section">
-            <h2>🚀 项目展示</h2>
-            <div class="projects-grid">
-                <!-- 项目1 -->
-                <a href="/mk/kn" class="project-card mdui-ripple">
-                    <img src="localcdn/gzs/{93D330BB-21E1-46CF-8EDB-262229E1024D}.png" alt="">
-                    <div class="project-card-content">
-                        <h3>文档平台·生态</h3>
-                        <p>可以存储文档/在线视频，也支持云存储（一些小文件）</p>
-                    </div>
-                </a>
-                <!-- 项目2 -->
-                <a href="/po/mc" class="project-card mdui-ripple">
-                    <img src="localcdn/gzs/mc1.png" alt="">
-                    <div class="project-card-content">
-                        <h3>铁路服务·土豆</h3>
-                        <p>为分服，为玩家提供铁路玩法。</p>
-                    </div>
-                </a>
-                <!-- 项目3 -->
-                <a href="/po/hm" class="project-card mdui-ripple">
-                    <img src="localcdn/gzs/bm.jpg" alt="">
-                    <div class="project-card-content">
-                        <h3>黑莓计划</h3>
-                        <p>是blackberry NB计划</p>
-                    </div>
-                </a>
-                <!-- 项目4 -->
-                
-            </div>
-        </section>
-    </main>
-
-    <!-- 页脚 -->
-    <footer class="footer">
-        <p>&copy; 2026 KNHX 工作室. 保留所有权利。</p>
-    </footer>
-
-    <script>
-        // 滚动时背景淡出效果
-        const backgroundImage = document.getElementById('backgroundImage');
-        const pageHeader = document.querySelector('.page-header');
-        
-        window.addEventListener('scroll', function() {
-            const scrollPosition = window.scrollY;
-            const headerHeight = pageHeader.offsetHeight;
+    <div class="side-card">
+            <div onclick="window.location.href='/app/kn/d' " class="side-item mdui-ripple">KN Pro<br><small>三端合一的新一代编辑器</small></div>
+            <div class="side-item mdui-ripple">Crafting Table<br><small>方便快捷的编程工具</small></div>
+            <div class="side-item mdui-ripple">更多敬请期待<br><small</small></div>
             
-            if (scrollPosition > headerHeight / 2) {
-                backgroundImage.classList.add('fade-out');
-            } else {
-                backgroundImage.classList.remove('fade-out');
-            }
-        });
-        
-        console.log('你好鸭，想加入的可以投递邮件2690180230@qq.com（注明是控制台来到哦~）');
-    </script>
+    </div>
+
+    <!--创作教程区域-->
+    <div class="container">
+        <div class="section-title-row">
+            <div class="section-title">
+                <i class="mdi mdi-book-open-page-variant"></i>
+                全部项目
+            </div>
+            
+        </div>
+        <div class="projects-grid">
+            <a href="/mk/kn" class="project-card mdui-ripple">
+                <img src="localcdn/gzs/{93D330BB-21E1-46CF-8EDB-262229E1024D}.png" alt="">
+                <div class="project-card-content">
+                    <h3>菠菜面社区</h3>
+                    <p>不会凉凉发社区~~</p>
+                </div>
+            </a>
+            <!-- 项目2 -->
+            <a href="/po/mc" class="project-card mdui-ripple">
+                <img src="localcdn/gzs/mc1.png" alt="">
+                <div class="project-card-content">
+                    <h3>铁路mc服务器</h3>
+                    <p>一个基于minecraft的铁路服务器，为玩家提供铁路玩法~</p>
+                </div>
+            </a>
+            <!-- 项目3 -->
+            <a href="/app/ccvue" class="project-card mdui-ripple">
+                <img src="/localcdn/gzs/%7BBF5BFB2D-FE5A-49C2-8C2D-8D0E1781D4EC%7D.png" alt="">
+                <div class="project-card-content">
+                    <h3>CCvue框架</h3>
+                    <p>一个基于vue的框架，用于快速开发web游戏应用</p>
+                </div>
+            </a>
+            <a onclick="window.open('/localcdn/gzs/q2.png')" class="project-card mdui-ripple">
+                <img src="localcdn/gzs/q2.png" alt="">
+                <div class="project-card-content">
+                    <h3>Crafting Table</h3>
+                    <p>一站式编程工具，方便快捷的编程（扫码体验）</p>
+                </div>
+            </a>
+            <a onclick="window.open('https://pan1.pgrm.run')" class="project-card mdui-ripple">
+                <img src="localcdn/gzs/{93D330BB-21E1-46CF-8EDB-262229E1024D}.png" alt="">
+                <div class="project-card-content">
+                    <h3>kitten cloud</h3>
+                    <p>KE云盘，存储你的项目文件</p>
+                </div>
+            </a>
+        </div>
+
+
+        <div style="margin-top:40px;display:flex;justify-content:space-between;align-items:center;">
+            <div class="section-title">
+                <i class="mdi mdi-package-variant"></i>
+                优秀作品
+            </div>
+            <a class="more-link" href="/workpool">查看更多</a>
+        </div>
+    </div>
+
+<script>
+// 数组1：轮播图片列表，在这里添加/修改轮播图地址
+const imgList = [
+    "https://cdn-community.bcmcdn.com/47/community/yetapxLXjOEEOMLOYi9bANqDwON3inPzxvMe7QglpD5s.jpg?hash=FrCu1-igZ29Rhw143uG0MJEZycdA",
+    "/localcdn/gzs/%7B93D330BB-21E1-46CF-8EDB-262229E1024D%7D.png"
+];
+
+const bannerDom = document.getElementById('banner');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const dotsWrap = document.getElementById('dotsWrap');
+
+let currentIndex = 0;
+let timer = null;
+const autoPlayDelay = 4000; // 自动轮播间隔毫秒
+
+// 生成小圆点
+function createDots(){
+    dotsWrap.innerHTML = '';
+    imgList.forEach((_, idx)=>{
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (idx === currentIndex ? ' active' : '');
+        dot.dataset.index = idx;
+        dot.addEventListener('click',()=>{
+            goTo(Number(dot.dataset.index));
+        })
+        dotsWrap.appendChild(dot);
+    })
+}
+
+// 更新banner图片与圆点状态
+function renderBanner(){
+    bannerDom.style.backgroundImage = `url(${imgList[currentIndex]})`;
+    // 更新圆点active
+    const dots = dotsWrap.querySelectorAll('.dot');
+    dots.forEach((d,i)=>{
+        d.classList.toggle('active', i === currentIndex);
+    })
+}
+
+// 跳转到指定下标
+function goTo(index){
+    if(index < 0) index = imgList.length -1;
+    if(index >= imgList.length) index = 0;
+    currentIndex = index;
+    renderBanner();
+}
+
+// 上一张
+function prev(){
+    goTo(currentIndex - 1);
+}
+// 下一张
+function next(){
+    goTo(currentIndex + 1);
+}
+
+// 启动自动播放
+function startAuto(){
+    clearInterval(timer);
+    timer = setInterval(next, autoPlayDelay);
+}
+// 停止自动播放
+function stopAuto(){
+    clearInterval(timer);
+}
+
+// 绑定按钮事件
+btnPrev.addEventListener('click', prev);
+btnNext.addEventListener('click', next);
+
+// 鼠标悬停停止轮播，离开恢复
+bannerDom.addEventListener('mouseenter', stopAuto);
+bannerDom.addEventListener('mouseleave', startAuto);
+
+// 初始化
+createDots();
+renderBanner();
+startAuto();
+</script>
+
 </body>
 </html>
