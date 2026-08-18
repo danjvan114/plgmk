@@ -1,0 +1,6 @@
+/** ===== 环境独立样式 =====
+ * 由 JS 自动识别:file:// 协议 → html[data-env="LOCAL"];其余(线上/CDN)→ html[data-env="CDN"]
+ * 当前无环境差异样式,留作扩展位。所有功能两环境一致。
+ */
+html[data-env="LOCAL"] {}
+html[data-env="CDN"] {}
