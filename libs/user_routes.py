@@ -99,6 +99,7 @@ def register_user_routes():
         msg_count = 0
         total_works = 0
         is_following = False
+        conn = None
         try:
             conn = get_main_db()
             if tab == 'followers':
@@ -123,14 +124,17 @@ def register_user_routes():
                     fpath = _os.path.join(WORKPOOL_DIR, row['db_path'])
                     if not _os.path.exists(fpath):
                         continue
+                    wc = None
                     try:
-                        wc = sqlite3.connect(fpath)
+                        wc = sqlite3.connect(fpath, timeout=30)
                         hit = wc.execute("SELECT id FROM favorites WHERE user_id = ?", (user.username,)).fetchone()
-                        wc.close()
                         if hit:
                             favs.append(dict(row))
                     except Exception:
                         pass
+                    finally:
+                        if wc:
+                            wc.close()
                 favorites = favs
             else:
                 order_sql = {'hot': 'like_count DESC', 'like': 'like_count DESC',
@@ -164,9 +168,11 @@ def register_user_routes():
                 wall_messages = [dict(r) for r in wrows]
             except Exception:
                 wall_messages = []
-            conn.close()
         except Exception:
             pass
+        finally:
+            if conn:
+                conn.close()
 
         return render_user_profile_template('user_profile.html', profile_user=user, workpool_works=works_list,
                                             tab=tab, sort=sort, q=q, page=page, per_page=per_page,
