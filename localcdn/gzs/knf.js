@@ -2,6 +2,22 @@
 (function() {
     const style = document.createElement('style');
     style.textContent = `
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        html {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+    
+    
+    
+    
+    
+    
+    
         .header-nav {
             background-color: #5BAF5E;
             display: flex;
@@ -181,29 +197,89 @@
         }
         return { url: URL.createObjectURL(new Blob([curBytes], { type: 'image/x-icon' })), hx: hx, hy: hy };
     }
+    // 动态光标动画管理器
+    const csAnimManager = {
+        timers: {},
+        currentFrame: {},
+        
+        start: function(role, frames) {
+            if (!frames || frames.length <= 1) return;
+            
+            const self = this;
+            let idx = 0;
+            
+            // 清理旧的定时器
+            if (this.timers[role]) {
+                clearInterval(this.timers[role]);
+            }
+            
+            // 为所有帧创建 URL（如果还没创建的话）
+            frames.forEach(function(f) {
+                if (!f.url) {
+                    const c = csCurUrl(f.data);
+                    f.url = c.url;
+                    f.hx = c.hx;
+                    f.hy = c.hy;
+                }
+            });
+            
+            // 设置初始帧
+            this.currentFrame[role] = 0;
+            this.updateCSS(role, frames[0]);
+            
+            // 启动动画循环
+            this.timers[role] = setInterval(function() {
+                idx = (idx + 1) % frames.length;
+                self.currentFrame[role] = idx;
+                self.updateCSS(role, frames[idx]);
+            }, frames[0].rate);
+        },
+        
+        updateCSS: function(role, frame) {
+            const root = document.documentElement;
+            const varName = '--cs-' + role;
+            const value = "url('" + frame.url + "') " + frame.hx + ' ' + frame.hy;
+            root.style.setProperty(varName, value);
+        },
+        
+        stop: function(role) {
+            if (this.timers[role]) {
+                clearInterval(this.timers[role]);
+                delete this.timers[role];
+            }
+        }
+    };
+    
     function csResolve(map, folder, ver, keys) {
         const file = csPick(map, keys);
-        if (!file) return Promise.resolve('');
+        if (!file) return Promise.resolve(null);
         const base = '/localcdn/gzs/cs/' + folder + '/';
         if (/\.ani$/i.test(file)) {
             return fetch(base + file + '?v=' + ver, { cache: 'no-store' })
                 .then(function (r) { return r.ok ? r.arrayBuffer() : null; })
                 .then(function (buf) {
-                    if (!buf) return '';
+                    if (!buf) return null;
                     const frames = csParseAni(buf);
-                    if (!frames.length) return '';
-                    const c = csCurUrl(frames[0].data);
-                    return "url('" + c.url + "') " + c.hx + ' ' + c.hy;
+                    if (!frames.length) return null;
+                    return { type: 'ani', frames: frames };
                 })
-                .catch(function () { return ''; });
+                .catch(function () { return null; });
         }
-        return Promise.resolve("url('" + base + file + '?v=' + ver + "')");
+        return fetch(base + file + '?v=' + ver, { cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.blob() : null; })
+            .then(function (blob) {
+                if (!blob) return null;
+                return { type: 'static', url: "url('" + base + file + '?v=' + ver + "')" };
+            })
+            .catch(function () { return null; });
     }
     function csThemeVars(map, folder, ver, cb) {
         const roles = [['cursor', ['pointer']], ['link', ['link']], ['text', ['text']], ['move', ['move']], ['unavail', ['unavailiable', 'unavailable']]];
         const out = {};
         const jobs = roles.map(function (r) {
-            return csResolve(map, folder, ver, r[1]).then(function (v) { out[r[0]] = v; });
+            return csResolve(map, folder, ver, r[1]).then(function (v) {
+                out[r[0]] = v;
+            });
         });
         Promise.all(jobs).then(function () { cb(out); });
     }
@@ -214,18 +290,48 @@
         const lightTxt = res[0], darkTxt = res[1];
         csThemeVars(csParseInf(lightTxt), csFolders.light, csHash(lightTxt), function (L) {
             csThemeVars(csParseInf(darkTxt), csFolders.dark, csHash(darkTxt), function (D) {
+                // 处理亮色主题光标
+                const lightVars = {};
+                const darkVars = {};
+                const lightAniFrames = {};
+                const darkAniFrames = {};
+                
+                ['cursor', 'link', 'text', 'move', 'unavail'].forEach(function(role) {
+                    // 亮色主题
+                    if (L[role] && L[role].type === 'ani') {
+                        const firstFrame = csCurUrl(L[role].frames[0].data);
+                        lightVars[role] = "url('" + firstFrame.url + "') " + firstFrame.hx + ' ' + firstFrame.hy;
+                        lightAniFrames[role] = L[role].frames;
+                    } else if (L[role] && L[role].type === 'static') {
+                        lightVars[role] = L[role].url;
+                    } else {
+                        lightVars[role] = (role === 'cursor' ? 'auto' : role === 'link' ? 'pointer' : role === 'text' ? 'text' : role === 'move' ? 'move' : 'not-allowed');
+                    }
+                    
+                    // 暗色主题
+                    if (D[role] && D[role].type === 'ani') {
+                        const firstFrame = csCurUrl(D[role].frames[0].data);
+                        darkVars[role] = "url('" + firstFrame.url + "') " + firstFrame.hx + ' ' + firstFrame.hy;
+                        darkAniFrames[role] = D[role].frames;
+                    } else if (D[role] && D[role].type === 'static') {
+                        darkVars[role] = D[role].url;
+                    } else {
+                        darkVars[role] = (role === 'cursor' ? 'auto' : role === 'link' ? 'pointer' : role === 'text' ? 'text' : role === 'move' ? 'move' : 'not-allowed');
+                    }
+                });
+                
                 let css = 'html,body{'
-                    + '--cs-cursor:' + (L.cursor || 'auto') + ';'
-                    + '--cs-link:' + (L.link || 'pointer') + ';'
-                    + '--cs-text:' + (L.text || 'text') + ';'
-                    + '--cs-move:' + (L.move || 'move') + ';'
-                    + '--cs-unavail:' + (L.unavail || 'not-allowed') + ';}';
+                    + '--cs-cursor:' + lightVars.cursor + ';'
+                    + '--cs-link:' + lightVars.link + ';'
+                    + '--cs-text:' + lightVars.text + ';'
+                    + '--cs-move:' + lightVars.move + ';'
+                    + '--cs-unavail:' + lightVars.unavail + ';}';
                 css += 'body.dark-mode,body.theme-dark{'
-                    + '--cs-cursor:' + (D.cursor || 'auto') + ';'
-                    + '--cs-link:' + (D.link || 'pointer') + ';'
-                    + '--cs-text:' + (D.text || 'text') + ';'
-                    + '--cs-move:' + (D.move || 'move') + ';'
-                    + '--cs-unavail:' + (D.unavail || 'not-allowed') + ';}';
+                    + '--cs-cursor:' + darkVars.cursor + ';'
+                    + '--cs-link:' + darkVars.link + ';'
+                    + '--cs-text:' + darkVars.text + ';'
+                    + '--cs-move:' + darkVars.move + ';'
+                    + '--cs-unavail:' + darkVars.unavail + ';}';
                 css += 'html,body,body *{cursor:var(--cs-cursor),auto !important;}';
                 css += 'a,button,[onclick],[role="button"],[role="menuitem"],[role="link"],input[type="button"],input[type="submit"],input[type="reset"],input[type="checkbox"],input[type="radio"],summary,label,.btn,.badge-btn,.glass-btn,.icon-btn,.lang-item,.qr-tab,.tp-item,.ft-tab,.carousel-nav,.carousel-dots button,.cr-tab,.dl-m-btn,.dl-col,.ext-install,.fl-link,.st-col,.stack-card,.feat-panel,.dot,.m-back-btn,.m-dl-btn,.m-dl-tool,.qr-modal-close,.nav-links a,.nav-more-btn,.mk-pop-btn,.mk-menu-item,.mk-sort-btn,.mk-filter-btn,.mk-card,.mk-dl,.mk-view,.mk-login,.mk-pg-btn,.mk-cat-btn,.mk-tab,.user-avatar,.mdui-tab-item,.gallery-image,.st-nav-btn,.look-perf,#backTop{cursor:var(--cs-link),pointer !important;}';
                 css += 'input:not([type]),input[type="text"],input[type="search"],input[type="url"],input[type="email"],input[type="password"],input[type="number"],textarea,select,[contenteditable="true"]{cursor:var(--cs-text),text !important;}';
@@ -234,6 +340,13 @@
                 const st = document.createElement('style');
                 st.textContent = css;
                 document.head.appendChild(st);
+                
+                // 启动动态光标动画
+                ['cursor', 'link', 'text', 'move', 'unavail'].forEach(function(role) {
+                    if (lightAniFrames[role] && lightAniFrames[role].length > 1) {
+                        csAnimManager.start(role, lightAniFrames[role]);
+                    }
+                });
             });
         });
     });
