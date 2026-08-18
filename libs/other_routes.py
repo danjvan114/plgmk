@@ -3,6 +3,7 @@ import os
 import json
 import urllib
 import uuid
+import re
 from .config import app, MARKETS
 from .utils import set_market, render_root_template, render_market_template
 from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info, mc_get_invite_code, mc_store_buy
@@ -65,7 +66,14 @@ def register_other_routes():
         users = {}
         from .config import User
         users = {u.username: u.to_dict() for u in User.query.all()}
-        return render_market_template('app_detail.html', market_id='kn', users=users)
+        ua = request.headers.get('User-Agent', '')
+        if request.args.get('m') == '0':
+            template = 'app_detail.html'
+        elif request.args.get('m') == '1':
+            template = 'mb/app_detail.html'
+        else:
+            template = 'mb/app_detail.html' if re.search(r'(Android|iPhone|iPad|iPod|Mobile|Mobi|Windows Phone|UCBrowser|MicroMessenger)', ua, re.I) else 'app_detail.html'
+        return render_market_template(template, market_id='kn', users=users)
 
     @app.route('/switch_market/<market_id>')
     def switch_market(market_id):
