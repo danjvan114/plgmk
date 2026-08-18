@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>发布新帖 - 论坛</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -62,6 +63,12 @@
         .submit-btn:active{transform:scale(.98)}
         .md-hint{background:#f5f9ff;border:1px solid #bbdefb;border-radius:8px;padding:12px 16px;margin-top:14px;font-size:12px;color:#666;line-height:1.9}
         .md-hint code{background:rgba(33,150,243,.08);color:#1565c0;padding:1px 6px;border-radius:4px;font-family:Consolas,Menlo,monospace}
+    
+        @media (max-width:640px){
+            .main-box{padding-left:10px;padding-right:10px}
+            .form-card{padding:20px 16px}
+            .form-title{font-size:19px}
+        }
     </style>
 </head>
 <body>
@@ -185,5 +192,5 @@
             });
         });
     </script>
-<script src="/localcdn/gzs/knf.js?v=9"></script></body>
+<script src="/localcdn/gzs/knf.js?v=18"></script></body>
 </html>

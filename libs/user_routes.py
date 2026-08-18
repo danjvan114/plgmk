@@ -385,7 +385,7 @@ def register_user_routes():
         
         return redirect(url_for('admin_users'))
 
-    @app.route('/op/user/delete/<username>')
+    @app.route('/op/user/delete/<username>', methods=['POST'])
     def admin_delete_user(username):
         if 'user' not in session:
             return redirect(url_for('login'))

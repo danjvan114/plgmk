@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>工作台 - 猫的社区</title>
+    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/material-icons@1.0.0/iconfont/material-icons.min.css">
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            margin: 0;
+            color: #333;
+        }
+        .wb-wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 90px; }
+        .wb-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .wb-title { display: flex; align-items: center; gap: 12px; }
+        .wb-title .material-icons { font-size: 34px; color: #5BAF5E; }
+        .wb-title h1 { font-size: 22px; margin: 0; font-weight: 700; }
+        .wb-title p { margin: 2px 0 0; color: #888; font-size: 13px; }
+        .wb-sec { font-size: 15px; font-weight: 700; color: #555; margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
+        .wb-sec::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+        .wb-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        .wb-card {
+            width: 236px; box-sizing: border-box;
+            background: #fff; border-radius: 14px; padding: 16px;
+            display: flex; gap: 13px; align-items: flex-start;
+            cursor: pointer; text-decoration: none; color: #333;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06);
+            border: 1px solid #eef0f3;
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+        .wb-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+        .wb-card:active { transform: scale(.98); }
+        .wb-ico {
+            width: 40px; height: 40px; border-radius: 11px; flex: none;
+            display: flex; align-items: center; justify-content: center;
+            background: #eaf6ec; color: #5BAF5E;
+        }
+        .wb-ico .material-icons { font-size: 23px; }
+        .wb-card h3 { margin: 0; font-size: 14.5px; font-weight: 600; }
+        .wb-card p { margin: 3px 0 0; font-size: 12px; color: #999; line-height: 1.45; }
+        .wb-flag { margin-left: auto; font-size: 11px; color: #aaa; flex: none; }
+        /* 模态框 */
+        .wb-mask {
+            position: fixed; inset: 0; background: rgba(0,0,0,.45);
+            display: none; align-items: center; justify-content: center;
+            z-index: 3000;
+        }
+        .wb-mask.show { display: flex; }
+        .wb-modal {
+            width: 420px; max-width: calc(100vw - 40px);
+            background: #fff; border-radius: 16px; padding: 22px;
+            box-shadow: 0 12px 40px rgba(0,0,0,.25);
+            max-height: 82vh; overflow-y: auto;
+        }
+        .wb-modal h2 { margin: 0 0 4px; font-size: 18px; }
+        .wb-modal .wb-mdesc { margin: 0 0 16px; font-size: 13px; color: #888; }
+        .wb-field { margin-bottom: 12px; }
+        .wb-field label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; }
+        .wb-field input {
+            width: 100%; box-sizing: border-box;
+            border: 1px solid #d8dce3; border-radius: 8px;
+            padding: 10px 12px; font-size: 14px; outline: none;
+            transition: border-color .15s;
+        }
+        .wb-field input:focus { border-color: #5BAF5E; }
+        .wb-mbtns { display: flex; gap: 10px; margin-top: 18px; }
+        .wb-mbtns button {
+            flex: 1; border: none; border-radius: 8px; padding: 11px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        .wb-cancel { background: #f1f3f5; color: #555; }
+        .wb-open { background: #5BAF5E; color: #fff; }
+        .wb-open:active { background: #4a9c4d; }
+        .wb-open[disabled] { opacity: .6; cursor: default; }
+        .wb-toast {
+            position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%);
+            background: rgba(0,0,0,.78); color: #fff; font-size: 13px;
+            padding: 10px 18px; border-radius: 8px; z-index: 4000;
+            display: none; max-width: 80vw;
+        }
+        .wb-toast.show { display: block; animation: wbFade .3s; }
+        @keyframes wbFade { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @media (max-width: 640px) {
+            .wb-wrap { padding: 16px 12px 80px; }
+            .wb-card { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="hv2"></div>
+    <div class="wb-wrap">
+        <div class="wb-head">
+            <div class="wb-title">
+                <i class="material-icons">dashboard</i>
+                <div>
+                    <h1>工作台</h1>
+                    <p>全站功能 / API 汇总,一站式操作</p>
+                </div>
+            </div>
+        </div>
+        <div id="wbSections"></div>
+    </div>
+
+    <div class="wb-mask" id="wbMask">
+        <div class="wb-modal">
+            <h2 id="wbMTitle"></h2>
+            <p class="wb-mdesc" id="wbMDesc"></p>
+            <div id="wbMFields"></div>
+            <div class="wb-mbtns">
+                <button class="wb-cancel" type="button" onclick="wbClose()">取消</button>
+                <button class="wb-open" type="button" id="wbMGo" onclick="wbGo()">打开</button>
+            </div>
+        </div>
+    </div>
+    <div class="wb-toast" id="wbToast"></div>
+
+    <script>
+        var IS_ADMIN = {{ 'true' if is_admin else 'false' }};
+        var CURRENT_USER = {{ (current_username or '') | tojson }};
+
+        // t: {name, icon, desc, url, method: GET|POST, body: form|json(仅POST), params:[{key,label,in:path|query|body,placeholder,required}], redirect: POST成功后跳转(可含{param}), needLogin}
+        var WB_SECTIONS = [
+            {
+                title: '作品池',
+                tools: [
+                    { name: '发布作品', icon: 'upload_file', desc: '用文件直链发布新作品', url: '/workpool/publish', method: 'GET',
+                      params: [{ key: 'f', label: '文件直链', in: 'query', placeholder: 'https://...', required: true }] },
+                    { name: '我的作品', icon: 'folder', desc: '管理我发布的作品', url: '/workpool/my', method: 'GET' },
+                    { name: '作品详情', icon: 'play_circle', desc: '直达指定作品页', url: '/workpool/{id}', method: 'GET',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true }] },
+                    { name: '更新作品', icon: 'update', desc: '更新文件/描述/标签', url: '/workpool/update/{id}', method: 'POST', body: 'json', redirect: '/workpool/{id}',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true },
+                               { key: 'file_url', label: '文件直链', in: 'body', placeholder: 'https://...' },
+                               { key: 'description', label: '描述', in: 'body' },
+                               { key: 'tags', label: '标签(逗号分隔)', in: 'body' },
+                               { key: 'thumbnail', label: '封面直链', in: 'body' },
+                               { key: 'file_type', label: '类型 player/img/html/redirect', in: 'body' }] },
+                    { name: '删除作品', icon: 'delete', desc: '删除指定作品(作者/管理员)', url: '/workpool/delete/{id}', method: 'POST', body: 'json', redirect: '/workpool',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true }] },
+                    { name: '点赞作品', icon: 'thumb_up', desc: '点赞或取消点赞', url: '/workpool/like/{id}', method: 'POST', body: 'json', redirect: '/workpool/{id}',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true }] },
+                    { name: '收藏作品', icon: 'star', desc: '收藏或取消收藏', url: '/workpool/fav/{id}', method: 'POST', body: 'json', redirect: '/workpool/{id}',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true }] },
+                    { name: '评论作品', icon: 'comment', desc: '发表评论或回复', url: '/workpool/comment/{id}', method: 'POST', body: 'json', redirect: '/workpool/{id}',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true },
+                               { key: 'content', label: '评论内容', in: 'body', required: true },
+                               { key: 'parent_id', label: '回复目标评论 ID(可空)', in: 'body' }] },
+                    { name: '投币', icon: 'monetization_on', desc: '给作品投币(每人限 1 个)', url: '/workpool/coin/{id}', method: 'POST', body: 'json', redirect: '/workpool/{id}',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true }] },
+                    { name: '举报作品', icon: 'report', desc: '举报违规作品', url: '/workpool/report/{id}', method: 'POST', body: 'json', redirect: '/workpool/{id}',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true },
+                               { key: 'reason', label: '举报原因', in: 'body', required: true }] },
+                    { name: '关注用户', icon: 'person_add', desc: '关注或取消关注', url: '/workpool/follow/{name}', method: 'POST', body: 'json', redirect: '/u/{name}',
+                      params: [{ key: 'name', label: '用户名', in: 'path', required: true }] },
+                    { name: '删除评论', icon: 'delete_sweep', desc: '删除某条评论', url: '/workpool/comment/delete/{id}/{cid}', method: 'POST', body: 'json', redirect: '/workpool/{id}',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true },
+                               { key: 'cid', label: '评论 ID', in: 'path', required: true }] }
+                ]
+            },
+            {
+                title: '论坛',
+                tools: [
+                    { name: '发布帖子', icon: 'edit', desc: '在论坛发布新帖', url: '/forum/new', method: 'GET' },
+                    { name: '帖子详情', icon: 'article', desc: '直达指定帖子', url: '/forum/post/{id}', method: 'GET',
+                      params: [{ key: 'id', label: '帖子 ID', in: 'path', required: true }] },
+                    { name: '板块浏览', icon: 'forum', desc: '直达论坛某板块', url: '/forum/{id}', method: 'GET',
+                      params: [{ key: 'id', label: '板块 ID', in: 'path', required: true }] },
+                    { name: '删除帖子', icon: 'delete', desc: '删除指定帖子', url: '/forum/post/delete/{id}', method: 'POST', body: 'json', redirect: '/forum',
+                      params: [{ key: 'id', label: '帖子 ID', in: 'path', required: true }] },
+                    { name: '置顶帖子', icon: 'push_pin', desc: '置顶/取消置顶(管理员)', url: '/forum/post/pin/{id}', method: 'POST', body: 'json', redirect: '/forum/post/{id}', adminOnly: true,
+                      params: [{ key: 'id', label: '帖子 ID', in: 'path', required: true }] },
+                    { name: '审核帖子', icon: 'fact_check', desc: '通过或驳回帖子(管理员)', url: '/forum/post/review/{id}', method: 'POST', body: 'json', redirect: '/forum/review', adminOnly: true,
+                      params: [{ key: 'id', label: '帖子 ID', in: 'path', required: true },
+                               { key: 'action', label: '动作 approve/reject', in: 'body', required: true }] },
+                    { name: '举报帖子', icon: 'report', desc: '举报违规帖子', url: '/forum/post/report/{id}', method: 'POST', body: 'json', redirect: '/forum/post/{id}',
+                      params: [{ key: 'id', label: '帖子 ID', in: 'path', required: true },
+                               { key: 'reason', label: '举报原因', in: 'body', required: true }] },
+                    { name: '跟帖回复', icon: 'reply', desc: '回复帖子或跟帖', url: '/forum/reply/{id}', method: 'POST', body: 'json', redirect: '/forum/post/{id}',
+                      params: [{ key: 'id', label: '帖子 ID', in: 'path', required: true },
+                               { key: 'content', label: '回复内容', in: 'body', required: true },
+                               { key: 'parent_id', label: '回复目标跟帖 ID(可空)', in: 'body' }] },
+                    { name: '删除跟帖', icon: 'delete_sweep', desc: '删除某条跟帖', url: '/forum/reply/delete/{id}', method: 'POST', body: 'json', redirect: '/forum',
+                      params: [{ key: 'id', label: '跟帖 ID', in: 'path', required: true }] },
+                    { name: '置顶跟帖', icon: 'push_pin', desc: '置顶某条跟帖', url: '/forum/reply/pin/{id}', method: 'POST', body: 'json', redirect: '/forum',
+                      params: [{ key: 'id', label: '跟帖 ID', in: 'path', required: true }] }
+                ]
+            },
+            {
+                title: '团队',
+                tools: [
+                    { name: '创建团队', icon: 'group_add', desc: '创建新团队', url: '/team/create', method: 'POST', body: 'form', redirect: '/team',
+                      params: [{ key: 'name', label: '团队名', in: 'body', required: true },
+                               { key: 'description', label: '简介', in: 'body' },
+                               { key: 'cover', label: '封面直链', in: 'body' },
+                               { key: 'qq', label: 'QQ 群号', in: 'body' }] },
+                    { name: '团队详情', icon: 'groups', desc: '直达团队主页', url: '/team/{id}', method: 'GET',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true }] },
+                    { name: '编辑团队', icon: 'settings', desc: '修改名称/简介/公告', url: '/team/{id}/edit', method: 'POST', body: 'form', redirect: '/team/{id}',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true },
+                               { key: 'name', label: '团队名', in: 'body' },
+                               { key: 'description', label: '简介', in: 'body' },
+                               { key: 'cover', label: '封面直链', in: 'body' },
+                               { key: 'qq', label: 'QQ 群号', in: 'body' },
+                               { key: 'bulletin', label: '公告', in: 'body' }] },
+                    { name: '解散团队', icon: 'delete_forever', desc: '解散团队(仅队长)', url: '/team/{id}/delete', method: 'POST', body: 'form', redirect: '/team',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true }] },
+                    { name: '添加成员', icon: 'person_add', desc: '按用户名添加成员', url: '/team/{id}/members/add', method: 'POST', body: 'form', redirect: '/team/{id}',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true },
+                               { key: 'username', label: '用户名', in: 'body', required: true }] },
+                    { name: '移除成员', icon: 'person_remove', desc: '移除指定成员', url: '/team/{id}/members/remove', method: 'POST', body: 'form', redirect: '/team/{id}',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true },
+                               { key: 'username', label: '用户名', in: 'body', required: true }] },
+                    { name: '退出团队', icon: 'logout', desc: '退出当前团队', url: '/team/{id}/leave', method: 'POST', body: 'form', redirect: '/team',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true }] },
+                    { name: '发送邀请', icon: 'send', desc: '邀请用户加入', url: '/team/{id}/invite', method: 'POST', body: 'form', redirect: '/team/{id}',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true },
+                               { key: 'username', label: '用户名', in: 'body', required: true }] },
+                    { name: '接受邀请', icon: 'check', desc: '接受团队邀请', url: '/team/invite/accept/{iid}', method: 'POST', body: 'form', redirect: '/team',
+                      params: [{ key: 'iid', label: '邀请 ID', in: 'path', required: true }] },
+                    { name: '拒绝邀请', icon: 'close', desc: '拒绝团队邀请', url: '/team/invite/reject/{iid}', method: 'POST', body: 'form', redirect: '/team',
+                      params: [{ key: 'iid', label: '邀请 ID', in: 'path', required: true }] },
+                    { name: '添加共有作品', icon: 'playlist_add', desc: '把自己的作品加入团队', url: '/team/{id}/works/add', method: 'POST', body: 'form', redirect: '/team/{id}',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true },
+                               { key: 'work_id', label: '作品 ID', in: 'body', required: true }] },
+                    { name: '移除共有作品', icon: 'playlist_remove', desc: '从团队移除作品', url: '/team/{id}/works/remove/{wid}', method: 'POST', body: 'form', redirect: '/team/{id}',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true },
+                               { key: 'wid', label: '作品 ID', in: 'path', required: true }] },
+                    { name: '发团队帖', icon: 'post_add', desc: '在团队发布帖子', url: '/team/{id}/posts/add', method: 'POST', body: 'form', redirect: '/team/{id}',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true },
+                               { key: 'title', label: '标题', in: 'body', required: true },
+                               { key: 'content', label: '内容', in: 'body', required: true },
+                               { key: 'pin', label: '置顶 1/0(队长可用)', in: 'body' }] },
+                    { name: '删除团队帖', icon: 'delete', desc: '删除团队帖子', url: '/team/{id}/posts/delete/{pid}', method: 'POST', body: 'form', redirect: '/team/{id}',
+                      params: [{ key: 'id', label: '团队 ID', in: 'path', required: true },
+                               { key: 'pid', label: '帖子 ID', in: 'path', required: true }] }
+                ]
+            },
+            {
+                title: '插件市场',
+                tools: [
+                    { name: '上传插件', icon: 'cloud_upload', desc: '发布新插件到市场', url: '/mk/kn/upload', method: 'GET' },
+                    { name: '更新插件', icon: 'system_update', desc: '更新已有插件(作者)', url: '/mk/kn/update/{id}', method: 'GET',
+                      params: [{ key: 'id', label: '插件 ID', in: 'path', required: true }] },
+                    { name: '插件详情', icon: 'extension', desc: '直达指定插件页', url: '/mk/kn/plugin/{id}', method: 'GET',
+                      params: [{ key: 'id', label: '插件 ID', in: 'path', required: true }] },
+                    { name: '下载插件', icon: 'download', desc: '下载插件文件', url: '/mk/kn/download/{id}', method: 'GET',
+                      params: [{ key: 'id', label: '插件 ID', in: 'path', required: true }] },
+                    { name: '评分', icon: 'star', desc: '给插件打 1-5 分', url: '/mk/kn/rate/{id}', method: 'POST', body: 'form', redirect: '/mk/kn/plugin/{id}',
+                      params: [{ key: 'id', label: '插件 ID', in: 'path', required: true },
+                               { key: 'score', label: '评分 1-5', in: 'body', required: true }] },
+                    { name: '上下架切换', icon: 'visibility', desc: '上架/下架插件(作者)', url: '/mk/kn/toggle_status/{id}', method: 'POST', redirect: '/mk/kn',
+                      params: [{ key: 'id', label: '插件 ID', in: 'path', required: true }] },
+                    { name: '删除插件', icon: 'delete', desc: '删除插件(作者)', url: '/mk/kn/delete/{id}', method: 'POST', redirect: '/mk/kn',
+                      params: [{ key: 'id', label: '插件 ID', in: 'path', required: true }] },
+                    { name: '开发者统计', icon: 'code', desc: '我的插件统计面板', url: '/dev/kn', method: 'GET' },
+                    { name: '开发文档', icon: 'menu_book', desc: '接口与开发指南', url: '/dev/kn/docs', method: 'GET' }
+                ]
+            },
+            {
+                title: '播放器',
+                tools: [
+                    { name: '打开播放器', icon: 'play_circle_filled', desc: 'KittenN 播放器:填写参数后打开,全部可空(不填 = 直接进入)', url: '/app/player/', method: 'GET',
+                      params: [
+                        { key: 'f', label: '文件直链', in: 'query', placeholder: 'https://...' },
+                        { key: 'auth', label: '加密模式(1=启用)', in: 'query', placeholder: '可空' },
+                        { key: 'u', label: 'auth 字符(配合 auth=1 解密)', in: 'query', placeholder: '可空' },
+                        { key: 'o', label: '扩展加载器(1=KE / 2=CUE)', in: 'query', placeholder: '可空' },
+                        { key: 'v', label: '扩展 URL(逗号分隔,自动编码)', in: 'query', transform: 'b64arr', placeholder: 'https://xxx.js' },
+                        { key: 'auto', label: '自动播放(1=跳过封面)', in: 'query', placeholder: '可空' }
+                      ] }
+                ]
+            },
+            {
+                title: '账号与个人',
+                tools: [
+                    { name: '用户主页', icon: 'person', desc: '直达任意用户主页', url: '/u/{name}', method: 'GET',
+                      params: [{ key: 'name', label: '用户名', in: 'path', required: true }] },
+                    { name: '我的主页', icon: 'home', desc: CURRENT_USER ? '前往 ' + CURRENT_USER + ' 的主页' : '登录后可用', url: '/u/' + (CURRENT_USER || 'x'), method: 'GET', needLogin: true },
+                    { name: '修改密码', icon: 'lock', desc: '更换账号密码', url: '/change_password', method: 'GET' },
+                    { name: '设置简介', icon: 'badge', desc: '修改个人简介', url: '/user/set_bio', method: 'POST', body: 'form', redirect: '/u/' + (CURRENT_USER || 'x'),
+                      params: [{ key: 'bio', label: '简介(≤500字)', in: 'body', required: true }] },
+                    { name: '设置头像', icon: 'portrait', desc: '修改头像直链', url: '/user/set_avatar', method: 'POST', body: 'form', redirect: '/u/' + (CURRENT_USER || 'x'),
+                      params: [{ key: 'avatar', label: '头像图片直链', in: 'body', required: true, placeholder: 'https://...' }] },
+                    { name: '设置横幅', icon: 'panorama', desc: '修改主页横幅', url: '/user/set_banner', method: 'POST', body: 'form', redirect: '/u/' + (CURRENT_USER || 'x'),
+                      params: [{ key: 'banner', label: '横幅图片直链', in: 'body', required: true, placeholder: 'https://...' }] },
+                    { name: '设置 QQ', icon: 'chat', desc: '修改绑定 QQ 号', url: '/user/set_qq', method: 'POST', body: 'form', redirect: '/u/' + (CURRENT_USER || 'x'),
+                      params: [{ key: 'qq', label: 'QQ 号(仅数字)', in: 'body', required: true }] },
+                    { name: '主页留言', icon: 'comment', desc: '给用户留言', url: '/u/{name}/wall', method: 'POST', body: 'form', redirect: '/u/{name}',
+                      params: [{ key: 'name', label: '用户名', in: 'path', required: true },
+                               { key: 'content', label: '留言内容(≤1000字)', in: 'body', required: true }] },
+                    { name: '删除留言', icon: 'delete_sweep', desc: '删除主页留言', url: '/u/{name}/wall/delete/{mid}', method: 'POST', body: 'form', redirect: '/u/{name}',
+                      params: [{ key: 'name', label: '用户名', in: 'path', required: true },
+                               { key: 'mid', label: '留言 ID', in: 'path', required: true }] },
+                    { name: '退出登录', icon: 'logout', desc: '注销当前会话', url: '/logout', method: 'GET' }
+                ]
+            },
+            {
+                title: '消息',
+                tools: [
+                    { name: '消息中心', icon: 'mail', desc: '查看私信与通知', url: '/messages', method: 'GET' },
+                    { name: '全部已读', icon: 'done_all', desc: '把所有消息标记已读', url: '/messages/read_all', method: 'POST', body: 'json', redirect: '/messages' },
+                    { name: '发布公告', icon: 'campaign', desc: '发布全站公告(管理员)', url: '/messages/announce', method: 'POST', body: 'json', redirect: '/messages', adminOnly: true,
+                      params: [{ key: 'title', label: '公告标题', in: 'body', required: true },
+                               { key: 'content', label: '公告内容', in: 'body', required: true }] },
+                    { name: '官方私信', icon: 'forward_to_inbox', desc: '给用户发官方私信(管理员)', url: '/messages/private', method: 'POST', body: 'json', redirect: '/messages', adminOnly: true,
+                      params: [{ key: 'to_user', label: '收件用户名', in: 'body', required: true },
+                               { key: 'content', label: '私信内容', in: 'body', required: true }] }
+                ]
+            },
+            {
+                title: '玩家 / MC',
+                tools: [
+                    { name: 'MC 登录', icon: 'sports_esports', desc: 'MC 玩家登录页', url: '/mc/login', method: 'GET' },
+                    { name: 'MC 商店', icon: 'storefront', desc: '浏览 MC 商店', url: '/app/mcs', method: 'GET' },
+                    { name: '玩家个人页', icon: 'person', desc: 'MC 玩家个人页', url: '/app/user', method: 'GET' },
+                    { name: '电梯管理', icon: 'elevator', desc: '电梯楼层管理', url: '/app/elevator/admin', method: 'GET' },
+                    { name: '白名单注册', icon: 'how_to_reg', desc: '用邀请码注册白名单', url: '/api/player/register_whitelist', method: 'POST', body: 'json',
+                      params: [{ key: 'invite_code', label: '邀请码', in: 'body', required: true }] },
+                    { name: '白名单列表', icon: 'list', desc: '查看白名单', url: '/api/mc/whitelist/list', method: 'GET' },
+                    { name: '设置玩家密码', icon: 'key', desc: '为玩家设置密码', url: '/api/player/set_password', method: 'POST', body: 'json',
+                      params: [{ key: 'username', label: '玩家名', in: 'body', required: true },
+                               { key: 'password', label: '密码', in: 'body' }] },
+                    { name: '玩家改密码', icon: 'password', desc: '修改玩家密码', url: '/api/player/change_password', method: 'POST', body: 'json',
+                      params: [{ key: 'old_password', label: '旧密码', in: 'body', required: true },
+                               { key: 'new_password', label: '新密码', in: 'body', required: true }] }
+                ]
+            },
+            {
+                title: '管理功能(管理员)',
+                tools: [
+                    { name: '作品审核', icon: 'verified', desc: '审核待上架作品', url: '/workpool/review', method: 'GET' },
+                    { name: '隐藏作品', icon: 'visibility_off', desc: '隐藏违规作品', url: '/workpool/review/hide/{id}', method: 'POST', body: 'json', redirect: '/workpool/review',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true }] },
+                    { name: '恢复作品', icon: 'visibility', desc: '恢复已隐藏作品', url: '/workpool/review/show/{id}', method: 'POST', body: 'json', redirect: '/workpool/review',
+                      params: [{ key: 'id', label: '作品 ID', in: 'path', required: true }] },
+                    { name: '论坛审核', icon: 'fact_check', desc: '审核待发布帖子', url: '/forum/review', method: 'GET' },
+                    { name: '版块管理', icon: 'dashboard_customize', desc: '增删论坛版块', url: '/forum/admin/boards', method: 'GET' },
+                    { name: '编辑版块', icon: 'edit_note', desc: '修改版块信息', url: '/forum/admin/boards/edit/{id}', method: 'POST', body: 'form', redirect: '/forum/admin/boards',
+                      params: [{ key: 'id', label: '版块 ID', in: 'path', required: true },
+                               { key: 'name', label: '版块名', in: 'body', required: true },
+                               { key: 'description', label: '描述', in: 'body' },
+                               { key: 'sort', label: '排序号', in: 'body' },
+                               { key: 'admin_only', label: '仅管理员 1/0', in: 'body' }] },
+                    { name: '删除版块', icon: 'delete', desc: '删除版块(无帖子时)', url: '/forum/admin/boards/delete/{id}', method: 'POST', body: 'form', redirect: '/forum/admin/boards',
+                      params: [{ key: 'id', label: '版块 ID', in: 'path', required: true }] },
+                    { name: '市场管理', icon: 'admin_panel', desc: '插件管理面板', url: '/mk/kn/admin', method: 'GET' },
+                    { name: '管理删除插件', icon: 'delete_forever', desc: '管理员删除插件', url: '/mk/kn/admin/delete/{id}', method: 'POST', redirect: '/mk/kn/admin',
+                      params: [{ key: 'id', label: '插件 ID', in: 'path', required: true }] },
+                    { name: '用户管理', icon: 'manage_accounts', desc: '用户与角色管理', url: '/op/user', method: 'GET' },
+                    { name: '添加用户', icon: 'person_add', desc: '创建新用户(管理员)', url: '/op/user/add', method: 'POST', body: 'form', redirect: '/op/user',
+                      params: [{ key: 'username', label: '用户名', in: 'body', required: true },
+                               { key: 'password', label: '密码', in: 'body', required: true },
+                               { key: 'role', label: '角色 user/admin', in: 'body' }] },
+                    { name: '编辑用户', icon: 'edit', desc: '改角色或密码', url: '/op/user/edit/{name}', method: 'POST', body: 'form', redirect: '/op/user',
+                      params: [{ key: 'name', label: '用户名', in: 'path', required: true },
+                               { key: 'role', label: '角色 user/admin', in: 'body' },
+                               { key: 'password', label: '新密码(可空)', in: 'body' }] },
+                    { name: '删除用户', icon: 'person_remove', desc: '删除用户(不能删自己)', url: '/op/user/delete/{name}', method: 'POST', redirect: '/op/user',
+                      params: [{ key: 'name', label: '用户名', in: 'path', required: true }] },
+                    { name: '文件管理器', icon: 'folder_open', desc: '站点文件管理', url: '/fm', method: 'GET' }
+                ]
+            }
+        ];
+
+        function wbCardHtml(t) {
+            var paramsAttr = t.params ? JSON.stringify(t.params).replace(/"/g, '&quot;') : '';
+            return '<a class="wb-card" data-t="' + paramsAttr + '" data-url="' + t.url + '" data-method="' + (t.method || 'GET') + '" data-body="' + (t.body || '') + '" data-redirect="' + (t.redirect || '') + '">' +
+                '<span class="wb-ico"><i class="material-icons">' + t.icon + '</i></span>' +
+                '<div><h3>' + t.name + '</h3><p>' + (t.desc || '') + '</p></div>' +
+                ((t.needLogin && !CURRENT_USER) ? '<span class="wb-flag">需登录</span>' : '') +
+                ((t.adminOnly && IS_ADMIN) ? '<span class="wb-flag">管理</span>' : '') +
+                '</a>';
+        }
+
+        function wbRender() {
+            var wrap = document.getElementById('wbSections');
+            var html = '';
+            WB_SECTIONS.forEach(function (sec) {
+                var tools = sec.tools.filter(function (t) { return !t.adminOnly || IS_ADMIN; });
+                if (!tools.length) return;
+                html += '<div class="wb-sec">' + sec.title + '</div><div class="wb-grid">' + tools.map(wbCardHtml).join('') + '</div>';
+            });
+            wrap.innerHTML = html;
+        }
+
+        var curTool = null;
+        function wbOpen(t) {
+            curTool = t;
+            document.getElementById('wbMTitle').textContent = t.name;
+            document.getElementById('wbMDesc').textContent = (t.desc || '') + (t.method === 'POST' ? ' (提交后' + (t.redirect ? '自动跳转' : '留在本页') + ')' : '');
+            var fields = '';
+            (t.params || []).forEach(function (p) {
+                if (p.fixed !== undefined) return;
+                fields += '<div class="wb-field"><label>' + p.label + (p.required ? ' *' : '') + (p.when ? ' (' + p.when.value + ' 时必填)' : '') + '</label>' +
+                    '<input type="text" data-key="' + p.key + '" data-in="' + p.in + '"' + (p.transform ? ' data-transform="' + p.transform + '"' : '') + ' placeholder="' + (p.placeholder || '') + '"' + (p.required ? ' required' : '') + '></div>';
+            });
+            document.getElementById('wbMFields').innerHTML = fields;
+            document.getElementById('wbMGo').textContent = t.method === 'POST' ? '提交' : '打开';
+            document.getElementById('wbMask').classList.add('show');
+            var first = document.querySelector('#wbMFields input');
+            if (first) first.focus();
+        }
+        function wbClose() {
+            document.getElementById('wbMask').classList.remove('show');
+            curTool = null;
+        }
+        function wbToast(msg) {
+            var el = document.getElementById('wbToast');
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(el._t);
+            el._t = setTimeout(function () { el.classList.remove('show'); }, 2600);
+        }
+        function wbFill(t) {
+            var url = t.url, qs = [], data = {}, vals = {}, ok = true;
+            (t.params || []).forEach(function (p) {
+                var inp = document.querySelector('#wbMFields input[data-key="' + p.key + '"]');
+                var val = inp ? inp.value.trim() : (p.fixed !== undefined ? String(p.fixed) : '');
+                var whenMet = !p.when || vals[p.when.key] === p.when.value;
+                if (inp && inp.required && whenMet && !val) { inp.style.borderColor = '#e53935'; ok = false; return; }
+                vals[p.key] = val;
+            });
+            if (!ok) return null;
+            (t.params || []).forEach(function (p) {
+                var val = vals[p.key];
+                if (p.in === 'path') url = url.replace('{' + p.key + '}', encodeURIComponent(val));
+                else if (p.in === 'query') {
+                    if (val === '' && p.fixed === undefined) return;
+                    if (p.transform === 'b64arr') {
+                        var urls = val.split(/[,，]/).map(function (s) { return s.trim(); }).filter(Boolean);
+                        qs.push(p.key + '=' + encodeURIComponent(btoa('["' + urls.join('","') + '"]')));
+                    } else qs.push(p.key + '=' + encodeURIComponent(val));
+                }
+                else data[p.key] = val;
+            });
+            if (qs.length) url += (url.indexOf('?') >= 0 ? '&' : '?') + qs.join('&');
+            return { url: url, data: data };
+        }
+        function wbGo() {
+            var tool = curTool;
+            if (!tool) return;
+            var redir = tool.redirect;
+            var filled = wbFill(tool);
+            if (!filled) return;
+            var btn = document.getElementById('wbMGo');
+            if (tool.method === 'POST') {
+                btn.disabled = true;
+                btn.textContent = '提交中...';
+                var opts = { method: 'POST' };
+                if (tool.body === 'json') {
+                    opts.headers = { 'Content-Type': 'application/json' };
+                    opts.body = JSON.stringify(filled.data);
+                } else {
+                    var fd = new FormData();
+                    Object.keys(filled.data).forEach(function (k) { fd.append(k, filled.data[k]); });
+                    opts.body = fd;
+                }
+                fetch(filled.url, opts).then(function (res) {
+                    return res.text().then(function (txt) {
+                        var info = { code: res.status };
+                        try { var j = JSON.parse(txt); info = j; } catch (e) { info.raw = txt; }
+                        return info;
+                    });
+                }).then(function (info) {
+                    btn.disabled = false;
+                    btn.textContent = '提交';
+                    var ok = !(info.success === false || info.error || (info.code >= 400 && !info.success));
+                    wbToast(ok ? ((info.message || info.msg) || '操作成功') : ((info.error || info.message || info.msg) || ('请求失败 (' + info.code + ')')));
+                    if (ok) {
+                        wbClose();
+                        if (redir) {
+                            var u = redir;
+                            (tool.params || []).forEach(function (p) {
+                                var inp = document.querySelector('#wbMFields input[data-key="' + p.key + '"]');
+                                if (p.in === 'path' && inp) u = u.replace('{' + p.key + '}', encodeURIComponent(inp.value.trim()));
+                            });
+                            setTimeout(function () { location.href = u; }, 900);
+                        }
+                    }
+                }).catch(function (err) {
+                    btn.disabled = false;
+                    btn.textContent = '提交';
+                    wbToast('请求失败: ' + err.message);
+                });
+            } else {
+                location.href = filled.url;
+            }
+        }
+
+        function wbPostDirect(t) {
+            var opts = { method: 'POST' };
+            if (t.body === 'json') { opts.headers = { 'Content-Type': 'application/json' }; opts.body = '{}'; }
+            else opts.body = new FormData();
+            fetch(t.url, opts).then(function (res) {
+                return res.text().then(function (txt) {
+                    var info = { code: res.status };
+                    try { info = JSON.parse(txt); } catch (e) { info.raw = txt; }
+                    return info;
+                });
+            }).then(function (info) {
+                var ok = !(info.success === false || info.error || (info.code >= 400 && !info.success));
+                wbToast(ok ? ((info.message || info.msg) || '操作成功') : ((info.error || info.message || info.msg) || ('请求失败 (' + info.code + ')')));
+                if (ok && t.redirect) setTimeout(function () { location.href = t.redirect; }, 900);
+            }).catch(function (err) {
+                wbToast('请求失败: ' + err.message);
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            var card = e.target.closest('.wb-card');
+            if (!card) return;
+            var paramsAttr = card.getAttribute('data-t');
+            var t = {
+                name: card.querySelector('h3').textContent,
+                desc: card.querySelector('p').textContent,
+                url: card.getAttribute('data-url'),
+                method: card.getAttribute('data-method') || 'GET',
+                body: card.getAttribute('data-body') || '',
+                redirect: card.getAttribute('data-redirect') || ''
+            };
+            if (t.needLogin && !CURRENT_USER) { location.href = '/login'; return; }
+            if (t.method === 'POST') {
+                if (paramsAttr) {
+                    t.params = JSON.parse(paramsAttr.replace(/&quot;/g, '"'));
+                    wbOpen(t);
+                } else {
+                    wbPostDirect(t);
+                }
+                return;
+            }
+            if (paramsAttr) {
+                t.params = JSON.parse(paramsAttr.replace(/&quot;/g, '"'));
+                wbOpen(t);
+            } else {
+                location.href = t.url;
+            }
+        });
+        document.getElementById('wbMask').addEventListener('click', function (e) {
+            if (e.target === this) wbClose();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') wbClose();
+        });
+
+        wbRender();
+    </script>
+    <script src="/localcdn/gzs/knf.js?v=18"></script>
+</body>
+</html>

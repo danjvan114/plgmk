@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{{ work.title }} - 作品池</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -127,6 +128,22 @@
         .pagination a:hover{background:#4caf50;color:#fff}
         .pagination .current{background:#4caf50;color:#fff}
         .pagination .disabled{background:rgba(255,255,255,.5);color:#999;cursor:not-allowed}
+    
+        @media (max-width:640px){
+            .main-box{padding-left:10px;padding-right:10px}
+            .detail-layout{flex-direction:column}
+            .side-col{width:100%}
+            .info-title{font-size:19px}
+            .action-row{gap:12px 14px}
+            .action-item{font-size:14px}
+            .comments-section{padding:14px}
+            .comment-input{flex-direction:column}
+            .comment-submit{align-self:stretch;width:100%}
+            .reply-box{margin-left:10px;padding:8px 10px}
+            .reply-item{margin-left:10px;padding:6px 10px}
+            .pagination{gap:4px}
+            .pagination a,.pagination span{padding:7px 11px}
+        }
     </style>
 </head>
 <body>
@@ -661,5 +678,5 @@
             });
         });
     </script>
-<script src="/localcdn/gzs/knf.js?v=9"></script></body>
+<script src="/localcdn/gzs/knf.js?v=18"></script></body>
 </html>

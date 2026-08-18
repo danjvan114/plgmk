@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>板块管理 - 菠菜面论坛</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -56,6 +57,13 @@
         .pagination .disabled{color:#bbb;cursor:not-allowed}
         .tip{color:#999;font-size:13px}
         #loader{position:fixed;top:0;left:0;width:100%;z-index:9999;background:#fff}
+    
+        @media (max-width:640px){
+            .main-box{padding-left:10px;padding-right:10px}
+            .form-row{grid-template-columns:1fr}
+            .form-card{padding:16px}
+            .table-card{overflow-x:auto}
+        }
     </style>
 </head>
 <body>
@@ -167,5 +175,5 @@
             if(e.key==='Enter' && this.value.trim()){location.href='/mk/kn?search='+encodeURIComponent(this.value.trim())}
         });
     </script>
-<script src="/localcdn/gzs/knf.js?v=9"></script></body>
+<script src="/localcdn/gzs/knf.js?v=18"></script></body>
 </html>

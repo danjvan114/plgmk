@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>团队 - 菠菜面</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -28,6 +29,15 @@
         .mdui-btn-raised:hover{background:#1976d2}
         .create-card .mdui-textfield-input,.create-card textarea{border:1px solid #ddd !important}
         .empty{text-align:center;color:#999;padding:40px;font-size:14px}
+    
+        @media (max-width:640px){
+            .team-wrap,.wrap{padding:56px 10px 30px}
+            .page-title{font-size:18px}
+            .team-name{font-size:16px}
+            .team-desc{font-size:12px}
+            .team-foot{flex-direction:column;align-items:flex-start;gap:8px}
+            .mdui-card-primary,.mdui-card-content{padding:14px}
+        }
     </style>
 </head>
 <body>
@@ -198,7 +208,7 @@
         </div>
         {% endif %}
     </div>
-    <script src="/localcdn/gzs/knf.js?v=9"></script>
+    <script src="/localcdn/gzs/knf.js?v=18"></script>
     <script>
         window.addEventListener('load', function(){ document.getElementById('loader').style.display='none'; });
     </script>

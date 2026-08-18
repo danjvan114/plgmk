@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>作品池</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -80,6 +81,17 @@
         .tag-chip.active{background:#f57f17;color:#fff;border-color:#f57f17}
         .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
         .icon-btn{position:relative}
+    
+        @media (max-width:640px){
+            .main-box{padding-left:10px;padding-right:10px}
+            .sort-bar{gap:6px}
+            .sort-bar a{padding:6px 12px;font-size:12px}
+            .grid{gap:12px}
+            .work-card{padding:14px}
+            .work-card h3{font-size:16px}
+            .pagination{gap:4px}
+            .pagination a,.pagination span{padding:7px 11px;font-size:13px}
+        }
     </style>
 </head>
 <body>
@@ -203,5 +215,5 @@
             });
         });
     </script>
-<script src="/localcdn/gzs/knf.js?v=9"></script></body>
+<script src="/localcdn/gzs/knf.js?v=18"></script></body>
 </html>

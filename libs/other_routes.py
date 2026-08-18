@@ -4,7 +4,7 @@ import json
 import urllib
 import uuid
 import re
-from .config import app, MARKETS
+from .config import app, MARKETS, User
 from .utils import set_market, render_root_template, render_market_template
 from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info, mc_get_invite_code, mc_store_buy
 from .player_routes import register_player, login_player, logout_player, check_player_login, set_player_password, change_player_password, remove_player_whitelist, register_whitelist, delete_player_account
@@ -21,6 +21,18 @@ def register_other_routes():
     @app.route('/about')
     def about():
         return render_root_template('about.html')
+
+    @app.route('/workbench')
+    def workbench():
+        is_admin = False
+        cu = session.get('user')
+        if cu:
+            try:
+                u = User.query.get(cu)
+                is_admin = bool(u and u.role == 'admin')
+            except Exception:
+                is_admin = False
+        return render_root_template('workbench.html', is_admin=is_admin, current_username=cu)
 
     @app.route('/health')
     def health_check():

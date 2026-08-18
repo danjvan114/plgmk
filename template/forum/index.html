@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>论坛</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -97,6 +98,16 @@
         .my-opt{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0}
         .my-opt a{background:#f5f9ff;color:#2196f3;padding:8px 12px;border-radius:6px;text-decoration:none;font-size:13px;transition:background .2s}
         .my-opt a:hover{background:#e3f2fd}
+    
+        @media (max-width:640px){
+            .main-box{flex-direction:column;padding-left:10px;padding-right:10px}
+            .right-col{width:100%}
+            .page-title{font-size:18px}
+            .post-item{gap:10px;padding:12px 8px}
+            .post-avatar{width:34px;height:34px;font-size:15px}
+            .post-title{font-size:14px}
+            .post-footer{width:100%;gap:12px;padding-left:0}
+        }
     </style>
 </head>
 <body>
@@ -271,5 +282,5 @@
             });
         });
     </script>
-<script src="/localcdn/gzs/knf.js?v=9"></script></body>
+<script src="/localcdn/gzs/knf.js?v=18"></script></body>
 </html>

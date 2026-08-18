@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>作品审核台</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -84,6 +85,16 @@
         .sample-card .sample-actions{display:flex;gap:8px;flex-wrap:wrap}
         .note{font-size:12px;color:#999;margin-top:14px;text-align:center}
         .empty{text-align:center;color:#999;padding:40px 0;font-size:14px}
+    
+        @media (max-width:640px){
+            .main-box{padding-left:10px;padding-right:10px}
+            .stat-card{min-width:140px;padding:16px}
+            .stat-card .num{font-size:26px}
+            .report-info{min-width:0;width:100%}
+            .report-item{padding:12px}
+            .card-head{padding:12px 14px}
+            .card-body{padding:14px}
+        }
     </style>
 </head>
 <body>
@@ -208,5 +219,5 @@
             });
         });
     </script>
-<script src="/localcdn/gzs/knf.js?v=9"></script></body>
+<script src="/localcdn/gzs/knf.js?v=18"></script></body>
 </html>

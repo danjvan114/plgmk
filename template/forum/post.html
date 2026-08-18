@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{{ post.title }} - 论坛</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -112,6 +113,18 @@
         .pagination a:hover{background:#2196f3;color:#fff}
         .pagination .current{background:#2196f3;color:#fff}
         .pagination .disabled{color:#bbb;cursor:not-allowed}
+    
+        @media (max-width:640px){
+            .main-box{padding-left:10px;padding-right:10px}
+            .post-head{padding:16px 14px 10px}
+            .post-title{font-size:18px}
+            .post-content{padding:16px 14px 10px}
+            .post-content div{padding:12px 14px}
+            .floor{padding:14px}
+            .reply-item{margin-left:14px;padding:10px 12px}
+            .reply-box{padding:16px 14px}
+            .post-op-row{padding:8px 14px}
+        }
     </style>
 </head>
 <body>
@@ -452,5 +465,5 @@
             });
         });
     </script>
-<script src="/localcdn/gzs/knf.js?v=9"></script></body>
+<script src="/localcdn/gzs/knf.js?v=18"></script></body>
 </html>

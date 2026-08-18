@@ -341,7 +341,7 @@ def register_market_routes():
         
         return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id))
 
-    @app.route('/mk/kn/toggle_status/<int:plugin_id>')
+    @app.route('/mk/kn/toggle_status/<int:plugin_id>', methods=['POST'])
     def toggle_plugin_status_route(plugin_id):
         return market_toggle_status('kn', plugin_id)
 
@@ -385,7 +385,7 @@ def register_market_routes():
         
         return redirect(url_for('market_index', market_id=market_id))
 
-    @app.route('/mk/kn/delete/<int:plugin_id>')
+    @app.route('/mk/kn/delete/<int:plugin_id>', methods=['POST'])
     def delete_plugin_route(plugin_id):
         return market_delete_plugin('kn', plugin_id)
 
@@ -453,7 +453,7 @@ def register_market_routes():
         
         return redirect(url_for('market_admin_panel', market_id=market_id))
 
-    @app.route('/mk/kn/admin/delete/<int:plugin_id>')
+    @app.route('/mk/kn/admin/delete/<int:plugin_id>', methods=['POST'])
     def admin_delete(plugin_id):
         return market_admin_delete('kn', plugin_id)
 

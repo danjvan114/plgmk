@@ -100,18 +100,117 @@
             z-index: 1000;
         }
         .header-dropdown-content a {
-            display: block;
-            padding: 10px 16px;
-            color: #333;
-            text-decoration: none;
-            font-size: 14px;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 16px; color: #333; text-decoration: none; font-size: 14px;
         }
         .header-dropdown-content a:hover {
             background-color: #f5f5f5;
         }
-        .header-dropdown:hover .header-dropdown-content {
+        .header-dropdown:hover .header-dropdown-content,
+        .header-dropdown.open .header-dropdown-content {
             display: block;
         }
+        .sd-head { display: none; }
+        .sd-overlay { display: none; }
+        /* ===== 移动端适配(APP 风格) ===== */
+        .mob-search { display: none; }
+        .knf-tabbar { display: none; }
+        /* 注入元素自带轻量涟漪(不依赖 mdui) */
+        .knf-rpl { position: relative; overflow: hidden; }
+        .knf-rpl-wave {
+            position: absolute; border-radius: 50%; pointer-events: none;
+            background: rgba(255,255,255,.35); transform: scale(0); opacity: .9;
+            transition: transform .55s ease-out, opacity .55s ease-out;
+        }
+        .knf-rpl-wave.done { transform: scale(1); opacity: 0; }
+        .av-wrp { display: inline-block; border-radius: 50%; line-height: 0; }
+        @media (max-width: 640px) {
+            .header-nav { padding: 0 8px; height: 52px; }
+            .logo-text { display: none; }
+            .nav-menu { display: none; }
+            body {
+                padding-bottom: 54px;
+                padding-bottom: calc(54px + env(safe-area-inset-bottom));
+                background-attachment: scroll !important;
+            }
+            body.page-enter { animation: none !important; }
+            .header-right { margin-left: 0; flex: 1; gap: 8px; }
+            .mob-search {
+                display: flex; flex: 1; min-width: 0; height: 34px; align-items: center;
+                background: rgba(255,255,255,.2); border-radius: 17px; padding: 0 4px 0 2px;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 -1px 0 rgba(0,0,0,.08);
+            }
+            .mob-search-scope {
+                border: none; background: transparent; color: #fff; font-size: 12px; font-weight: 700;
+                padding: 0 7px; cursor: pointer; white-space: nowrap; height: 100%; border-radius: 15px 0 0 15px;
+            }
+            .mob-search-scope:active { background: rgba(255,255,255,.16); }
+            .mob-search-div { width: 1px; height: 18px; background: rgba(255,255,255,.35); flex: none; }
+            .mob-search-input {
+                flex: 1; min-width: 0; background: transparent; border: none; outline: none;
+                color: #fff; font-size: 13px; height: 100%; padding: 0 8px;
+            }
+            .mob-search-input::placeholder { color: rgba(255,255,255,.65); }
+            .mob-search-go {
+                flex: none; width: 28px; height: 28px; border: none; border-radius: 50%;
+                background: transparent; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            }
+            .mob-search-go:active { background: rgba(255,255,255,.18); }
+            .knf-tabbar {
+                position: fixed; left: 0; right: 0; bottom: 0; z-index: 2000;
+                display: flex; height: 54px; padding-bottom: 0;
+                height: calc(54px + env(safe-area-inset-bottom));
+                padding-bottom: env(safe-area-inset-bottom);
+                background: #5BAF5E; box-shadow: 0 -2px 10px rgba(0,0,0,.18);
+                touch-action: manipulation;
+            }
+            .knf-tabbar a {
+                flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+                color: rgba(255,255,255,.88); text-decoration: none; font-size: 11px; font-weight: 600;
+                gap: 3px; letter-spacing: .5px; -webkit-tap-highlight-color: transparent;
+            }
+            .knf-tabbar a.active { color: #fff; font-weight: 800; background: rgba(255,255,255,.14); }
+            .knf-tabbar a i.material-icons { font-size: 21px; line-height: 1; }
+            .header-dropdown-content {
+                display: block;
+                position: fixed; top: 0; right: 0; bottom: 0;
+                width: 260px; min-width: 260px;
+                transform: translateX(100%);
+                transition: transform .28s ease;
+                border-radius: 0;
+                box-shadow: -4px 0 24px rgba(0,0,0,.22);
+                background: #fff;
+                z-index: 2100;
+                padding-top: env(safe-area-inset-top);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .header-dropdown.open .header-dropdown-content { transform: translateX(0); }
+            .header-dropdown-content::before {
+                content: '';
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,.45);
+                z-index: -1;
+            }
+.header-dropdown-content a { padding: 14px 20px; font-size: 15px; }
+            .header-dropdown-content a:active { background-color: #f0f0f0; }
+            .sd-head {
+                display: flex; align-items: center; gap: 12px;
+                padding: 18px 20px 14px; border-bottom: 1px solid #eee;
+            }
+            .sd-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+            .sd-name { font-size: 16px; font-weight: 700; color: #333; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .sd-overlay {
+                display: block;
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,.45);
+                z-index: 2099;
+                opacity: 0; pointer-events: none;
+                transition: opacity .25s ease;
+            }
+            .header-dropdown.open .sd-overlay { opacity: 1; pointer-events: auto; }
+        }
+            .header-dropdown.open .sd-overlay { opacity: 1; pointer-events: auto; }
     `;
     document.head.appendChild(style);
 
@@ -363,12 +462,20 @@
     }
 
     const navItems = [
-        { text: '首页', href: '/' },
-        { text: '发现', href: '/workpool' },
-        { text: '工作室', href: '/team' },
-        { text: '论坛', href: '/forum' },
-        { text: '市场', href: '/mk/kn' }
+        { text: '首页', href: '/', icon: 'home' },
+        { text: '发现', href: '/workpool', icon: 'explore' },
+        { text: '工作室', href: '/team', icon: 'business_center' },
+        { text: '论坛', href: '/forum', icon: 'forum' },
+        { text: '市场', href: '/mk/kn', icon: 'storefront' }
     ];
+
+    // 注入 Material Icons 图标库
+    if (!document.querySelector('link[href*="material-icons"]')) {
+        var iconLink = document.createElement('link');
+        iconLink.rel = 'stylesheet';
+        iconLink.href = 'https://cdn.jsdelivr.net/npm/material-icons@1.0.0/iconfont/material-icons.min.css';
+        document.head.appendChild(iconLink);
+    }
 
     const activeIndex = getActiveIndex();
 
@@ -376,7 +483,7 @@
     let navHtml = '';
     navItems.forEach(function(item, idx) {
         const activeClass = idx === activeIndex ? ' active' : '';
-        navHtml += '<a class="mdui-ripple' + activeClass + '" href="' + item.href + '">' + item.text + '</a>';
+        navHtml += '<a class="knf-rpl' + activeClass + '" href="' + item.href + '">' + item.text + '</a>';
     });
 
     const hv2 = document.getElementById('hv2');
@@ -386,10 +493,74 @@
             '<a class="logo-text" href="/">猫的社区</a>' +
             '<div class="nav-menu">' + navHtml + '</div>' +
             '<div class="header-right">' +
-                '<a class="login-btn mdui-ripple" href="/login">登录</a>' +
+                '<a class="login-btn knf-rpl" href="/login">登录</a>' +
                 '<div id="userArea"></div>' +
+                '<div class="mob-search">' +
+                    '<button class="mob-search-scope" type="button">帖子</button>' +
+                    '<span class="mob-search-div"></span>' +
+                    '<input class="mob-search-input" type="search" placeholder="搜索帖子 / 作品 / 插件" autocomplete="off">' +
+                    '<button class="mob-search-go" type="button" aria-label="搜索">' +
+                        '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
+                    '</button>' +
+                '</div>' +
             '</div>' +
         '</div>';
+
+        // 移动端搜索:帖子 / 作品 / 插件 范围切换
+        var scopes = [
+            { name: '帖子', url: '/forum?q=' },
+            { name: '作品', url: '/workpool?search=' },
+            { name: '插件', url: '/mk/kn?search=' }
+        ];
+        var scopeBtn = hv2.querySelector('.mob-search-scope');
+        var scopeInput = hv2.querySelector('.mob-search-input');
+        var scopeGo = hv2.querySelector('.mob-search-go');
+        var scopeIdx = 0;
+        if (scopeBtn && scopeInput && scopeGo) {
+            scopeBtn.addEventListener('click', function () {
+                scopeIdx = (scopeIdx + 1) % scopes.length;
+                scopeBtn.textContent = scopes[scopeIdx].name;
+                scopeInput.placeholder = '搜索' + scopes[scopeIdx].name;
+            });
+            function mobSearchGo() {
+                var v = scopeInput.value.trim();
+                if (!v) { scopeInput.focus(); return; }
+                location.href = scopes[scopeIdx].url + encodeURIComponent(v);
+            }
+            scopeGo.addEventListener('click', mobSearchGo);
+            scopeInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') mobSearchGo();
+            });
+        }
+
+        // 移动端底部导航栏(统一 JS 绘制)
+        var tabbar = document.createElement('nav');
+        tabbar.className = 'knf-tabbar';
+        tabbar.innerHTML = navItems.map(function (item, idx) {
+            return '<a class="knf-rpl" href="' + item.href + '"><i class="material-icons">' + item.icon + '</i><span>' + item.text + '</span></a>';
+        }).join('');
+        document.body.appendChild(tabbar);
+        var tbActive = tabbar.querySelector('a:nth-child(' + (activeIndex + 1) + ')');
+        if (tbActive) tbActive.className = 'active';
+
+        // 注入元素涟漪:pointerdown 委托,轻量 transform 动画
+        document.addEventListener('pointerdown', function (e) {
+            var el = e.target && e.target.closest ? e.target.closest('.knf-rpl') : null;
+            if (!el) return;
+            var rect = el.getBoundingClientRect();
+            if (!rect.width) return;
+            var wave = document.createElement('span');
+            wave.className = 'knf-rpl-wave';
+            var d = Math.max(rect.width, rect.height) * 2.2;
+            wave.style.width = d + 'px';
+            wave.style.height = d + 'px';
+            wave.style.left = (e.clientX - rect.left - d / 2) + 'px';
+            wave.style.top = (e.clientY - rect.top - d / 2) + 'px';
+            if (el.closest('.header-dropdown-content')) wave.style.background = 'rgba(0,0,0,.08)';
+            el.appendChild(wave);
+            requestAnimationFrame(function () { wave.classList.add('done'); });
+            setTimeout(function () { if (wave.parentNode) wave.parentNode.removeChild(wave); }, 700);
+        });
 
         // 通过API检查登录状态
         fetch('/api/user/current?t=' + Date.now())
@@ -406,16 +577,35 @@
                     // 显示头像和下拉菜单
                     if (userArea) {
                         userArea.innerHTML = '<div class="header-dropdown">' +
-                            '<img class="user-avatar" src="' + avatarUrl + '" alt="' + data.username + '" onerror="this.src=\'/localcdn/gzs/default-avatar.png\'">' +
+                            '<div class="sd-overlay"></div>' +
+                            '<span class="knf-rpl av-wrp"><img class="user-avatar" src="' + avatarUrl + '" alt="' + data.username + '" onerror="this.src=\'/localcdn/gzs/default-avatar.png\'"></span>' +
                             '<div class="header-dropdown-content">' +
-                                '<a class="mdui-ripple" href="/u/' + data.username + '">我的主页</a>' +
-                                '<a class="mdui-ripple" href="/workpool/my">我的作品</a>' +
-                                '<a class="mdui-ripple" href="/messages">消息中心</a>' +
-                                '<a class="mdui-ripple" href="/change_password">修改密码</a>' +
-                                '<a class="mdui-ripple" href="/logout">退出登录</a>' +
+                                '<div class="sd-head"><img class="sd-avatar" src="' + avatarUrl + '" alt="' + data.username + '" onerror="this.src=\'/localcdn/gzs/default-avatar.png\'"><span class="sd-name">' + data.username + '</span></div>' +
+                                '<a class="knf-rpl" href="/workbench"><i class="material-icons">dashboard</i>工作台</a>' +
+                                '<a class="knf-rpl" href="/u/' + data.username + '"><i class="material-icons">person</i>我的主页</a>' +
+                                '<a class="knf-rpl" href="/workpool/my"><i class="material-icons">work</i>我的作品</a>' +
+                                '<a class="knf-rpl" href="/messages"><i class="material-icons">mail</i>消息中心</a>' +
+                                '<a class="knf-rpl" href="/change_password"><i class="material-icons">lock</i>修改密码</a>' +
+                                '<a class="knf-rpl" href="/logout"><i class="material-icons">logout</i>退出登录</a>' +
                             '</div>' +
                         '</div>';
                     }
+
+                    // 触屏设备点头像切换下拉菜单(点击他处关闭)
+                    var drop = document.querySelector('.header-dropdown');
+                    if (drop) {
+                        drop.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            var c = this.querySelector('.header-dropdown-content');
+                            if (c) this.classList.toggle('open');
+                        });
+                    }
+                    document.addEventListener('click', function (e) {
+                        var c = document.querySelector('.header-dropdown');
+                        if (!c) return;
+                        if (e.target === c.querySelector('.sd-overlay')) { c.classList.remove('open'); return; }
+                        if (c.classList.contains('open') && !c.contains(e.target)) c.classList.remove('open');
+                    });
                 }
             })
             .catch(err => console.log('获取用户信息失败:', err));
