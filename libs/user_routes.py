@@ -68,9 +68,43 @@ def register_user_routes():
             if user and user.password == password:
                 session['user'] = username
                 session['market'] = 'kn'
+                session.permanent = True
                 return redirect(url_for('index'))
         
         return render_market_template('login.html', error=None, backurl=request.url_root + 'auth/redirect')
+
+    @app.route('/api/user/current')
+    def api_user_current():
+        if 'user' not in session:
+            return jsonify({'logged_in': False})
+        user = User.query.get(session['user'])
+        if not user:
+            return jsonify({'logged_in': False})
+        return jsonify({
+            'logged_in': True,
+            'username': user.username,
+            'avatar': user.avatar_url,
+            'qq': user.qq
+        })
+
+    @app.route('/api/users/info', methods=['GET'])
+    def api_users_info():
+        """批量获取用户信息（头像、QQ等）"""
+        usernames = request.args.get('usernames', '').split(',')
+        usernames = [u.strip() for u in usernames if u.strip()]
+        if not usernames:
+            return jsonify({})
+        result = {}
+        for uname in usernames:
+            user = User.query.get(uname)
+            if user:
+                result[uname] = {
+                    'username': user.username,
+                    'qq': user.qq or '',
+                    'avatar': user.avatar or '',
+                    'role': user.role or 'user'
+                }
+        return jsonify(result)
 
     @app.route('/register', methods=['GET', 'POST'])
     def register():

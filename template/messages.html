@@ -12,45 +12,6 @@
         body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
         body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
         @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-        header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
-        @keyframes headerSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
-        .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
-        .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;animation:logoFadeIn .5s .1s both}
-        @keyframes logoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-        .logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
-        .logo-icon img{width:100%;height:100%;object-fit:cover}
-        .head-space{flex:1}
-        .search{height:36px;width:280px;background:rgba(255,255,255,.2);border-radius:18px;display:flex;align-items:center;padding:0 16px;animation:searchFadeIn .5s .15s both}
-        @keyframes searchFadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-        .search input{background:transparent;border:none;outline:none;color:#fff;width:100%;font-size:14px}
-        .search input::placeholder{color:rgba(255,255,255,.7)}
-        .nav-links{display:flex;gap:24px}
-        .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
-        .nav-links a:hover{color:#fff;transform:translateY(-1px)}
-        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
-        .nav-links a:hover::after{width:100%}
-        .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
-        .btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
-        .btn:active{transform:scale(.95)}
-        .dropdown{position:relative;display:inline-block}
-        .dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
-        .dropbtn:hover{color:#fff}
-        .dropbtn:focus{outline:none}
-        .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:dropdownFade .2s}
-        @keyframes dropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-        .dropdown-content.show{display:block}
-        .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s}
-        .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
-        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
-        @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-        .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both;position:relative}
-        @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-        .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
-        .icon-btn.active{background:#fff;color:#4caf50}
-        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
-        #loader .mdui-progress{margin:0;border-radius:0}
-        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
         .main-box{max-width:95%;margin:0 auto;padding-top:72px;padding-left:24px;padding-right:24px}
         .tabs{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border-radius:8px;padding:6px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.1)}
         .tab{flex:1;text-align:center;padding:12px 0;border-radius:6px;cursor:pointer;color:#666;font-size:15px;font-weight:500;transition:all .2s}
@@ -84,53 +45,7 @@
             <div class="mdui-progress-indeterminate"></div>
         </div>
     </div>
-    <header>
-        <div class="wrap">
-            <div class="logo">
-                <div class="logo-icon"><img src="/mk/kn/uploads/kn.png" alt="Logo"></div>
-                菠菜面
-            </div>
-            <div class="nav-links">
-                <a href="/mk/{{ current_market or 'kn' }}">首页</a>
-                <a href="https://pan1.pgrm.run">我的存储</a>
-                <a href="/workpool">作品池</a>
-                <a href="/dev/{{ current_market or 'kn' }}">开发者中心</a>
-                <a href="/app/kn/d">应用下载</a>
-                <div class="dropdown">
-                    <button class="dropbtn">插件市场 ▼</button>
-                    <div class="dropdown-content">
-                        {% if markets %}
-                        {% for market_id, market_name in markets.items() %}
-                        <a class="mdui-ripple" href="/mk/{{ market_id }}">{{ market_name }}</a>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-                {% if session.user %}
-                <a href="/mk/{{ current_market or 'kn' }}/upload">上传插件</a>
-                <a href="/mk/{{ current_market or 'kn' }}/developer/stats">我的统计</a>
-                {% if users and users.get(session.user, {}).get('role') == 'admin' %}
-                <a href="/mk/{{ current_market or 'kn' }}/admin">后台管理</a>
-                {% endif %}
-                {% endif %}
-            </div>
-            <div class="head-space"></div>
-            {% if session.user %}
-            <div class="icon-btn active" title="消息中心" onclick="location.href='/messages'" style="position:relative"><i class="fa-solid fa-bell" style="font-size:22px"></i><span class="notify-badge" id="unread-badge" style="display:none">0</span></div>
-            <div class="dropdown">
-                <div class="user-avatar" title="{{ session.user }}">{% if users.get(session.user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[session.user]['qq'] }}&s=100" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">{% else %}{{ session.user[0].upper() }}{% endif %}</div>
-                <div class="dropdown-content">
-                    <a href="/u/{{ session.user }}">我的主页</a>
-                    <a href="/workpool/my">我的作品</a>
-                    <a href="/change_password">修改密码</a>
-                    <a href="/logout">退出登录</a>
-                </div>
-            </div>
-            {% else %}
-            <a href="/login" class="btn mdui-ripple" style="margin-left:12px">登录</a>
-            {% endif %}
-        </div>
-    </header>
+    <div id="hv2"></div>
     <div class="main-box">
         {% set type_map = {'like': ['被点赞', 'fa-thumbs-up'], 'fav': ['被收藏', 'fa-heart'], 'coin': ['被投币', 'fa-coins'], 'follow': ['被关注', 'fa-user-plus'], 'comment': ['作品评论', 'fa-comment'], 'reply': ['评论/跟帖回复', 'fa-reply'], 'official': ['官方私信', 'fa-envelope']} %}
         <div class="mdui-tab" mdui-tab>
@@ -241,6 +156,33 @@
         }
         loadUnread();
 
+        // 动态加载用户头像
+        (function(){
+            var avatarEls = document.querySelectorAll('[data-username]');
+            if(avatarEls.length === 0) return;
+            
+            var usernames = [];
+            avatarEls.forEach(function(el){
+                var u = el.getAttribute('data-username');
+                if(u) usernames.push(u);
+            });
+            var uniqueNames = usernames.filter(function(v,i,a){ return a.indexOf(v) === i; });
+            
+            fetch('/api/users/info?usernames=' + encodeURIComponent(uniqueNames.join(',')))
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    avatarEls.forEach(function(el){
+                        var u = el.getAttribute('data-username');
+                        if(data[u]){
+                            var avatarUrl = data[u].avatar || (data[u].qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + data[u].qq + '&s=100' : '');
+                            if(avatarUrl){
+                                el.innerHTML = '<img src="' + avatarUrl + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">';
+                            }
+                        }
+                    });
+                });
+        })();
+
         document.addEventListener('DOMContentLoaded', function() {
             var dropdowns = document.querySelectorAll('.dropdown');
             dropdowns.forEach(function(dropdown) {
@@ -263,5 +205,6 @@
             });
         });
     </script>
+    <script src="/localcdn/gzs/knf.js?v=3"></script>
 </body>
 </html>

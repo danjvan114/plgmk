@@ -69,12 +69,12 @@
             <div class="mdui-progress-indeterminate"></div>
         </div>
     </div>
-    <header id="hz5kl"></header>
+    <div id="hv2"></div>
     <div class="main-box">
         <a href="/workpool" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
         <div class="form-card">
             <h1 class="form-title">发布作品
-                {% set _t = user_team(session.user) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:12px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}
+                <span id="teamBadge"></span>
             </h1>
             {% if file_url %}
             <div class="file-url-display">
@@ -180,5 +180,5 @@
             });
         });
     </script>
-<script src="/localcdn/gzs/mkh.js"></script></body>
+<script src="/localcdn/gzs/knf.js?v=3"></script></body>
 </html>

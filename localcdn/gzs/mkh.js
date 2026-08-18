@@ -125,7 +125,9 @@
                 (unread > 0 ? '<span class="notify-badge">' + (unread > 99 ? '99+' : unread) + '</span>' : '') +
                 '</div>');
             var avatar = '';
-            if (user.qq) {
+            if (user.avatar) {
+                avatar = '<img src="' + esc(user.avatar) + '" alt="头像">';
+            } else if (user.qq) {
                 avatar = '<img src="https://q1.qlogo.cn/g?b=qq&nk=' + esc(user.qq) + '&s=100" alt="头像">';
             } else if (user.username) {
                 avatar = esc(user.username.charAt(0).toUpperCase());

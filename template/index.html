@@ -7,6 +7,7 @@
     <!-- MDUI2 样式与JS -->
     <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
     <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
+    
     <!-- Material Design Icons 图标库 -->
     
     <style>
@@ -18,47 +19,6 @@
         }
         body {
             background-color: #fff9e8;
-        }
-        /* 顶部导航栏 */
-        .header-nav {
-            background-color: #5BAF5E;
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            gap: 24px;
-            height: 100%;
-            position: relative;
-            z-index: 10;
-        }
-        .logo-text {
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .nav-menu a {
-            color: #ffffff;
-            text-decoration: none;
-            margin: 0 12px;
-            font-size: 16px;
-            height: 100%;
-        }
-        .nav-menu a.active {
-            background-color: #b3e29d;
-            padding:10px 6px;
-        }
-        .header-right {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap:16px;
-        }
-        .create-btn {
-            background-color:#ed3b3b;
-            color:white;
-            border:none;
-            padding:8px 22px;
-            font-size:16px;
-            border-radius:2px;
         }
         /* Banner轮播区域 */
         .banner-wrap {
@@ -241,19 +201,7 @@
 </head>
 <body>
     <!--导航栏-->
-    <div class="header-nav">
-        <div class="logo-text">KNHX</div>
-        <div class="nav-menu">
-            <a class="a2 active mdui-ripple" href="#">首页</a>
-            
-            <a class="a2 mdui-ripple" href="/workpool">发现</a>
-            <a class="a2 mdui-ripple" href="/team">工作室</a>
-            <a class="a2 mdui-ripple" href="/forum">论坛</a>
-            <a class="a2 mdui-ripple" href="/mk/kn">市场</a>
-            
-            <a class="a2" href="/app/kn/d">下载</a>
-            
-        </div>
+    <div class="header-nav" id="hv2">
         
     </div>
     <div style="height: 30px;"></div>
@@ -416,6 +364,6 @@ createDots();
 renderBanner();
 startAuto();
 </script>
-
+<script src="/localcdn/gzs/knf.js?v=2"></script>
 </body>
 </html>

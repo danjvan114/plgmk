@@ -135,7 +135,7 @@
             <div class="mdui-progress-indeterminate"></div>
         </div>
     </div>
-    <header id="hz5kl"></header>
+    <div id="hv2"></div>
     <div class="main-box">
         <a href="/workpool" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
         <div class="detail-layout">
@@ -216,11 +216,9 @@
                             <i class="fa-solid fa-up-right-from-square" style="font-size:20px"></i>在新窗口打开
                         </a>
                         {% endif %}
-                        {% if session.user and (work.author == session.user or work.author_id == session.user) %}
-                        <span class="action-item delete-action action-spacer" onclick="deleteWork({{ work.id }})">
+                        <span class="action-item delete-action action-spacer" id="btnDeleteWork" style="display:none" onclick="deleteWork({{ work.id }})">
                             <i class="fa-solid fa-trash-can" style="font-size:20px"></i>擦除作品
                         </span>
-                        {% endif %}
                     </div>
                 </div>
                 {% if work.description %}
@@ -247,12 +245,8 @@
                                 </span>
                                 <span class="comment-time">{{ comment.created_at }}
                                     <a href="javascript:void(0)" class="comment-reply" onclick="replyComment({{ work.id }}, {{ comment.id }})">回复</a>
-                                    {% if session.user == comment.username or session.user == work.author or (users and users.get(session.user, {}).get('role') == 'admin') %}
-                                    <a href="javascript:void(0)" class="comment-op" onclick="deleteComment({{ work.id }}, {{ comment.id }})">删除</a>
-                                    {% endif %}
-                                    {% if session.user == work.author or (users and users.get(session.user, {}).get('role') == 'admin') %}
-                                    <a href="javascript:void(0)" class="comment-op pin" onclick="pinComment({{ work.id }}, {{ comment.id }})">{% if comment.is_pinned %}取消置顶{% else %}置顶{% endif %}</a>
-                                    {% endif %}
+                                    <a href="javascript:void(0)" class="comment-op comment-delete-btn" data-comment-id="{{ comment.id }}" data-username="{{ comment.username|e }}" style="display:none" onclick="deleteComment({{ work.id }}, {{ comment.id }})">删除</a>
+                                    <a href="javascript:void(0)" class="comment-op comment-pin-btn" data-comment-id="{{ comment.id }}" style="display:none" onclick="pinComment({{ work.id }}, {{ comment.id }})">{% if comment.is_pinned %}取消置顶{% else %}置顶{% endif %}</a>
                                     <a href="javascript:void(0)" class="comment-op" onclick="reportComment({{ work.id }}, {{ comment.id }})">举报</a>
                                 </span>
                             </div>
@@ -264,9 +258,7 @@
                                     <span class="comment-user"><a href="/u/{{ reply.username|e }}" style="color:#666;text-decoration:none">{{ reply.username|e }}</a></span>
                                     <span class="comment-time">{{ reply.created_at }}
                                         <a href="javascript:void(0)" class="comment-reply" onclick="replyComment({{ work.id }}, {{ comment.id }})">回复</a>
-                                        {% if session.user == reply.username or session.user == work.author or (users and users.get(session.user, {}).get('role') == 'admin') %}
-                                        <a href="javascript:void(0)" class="comment-op" onclick="deleteComment({{ work.id }}, {{ reply.id }})">删除</a>
-                                        {% endif %}
+                                        <a href="javascript:void(0)" class="comment-op comment-delete-btn" data-comment-id="{{ reply.id }}" data-username="{{ reply.username|e }}" style="display:none" onclick="deleteComment({{ work.id }}, {{ reply.id }})">删除</a>
                                         <a href="javascript:void(0)" class="comment-op" onclick="reportComment({{ work.id }}, {{ reply.id }})">举报</a>
                                     </span>
                                 </div>
@@ -309,10 +301,10 @@
             <div class="side-col">
                 <div class="author-card">
                     <div class="author-head">
-                        <span class="author-name" style="cursor:pointer" onclick="location.href='/u/{{ work.author|e }}'">{{ work.author|e }}{% set _t = user_team(work.author) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</span>
-                        <div class="author-avatar" onclick="location.href='/u/{{ work.author|e }}'" style="cursor:pointer;overflow:hidden">{% if users.get(work.author, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[work.author]['qq'] }}&s=100" style="width:100%;height:100%;object-fit:cover" alt="头像">{% else %}{{ work.author[:1].upper() }}{% endif %}</div>
+                        <span class="author-name" style="cursor:pointer" onclick="location.href='/u/{{ work.author|e }}'" data-username="{{ work.author|e }}">{{ work.author|e }}</span>
+                        <div class="author-avatar" onclick="location.href='/u/{{ work.author|e }}'" style="cursor:pointer;overflow:hidden" data-username="{{ work.author|e }}">加载中...</div>
                     </div>
-                    <p class="author-sign">{% if users.get(work.author, {}).get('bio') %}{{ users[work.author]['bio'] }}{% else %}作者 ID：{{ work.author_id|e or work.author|e }}{% endif %}</p>
+                    <p class="author-sign" id="authorSign">加载中...</p>
                     {% if session.user and session.user != work.author %}
                     <button class="author-follow {% if user_follows_author %}following{% endif %}" id="follow-btn" onclick="toggleFollow('{{ work.author|e }}')">
                         {% if user_follows_author %}<i class="fa-solid fa-check"></i> 已关注{% else %}<i class="fa-solid fa-plus"></i> 关注{% endif %}
@@ -589,6 +581,64 @@
         }
         loadUnread();
 
+        // 动态加载作者头像、签名和用户权限
+        (function(){
+            var workAuthor = '{{ work.author|e }}';
+            var workId = {{ work.id }};
+            
+            // 获取作者信息
+            fetch('/api/users/info?usernames=' + encodeURIComponent(workAuthor))
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    if(data[workAuthor]){
+                        var u = data[workAuthor];
+                        // 加载头像
+                        var avatarEls = document.querySelectorAll('.author-avatar[data-username="' + workAuthor + '"]');
+                        avatarEls.forEach(function(el){
+                            var avatarUrl = u.avatar || (u.qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + u.qq + '&s=100' : '');
+                            if(avatarUrl){
+                                el.innerHTML = '<img src="' + avatarUrl + '" style="width:100%;height:100%;object-fit:cover" alt="头像">';
+                            } else {
+                                el.innerHTML = workAuthor.charAt(0).toUpperCase();
+                            }
+                        });
+                        // 加载签名
+                        var signEl = document.getElementById('authorSign');
+                        if(signEl){
+                            signEl.textContent = u.bio || '作者 ID：' + workAuthor;
+                        }
+                    }
+                });
+            
+            // 获取当前用户权限
+            fetch('/api/user/current?t=' + Date.now())
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    if(!data.logged_in) return;
+                    var isAuthor = data.username === workAuthor;
+                    var isAdmin = data.role === 'admin';
+                    
+                    // 显示删除按钮（作者或管理员）
+                    var deleteBtn = document.getElementById('btnDeleteWork');
+                    if(deleteBtn && (isAuthor || isAdmin)){
+                        deleteBtn.style.display = 'inline-block';
+                    }
+                    
+                    // 显示评论删除/置顶按钮
+                    document.querySelectorAll('.comment-delete-btn').forEach(function(btn){
+                        var commentUsername = btn.getAttribute('data-username');
+                        if(commentUsername === data.username || isAuthor || isAdmin){
+                            btn.style.display = 'inline-block';
+                        }
+                    });
+                    document.querySelectorAll('.comment-pin-btn').forEach(function(btn){
+                        if(isAuthor || isAdmin){
+                            btn.style.display = 'inline-block';
+                        }
+                    });
+                });
+        })();
+
         document.addEventListener('DOMContentLoaded', function() {
             var dropdowns = document.querySelectorAll('.dropdown');
             dropdowns.forEach(function(dropdown) {
@@ -611,5 +661,5 @@
             });
         });
     </script>
-<script src="/localcdn/gzs/mkh.js"></script></body>
+<script src="/localcdn/gzs/knf.js?v=3"></script></body>
 </html>

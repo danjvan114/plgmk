@@ -99,21 +99,15 @@
     </style>
 </head>
 <body>
-    <header id="hz5kl"></header>
+    <div id="hv2"></div>
     <div class="main-box">
         <a href="javascript:history.back()" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回</a>
         <div class="banner">
             {% if profile_user.banner %}<img src="{{ profile_user.banner|e }}" alt="头图">{% else %}<img src="https://cdn-community.bcmcdn.com/47/community/qHrkuIrcIWh1dXcSsjX8WoP63amM6qZxqtwiZXtTQV44.avif?hash=Fplr0V7Sahn9Wrt-W-vquxg9bOu5" alt="默认头图">{% endif %}
         </div>
         <div class="profile-card">
-            <div class="profile-avatar">
-                {% if profile_user.avatar %}
-                <img src="{{ profile_user.avatar|e }}" alt="头像">
-                {% elif profile_user.qq %}
-                <img src="https://q1.qlogo.cn/g?b=qq&nk={{ profile_user.qq }}&s=640" alt="头像">
-                {% else %}
+            <div class="profile-avatar" data-username="{{ profile_user.username|e }}">
                 <img src="https://static.codemao.cn/FjCi6RLz1-HB5C47m7M_0gZqJNDG" alt="默认头像">
-                {% endif %}
             </div>
             <div class="profile-info">
                 <div class="profile-name">
@@ -221,7 +215,7 @@
                 <div class="user-list">
                     {% for f in followers %}
                     <div class="user-item mdui-ripple" onclick="location.href='/u/{{ f.username|e }}'">
-                        <div class="user-item-avatar">{% if users.get(f.username, {}).get('avatar') %}<img src="{{ users[f.username]['avatar']|e }}" alt="头像">{% elif users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
+                        <div class="user-item-avatar" data-username="{{ f.username|e }}">{{ f.username[:1].upper() }}</div>
                         <div style="font-weight:600">{{ f.username|e }}</div>
                     </div>
                     {% endfor %}
@@ -239,7 +233,7 @@
                 <div class="user-list">
                     {% for f in following %}
                     <div class="user-item" onclick="location.href='/u/{{ f.username|e }}'">
-                        <div class="user-item-avatar">{% if users.get(f.username, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[f.username]['qq'] }}&s=100" alt="头像">{% else %}{{ f.username[:1].upper() }}{% endif %}</div>
+                        <div class="user-item-avatar" data-username="{{ f.username|e }}">{{ f.username[:1].upper() }}</div>
                         <div style="font-weight:600">{{ f.username|e }}</div>
                     </div>
                     {% endfor %}
@@ -295,12 +289,10 @@
                     {% for m in wall_messages %}
                     <div class="wall-item" id="wall-{{ m.id }}">
                         <div class="from-user">
-                            <span class="wall-author-avatar">{% if users.get(m.from_user, {}).get('avatar') %}<img src="{{ users[m.from_user]['avatar']|e }}" alt="头像">{% elif users.get(m.from_user, {}).get('qq') %}<img src="https://q1.qlogo.cn/g?b=qq&nk={{ users[m.from_user]['qq'] }}&s=100" alt="头像">{% else %}{{ m.from_user[:1].upper() }}{% endif %}</span>
+                            <span class="wall-author-avatar" data-username="{{ m.from_user|e }}">{{ m.from_user[:1].upper() }}</span>
                             {{ m.from_user|e }}
                             <span class="time">{{ m.created_at }}</span>
-                            {% if session.user and (session.user == m.from_user or session.user == profile_user.username) %}
-                            <span class="del" onclick="deleteWall({{ m.id }})"><i class="fa-solid fa-xmark"></i> 删除</span>
-                            {% endif %}
+                            <span class="del" data-wall-id="{{ m.id }}" data-wall-from="{{ m.from_user|e }}" style="display:none" onclick="deleteWall({{ m.id }})"><i class="fa-solid fa-xmark"></i> 删除</span>
                         </div>
                         <div class="content">{{ m.content|e }}</div>
                     </div>
@@ -434,6 +426,50 @@
         }
         loadUnread();
 
+        // 动态加载用户头像
+        (function(){
+            var profileUsername = '{{ profile_user.username|e }}';
+            
+            // 收集所有需要加载头像的用户名
+            var allUsernames = [];
+            document.querySelectorAll('[data-username]').forEach(function(el){
+                var u = el.getAttribute('data-username');
+                if(u) allUsernames.push(u);
+            });
+            if(allUsernames.length === 0) return;
+            
+            var uniqueNames = allUsernames.filter(function(v,i,a){ return a.indexOf(v) === i; });
+            fetch('/api/users/info?usernames=' + encodeURIComponent(uniqueNames.join(',')))
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    // 加载所有头像
+                    document.querySelectorAll('[data-username]').forEach(function(el){
+                        var u = el.getAttribute('data-username');
+                        if(data[u]){
+                            var avatarUrl = data[u].avatar || (data[u].qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + data[u].qq + '&s=100' : '');
+                            if(avatarUrl){
+                                el.innerHTML = '<img src="' + avatarUrl + '" alt="头像">';
+                            }
+                        }
+                    });
+                });
+            
+            // 获取当前用户权限，控制按钮显示
+            fetch('/api/user/current?t=' + Date.now())
+                .then(function(r){ return r.json(); })
+                .then(function(currentData){
+                    if(!currentData.logged_in) return;
+                    
+                    // 控制留言板删除按钮显示
+                    document.querySelectorAll('.del[data-wall-from]').forEach(function(btn){
+                        var wallFrom = btn.getAttribute('data-wall-from');
+                        if(currentData.username === wallFrom || currentData.username === profileUsername){
+                            btn.style.display = 'inline-block';
+                        }
+                    });
+                });
+        })();
+
         document.addEventListener('DOMContentLoaded', function() {
             var dropdowns = document.querySelectorAll('.dropdown');
             dropdowns.forEach(function(dropdown) {
@@ -491,6 +527,6 @@
         </div>
     </div>
 
-    <script src="/localcdn/gzs/mkh.js"></script>
+    <script src="/localcdn/gzs/knf.js?v=3"></script>
 </body>
 </html>

@@ -120,7 +120,7 @@
             <div class="mdui-progress-indeterminate"></div>
         </div>
     </div>
-    <header id="hz5kl"></header>
+    <div id="hv2"></div>
     <div class="main-box">
         <div class="breadcrumb">
             <a href="/forum"><i class="fa-solid fa-comments"></i> 论坛</a>
@@ -144,16 +144,10 @@
             <div class="post-content">
                 <div>{{ post.content_html|safe }}</div>
             </div>
-            <div class="post-op-row">
-                {% if session.user and (post.author == session.user or post.author_id == session.user or (users and users.get(session.user, {}).get('role') == 'admin')) %}
-                <button class="op-link danger" onclick="deletePost({{ post.id }})"><i class="fa-solid fa-trash-can"></i> 删帖</button>
-                {% endif %}
-                {% if session.user and users and users.get(session.user, {}).get('role') == 'admin' %}
-                <button class="op-link warn" onclick="pinPost({{ post.id }})"><i class="fa-solid fa-thumbtack"></i> {% if post.is_pinned %}取消置顶{% else %}置顶{% endif %}</button>
-                {% endif %}
-                {% if session.user %}
-                <button class="op-link warn" onclick="reportPost({{ post.id }})"><i class="fa-regular fa-flag"></i> 举报</button>
-                {% endif %}
+            <div class="post-op-row" id="postOpRow" data-author="{{ post.author|e }}" data-post-id="{{ post.id }}">
+                <button class="op-link warn" id="btnReport" style="display:none" onclick="reportPost({{ post.id }})"><i class="fa-regular fa-flag"></i> 举报</button>
+                <button class="op-link danger" id="btnDelete" style="display:none" onclick="deletePost({{ post.id }})"><i class="fa-solid fa-trash-can"></i> 删帖</button>
+                <button class="op-link warn" id="btnPin" style="display:none" onclick="pinPost({{ post.id }})"><i class="fa-solid fa-thumbtack"></i> 置顶</button>
             </div>
         </div>
         {% for r in top_responses %}
@@ -166,15 +160,9 @@
                 </div>
                 <div class="floor-ops">
                     <span class="floor-time">{{ r.created_at }}</span>
-                    {% if session.user %}
-                    <a onclick="replyPrompt({{ r.id }})"><i class="fa-solid fa-reply"></i> 回复</a>
-                    {% if r.username == session.user or post.author == session.user or (users and users.get(session.user, {}).get('role') == 'admin') %}
-                    <a class="danger" onclick="deleteReply({{ r.id }})"><i class="fa-solid fa-trash-can"></i> 删除</a>
-                    {% endif %}
-                    {% if session.user == post.author or (users and users.get(session.user, {}).get('role') == 'admin') %}
-                    <a onclick="pinReply({{ r.id }})"><i class="fa-solid fa-thumbtack"></i> {% if r.is_pinned %}取消置顶{% else %}置顶{% endif %}</a>
-                    {% endif %}
-                    {% endif %}
+                    <a class="reply-btn" data-reply-id="{{ r.id }}" style="display:none"><i class="fa-solid fa-reply"></i> 回复</a>
+                    <a class="delete-btn" data-delete-id="{{ r.id }}" data-username="{{ r.username|e }}" style="display:none"><i class="fa-solid fa-trash-can"></i> 删除</a>
+                    <a class="pin-btn" data-pin-id="{{ r.id }}" style="display:none"><i class="fa-solid fa-thumbtack"></i> 置顶</a>
                 </div>
             </div>
             <div class="floor-content">{{ r.content|e }}</div>
@@ -187,15 +175,9 @@
                     </div>
                     <div class="floor-ops">
                         <span class="floor-time">{{ rep.created_at }}</span>
-                        {% if session.user %}
-                        <a onclick="replyPrompt({{ r.id }})"><i class="fa-solid fa-reply"></i> 回复</a>
-                        {% if rep.username == session.user or post.author == session.user or (users and users.get(session.user, {}).get('role') == 'admin') %}
-                        <a class="danger" onclick="deleteReply({{ rep.id }})"><i class="fa-solid fa-trash-can"></i> 删除</a>
-                        {% endif %}
-                        {% if session.user == post.author or (users and users.get(session.user, {}).get('role') == 'admin') %}
-                        <a onclick="pinReply({{ rep.id }})"><i class="fa-solid fa-thumbtack"></i> {% if rep.is_pinned %}取消置顶{% else %}置顶{% endif %}</a>
-                        {% endif %}
-                        {% endif %}
+                        <a class="reply-btn" data-reply-id="{{ r.id }}" style="display:none"><i class="fa-solid fa-reply"></i> 回复</a>
+                        <a class="delete-btn" data-delete-id="{{ rep.id }}" data-username="{{ rep.username|e }}" style="display:none"><i class="fa-solid fa-trash-can"></i> 删除</a>
+                        <a class="pin-btn" data-pin-id="{{ rep.id }}" style="display:none"><i class="fa-solid fa-thumbtack"></i> 置顶</a>
                     </div>
                 </div>
                 <div class="reply-content">{{ rep.content|e }}</div>
@@ -229,17 +211,9 @@
             {% endif %}
         </div>
         {% endif %}
-        {% if session.user %}
-        <div class="reply-box">
-            <h3><i class="fa-solid fa-pen-to-square" style="color:#2196f3"></i>参与讨论</h3>
-            <textarea id="reply-content" placeholder="写下你的跟帖内容..."></textarea>
-            <div class="submit-row">
-                <button class="submit-btn" onclick="submitReply({{ post.id }})"><i class="fa-solid fa-paper-plane"></i> 发布回复</button>
-            </div>
+        <div id="replySection">
+            <div class="floor"><p class="login-tip"><a href="/login">登录</a>后参与讨论</p></div>
         </div>
-        {% else %}
-        <div class="floor"><p class="login-tip"><a href="/login">登录</a>后参与讨论</p></div>
-        {% endif %}
     </div>
 
     <script>
@@ -392,6 +366,70 @@
         }
         loadUnread();
 
+        // 动态判断用户权限并显示相应按钮
+        (function(){
+            fetch('/api/user/current?t=' + Date.now())
+                .then(function(r){ return r.json(); })
+                .then(function(data){
+                    if(!data.logged_in) return;
+                    
+                    var postOpRow = document.getElementById('postOpRow');
+                    if(!postOpRow) return;
+                    
+                    var postAuthor = postOpRow.getAttribute('data-author');
+                    var isAdmin = data.role === 'admin';
+                    var isAuthor = data.username === postAuthor;
+                    
+                    // 所有登录用户都可以举报
+                    document.getElementById('btnReport').style.display = 'inline-block';
+                    
+                    // 作者或管理员可以删帖
+                    if(isAuthor || isAdmin){
+                        document.getElementById('btnDelete').style.display = 'inline-block';
+                    }
+                    
+                    // 只有管理员可以置顶
+                    if(isAdmin){
+                        document.getElementById('btnPin').style.display = 'inline-block';
+                        document.getElementById('btnPin').innerHTML = '<i class="fa-solid fa-thumbtack"></i> {% if post.is_pinned %}取消置顶{% else %}置顶{% endif %}';
+                    }
+                    
+                    // 显示回复按钮
+                    document.querySelectorAll('.reply-btn').forEach(function(btn){
+                        btn.style.display = 'inline-block';
+                        btn.setAttribute('onclick', 'replyPrompt(' + btn.getAttribute('data-reply-id') + ')');
+                    });
+                    
+                    // 显示删除按钮（作者、帖子作者、管理员）
+                    document.querySelectorAll('.delete-btn').forEach(function(btn){
+                        var username = btn.getAttribute('data-username');
+                        if(username === data.username || isAuthor || isAdmin){
+                            btn.style.display = 'inline-block';
+                            btn.setAttribute('onclick', 'deleteReply(' + btn.getAttribute('data-delete-id') + ')');
+                        }
+                    });
+                    
+                    // 显示置顶按钮（帖子作者、管理员）
+                    document.querySelectorAll('.pin-btn').forEach(function(btn){
+                        if(isAuthor || isAdmin){
+                            btn.style.display = 'inline-block';
+                            btn.setAttribute('onclick', 'pinReply(' + btn.getAttribute('data-pin-id') + ')');
+                        }
+                    });
+                    
+                    // 显示回复框
+                    var replySection = document.getElementById('replySection');
+                    if(replySection){
+                        replySection.innerHTML = '<div class="reply-box">' +
+                            '<h3><i class="fa-solid fa-pen-to-square" style="color:#2196f3"></i>参与讨论</h3>' +
+                            '<textarea id="reply-content" placeholder="写下你的跟帖内容..."></textarea>' +
+                            '<div class="submit-row">' +
+                            '<button class="submit-btn" onclick="submitReply({{ post.id }})"><i class="fa-solid fa-paper-plane"></i> 发布回复</button>' +
+                            '</div></div>';
+                    }
+                });
+        })();
+
         document.addEventListener('DOMContentLoaded', function() {
             var dropdowns = document.querySelectorAll('.dropdown');
             dropdowns.forEach(function(dropdown) {
@@ -414,5 +452,5 @@
             });
         });
     </script>
-<script src="/localcdn/gzs/mkh.js"></script></body>
+<script src="/localcdn/gzs/knf.js?v=3"></script></body>
 </html>

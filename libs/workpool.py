@@ -1783,7 +1783,8 @@ def register_workpool_routes():
             u = User.query.get(username)
             if u:
                 user_info = {'username': username, 'role': u.role or 'user', 'qq': (u.qq or ''),
-                             'reg_time': (u.reg_time or ''), 'is_admin': bool(u.role == 'admin')}
+                             'reg_time': (u.reg_time or ''), 'is_admin': bool(u.role == 'admin'),
+                             'avatar': (u.avatar or '')}
                 conn = None
                 try:
                     conn = get_main_db()
