@@ -461,7 +461,7 @@
                 fetch(filled.url, opts).then(function (res) {
                     return res.text().then(function (txt) {
                         var info = { code: res.status, raw: txt };
-                        try { var j = JSON.parse(txt); for (var k in j) info[k] = j[k]; } catch (e) {}
+                        try { var j = JSON.parse(txt); for (var k in j) info[k] = j[k]; info.raw = JSON.stringify(j); } catch (e) {}
                         return info;
                     });
                 }).then(function (info) {
@@ -497,7 +497,7 @@
             fetch(t.url, opts).then(function (res) {
                 return res.text().then(function (txt) {
                     var info = { code: res.status, raw: txt };
-                    try { var j = JSON.parse(txt); for (var k in j) info[k] = j[k]; } catch (e) {}
+                    try { var j = JSON.parse(txt); for (var k in j) info[k] = j[k]; info.raw = JSON.stringify(j); } catch (e) {}
                     return info;
                 });
             }).then(function (info) {
