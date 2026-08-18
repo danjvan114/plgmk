@@ -151,12 +151,10 @@ body.dark-mode #particles svg.glow { filter:drop-shadow(0 0 16px #eef2ff); }
 .cursor-glow { position:fixed; pointer-events:none; z-index:9999; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(107,114,245,.05) 0%,transparent 65%); transform:translate(-50%,-50%); opacity:0; transition:opacity .4s; }
 @media (hover:hover) { body:hover .cursor-glow { opacity:1; } }
 @media (hover:none) { .cursor-glow { display:none !important; } }
-/* 轻量模式(手动节能 / 无 WebGL):关掉重特效(orb 大模糊/粒子/鼠标光晕/视差),CPU 渲染不卡,下载不受影响 */
-body.no-webgl .bg-orb, body.lite-mode .bg-orb,
-body.no-webgl #particles, body.lite-mode #particles,
-body.no-webgl .cursor-glow, body.lite-mode .cursor-glow { display:none !important; }
-body.no-webgl .parallax, body.lite-mode .parallax { transform:none !important; }
-body.no-webgl .bg-photo, body.lite-mode .bg-photo { filter:none !important; }
+/* 无 WebGL(no-webgl):关掉重特效(orb 大模糊/粒子/鼠标光晕/视差),CPU 渲染不卡 */
+body.no-webgl .bg-orb, body.no-webgl #particles, body.no-webgl .cursor-glow { display:none !important; }
+body.no-webgl .parallax { transform:none !important; }
+body.no-webgl .bg-photo { filter:none !important; }
 /* 性能模式按钮:节能态高亮 */
 #perfBtn.lite { color:var(--accent-1); background:var(--glass-tint); box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 0 14px var(--accent-glow); }
 /* 性能提示浮层 */
@@ -250,29 +248,31 @@ body.theme-ocean .m-dl-btn.ghost, body.theme-amber .m-dl-btn.ghost { color:#fff;
 /* 移动端:回到下载页按钮(右下角) */
 .m-back-btn { position:fixed; right:20px; bottom:90px; z-index:950; display:none; align-items:center; gap:6px; padding:10px 16px; border-radius:30px; border:none; cursor:pointer; background:var(--grad-btn); color:#fff; font-size:13px; font-weight:800; font-family:inherit; box-shadow:0 10px 26px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.35); transition:transform .45s cubic-bezier(.34,1.56,.64,1); }
 .m-back-btn:hover { transform:translateY(-3px) scale(1.05); }
-/* 节能模式:关闭液态玻璃(backdrop-filter),减少 GPU 开销 */
-body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
-/* 节能模式:切页/交互动画直接进行完毕,无过渡;但保留默认启动动画(intro) */
-body.lite-mode *:not(.intro):not(.intro *), body.lite-mode *::before, body.lite-mode *::after { transition:none !important; animation:none !important; }
-/* 节能模式:玻璃 UI 全部改实心(不透明) */
-body.lite-mode header, body.lite-mode .card, body.lite-mode .term, body.lite-mode .btn, body.lite-mode .icon-btn,
-body.lite-mode .badge-btn, body.lite-mode .ft-tab, body.lite-mode .stack-card, body.lite-mode .feat-panel,
-body.lite-mode .ext-inner, body.lite-mode .stats-card, body.lite-mode .download-card, body.lite-mode .theme-pop,
-body.lite-mode .qq-pop, body.lite-mode .perf-pop, body.lite-mode .lang-pop, body.lite-mode .perf-tip, body.lite-mode .carousel-nav,
-body.lite-mode .chip, body.lite-mode .m-chip, body.lite-mode .toast, body.lite-mode .st-clock, body.lite-mode .nav-links a, body.lite-mode .look-pop, body.lite-mode .qr-pop, body.lite-mode .look-perf, body.lite-mode .qr-tab, body.lite-mode .cr-card, body.lite-mode .cr-card.cur, body.lite-mode .fl-link {
-  background-color:var(--solid-glass) !important;
+/* 节能模式:全局属性 body.lite-mode → 只关掉全部模糊特效(backdrop-filter 玻璃模糊 + filter 大模糊),不做别的 */
+body.lite-mode, body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  filter:none !important;
 }
-/* 节能模式:取消按钮/导航/卡片的悬浮位移(开头卡片 #termBox 保留) */
-body.lite-mode .btn, body.lite-mode .card:not(#termBox), body.lite-mode .card:not(#termBox).reveal.in { transform:none !important; }
-body.lite-mode .btn, body.lite-mode .icon-btn, body.lite-mode .ft-tab, body.lite-mode .tp-item, body.lite-mode .badge-btn, body.lite-mode .carousel-nav, body.lite-mode .ext-install, body.lite-mode .pt-btn { transition:background .3s,color .3s,box-shadow .3s; }
-body.lite-mode .btn:hover, body.lite-mode .icon-btn:hover, body.lite-mode .ft-tab:hover, body.lite-mode .tp-item:hover, body.lite-mode .badge-btn:hover, body.lite-mode .ext-install:hover, body.lite-mode .pt-btn:hover,
-body.lite-mode .nav-links a:hover, body.lite-mode #backTop:hover, body.lite-mode .card:not(#termBox):hover { transform:none !important; }
-
-/* 节能模式:切页箭头保持垂直居中,不掉落 */
-body.lite-mode .carousel-nav, body.lite-mode .carousel-nav:hover, body.lite-mode .carousel-nav:active { transform:translateY(-50%) !important; }
-body.lite-mode .stack-card, body.lite-mode .feat-panel { transform:perspective(900px) rotateX(0) rotateY(0) translateY(var(--off,0px)) scale(var(--sc,1)) rotate(var(--rot,0deg)) !important; }
-/* 节能模式:卡片摆正、实心、无模糊(cur 的 blur 优先级更高,需单独覆盖) */
-body.lite-mode .st-col, body.lite-mode .st-col.cur { transform:perspective(900px) translateY(var(--st-y,0px)) scale(var(--st-sc,1)) !important; opacity:1 !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; background:var(--solid-glass) !important; box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); }
+/* 节能模式:没模糊后玻璃太透,玻璃面板改为半透明填充背景 */
+body.lite-mode {
+  --glass-nav:rgba(255,255,255,.60);
+  --glass-card:rgba(255,255,255,.55);
+  --glass-strong:rgba(255,255,255,.70);
+}
+body.lite-mode.dark-mode {
+  --glass-nav:rgba(20,24,42,.72);
+  --glass-card:rgba(20,24,42,.66);
+  --glass-strong:rgba(20,24,42,.80);
+}
+body.lite-mode .lang-pop, body.lite-mode .look-pop, body.lite-mode .qr-pop, body.lite-mode .m-pop,
+body.lite-mode .st-col, body.lite-mode .st-col.cur, body.lite-mode .cr-card.cur {
+  background-color:rgba(255,255,255,.66) !important;
+}
+body.lite-mode.dark-mode .lang-pop, body.lite-mode.dark-mode .look-pop, body.lite-mode.dark-mode .qr-pop, body.lite-mode.dark-mode .m-pop,
+body.lite-mode.dark-mode .st-col, body.lite-mode.dark-mode .st-col.cur, body.lite-mode.dark-mode .cr-card.cur {
+  background-color:rgba(20,24,42,.78) !important;
+}
 
 /* ---------- 下载移动端 ---------- */
 .dl-mobile { margin-top:26px; text-align:center; }
@@ -517,7 +517,6 @@ body.theme-amber .feature-icon { color:#241505; box-shadow:inset 0 1px 0 var(--g
 /* 项目数据:去掉 .card 的 overflow:hidden(否则左右按钮被裁剪)与父级 backdrop-filter(压住子卡片毛玻璃);
    同时移除卡片背景——只保留三张堆叠卡片,不要底部再叠一张"底卡";禁 tilt 消除划过时的背景轮廓 */
 #statsCard { overflow:visible !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; background:transparent !important; box-shadow:none !important; border-radius:0 !important; transform:none !important; }
-body.lite-mode #statsCard { background:transparent !important; }
 .st-nav-btn { display:flex; position:absolute; top:50%; transform:translateY(-50%); z-index:30; }
 #stPrev { left:-48px; z-index:60; }
 #stNext { right:-48px; z-index:60; }
@@ -681,8 +680,6 @@ body.dark-mode .term-def { filter:saturate(.72) brightness(.74) contrast(1.06); 
   @keyframes navItemIn { from { opacity:0; transform:translateX(26px) scale(.92); } to { opacity:1; transform:none; } }
   /* 收起:菜单项文字慢慢消失 */
   @keyframes navItemOut { to { opacity:0; transform:translateX(-12px); } }
-  /* 节能模式:动画全禁用,菜单项直接显示(不依赖滑入动画) */
-  body.lite-mode header.menu-open .nav-links > a,
 header.hiding-nav .nav-links, header.hiding-nav .nav-right { animation:fadeOut .2s ease both; }
 header.hiding-nav .logo { animation:fadeOut .2s ease both; }
 header.nav-reveal .nav-left, header.nav-reveal .nav-right { animation:fadeIn .55s ease both; }
