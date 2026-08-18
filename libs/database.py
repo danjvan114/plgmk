@@ -3,14 +3,23 @@ import os
 import json
 from .utils import get_market_db_path, get_market_path
 
+_engine_cache = {}
+
 def get_market_db_engine(market_id):
-    db_path = get_market_db_path(market_id)
-    return create_engine(f'sqlite:///{db_path}'), text
+    if market_id not in _engine_cache:
+        db_path = get_market_db_path(market_id)
+        _engine_cache[market_id] = create_engine(
+            f'sqlite:///{db_path}',
+            connect_args={'timeout': 30, 'check_same_thread': False},
+            pool_pre_ping=True,
+            pool_recycle=3600
+        )
+    return _engine_cache[market_id], text
 
 def get_market_plugins(market_id):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM plugin WHERE status = 'active'"))
+        result = conn.execute(sql_text("SELECT * FROM plugin WHERE status = 'active'"))
         plugins = []
         for row in result:
             plugin = {
@@ -24,10 +33,10 @@ def get_market_plugins(market_id):
         return plugins
 
 def search_market_plugins(market_id, query):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         result = conn.execute(
-            text("SELECT * FROM plugin WHERE status = 'active' AND (name LIKE :name OR description LIKE :desc)"),
+            sql_text("SELECT * FROM plugin WHERE status = 'active' AND (name LIKE :name OR description LIKE :desc)"),
             {'name': f'%{query}%', 'desc': f'%{query}%'}
         )
         plugins = []
@@ -43,9 +52,9 @@ def search_market_plugins(market_id, query):
         return plugins
 
 def get_plugin_by_id(market_id, plugin_id):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM plugin WHERE id = :id"), {'id': plugin_id})
+        result = conn.execute(sql_text("SELECT * FROM plugin WHERE id = :id"), {'id': plugin_id})
         row = result.fetchone()
         if row:
             ttmp4_path = row[13] if len(row) > 13 else ''
@@ -74,91 +83,91 @@ def get_plugin_by_id(market_id, plugin_id):
         return None
 
 def get_plugin_images(market_id, plugin_id):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM plugin_image WHERE plugin_id = :id"), {'id': plugin_id})
+        result = conn.execute(sql_text("SELECT * FROM plugin_image WHERE plugin_id = :id"), {'id': plugin_id})
         images = []
         for row in result:
             images.append({'id': row[0], 'image_path': row[2]})
         return images
 
 def add_plugin(market_id, name, description, author, version, file_path, tags, created_at, updated_at):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         conn.execute(
-            text("INSERT INTO plugin (name, description, author, version, download_count, rating, rating_count, status, file_path, created_at, updated_at, tags) VALUES (:name, :desc, :author, :version, 0, 0.0, 0, 'active', :file_path, :created_at, :updated_at, :tags)"),
+            sql_text("INSERT INTO plugin (name, description, author, version, download_count, rating, rating_count, status, file_path, created_at, updated_at, tags) VALUES (:name, :desc, :author, :version, 0, 0.0, 0, 'active', :file_path, :created_at, :updated_at, :tags)"),
             {'name': name, 'desc': description, 'author': author, 'version': version, 'file_path': file_path, 'created_at': created_at, 'updated_at': updated_at, 'tags': tags}
         )
         conn.commit()
-        result = conn.execute(text("SELECT last_insert_rowid()"))
+        result = conn.execute(sql_text("SELECT last_insert_rowid()"))
         return result.fetchone()[0]
 
 def add_plugin_image(market_id, plugin_id, image_path):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         conn.execute(
-            text("INSERT INTO plugin_image (plugin_id, image_path) VALUES (:plugin_id, :image_path)"),
+            sql_text("INSERT INTO plugin_image (plugin_id, image_path) VALUES (:plugin_id, :image_path)"),
             {'plugin_id': plugin_id, 'image_path': image_path}
         )
         conn.commit()
 
 def add_plugin_ttmp4(market_id, plugin_id, ttmp4_path):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         conn.execute(
-            text("UPDATE plugin SET ttmp4_path = :ttmp4_path WHERE id = :plugin_id"),
+            sql_text("UPDATE plugin SET ttmp4_path = :ttmp4_path WHERE id = :plugin_id"),
             {'plugin_id': plugin_id, 'ttmp4_path': ttmp4_path}
         )
         conn.commit()
 
 def update_plugin_download_count(market_id, plugin_id):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         conn.execute(
-            text("UPDATE plugin SET download_count = download_count + 1 WHERE id = :id"),
+            sql_text("UPDATE plugin SET download_count = download_count + 1 WHERE id = :id"),
             {'id': plugin_id}
         )
         conn.commit()
 
 def add_rating(market_id, plugin_id, user_id, score, created_at):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         conn.execute(
-            text("INSERT INTO rating (plugin_id, user_id, score, created_at) VALUES (:plugin_id, :user_id, :score, :created_at)"),
+            sql_text("INSERT INTO rating (plugin_id, user_id, score, created_at) VALUES (:plugin_id, :user_id, :score, :created_at)"),
             {'plugin_id': plugin_id, 'user_id': user_id, 'score': score, 'created_at': created_at}
         )
         conn.execute(
-            text("UPDATE plugin SET rating_count = rating_count + 1, rating = (SELECT AVG(score) FROM rating WHERE plugin_id = :id) WHERE id = :id"),
+            sql_text("UPDATE plugin SET rating_count = rating_count + 1, rating = (SELECT AVG(score) FROM rating WHERE plugin_id = :id) WHERE id = :id"),
             {'id': plugin_id}
         )
         conn.commit()
 
 def update_rating(market_id, plugin_id, user_id, score):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         conn.execute(
-            text("UPDATE rating SET score = :score WHERE plugin_id = :plugin_id AND user_id = :user_id"),
+            sql_text("UPDATE rating SET score = :score WHERE plugin_id = :plugin_id AND user_id = :user_id"),
             {'score': score, 'plugin_id': plugin_id, 'user_id': user_id}
         )
         conn.execute(
-            text("UPDATE plugin SET rating = (SELECT AVG(score) FROM rating WHERE plugin_id = :id) WHERE id = :id"),
+            sql_text("UPDATE plugin SET rating = (SELECT AVG(score) FROM rating WHERE plugin_id = :id) WHERE id = :id"),
             {'id': plugin_id}
         )
         conn.commit()
 
 def get_user_ratings(market_id, user_id):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT plugin_id, score FROM rating WHERE user_id = :user_id"), {'user_id': user_id})
+        result = conn.execute(sql_text("SELECT plugin_id, score FROM rating WHERE user_id = :user_id"), {'user_id': user_id})
         ratings = {}
         for row in result:
             ratings[row[0]] = row[1]
         return ratings
 
 def get_all_plugins(market_id):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM plugin"))
+        result = conn.execute(sql_text("SELECT * FROM plugin"))
         plugins = []
         for row in result:
             plugin = {
@@ -172,45 +181,50 @@ def get_all_plugins(market_id):
         return plugins
 
 def toggle_plugin_status(market_id, plugin_id):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT status FROM plugin WHERE id = :id"), {'id': plugin_id})
+        result = conn.execute(sql_text("SELECT status FROM plugin WHERE id = :id"), {'id': plugin_id})
         row = result.fetchone()
         if row:
             new_status = 'inactive' if row[0] == 'active' else 'active'
-            conn.execute(text("UPDATE plugin SET status = :status WHERE id = :id"), {'status': new_status, 'id': plugin_id})
+            conn.execute(sql_text("UPDATE plugin SET status = :status WHERE id = :id"), {'status': new_status, 'id': plugin_id})
             conn.commit()
             return new_status
         return None
 
 def update_plugin_info(market_id, plugin_id, name, description, version, tags, file_path=None):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     from datetime import datetime
     updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with engine.connect() as conn:
         if file_path:
             conn.execute(
-                text("UPDATE plugin SET name = :name, description = :desc, version = :version, tags = :tags, file_path = :file_path, updated_at = :updated_at WHERE id = :id"),
+                sql_text("UPDATE plugin SET name = :name, description = :desc, version = :version, tags = :tags, file_path = :file_path, updated_at = :updated_at WHERE id = :id"),
                 {'name': name, 'desc': description, 'version': version, 'tags': tags, 'file_path': file_path, 'updated_at': updated_at, 'id': plugin_id}
             )
         else:
             conn.execute(
-                text("UPDATE plugin SET name = :name, description = :desc, version = :version, tags = :tags, updated_at = :updated_at WHERE id = :id"),
+                sql_text("UPDATE plugin SET name = :name, description = :desc, version = :version, tags = :tags, updated_at = :updated_at WHERE id = :id"),
                 {'name': name, 'desc': description, 'version': version, 'tags': tags, 'updated_at': updated_at, 'id': plugin_id}
             )
         conn.commit()
 
 def delete_plugin(market_id, plugin_id):
-    engine, text = get_market_db_engine(market_id)
+    engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
-        conn.execute(text("DELETE FROM plugin_image WHERE plugin_id = :id"), {'id': plugin_id})
-        conn.execute(text("DELETE FROM rating WHERE plugin_id = :id"), {'id': plugin_id})
-        conn.execute(text("DELETE FROM plugin WHERE id = :id"), {'id': plugin_id})
+        conn.execute(sql_text("DELETE FROM plugin_image WHERE plugin_id = :id"), {'id': plugin_id})
+        conn.execute(sql_text("DELETE FROM rating WHERE plugin_id = :id"), {'id': plugin_id})
+        conn.execute(sql_text("DELETE FROM plugin WHERE id = :id"), {'id': plugin_id})
         conn.commit()
 
 def init_market_database(market_id):
     db_path = get_market_db_path(market_id)
-    engine = create_engine(f'sqlite:///{db_path}')
+    engine = create_engine(
+        f'sqlite:///{db_path}',
+        connect_args={'timeout': 30, 'check_same_thread': False},
+        pool_pre_ping=True,
+        pool_recycle=3600
+    )
     
     plugin_table = text("""
     CREATE TABLE IF NOT EXISTS plugin (
@@ -259,7 +273,12 @@ def init_player_database():
     userdata_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
     os.makedirs(userdata_dir, exist_ok=True)
     db_path = os.path.join(userdata_dir, 'players.db')
-    engine = create_engine(f'sqlite:///{db_path}')
+    engine = create_engine(
+        f'sqlite:///{db_path}',
+        connect_args={'timeout': 30, 'check_same_thread': False},
+        pool_pre_ping=True,
+        pool_recycle=3600
+    )
     
     player_table = text("""
     CREATE TABLE IF NOT EXISTS player (
@@ -289,13 +308,23 @@ def init_player_database():
 def get_player_engine():
     userdata_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
     db_path = os.path.join(userdata_dir, 'players.db')
-    return create_engine(f'sqlite:///{db_path}')
+    return create_engine(
+        f'sqlite:///{db_path}',
+        connect_args={'timeout': 30, 'check_same_thread': False},
+        pool_pre_ping=True,
+        pool_recycle=3600
+    )
 
 def init_auth_callback_database():
     userdata_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mk', 'userdata')
     os.makedirs(userdata_dir, exist_ok=True)
     db_path = os.path.join(userdata_dir, 'auth_callback.db')
-    engine = create_engine(f'sqlite:///{db_path}')
+    engine = create_engine(
+        f'sqlite:///{db_path}',
+        connect_args={'timeout': 30, 'check_same_thread': False},
+        pool_pre_ping=True,
+        pool_recycle=3600
+    )
     
     auth_table = text("""
     CREATE TABLE IF NOT EXISTS auth_callback (

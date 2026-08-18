@@ -18,7 +18,7 @@ MY_WORKS_MAX = 50
 
 def get_team_db():
     os.makedirs(os.path.dirname(TEAM_DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(TEAM_DB_PATH)
+    conn = sqlite3.connect(TEAM_DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
     return conn
 
