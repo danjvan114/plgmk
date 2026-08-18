@@ -460,15 +460,15 @@
                 }
                 fetch(filled.url, opts).then(function (res) {
                     return res.text().then(function (txt) {
-                        var info = { code: res.status };
-                        try { var j = JSON.parse(txt); info = j; } catch (e) { info.raw = txt; }
+                        var info = { code: res.status, raw: txt };
+                        try { var j = JSON.parse(txt); for (var k in j) info[k] = j[k]; } catch (e) {}
                         return info;
                     });
                 }).then(function (info) {
                     btn.disabled = false;
                     btn.textContent = '提交';
                     var ok = !(info.success === false || info.error || (info.code >= 400 && !info.success));
-                    wbToast(ok ? ((info.message || info.msg) || '操作成功') : ((info.error || info.message || info.msg) || ('请求失败 (' + info.code + ')')));
+                    wbToast(ok ? ((info.message || info.msg) || '操作成功') : (info.raw || '请求失败 (' + info.code + ')'));
                     if (ok) {
                         wbClose();
                         if (redir) {
@@ -496,13 +496,13 @@
             else opts.body = new FormData();
             fetch(t.url, opts).then(function (res) {
                 return res.text().then(function (txt) {
-                    var info = { code: res.status };
-                    try { info = JSON.parse(txt); } catch (e) { info.raw = txt; }
+                    var info = { code: res.status, raw: txt };
+                    try { var j = JSON.parse(txt); for (var k in j) info[k] = j[k]; } catch (e) {}
                     return info;
                 });
             }).then(function (info) {
                 var ok = !(info.success === false || info.error || (info.code >= 400 && !info.success));
-                wbToast(ok ? ((info.message || info.msg) || '操作成功') : ((info.error || info.message || info.msg) || ('请求失败 (' + info.code + ')')));
+                wbToast(ok ? ((info.message || info.msg) || '操作成功') : (info.raw || '请求失败 (' + info.code + ')'));
                 if (ok && t.redirect) setTimeout(function () { location.href = t.redirect; }, 900);
             }).catch(function (err) {
                 wbToast('请求失败: ' + err.message);
