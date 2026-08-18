@@ -893,6 +893,9 @@ body.dark-mode .st-col, body.dark-mode .st-col.cur {
       </button>
       
     </div>
+    <button class="icon-btn" id="adAvatarBtn" aria-label="个人中心" title="个人中心" style="overflow:hidden;padding:0">
+      <span class="ad-avatar-fb"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg></span>
+    </button>
     <button class="icon-btn hamburger" id="hamburgerBtn" aria-label="打开菜单" aria-expanded="false">
       <i></i><i></i><i></i>
     </button>
@@ -1337,6 +1340,21 @@ body.dark-mode .st-col, body.dark-mode .st-col.cur {
   <div class="look-sep"></div>
   <button class="look-perf" id="lookPerf"><i class="mdui-icon material-icons">eco</i><span class="look-perf-main"><span id="lookPerfState">节能模式 · 已关闭</span><small data-i18n="perf_desc">关闭特效 · 保留流畅基础体验</small></span></button>
 </div>
+<div class="look-pop" id="adAvatarPop" style="min-width:214px">
+  <span style="display:block;font-size:12px;font-weight:800;color:var(--text-3);padding:4px 12px 6px" id="adAvatarName">个人中心</span>
+  <button class="ad-avatar-item" id="adAvatarHome" type="button" onclick="location.href='/u/me'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg><span>我的主页</span></button>
+  <button class="ad-avatar-item" type="button" onclick="location.href='/workpool/my'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><rect x="7" y="7" width="10" height="10" rx="3"/></svg><span>我的作品</span></button>
+  <button class="ad-avatar-item" type="button" onclick="location.href='/messages'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></svg><span>消息中心</span></button>
+  <button class="ad-avatar-item" type="button" onclick="location.href='/change_password'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13 4l-2 16"/></svg><span>修改密码</span></button>
+  <div class="look-sep"></div>
+  <button class="ad-avatar-item" type="button" onclick="location.href='/logout'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span>退出登录</span></button>
+</div>
+<style>
+.ad-avatar-item { display:flex; align-items:center; gap:10px; width:100%; padding:9px 12px; border:none; background:transparent; color:var(--text-2); font-size:13.5px; font-weight:600; font-family:inherit; cursor:pointer; text-align:left; border-radius:14px; transition:background .25s,color .25s; }
+.ad-avatar-item svg { flex:none; opacity:.85; }
+.ad-avatar-item:hover { background:var(--glass-tint); color:var(--accent-1); }
+#adAvatarBtn img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+</style>
 <!-- 二维码悬浮窗(移动端下载 + QQ 群) -->
 <div class="qr-pop" id="qrPop">
   <div class="qr-tabs">
@@ -2145,6 +2163,48 @@ body.dark-mode .st-col, body.dark-mode .st-col.cur {
     };
     qrBtn.addEventListener('click', function (e) { e.stopPropagation(); if (qrPop.classList.contains('show')) { hideQrPop(); } else { closeAllPops(); showQr(); } });
     lookBtn.addEventListener('click', function (e) { e.stopPropagation(); if (lookPop.classList.contains('show')) { hideLookPop(); } else { closeAllPops(); showLook(); } });
+    /* ===== 用户头像(导航栏最右侧,追加组件) ===== */
+    var adAvatarBtn = $('#adAvatarBtn'), adAvatarPop = $('#adAvatarPop'), adAvatarT = null;
+    function showAdAvatar() { if (!isMobileUA && otherPopOpen('.look-pop.show')) return; clearTimeout(adAvatarT); langPop.classList.remove('show'); clearTimeout(langTimer); lookPop.classList.remove('show'); clearTimeout(lookTimer); themePop.classList.remove('show'); clearTimeout(popTimer); qqPop.classList.remove('show'); clearTimeout(qqTimer); perfPop.classList.remove('show'); clearTimeout(perfTimer); mPop.classList.remove('show'); clearTimeout(mTimer); posPop(adAvatarPop, adAvatarBtn); adAvatarPop.classList.add('show'); unlockBtnId = 'adAvatarBtn'; syncNavLock(); }
+    function hideAdAvatar() { adAvatarT = setTimeout(function () { adAvatarPop.classList.remove('show'); unlockBtnId = null; syncPopOpen(); syncNavLock(); }, 250); }
+    var adAvatarOpenT = null;
+    if (adAvatarBtn && adAvatarPop) {
+      adAvatarBtn.addEventListener('mouseenter', function () { if (!hoverPop) return; clearTimeout(adAvatarOpenT); adAvatarOpenT = setTimeout(showAdAvatar, 300); });
+      adAvatarBtn.addEventListener('mouseleave', function () { if (!hoverPop) return; clearTimeout(adAvatarOpenT); hideAdAvatar(); });
+      adAvatarPop.addEventListener('mouseenter', function () { if (!hoverPop) return; showAdAvatar(); });
+      adAvatarPop.addEventListener('mouseleave', function () { if (!hoverPop) return; hideAdAvatar(); });
+      adAvatarBtn.addEventListener('click', function (e) { e.stopPropagation(); if (adAvatarPop.classList.contains('show')) { hideAdAvatar(); } else { closeAllPops(); showAdAvatar(); } });
+    }
+    (function () {
+      var b = document.getElementById('adAvatarBtn');
+      var fbHtml = b ? b.innerHTML : '';
+      function useFallback() { if (b) b.innerHTML = fbHtml; }
+      if (typeof fetch !== 'function' || !b) return;
+      fetch('/api/user/current?t=' + Date.now())
+        .then(function (r) { return r.json(); })
+        .catch(function () { return { logged_in: false }; })
+        .then(function (data) {
+          if (data && data.logged_in) {
+            var u = data.username || 'me';
+            var av = data.avatar || (data.qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + data.qq + '&s=100' : '');
+            var t = document.getElementById('adAvatarName');
+            if (t) t.textContent = (data.nickname || u);
+            var home = document.getElementById('adAvatarHome');
+            if (home) home.setAttribute('onclick', "location.href='/u/" + encodeURIComponent(u) + "'");
+            if (av) {
+              var img = document.createElement('img');
+              img.alt = '头像';
+              img.onerror = useFallback;
+              img.src = av;
+              b.innerHTML = '';
+              b.appendChild(img);
+            }
+          } else {
+            b.addEventListener('click', function (e) { e.stopPropagation(); location.href = '/login'; });
+          }
+        });
+    })();
+
     langBtn.addEventListener('click', function (e) { e.stopPropagation(); if (langPop.classList.contains('show')) { hideLang(); } else { closeAllPops(); showLang(); } });
     document.addEventListener('click', function (e) {
       if (e.target.closest('header')) return;
