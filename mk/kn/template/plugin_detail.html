@@ -1225,8 +1225,8 @@ body.lite-mode .pd-navbar { background:var(--solid-glass) !important; backdrop-f
 body.lite-mode .pd-navbar .icon-btn { background:var(--glass-tint-2) !important; color:var(--accent-1) !important; }
 /* --- 独立 Tab 导航栏(与内容卡片完全分层) --- */
 .pd-tabbar {
-  display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:wrap;
-  max-width:700px; margin:0 auto 24px; padding:8px 12px;
+  display:flex; justify-content:center; align-items:center; gap:4px; flex-wrap:nowrap;
+  max-width:700px; margin:0 auto 24px; padding:8px 12px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
   border-radius:60px;
   background:var(--glass-nav);
   backdrop-filter:blur(6px) saturate(160%); -webkit-backdrop-filter:blur(6px) saturate(160%);
@@ -1235,7 +1235,7 @@ body.lite-mode .pd-navbar .icon-btn { background:var(--glass-tint-2) !important;
 .pd-tab {
   flex:none; display:inline-flex; align-items:center; gap:6px;
   padding:9px 20px; border:none; border-radius:30px; cursor:pointer;
-  font-size:14px; font-weight:700; font-family:inherit; color:var(--text-2);
+  font-size:14px; font-weight:700; font-family:inherit; color:var(--text-2); white-space:nowrap; flex:none;
   background:transparent; box-shadow:none;
   transition:color .25s,background .3s,box-shadow .3s,transform .45s var(--ease-pop);
 }
@@ -1277,9 +1277,9 @@ body.lite-mode .pd-pane { transition:none !important; }
   .pd-nav-logo { height:26px; }
   .pd-nav-title { font-size:14.5px; }
   .pd-nav-tools { gap:6px; }
-  .pd-tabbar { max-width:100%; padding:6px 8px; }
-  .pd-tab { padding:8px 14px; font-size:13px; }
-  .pd-tab i { font-size:14px; }
+  .pd-tabbar { max-width:100%; padding:5px 6px; }
+  .pd-tab { padding:7px 11px; font-size:12.5px; }
+  .pd-tab i { font-size:13px; margin-right:4px; }
   .pd-pane { --x:44px; }
 }
 
@@ -1524,7 +1524,7 @@ body > footer, footer.site-footer { flex:1 0 auto; }
 
 /* ---------- 主题按钮图标:太阳/月亮双态(theme.js 切换 .dark) ---------- */
 #themeBtn { position:relative; }
-#themeBtn svg { position:absolute; inset:0; margin:auto; transition:opacity .3s,transform .4s var(--ease-pop); }
+#themeBtn svg { position:absolute; inset:0; margin:auto; transition:opacity .45s var(--ease-pop),transform .5s var(--ease-pop); }
 #themeBtn .ic-moon { opacity:0; transform:rotate(-90deg) scale(.6); }
 #themeBtn.dark .ic-sun { opacity:0; transform:rotate(90deg) scale(.6); }
 #themeBtn.dark .ic-moon { opacity:1; transform:none; }
@@ -1743,11 +1743,11 @@ th > i { font-size:14px; margin-right:4px; vertical-align:-2px; }
   <div class="detail-glow"></div>
   <h1 class="page-title">{{ plugin.name }}</h1>
   <div class="meta">
-    <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg>@{{ plugin.author }}</span>
-    <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>{{ plugin.version }}</span>
-    <span class="meta-badge rating">★ {{ "%.1f"|format(plugin.rating) }}</span>
-    <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></svg>{{ plugin.rating_count }} 评价</span>
-    <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>{{ plugin.created_at }}</span>
+    <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.5 4-5 7.5-5s6.7 1.5 7.5 5"/></svg>@{{ plugin.author or '无数据' }}</span>
+    <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>{{ plugin.version or '无数据' }}</span>
+    <span class="meta-badge rating">★ {{ '%.1f'|format(plugin.rating) if plugin.rating is not none else '无数据' }}</span>
+    <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></svg>{{ plugin.rating_count if plugin.rating_count is not none else '无数据' }} 评价</span>
+    <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>{{ plugin.created_at or '无数据' }}</span>
   </div>
   <div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
 </div>
@@ -1790,9 +1790,9 @@ th > i { font-size:14px; margin-right:4px; vertical-align:-2px; }
       
       <div class="detail-sidebar">
         <div class="stats">
-          <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label"><i class="mdui-icon material-icons">download</i><span data-i18n="pd_stat_dl">下载次数</span></div></div>
-          <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label"><i class="mdui-icon material-icons">star</i><span data-i18n="pd_stat_rate">评分</span></div></div>
-          <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count }}</div><div class="stat-label"><i class="mdui-icon material-icons">comment</i><span data-i18n="pd_stat_cnt">评价数</span></div></div>
+          <div class="stat-item card"><div class="stat-value">{{ plugin.downloads if plugin.downloads is not none else '无数据' }}</div><div class="stat-label"><i class="mdui-icon material-icons">download</i><span data-i18n="pd_stat_dl">下载次数</span></div></div>
+          <div class="stat-item card"><div class="stat-value">{{ '%.1f'|format(plugin.rating) if plugin.rating is not none else '无数据' }}</div><div class="stat-label"><i class="mdui-icon material-icons">star</i><span data-i18n="pd_stat_rate">评分</span></div></div>
+          <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count if plugin.rating_count is not none else '无数据' }}</div><div class="stat-label"><i class="mdui-icon material-icons">comment</i><span data-i18n="pd_stat_cnt">评价数</span></div></div>
         </div>
         
         <div class="detail-actions">
@@ -1834,9 +1834,9 @@ th > i { font-size:14px; margin-right:4px; vertical-align:-2px; }
   <!-- 统计 -->
   <div class="pd-pane" id="tab-stats">
     <div class="stats" style="grid-template-columns:repeat(3,1fr);">
-      <div class="stat-item card"><div class="stat-value">{{ plugin.downloads }}</div><div class="stat-label"><i class="mdui-icon material-icons">download</i><span data-i18n="pd_stat_dl">下载次数</span></div></div>
-      <div class="stat-item card"><div class="stat-value">{{ "%.1f"|format(plugin.rating) }}</div><div class="stat-label"><i class="mdui-icon material-icons">star</i><span data-i18n="pd_stat_rate">评分</span></div></div>
-      <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count }}</div><div class="stat-label"><i class="mdui-icon material-icons">comment</i><span data-i18n="pd_stat_cnt">评价数</span></div></div>
+      <div class="stat-item card"><div class="stat-value">{{ plugin.downloads if plugin.downloads is not none else '无数据' }}</div><div class="stat-label"><i class="mdui-icon material-icons">download</i><span data-i18n="pd_stat_dl">下载次数</span></div></div>
+      <div class="stat-item card"><div class="stat-value">{{ '%.1f'|format(plugin.rating) if plugin.rating is not none else '无数据' }}</div><div class="stat-label"><i class="mdui-icon material-icons">star</i><span data-i18n="pd_stat_rate">评分</span></div></div>
+      <div class="stat-item card"><div class="stat-value">{{ plugin.rating_count if plugin.rating_count is not none else '无数据' }}</div><div class="stat-label"><i class="mdui-icon material-icons">comment</i><span data-i18n="pd_stat_cnt">评价数</span></div></div>
     </div>
   </div>
 </div>
@@ -1935,7 +1935,7 @@ th > i { font-size:14px; margin-right:4px; vertical-align:-2px; }
   });
 })();
 
-function goBack() { window.history.back(); }
+function goBack() { location.href = '/mk/{{ current_market or "kn" }}'; }
 function openImage(url) { document.getElementById('modalImage').src = url; document.getElementById('imageModal').classList.add('active'); }
 document.getElementById('imageModal').addEventListener('click', function () { this.classList.remove('active'); });
 function copyWebUrl() {

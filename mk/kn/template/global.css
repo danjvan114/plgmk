@@ -175,7 +175,7 @@ body > footer, footer.site-footer { flex:1 0 auto; }
 
 /* ---------- 主题按钮图标:太阳/月亮双态(theme.js 切换 .dark) ---------- */
 #themeBtn { position:relative; }
-#themeBtn svg { position:absolute; inset:0; margin:auto; transition:opacity .3s,transform .4s var(--ease-pop); }
+#themeBtn svg { position:absolute; inset:0; margin:auto; transition:opacity .45s var(--ease-pop),transform .5s var(--ease-pop); }
 #themeBtn .ic-moon { opacity:0; transform:rotate(-90deg) scale(.6); }
 #themeBtn.dark .ic-sun { opacity:0; transform:rotate(90deg) scale(.6); }
 #themeBtn.dark .ic-moon { opacity:1; transform:none; }

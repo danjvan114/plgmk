@@ -853,7 +853,8 @@ body.lite-mode .nav-more-menu { backdrop-filter:none; -webkit-backdrop-filter:no
   .nav-links a { padding:6px 11px; font-size:13px; gap:5px; }
   .nav-links a svg { width:13px; height:13px; }
 }
-.mk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:3px; }
+.mk-grid { display:flex; flex-wrap:wrap; gap:14px; }
+.mk-grid > * { flex:1 1 300px; min-width:280px; max-width:100%; width:auto; }
 .mk-card { position:relative; display:flex; gap:12px; padding:15px; border-radius:20px; background:var(--glass-card); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow); transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)); transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .45s,background .4s; cursor:pointer; }
 .mk-card::after { content:''; position:absolute; inset:0; border-radius:inherit; z-index:-1; background:linear-gradient(135deg,var(--glass-tint),transparent 60%); opacity:0; transition:opacity .45s ease; }
 .mk-card:hover { box-shadow:inset 0 1px 0 var(--glass-hi-top), var(--shadow-hover); --ty:-5px; }
@@ -885,5 +886,6 @@ body.lite-mode .mk-view { background:var(--glass-tint); }
 .mk-render .mk-card { animation:mkPop .45s cubic-bezier(.34,1.56,.64,1) backwards; }
 @media (max-width:720px) {
   .mk-sec { padding:22px 5vw 64px; }
-  .mk-grid { grid-template-columns:1fr; }
+  .mk-grid { gap:12px; }
+  .mk-grid > * { flex:1 1 100%; min-width:0; max-width:100%; }
 }
