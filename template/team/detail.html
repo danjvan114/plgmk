@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{{ team.name }} - 团队主页</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -72,6 +73,21 @@
         .tab-loading{text-align:center;padding:40px;color:#999}
         .tab-loading .mdui-spinner{width:40px;height:40px;color:#2196f3}
         .tab-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+    
+        @media (max-width:640px){
+            .team-wrap{padding:0 10px 24px}
+            .team-header{margin-top:52px}
+            .cover-box{height:150px}
+            .team-icon{left:12px;top:12px;width:64px;height:64px;border-width:3px}
+            .team-icon .initial{font-size:26px}
+            .team-meta{padding:14px 14px 16px}
+            .team-title{font-size:19px}
+            .team-desc{font-size:13px}
+            .card-head{padding:12px 14px}
+            .card-body{padding:12px 14px}
+            .mgr-row{grid-template-columns:1fr}
+            .tab-actions{flex-direction:column;align-items:stretch}
+        }
     </style>
 </head>
 <body>
@@ -317,7 +333,7 @@
         {% endif %}
     </div>
 
-    <script src="/localcdn/gzs/knf.js?v=9"></script>
+    <script src="/localcdn/gzs/knf.js?v=18"></script>
     <script>
         window.addEventListener('load', function(){ document.getElementById('loader').style.display='none'; });
 

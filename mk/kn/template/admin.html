@@ -673,8 +673,8 @@ th > i { font-size:14px; margin-right:4px; vertical-align:-2px; }
 <td>{{ plugin.downloads }}</td>
 <td><span data-i18n-status style="color:{{ 'var(--success)' if plugin.get('status','active') == 'active' else 'var(--danger)' }};font-weight:700">{{ '启用' if plugin.get('status','active') == 'active' else '禁用' }}</span></td>
 <td style="display:flex;gap:8px">
-<a href="/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}" class="btn sm {{ 'danger' if plugin.get('status','active') == 'active' else 'success' }}"><i class="mdui-icon material-icons">{{ 'block' if plugin.get('status','active') == 'active' else 'check_circle' }}</i><span data-i18n-status>{{ '禁用' if plugin.get('status','active') == 'active' else '启用' }}</span></a>
-<a href="/mk/{{ current_market or 'kn' }}/admin/delete/{{ plugin.id }}" class="btn sm danger" onclick="return confirm('确定删除？')"><i class="mdui-icon material-icons">delete</i><span data-i18n="delete">删除</span></a>
+<a href="javascript:;" class="btn sm {{ 'danger' if plugin.get('status','active') == 'active' else 'success' }}" onclick="fetch('/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}',{method:'POST'}).then(()=>location.reload())"><i class="mdui-icon material-icons">{{ 'block' if plugin.get('status','active') == 'active' else 'check_circle' }}</i><span data-i18n-status>{{ '禁用' if plugin.get('status','active') == 'active' else '启用' }}</span></a>
+<a href="javascript:;" class="btn sm danger" onclick="if(confirm('确定删除？'))fetch('/mk/{{ current_market or 'kn' }}/admin/delete/{{ plugin.id }}',{method:'POST'}).then(()=>location.reload())"><i class="mdui-icon material-icons">delete</i><span data-i18n="delete">删除</span></a>
 </td>
 </tr>
 {% endfor %}

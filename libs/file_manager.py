@@ -39,6 +39,20 @@ def encrypt_password_for_frontend(password):
     )
     return base64.b64encode(encrypted).decode('utf-8')
 
+def _fm_ok():
+    if session.get('fm_authenticated'):
+        return True
+    try:
+        from .config import User
+        u = session.get('user')
+        if u:
+            user = User.query.get(u)
+            if user and user.role == 'admin':
+                return True
+    except Exception:
+        pass
+    return False
+
 def register_file_manager_routes(app, localcdn_path):
     generate_password()
 
@@ -54,7 +68,7 @@ def register_file_manager_routes(app, localcdn_path):
 
     @app.route('/fm', methods=['GET'])
     def fm_page():
-        if not session.get('fm_authenticated'):
+        if not _fm_ok():
             return redirect('/fm/login')
         return send_file(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'webapp', 'fm', 'index.html'))
 
@@ -87,7 +101,7 @@ def register_file_manager_routes(app, localcdn_path):
 
     @app.route('/api/fm/list', methods=['GET'])
     def fm_list():
-        if not session.get('fm_authenticated'):
+        if not _fm_ok():
             return jsonify({'success': False, 'message': '未授权'})
         path = request.args.get('path', '')
         full_path = _validate_path(path)
@@ -110,7 +124,7 @@ def register_file_manager_routes(app, localcdn_path):
 
     @app.route('/api/fm/upload', methods=['POST'])
     def fm_upload():
-        if not session.get('fm_authenticated'):
+        if not _fm_ok():
             return jsonify({'success': False, 'message': '未授权'})
         path = request.form.get('path', '')
         file = request.files.get('file')
@@ -125,7 +139,7 @@ def register_file_manager_routes(app, localcdn_path):
 
     @app.route('/api/fm/delete', methods=['POST'])
     def fm_delete():
-        if not session.get('fm_authenticated'):
+        if not _fm_ok():
             return jsonify({'success': False, 'message': '未授权'})
         data = request.get_json()
         path = data.get('path', '')
@@ -143,7 +157,7 @@ def register_file_manager_routes(app, localcdn_path):
 
     @app.route('/api/fm/rename', methods=['POST'])
     def fm_rename():
-        if not session.get('fm_authenticated'):
+        if not _fm_ok():
             return jsonify({'success': False, 'message': '未授权'})
         data = request.get_json()
         path = data.get('path', '')
@@ -167,7 +181,7 @@ def register_file_manager_routes(app, localcdn_path):
 
     @app.route('/api/fm/download', methods=['GET'])
     def fm_download():
-        if not session.get('fm_authenticated'):
+        if not _fm_ok():
             return jsonify({'success': False, 'message': '未授权'})
         path = request.args.get('path', '')
         full_path = _validate_path(path)
@@ -177,7 +191,7 @@ def register_file_manager_routes(app, localcdn_path):
 
     @app.route('/api/fm/mkdir', methods=['POST'])
     def fm_mkdir():
-        if not session.get('fm_authenticated'):
+        if not _fm_ok():
             return jsonify({'success': False, 'message': '未授权'})
         data = request.get_json()
         path = data.get('path', '')
@@ -200,7 +214,7 @@ def register_file_manager_routes(app, localcdn_path):
 
     @app.route('/api/fm/search', methods=['GET'])
     def fm_search():
-        if not session.get('fm_authenticated'):
+        if not _fm_ok():
             return jsonify({'success': False, 'message': '未授权'})
         keyword = request.args.get('keyword', '').lower()
         if not keyword:

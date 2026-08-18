@@ -671,7 +671,7 @@ th > i { font-size:14px; margin-right:4px; vertical-align:-2px; }
 <div class="plugin-actions">
 <a href="/mk/{{ current_market or 'kn' }}/plugin/{{ plugin.id }}" class="btn sm ghost"><i class="mdui-icon material-icons">visibility</i><span data-i18n="view">查看</span></a>
 <a href="/mk/{{ current_market or 'kn' }}/update/{{ plugin.id }}" class="btn sm ghost"><i class="mdui-icon material-icons">edit</i><span data-i18n="edit">编辑</span></a>
-<a href="/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}" class="btn sm {{ 'danger' if plugin.status == 'active' else 'success' }}"><i class="mdui-icon material-icons">{{ 'visibility_off' if plugin.status == 'active' else 'publish' }}</i><span data-i18n-status="shelf">{{ '下架' if plugin.status == 'active' else '上架' }}</span></a>
+<a href="javascript:;" class="btn sm {{ 'danger' if plugin.status == 'active' else 'success' }}" onclick="fetch('/mk/{{ current_market or 'kn' }}/toggle_status/{{ plugin.id }}',{method:'POST'}).then(()=>location.reload())"><i class="mdui-icon material-icons">{{ 'visibility_off' if plugin.status == 'active' else 'publish' }}</i><span data-i18n-status="shelf">{{ '下架' if plugin.status == 'active' else '上架' }}</span></a>
 </div>
 </div>
 {% endfor %}

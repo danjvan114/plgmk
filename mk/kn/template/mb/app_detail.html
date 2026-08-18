@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#6b72f5">
+<title>KN Expanse · 发现</title>
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
+<link rel="stylesheet" href="/localcdn/gzs/mdui.min.css">
+<style>
+/* ===== KN Expanse 移动端(APP 风格) ===== */
+:root{
+  --bg:#eef1f8; --card:#ffffff; --card2:#f7f8fc; --text-1:#1d2238; --text-2:#5a6178; --text-3:#9aa1b6;
+  --accent:#6b72f5; --accent-2:#8a6df0; --accent-soft:rgba(107,114,245,.12); --divider:#eceff5;
+  --bar-bg:rgba(255,255,255,.92); --shadow:0 6px 22px rgba(42,54,94,.10); --shadow-2:0 10px 30px rgba(42,54,94,.14);
+  --topbar-h:56px; --tabbar-h:58px; --grad:linear-gradient(115deg,#5b63e8,#8a6df0 55%,#4f8ee0);
+}
+body.mobd-dark{
+  --bg:#0d1020; --card:#161a2e; --card2:#1b2036; --text-1:#e8eaf4; --text-2:#a9aec5; --text-3:#767d99;
+  --accent:#8b93ff; --accent-2:#a78bfa; --accent-soft:rgba(139,147,255,.14); --divider:#22263e;
+  --bar-bg:rgba(19,22,42,.92); --shadow:0 6px 22px rgba(0,0,0,.35); --shadow-2:0 10px 30px rgba(0,0,0,.45);
+}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text-1);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+  padding-top:var(--topbar-h);padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom));-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none;
+}
+a{color:var(--accent);text-decoration:none}
+button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+
+/* ---- 顶栏 ---- */
+.mobd-appbar{position:fixed;top:0;left:0;right:0;height:calc(var(--topbar-h) + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);z-index:1200;background:var(--bar-bg);box-shadow:0 1px 0 var(--divider);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.mobd-appbar .mdui-toolbar{height:var(--topbar-h);line-height:var(--topbar-h);padding:0 4px 0 6px}
+.mobd-appbar .mdui-btn-icon{color:var(--text-1)}
+#mobd-title{font-size:17px;font-weight:800;color:var(--text-1);margin-left:2px;letter-spacing:.3px}
+.mobd-hidden{display:none !important}
+#mobd-actions .mdui-btn-icon{color:var(--text-2)}
+
+/* ---- 页面 ---- */
+#mobd-content{min-height:100%}
+.mobd-page{display:none;padding:14px 12px 26px;max-width:560px;margin:0 auto}
+.mobd-page.mobd-active{display:block;animation:mobdFade .26s ease}
+@keyframes mobdFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---- 底栏 ---- */
+.mobd-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:1200;height:calc(var(--tabbar-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--bar-bg);box-shadow:0 -1px 0 var(--divider);display:flex;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.mobd-tabbar.mobd-hidden{display:none}
+.mobd-tab{flex:1;border:none;background:transparent;color:var(--text-2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:color .2s}
+.mobd-tab .mobd-tab-ico{font-size:22px;line-height:1;height:22px}
+.mobd-tab .mobd-tab-txt{font-size:11px;font-weight:600;letter-spacing:.3px}
+.mobd-tab.mobd-active{color:var(--accent)}
+.mobd-tab.mobd-active .mobd-tab-txt{font-weight:800}
+
+/* ---- 通用卡片 ---- */
+.mcard{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
+.mcard-tap{transition:transform .15s ease,box-shadow .2s ease}
+.mcard-tap:active{transform:scale(.985);box-shadow:var(--shadow-2)}
+.msec-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;margin:20px 4px 12px;color:var(--text-1)}
+.msec-title .mi{color:var(--accent);font-size:20px}
+.msec-title .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.msec-sub{font-size:12.5px;color:var(--text-3);margin:-6px 4px 12px}
+.mdiv{height:1px;background:var(--divider);margin:14px 0}
+
+/* ---- Hero ---- */
+.mhero{text-align:center;background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:28px 18px 22px;margin-bottom:4px;position:relative;overflow:hidden}
+.mhero::before{content:'';position:absolute;top:-70px;right:-70px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(107,114,245,.16),transparent 68%)}
+.mhero-logo{width:86px;height:86px;border-radius:24px;object-fit:contain;margin:0 auto 12px;display:block;box-shadow:0 10px 26px rgba(107,114,245,.28)}
+.mhero-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:30px;padding:5px 12px;margin-bottom:10px}
+.mhero h1{font-size:24px;font-weight:900;margin:0 0 6px;line-height:1.3;letter-spacing:.4px}
+.mhero h1 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mhero .hand{display:block;font-size:14px;font-weight:900;font-style:italic;color:var(--accent-2);text-transform:lowercase;margin-top:2px}
+.mhero p{font-size:13px;color:var(--text-2);line-height:1.7;margin:0 auto 18px;max-width:320px}
+.mhero-btns{display:flex;gap:10px;justify-content:center}
+.mbtn{flex:1;max-width:200px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:40px;padding:12px 18px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit;transition:transform .18s ease,box-shadow .25s}
+.mbtn:active{transform:scale(.96)}
+.mbtn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(107,114,245,.35), inset 0 1px 0 rgba(255,255,255,.3)}
+.mbtn-ghost{background:var(--card2);color:var(--text-2);box-shadow:inset 0 1px 0 var(--divider)}
+.mbtn-block{width:100%;max-width:none}
+
+/* ---- 特性/能力条目 ---- */
+.fitem{display:flex;gap:12px;align-items:flex-start}
+.fitem .fico{flex:none;width:44px;height:44px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.fitem .fico .mi{font-size:22px}
+.fitem h4{font-size:14.5px;font-weight:800;margin:2px 0 3px;color:var(--text-1)}
+.fitem p{font-size:12.5px;color:var(--text-2);line-height:1.6;margin:0}
+.fitem+.fitem{margin-top:16px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:30px;padding:4px 10px}
+.chip.plain{color:var(--text-3);background:var(--card2)}
+
+/* ---- 扩展横向滚动 ---- */
+.hscroll{display:flex;gap:12px;overflow-x:auto;margin:0 -4px;padding:4px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.hscroll::-webkit-scrollbar{display:none}
+.hcard{flex:0 0 82%;scroll-snap-align:start;background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:16px;cursor:pointer}
+.hcard .fico{width:46px;height:46px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.hcard h4{font-size:14.5px;font-weight:800;margin:0 0 2px}
+.hcard .author{font-size:11.5px;color:var(--text-3);margin:0 0 8px}
+.hcard p{font-size:12.5px;color:var(--text-2);line-height:1.6;margin:0 0 10px}
+.hcard .foot{display:flex;align-items:center;justify-content:space-between}
+.hcard .rate{font-size:12px;font-weight:800;color:#f59e0b}
+.hcard .view{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;color:var(--accent)}
+
+/* ---- 统计 ---- */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:14px 10px;text-align:center}
+.stat-card .num{font-size:22px;font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat-card .lab{font-size:11.5px;color:var(--text-3);margin-top:3px;font-weight:600}
+.stat-card .bar{height:4px;border-radius:2px;background:var(--card2);margin-top:8px;overflow:hidden}
+.stat-card .bar i{display:block;height:100%;border-radius:2px;background:var(--grad);transition:width 1.2s cubic-bezier(.22,.61,.36,1)}
+
+/* ---- 步骤 ---- */
+.step{display:flex;gap:14px;align-items:flex-start}
+.step .badge{flex:none;width:38px;height:38px;border-radius:12px;background:var(--grad);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(107,114,245,.3)}
+.step h4{font-size:14px;font-weight:800;margin:2px 0 3px}
+.step p{font-size:12.5px;color:var(--text-2);line-height:1.6;margin:0}
+.step+.step{margin-top:16px}
+
+/* ---- 团队 ---- */
+.team-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.team-card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:16px;text-align:center;cursor:pointer;transition:transform .15s ease}
+.team-card:active{transform:scale(.97)}
+.team-card .ava{width:56px;height:56px;border-radius:50%;object-fit:cover;margin:0 auto 8px;display:block;box-shadow:0 6px 14px rgba(42,54,94,.18)}
+.team-card h4{font-size:14px;font-weight:800;margin:0 0 2px}
+.team-card .role{font-size:11px;color:var(--accent);font-weight:700;margin:0 0 6px}
+.team-card p{font-size:11.5px;color:var(--text-3);line-height:1.55;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ---- 下载页 ---- */
+.dl-item{display:flex;align-items:center;gap:12px;cursor:pointer}
+.dl-item .dico{flex:none;width:46px;height:46px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.dl-item .dico .mi{font-size:24px}
+.dl-item h4{font-size:14.5px;font-weight:800;margin:0 0 2px}
+.dl-item .small{font-size:11.5px;color:var(--text-3)}
+.dl-item+.dl-item{margin-top:14px}
+.dl-arrow{color:var(--text-3);margin-left:auto}
+.dl-soon .dico{background:var(--card2);color:var(--text-3)}
+.dl-soon h4{color:var(--text-3)}
+
+/* ---- 我的/更多 ---- */
+.u-head{display:flex;align-items:center;gap:14px}
+.u-ava{flex:none;width:62px;height:62px;border-radius:50%;object-fit:cover;background:var(--accent-soft);color:var(--accent);font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px rgba(107,114,245,.28)}
+.u-head h3{font-size:17px;font-weight:900;margin:0 0 3px}
+.u-head .role{display:inline-block;font-size:11px;font-weight:800;color:var(--accent);background:var(--accent-soft);border-radius:30px;padding:3px 9px}
+.u-head p{font-size:12px;color:var(--text-3);margin:5px 0 0}
+.menu-list{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.menu-row{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border:none;background:transparent;color:var(--text-1);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;border-bottom:1px solid var(--divider)}
+.menu-row:last-child{border-bottom:none}
+.menu-row:active{background:var(--card2)}
+.menu-row .mi{color:var(--accent);font-size:20px}
+.menu-row .mi.mi2{color:var(--text-3)}
+.menu-row .m-switch{margin-left:auto;display:flex;align-items:center}
+.menu-row .chev{color:var(--text-3);margin-left:auto}
+.menu-row .chev.r{margin-left:0}
+.switch{position:relative;width:44px;height:24px;border-radius:14px;background:var(--card2);border:none;cursor:pointer;transition:background .2s}
+.switch.on{background:var(--accent)}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch.on::after{transform:translateX(20px)}
+
+/* ---- 子页 ---- */
+.sub-title{font-size:15px;font-weight:900;margin:0 0 12px;color:var(--text-1)}
+.ext-big{width:72px;height:72px;border-radius:20px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.ext-big .mi{font-size:36px}
+.p-tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+.u-bio{font-size:13px;color:var(--text-2);line-height:1.7;margin:12px 0 0}
+.u-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.u-meta .chip{font-size:11px;font-weight:700;color:var(--text-2);background:var(--card2);border-radius:30px;padding:4px 10px}
+.foot-note{text-align:center;font-size:11.5px;color:var(--text-3);padding:18px 0 6px;line-height:1.8}
+.foot-note a{margin:0 4px}
+</style>
+</head>
+<body>
+
+<!-- ===== mdui 顶栏 ===== -->
+<div class="mobd-appbar" id="mobd-topbar">
+  <div class="mdui-toolbar">
+    <a href="javascript:void(0)" class="mdui-btn mdui-btn-icon mdui-ripple mobd-hidden" id="mobd-back" aria-label="返回">
+      <i class="mdui-icon material-icons">arrow_back</i>
+    </a>
+    <span id="mobd-title">发现</span>
+    <div class="mdui-toolbar-spacer"></div>
+    <div id="mobd-actions">
+      <button class="mdui-btn mdui-btn-icon mdui-ripple" id="mobd-theme" aria-label="切换深色模式">
+        <i class="mdui-icon material-icons" id="mobd-theme-ico">brightness_6</i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 页面容器 ===== -->
+<main id="mobd-content">
+
+  <!-- 发现(默认主页) -->
+  <section class="mobd-page" id="page-discover">
+    <div class="mhero">
+      <img class="mhero-logo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse">
+      <span class="mhero-badge"><i class="mdui-icon material-icons" style="font-size:14px">auto_awesome</i>全新 v1.3.0</span>
+      <h1>现代化图形化编辑器<span class="grad">为生态而生</span><span class="hand">for creators</span></h1>
+      <p>高性能可扩展的图形化编程软件,为开发者提供简单而高效的方式来创建和分发游戏。</p>
+      <div class="mhero-btns">
+        <button class="mbtn mbtn-primary" id="dlCta"><i class="mdui-icon material-icons" style="font-size:18px">file_download</i>立即下载</button>
+        <button class="mbtn mbtn-ghost" onclick="window.open('https://code.pgrm.run/mk/kn','_blank')"><i class="mdui-icon material-icons" style="font-size:18px">extension</i>插件市场</button>
+      </div>
+    </div>
+
+    <div class="msec-title"><i class="mdui-icon material-icons mi">help</i><span>为什么选择 <span class="grad">KN Expanse</span></span></div>
+    <div class="mcard">
+      <div class="fitem"><span class="fico"><i class="mdui-icon material-icons">brush</i></span><div><h4>高性能绘制</h4><p>GPU 硬件加速,复杂场景依旧丝滑流畅,告别卡顿掉帧。</p><div class="chips"><span class="chip">GPU 加速</span><span class="chip">120 FPS</span></div></div></div>
+      <div class="mdiv"></div>
+      <div class="fitem"><span class="fico"><i class="mdui-icon material-icons">code</i></span><div><h4>可视化编程</h4><p>零门槛节点编辑,拖拽连线即写代码,创意不被语法束缚。</p><div class="chips"><span class="chip">拖拽连线</span><span class="chip">零代码</span></div></div></div>
+      <div class="mdiv"></div>
+      <div class="fitem"><span class="fico"><i class="mdui-icon material-icons">extension</i></span><div><h4>插件生态</h4><p>开放 JS 插件系统,官方与社区共建,一站式获取工具素材。</p><div class="chips"><span class="chip">JS 扩展</span><span class="chip">社区共建</span></div></div></div>
+      <div class="mdiv"></div>
+      <div class="fitem"><span class="fico"><i class="mdui-icon material-icons">send</i></span><div><h4>快速分发</h4><p>云存档 + 一键打包,Windows 一键分发,Mac / Linux 版研发中。</p><div class="chips"><span class="chip">云存档</span><span class="chip">多平台导出</span></div></div></div>
+    </div>
+
+    <div class="msec-title"><i class="mdui-icon material-icons mi">bolt</i><span>强大编辑器<span class="grad">核心能力</span></span></div>
+    <div class="mcard">
+      <div class="fitem"><span class="fico"><i class="mdui-icon material-icons">account_tree</i></span><div><h4>节点式编程</h4><p>可视化节点构建游戏逻辑,拖拽连线即写代码,结构一目了然。</p></div></div>
+      <div class="mdiv"></div>
+      <div class="fitem"><span class="fico"><i class="mdui-icon material-icons">visibility</i></span><div><h4>实时预览</h4><p>所见即所得,修改即时生效,边改边玩,快速迭代。</p></div></div>
+      <div class="mdiv"></div>
+      <div class="fitem"><span class="fico"><i class="mdui-icon material-icons">extension</i></span><div><h4>可扩展架构</h4><p>模块化设计,开放 JS 扩展接口,社区共建无限可能。</p></div></div>
+      <div class="mdiv"></div>
+      <div class="fitem"><span class="fico"><i class="mdui-icon material-icons">ios_share</i></span><div><h4>多平台导出</h4><p>一键导出多平台格式,Windows / macOS / Linux 全覆盖。</p></div></div>
+    </div>
+
+    <div class="msec-title"><i class="mdui-icon material-icons mi">extension</i><span>优秀扩展<span class="grad">为创作加速</span></span></div>
+    <div class="hscroll" id="extScroll"></div>
+
+    <div class="msec-title"><i class="mdui-icon material-icons mi">insert_chart</i><span>项目数据<span class="grad">实时更新</span></span></div>
+    <div class="stat-grid" id="statGrid">
+      <div class="stat-card"><div class="num" id="mStat1">0</div><div class="lab">活跃开发者</div><div class="bar"><i id="mBar1"></i></div></div>
+      <div class="stat-card"><div class="num" id="mStat2">0</div><div class="lab">项目创建</div><div class="bar"><i id="mBar2"></i></div></div>
+      <div class="stat-card"><div class="num" id="mStat3">0</div><div class="lab">发布帖子</div><div class="bar"><i id="mBar3"></i></div></div>
+    </div>
+
+    <div class="msec-title"><i class="mdui-icon material-icons mi">flag</i><span>三步开启<span class="grad">创作之旅</span></span></div>
+    <div class="mcard">
+      <div class="step"><span class="badge">01</span><div><h4>下载安装</h4><p>选择平台版本,一键安装强大编辑器,即装即用。</p></div></div>
+      <div class="mdiv"></div>
+      <div class="step"><span class="badge">02</span><div><h4>拖拽创作</h4><p>内置组件库,拖拽搭建场景与逻辑,创意即刻成型。</p></div></div>
+      <div class="mdiv"></div>
+      <div class="step"><span class="badge">03</span><div><h4>发布分发</h4><p>一键导出多平台工程,云分发触达全球玩家。</p></div></div>
+    </div>
+
+    <div class="msec-title"><i class="mdui-icon material-icons mi">group</i><span>制作团队</span></div>
+    <div class="team-grid" id="teamGrid">
+      <div class="team-card mcard-tap" onclick="mobd.push('user');mobdUser('Starry')"><img class="ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAlqfbtEqRjhfOBunI_HQH_leyt7nAACQCIAAvLa8VfkpwVQ7yU4Cz0E.jpg" alt="Starry"><h4>Starry</h4><p class="role">创始人 &amp; 核心开发</p><p>KNExpanse 项目发起人,构思产品整体框架,负责核心功能开发,决定项目后续更新方向。</p></div>
+      <div class="team-card mcard-tap" onclick="mobd.push('user');mobdUser('danjvan')"><img class="ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHApqfbt9tXvUV0ii7Ik54cseyIriAANCIgAC8trxV7_cQrV9GkgNPQQ.jpg" alt="danjvan"><h4>danjvan</h4><p class="role">前后端 + JS 开发</p><p>包揽前端页面、后端服务和数据库相关开发,搭建私有化云平台,保障云端功能稳定不掉线。</p></div>
+      <div class="team-card mcard-tap" onclick="mobd.push('user');mobdUser('Sleepforest')"><img class="ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAxqfbuGOe2o31A0Tfanha29bEw0QgACRCIAAvLa8VezI2dHK_oRyj0E.jpg" alt="Sleepforest"><h4>Sleepforest</h4><p class="role">UI 设计</p><p>大名鼎鼎的 Vibecoding 之神(bushi)!全权负责界面视觉与交互设计,打造整套项目视觉风格。</p></div>
+      <div class="team-card mcard-tap" onclick="mobd.push('user');mobdUser('Inventocode')"><img class="ava" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZHAtqfbt_PMPFSPAJm034HEsDijjozAACQyIAAvLa8VdlgZfTIXacAT0E.jpg" alt="Inventocode"><h4>Inventocode</h4><p class="role">特别感谢</p><p>开发过程中交流技术,提供思路与指导,给予项目支持。</p></div>
+    </div>
+
+    <div class="foot-note">用热爱创造无限可能<br><a href="https://www.codemao.cn/" target="_blank">点猫科技</a>·<a href="https://code.pgrm.run/" target="_blank">KNHX工作室</a>·<a href="https://code.pgrm.run/app/ccvue" target="_blank">CatCode</a></div>
+  </section>
+
+  <!-- 下载 -->
+  <section class="mobd-page" id="page-download">
+    <div class="mhero">
+      <img class="mhero-logo" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png" alt="KN Expanse">
+      <h1>立即<span class="grad">开始创作</span></h1>
+      <p>选择你的平台,下载 KN Expanse 桌面版</p>
+    </div>
+    <div class="msec-title"><i class="mdui-icon material-icons mi">computer</i><span>桌面版</span></div>
+    <div class="mcard">
+      <a class="dl-item" href="https://api.gitproxy.dev/github.com/danjvan114/knu/releases/download/1.2.4/KN.Expanse.v1.2.4.exe" target="_blank" rel="noopener">
+        <span class="dico"><i class="mdui-icon material-icons">laptop_windows</i></span>
+        <div><h4>Windows</h4><p class="small">KN Expanse v1.3.0 · 64位 exe</p></div>
+        <i class="mdui-icon material-icons dl-arrow">download</i>
+      </a>
+      <div class="mdiv"></div>
+      <div class="dl-item dl-soon">
+        <span class="dico"><i class="mdui-icon material-icons">laptop_mac</i></span>
+        <div><h4>macOS</h4><p class="small">Apple Silicon / Intel · 研发中</p></div>
+        <i class="mdui-icon material-icons dl-arrow">schedule</i>
+      </div>
+      <div class="mdiv"></div>
+      <div class="dl-item dl-soon">
+        <span class="dico"><i class="mdui-icon material-icons">laptop_chromebook</i></span>
+        <div><h4>Linux</h4><p class="small">AppImage / deb · 研发中</p></div>
+        <i class="mdui-icon material-icons dl-arrow">schedule</i>
+      </div>
+    </div>
+    <div class="msec-title"><i class="mdui-icon material-icons mi">smartphone</i><span>移动端</span></div>
+    <div class="mcard">
+      <a class="dl-item" href="https://code.pgrm.run/localcdn/2/app-debug.apk" target="_blank" rel="noopener">
+        <span class="dico"><i class="mdui-icon material-icons">android</i></span>
+        <div><h4>安卓下载</h4><p class="small">APK 安装包</p></div>
+        <i class="mdui-icon material-icons dl-arrow">download</i>
+      </a>
+      <div class="mdiv"></div>
+      <div class="dl-item dl-soon">
+        <span class="dico"><i class="mdui-icon material-icons">phone_iphone</i></span>
+        <div><h4>iOS</h4><p class="small">正在研发</p></div>
+        <i class="mdui-icon material-icons dl-arrow">schedule</i>
+      </div>
+    </div>
+    <button class="mbtn mbtn-ghost mbtn-block" onclick="window.open('https://github.com/danjvan114/knu/releases','_blank')"><i class="mdui-icon material-icons" style="font-size:18px">update</i>查看更新记录</button>
+  </section>
+
+  <!-- 我的 -->
+  <section class="mobd-page" id="page-me">
+    <div id="meLogin" class="mcard mobd-hidden">
+      <div class="u-head">
+        <span class="u-ava"><i class="mdui-icon material-icons">person</i></span>
+        <div><h3>未登录</h3><p>登录后同步你的主页与作品</p></div>
+      </div>
+      <div class="mdiv"></div>
+      <div style="display:flex;gap:10px">
+        <button class="mbtn mbtn-ghost mbtn-block" onclick="location.href='/login'">登录</button>
+        <button class="mbtn mbtn-ghost mbtn-block" onclick="location.href='/register'">注册</button>
+      </div>
+    </div>
+    <div id="meUser" class="mcard mobd-hidden">
+      <div class="u-head">
+        <span class="u-ava" id="meAva"></span>
+        <div>
+          <h3 id="meName"></h3>
+          <span class="role" id="meRole"></span>
+          <p id="meBio"></p>
+        </div>
+      </div>
+    </div>
+    <div class="msec-title"><i class="mdui-icon material-icons mi">settings</i><span>设置</span></div>
+    <div class="menu-list">
+      <button class="menu-row" id="meHomeBtn"><i class="mdui-icon material-icons">person</i><span>我的主页</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+      <button class="menu-row" onclick="window.open('https://code.pgrm.run/mk/kn/upload','_blank')"><i class="mdui-icon material-icons">publish</i><span>发布作品</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+      <button class="menu-row" onclick="window.open('https://code.pgrm.run/mk/kn/developer/stats','_blank')"><i class="mdui-icon material-icons">bar_chart</i><span>开发者统计</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+      <button class="menu-row" onclick="location.href='/logout'"><i class="mdui-icon material-icons mi2">exit_to_app</i><span>退出登录</span></button>
+    </div>
+  </section>
+
+  <!-- 更多 -->
+  <section class="mobd-page" id="page-more">
+    <div class="msec-title"><i class="mdui-icon material-icons mi">explore</i><span>浏览</span></div>
+    <div class="menu-list">
+      <button class="menu-row" onclick="window.open('https://code.pgrm.run/mk/kn','_blank')"><i class="mdui-icon material-icons">forum</i><span>编程社区</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+      <button class="menu-row" onclick="window.open('https://code.pgrm.run/mk/kn/plugin','_blank')"><i class="mdui-icon material-icons">extension</i><span>正式插件市场</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+      <button class="menu-row" onclick="window.open('https://github.com/danjvan114/knu/releases','_blank')"><i class="mdui-icon material-icons">update</i><span>更新记录</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+      <button class="menu-row" onclick="mobd.go('discover');setTimeout(function(){document.getElementById('teamGrid').scrollIntoView({behavior:'smooth'})},80)"><i class="mdui-icon material-icons">group</i><span>制作团队</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+    </div>
+    <div class="msec-title"><i class="mdui-icon material-icons mi">link</i><span>友情链接</span></div>
+    <div class="menu-list">
+      <button class="menu-row" onclick="window.open('https://www.codemao.cn/','_blank')"><i class="mdui-icon material-icons">rocket_launch</i><span>点猫科技</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+      <button class="menu-row" onclick="window.open('https://code.pgrm.run/','_blank')"><i class="mdui-icon material-icons">hub</i><span>KNHX工作室</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+      <button class="menu-row" onclick="window.open('https://code.pgrm.run/app/ccvue','_blank')"><i class="mdui-icon material-icons">memory</i><span>CatCode</span><i class="mdui-icon material-icons chev">chevron_right</i></button>
+    </div>
+    <div class="foot-note">KN Expanse · 用热爱创造无限可能<br>v1.3.0</div>
+  </section>
+
+  <!-- 扩展详情(子页) -->
+  <section class="mobd-page" id="page-ext">
+    <div class="mcard" style="text-align:center">
+      <div class="ext-big" style="margin:0 auto 12px" id="extIco"></div>
+      <h3 class="sub-title" id="extName" style="margin-bottom:2px">扩展详情</h3>
+      <p class="author" id="extAuthor" style="font-size:12px;color:var(--text-3);margin:0 0 6px"></p>
+      <p style="font-size:13px;color:var(--text-2);line-height:1.7;margin:0" id="extDesc"></p>
+      <div class="p-tags" id="extTags"></div>
+      <div class="mdiv"></div>
+      <div class="chips" style="justify-content:center">
+        <span class="chip" id="extRate"></span>
+      </div>
+      <div style="margin-top:14px">
+        <button class="mbtn mbtn-primary mbtn-block" id="extInstall"><i class="mdui-icon material-icons" style="font-size:18px">extension</i>进入插件市场</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 用户资料(子页) -->
+  <section class="mobd-page" id="page-user">
+    <div class="mcard">
+      <div class="u-head">
+        <span class="u-ava" id="uAva"></span>
+        <div>
+          <h3 id="uName"></h3>
+          <span class="role" id="uRole"></span>
+        </div>
+      </div>
+      <p class="u-bio" id="uBio"></p>
+      <div class="u-meta">
+        <span class="chip" id="uReg"></span>
+        <span class="chip" id="uQq"></span>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="mbtn mbtn-ghost mbtn-block" id="uHomeBtn"><i class="mdui-icon material-icons" style="font-size:18px">person</i>查看主页</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 底栏容器(mobd.js 统一绘制) -->
+<nav id="mobd-tabbar"></nav>
+
+<script src="/localcdn/gzs/mdui.min.js"></script>
+<script src="/localcdn/gzs/mobd.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- 服务端注入数据 ---------- */
+  var USERS = {{ users | tojson | safe }};
+  var CUR_USER = {{ session.get('user', '') | tojson | safe }};
+
+  function $(s) { return document.querySelector(s); }
+  function $$(s) { return Array.prototype.slice.call(document.querySelectorAll(s)); }
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function avaUrl(user, size) {
+    size = size || 100;
+    var qq = user && user.qq;
+    return qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + qq + '&s=' + size : '';
+  }
+
+  /* ---------- 页面注册 ---------- */
+  mobd.page('discover', { title: '发现' });
+  mobd.page('download', { title: '下载' });
+  mobd.page('me', { title: '我的' });
+  mobd.page('more', { title: '更多' });
+  mobd.page('ext', { title: '扩展详情', sub: true });
+  mobd.page('user', { title: '用户资料', sub: true });
+
+  /* ---------- 底栏(统一 JS 绘制) ---------- */
+  mobd.tabbar({
+    items: [
+      { id: 'discover', icon: '<i class="mdui-icon material-icons">explore</i>', text: '发现' },
+      { id: 'download', icon: '<i class="mdui-icon material-icons">download</i>', text: '下载' },
+      { id: 'me', icon: '<i class="mdui-icon material-icons">person</i>', text: '我的' },
+      { id: 'more', icon: '<i class="mdui-icon material-icons">more_horiz</i>', text: '更多' }
+    ]
+  });
+
+  /* ---------- 深色模式 ---------- */
+  var DARK_KEY = 'mobd-dark';
+  function applyDark(on) {
+    document.body.classList.toggle('mobd-dark', on);
+    try { localStorage.setItem(DARK_KEY, on ? '1' : '0'); } catch (e) {}
+  }
+  var darkOn = false;
+  try { darkOn = localStorage.getItem(DARK_KEY) === '1'; } catch (e) {}
+  applyDark(darkOn);
+  $('#mobd-theme').addEventListener('click', function () { applyDark(!document.body.classList.contains('mobd-dark')); });
+
+  /* ---------- 项目数据动画 ---------- */
+  var COMMUNITY_LAUNCH = new Date('2026-07-15T00:00:00+08:00');
+  var _days = Math.max(0, Math.floor((Date.now() - COMMUNITY_LAUNCH.getTime()) / 86400000));
+  var STATS = [
+    { el: 'mStat1', bar: 'mBar1', num: 8 + Math.round(_days * 0.2), pct: 55 },
+    { el: 'mStat2', bar: 'mBar2', num: 15 + Math.round(_days * 2), pct: 62 },
+    { el: 'mStat3', bar: 'mBar3', num: 12 + Math.round(_days * 3.5), pct: 58 }
+  ];
+  var statDone = false;
+  function animStats() {
+    if (statDone) return;
+    statDone = true;
+    STATS.forEach(function (s) {
+      var el = document.getElementById(s.el), bar = document.getElementById(s.bar);
+      if (!el) return;
+      var t0 = null;
+      function tick(ts) {
+        if (!t0) t0 = ts;
+        var p = Math.min((ts - t0) / 1200, 1);
+        var e = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(s.num * e).toLocaleString();
+        if (bar) bar.style.width = (s.pct * e) + '%';
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+  var statObs = new IntersectionObserver(function (ents) {
+    ents.forEach(function (en) { if (en.isIntersecting) { animStats(); statObs.disconnect(); } });
+  });
+  statObs.observe($('#statGrid'));
+
+  /* ---------- 扩展数据(插件市场 API) ---------- */
+  var MARKET_BASE = 'https://code.pgrm.run';
+  var PLUGINS = [];
+  var EXT_ICONS = ['extension', 'auto_awesome', 'palette', 'bar_chart', 'videogame_asset', 'science'];
+
+  function renderExt() {
+    var box = $('#extScroll');
+    if (!box) return;
+    if (!PLUGINS.length) {
+      box.innerHTML = '<div class="hcard" style="flex:0 0 82%"><span class="fico"><i class="mdui-icon material-icons">extension</i></span><h4>正在加载扩展…</h4><p>从插件市场获取最新扩展</p></div>';
+      return;
+    }
+    var top = PLUGINS.slice().sort(function (a, b) { return (b.rating || 0) - (a.rating || 0); }).slice(0, 6);
+    box.innerHTML = top.map(function (p, i) {
+      var tags = (p.tags || []).slice(0, 2).map(escHtml).join(' · ');
+      return '<div class="hcard mcard-tap" data-id="' + escHtml(p.id) + '">' +
+        '<span class="fico"><i class="mdui-icon material-icons">' + EXT_ICONS[i % EXT_ICONS.length] + '</i></span>' +
+        '<h4>' + escHtml(p.name) + '</h4>' +
+        '<p class="author">by @' + escHtml(p.author) + (tags ? ' · ' + tags : '') + '</p>' +
+        '<p>' + escHtml((p.summary || p.description || '').slice(0, 60)) + '</p>' +
+        '<div class="foot"><span class="rate">★ ' + (p.rating != null ? Number(p.rating).toFixed(1) : '5.0') + '</span>' +
+        '<span class="view"><i class="mdui-icon material-icons" style="font-size:14px">visibility</i>查看</span></div>' +
+        '</div>';
+    }).join('');
+    box.querySelectorAll('.hcard').forEach(function (c) {
+      c.addEventListener('click', function () { openExt(c.getAttribute('data-id')); });
+    });
+  }
+
+  function loadPlugins() {
+    var url = MARKET_BASE + '/app/api/knmk?page=1';
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.onload = function () {
+      try {
+        var d = JSON.parse(xhr.responseText);
+        if (d && d.plugins && d.plugins.length) { PLUGINS = d.plugins; }
+      } catch (e) {}
+      renderExt();
+    };
+    xhr.onerror = function () { renderExt(); };
+    xhr.send();
+  }
+
+  /* ---------- 扩展详情子页 ---------- */
+  var curPlugin = null;
+  function openExt(id) {
+    curPlugin = null;
+    for (var i = 0; i < PLUGINS.length; i++) { if (String(PLUGINS[i].id) === String(id)) { curPlugin = PLUGINS[i]; break; } }
+    if (!curPlugin) { window.open(MARKET_BASE + '/mk/kn', '_blank'); return; }
+    $('#extIco').innerHTML = '<i class="mdui-icon material-icons">extension</i>';
+    $('#extName').textContent = curPlugin.name || '扩展';
+    $('#extAuthor').textContent = 'by @' + (curPlugin.author || 'unknown');
+    $('#extDesc').textContent = curPlugin.description || curPlugin.summary || '暂无简介';
+    var tags = (curPlugin.tags || []).map(function (t) { return '<span class="chip plain">' + escHtml(t) + '</span>'; }).join('');
+    $('#extTags').innerHTML = tags;
+    $('#extRate').textContent = '★ 评分 ' + (curPlugin.rating != null ? Number(curPlugin.rating).toFixed(1) : '5.0');
+    $('#extInstall').onclick = function () {
+      window.open(MARKET_BASE + '/mk/kn/plugin/' + encodeURIComponent(id), '_blank');
+    };
+    mobd.push('ext');
+  }
+
+  /* ---------- 用户资料子页 ---------- */
+  function mobdUser(username) {
+    var u = USERS[username] || {};
+    var name = username || '未知用户';
+    var ava = avaUrl(u, 100);
+    $('#uAva').innerHTML = ava ? '<img class="u-ava" src="' + ava + '" alt="">' : name.slice(0, 1).toUpperCase();
+    $('#uName').textContent = name;
+    $('#uRole').textContent = u.role || '用户';
+    $('#uBio').textContent = u.bio || '这个人很懒,还没有填写简介。';
+    $('#uReg').textContent = u.reg_time ? '加入于 ' + u.reg_time.slice(0, 10) : '未知加入时间';
+    $('#uQq').textContent = u.qq ? 'QQ ' + u.qq : '';
+    $('#uHomeBtn').onclick = function () { location.href = '/u/' + encodeURIComponent(name); };
+    mobd.push('user');
+  }
+  window.mobdUser = mobdUser;
+
+  /* ---------- 我的 ---------- */
+  function renderMe() {
+    if (!CUR_USER) {
+      $('#meLogin').classList.remove('mobd-hidden');
+      $('#meUser').classList.add('mobd-hidden');
+      $('#meHomeBtn').classList.add('mobd-hidden');
+      return;
+    }
+    $('#meLogin').classList.add('mobd-hidden');
+    $('#meUser').classList.remove('mobd-hidden');
+    var u = USERS[CUR_USER] || {};
+    var ava = avaUrl(u, 100);
+    $('#meAva').innerHTML = ava ? '<img src="' + ava + '" alt="" style="width:62px;height:62px;border-radius:50%;object-fit:cover">' : CUR_USER.slice(0, 1).toUpperCase();
+    $('#meName').textContent = CUR_USER;
+    $('#meRole').textContent = u.role || '用户';
+    $('#meBio').textContent = u.bio || '';
+    $('#meHomeBtn').classList.remove('mobd-hidden');
+  }
+  $('#meHomeBtn').addEventListener('click', function () { location.href = '/u/' + encodeURIComponent(CUR_USER); });
+  renderMe();
+
+  /* ---------- 立即下载 CTA ---------- */
+  $('#dlCta').addEventListener('click', function () { mobd.go('download'); });
+
+  /* ---------- 启动 ---------- */
+  loadPlugins();
+  renderExt();
+  mobd.init({ default: 'discover' });
+})();
+</script>
+</body>
+</html>

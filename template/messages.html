@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>消息中心</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -37,6 +38,14 @@
         .announce-card p{font-size:14px;color:#555;line-height:1.8;white-space:pre-wrap;word-break:break-all}
         .announce-card .msg-time{display:block;margin-top:10px;font-size:12px;color:#999}
         .empty{text-align:center;color:#999;padding:60px 0;font-size:14px}
+    
+        @media (max-width:640px){
+            .main-box{padding-left:10px;padding-right:10px}
+            .tabs{overflow-x:auto}
+            .msg-item{padding:12px}
+            .read-all-btn{padding:6px 12px;font-size:12px}
+            .announce-card{padding:14px}
+        }
     </style>
 </head>
 <body>
@@ -205,6 +214,6 @@
             });
         });
     </script>
-    <script src="/localcdn/gzs/knf.js?v=9"></script>
+    <script src="/localcdn/gzs/knf.js?v=18"></script>
 </body>
 </html>

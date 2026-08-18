@@ -664,7 +664,7 @@ th > i { font-size:14px; margin-right:4px; vertical-align:-2px; }
 <td><span class="tag role-{{ info.role }}">{{ {'admin':'管理员','developer':'开发者','user':'普通用户'}[info.role] }}</span></td>
 <td>
 <button class="btn sm ghost" onclick="showEditModal('{{ username }}', '{{ info.role }}')"><i class="mdui-icon material-icons">edit</i><span data-i18n="edit">编辑</span></button>
-<a href="/op/user/delete/{{ username }}" class="btn sm danger" onclick="return confirm('确定删除用户？')"><i class="mdui-icon material-icons">delete</i><span data-i18n="delete">删除</span></a>
+<a href="javascript:;" class="btn sm danger" onclick="if(confirm('确定删除用户？'))fetch('/op/user/delete/{{ username }}',{method:'POST'}).then(()=>location.reload())"><i class="mdui-icon material-icons">delete</i><span data-i18n="delete">删除</span></a>
 </td>
 </tr>
 {% endfor %}
