@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>导播控制台</title>
+<link rel="stylesheet" href="/static/vendor/mdui.min.css">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="mdui-theme-primary-indigo mdui-theme-accent-pink">
+
+<div class="mdui-appbar mdui-appbar-fixed">
+  <div class="mdui-toolbar mdui-color-indigo-700">
+    <a class="mdui-typo-headline" href="javascript:void(0)">导播控制台</a>
+    <div class="mdui-toolbar-spacer"></div>
+    <span id="globalStatus" class="mdui-typo-body-1"></span>
+  </div>
+</div>
+
+<div class="mdui-drawer mdui-drawer-open" id="drawer">
+  <div class="mdui-drawer-header mdui-typo-title">推流实例</div>
+  <ul class="mdui-list" id="streamList"></ul>
+  <div class="drawer-actions">
+    <button class="mdui-btn mdui-btn-block mdui-color-indigo mdui-ripple" id="btnNewStream">+ 新建推流</button>
+    <button class="mdui-btn mdui-btn-block mdui-btn-outlined mdui-ripple" id="btnSettings">设置</button>
+  </div>
+</div>
+
+<div class="main" id="main">
+  <div id="detail"></div>
+</div>
+
+<!-- 新建推流 -->
+<div class="mdui-dialog" id="newStreamDialog">
+  <div class="mdui-dialog-title">新建推流</div>
+  <div class="mdui-dialog-content">
+    <p class="hint" id="defaultRtmpHint"></p>
+    <div class="mdui-textfield">
+      <label class="mdui-textfield-label">名称</label>
+      <input class="mdui-textfield-input" id="ns-name" type="text">
+    </div>
+    <div class="mdui-textfield">
+      <label class="mdui-textfield-label">RTMP 地址（rtmp://域名/app）</label>
+      <input class="mdui-textfield-input" id="ns-rtmp" type="text" placeholder="rtmp://push.example.com/live">
+    </div>
+    <div class="mdui-textfield">
+      <label class="mdui-textfield-label">推流码（key）</label>
+      <input class="mdui-textfield-input" id="ns-key" type="text">
+    </div>
+  </div>
+  <div class="mdui-dialog-actions">
+    <button class="mdui-btn" mdui-dialog-close>取消</button>
+    <button class="mdui-btn mdui-color-indigo" id="ns-ok">创建</button>
+  </div>
+</div>
+
+<!-- 设置 -->
+<div class="mdui-dialog" id="settingsDialog">
+  <div class="mdui-dialog-title">设置</div>
+  <div class="mdui-dialog-content">
+    <div class="mdui-textfield">
+      <label class="mdui-textfield-label">默认 RTMP 地址（新建推流时自动填充）</label>
+      <input class="mdui-textfield-input" id="st-rtmp" type="text" placeholder="留空则每次新建时询问">
+    </div>
+    <div class="mdui-textfield">
+      <label class="mdui-textfield-label">Web 端口</label>
+      <input class="mdui-textfield-input" id="st-port" type="number" min="1" max="65535">
+    </div>
+    <div class="mdui-textfield">
+      <label class="mdui-textfield-label">ffmpeg 路径（可留空用 PATH）</label>
+      <input class="mdui-textfield-input" id="st-ffmpeg" type="text">
+    </div>
+    <div class="row">
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">默认码率 (kbps)</label>
+        <input class="mdui-textfield-input" id="st-bitrate" type="number" min="100">
+      </div>
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">帧率 (fps)</label>
+        <input class="mdui-textfield-input" id="st-fps" type="number" min="1" max="120">
+      </div>
+    </div>
+    <div class="row">
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">ffmpeg 日志级别</label>
+        <select class="mdui-select" id="st-loglevel">
+          <option value="quiet">quiet（仅致命错误）</option>
+          <option value="error">error（仅错误）</option>
+          <option value="warning">warning（警告+错误，默认）</option>
+          <option value="info">info（详细信息）</option>
+          <option value="verbose">verbose（更详细）</option>
+          <option value="debug">debug（调试，最详细）</option>
+        </select>
+      </div>
+      <div class="col" style="padding-top:18px">
+        <label class="mdui-switch">
+          <input type="checkbox" id="st-autorestart">
+          <i class="mdui-switch-icon"></i>
+          推流异常退出时自动重启
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="mdui-dialog-actions">
+    <button class="mdui-btn" mdui-dialog-close>取消</button>
+    <button class="mdui-btn mdui-color-indigo" id="st-ok">保存</button>
+  </div>
+</div>
+
+<!-- 添加图层 -->
+<div class="mdui-dialog" id="addLayerDialog">
+  <div class="mdui-dialog-title">添加图层</div>
+  <div class="mdui-dialog-content">
+    <div class="row">
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">图层名称</label>
+        <input class="mdui-textfield-input" id="al-name" type="text">
+      </div>
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">类型</label>
+        <select class="mdui-select" id="al-type">
+          <option value="media">媒体播放（视频）</option>
+          <option value="image">图片（含透明通道）</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" id="al-mode-row">
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">播放方式</label>
+        <select class="mdui-select" id="al-mode">
+          <option value="single">单文件</option>
+          <option value="folder">文件夹循环</option>
+          <option value="list">指定列表（数组格式）</option>
+        </select>
+      </div>
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">循环播放</label>
+        <div style="padding-top:26px">
+          <label class="mdui-switch">
+            <input type="checkbox" id="al-loop" checked>
+            <i class="mdui-switch-icon"></i>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="mdui-textfield">
+      <label class="mdui-textfield-label" id="al-src-label">素材路径</label>
+      <input class="mdui-textfield-input" id="al-source" type="text" placeholder="C:\videos\a.mp4">
+    </div>
+    <div class="mdui-textfield" id="al-list-wrap" style="display:none">
+      <label class="mdui-textfield-label">文件列表（JSON 数组，如 ["C:/a.mp4","C:/b.mp4"]）</label>
+      <textarea class="mdui-textfield-input" id="al-list" rows="3"></textarea>
+    </div>
+    <div class="row">
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">X（左上角坐标）</label>
+        <input class="mdui-textfield-input" id="al-x" type="number" value="0">
+      </div>
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">Y（左上角坐标）</label>
+        <input class="mdui-textfield-input" id="al-y" type="number" value="0">
+      </div>
+    </div>
+    <div class="row">
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">宽（留空自动等比）</label>
+        <input class="mdui-textfield-input" id="al-w" type="number">
+      </div>
+      <div class="mdui-textfield col">
+        <label class="mdui-textfield-label">高（留空自动等比）</label>
+        <input class="mdui-textfield-input" id="al-h" type="number">
+      </div>
+    </div>
+    <label class="mdui-switch">
+      <input type="checkbox" id="al-chroma">
+      <i class="mdui-switch-icon"></i>
+      颜色抠图（透明化指定颜色）
+    </label>
+    <div id="al-chroma-wrap" style="display:none; margin-top:16px">
+      <div class="row">
+        <div class="col">
+          <label class="mdui-textfield-label">抠图颜色</label>
+          <input type="color" id="al-chroma-color" value="#00FF00" style="width:100%; height:38px; border:none; cursor:pointer">
+        </div>
+        <div class="mdui-textfield col">
+          <label class="mdui-textfield-label">强度：<span id="al-chroma-val">20</span></label>
+          <input type="range" id="al-chroma-intensity" min="0" max="100" value="20" style="width:100%">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mdui-dialog-actions">
+    <button class="mdui-btn" mdui-dialog-close>取消</button>
+    <button class="mdui-btn mdui-color-indigo" id="al-ok">添加</button>
+  </div>
+</div>
+
+<script src="/static/vendor/mdui.min.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
