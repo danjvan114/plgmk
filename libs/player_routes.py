@@ -152,27 +152,50 @@ def login_player():
 
 def set_player_password():
     data = request.get_json()
-    
+
+    player_logged_in = 'player_name' in session
+    site_admin = False
+    try:
+        from .config import User
+        u = session.get('user')
+        if u:
+            user = User.query.get(u)
+            site_admin = bool(user and user.role == 'admin')
+    except Exception:
+        pass
+
+    if not player_logged_in and not site_admin:
+        return jsonify({
+            'success': False,
+            'message': '请先登录'
+        }), 401
+
     if not data or 'username' not in data or 'password' not in data:
         return jsonify({
             'success': False,
             'message': '缺少用户名或密码'
         }), 400
-    
+
     username = data['username'].strip()
     password = data['password'].strip()
-    
+
     if not username or not password:
         return jsonify({
             'success': False,
             'message': '用户名和密码不能为空'
         }), 400
-    
+
     if len(password) < 6:
         return jsonify({
             'success': False,
             'message': '密码长度不能少于6位'
         }), 400
+
+    if not site_admin and username != session.get('player_name'):
+        return jsonify({
+            'success': False,
+            'message': '无权限修改其他玩家的密码'
+        }), 403
     
     try:
         engine = get_player_engine()

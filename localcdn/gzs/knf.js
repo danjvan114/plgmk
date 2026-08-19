@@ -1,5 +1,55 @@
-// 全站统一顶栏导航
+// 全站统一顶栏导航 v19 —— PC 端由 mbd.js(KE 顶栏)绘制,移动端保持本脚本原生顶栏
+
+const s=document.createElement('script');s.src='/localcdn/gzs/cursor.js';document.head.appendChild(s);
 (function() {
+    /* ===== 禁止全部模糊 / 毛玻璃:遍历全部 CSS 规则强制关闭 ===== */
+    (function noFx() {
+        function hasBlur(v) { return /blur/i.test(v); }
+        function walk(rules) {
+            if (!rules) return;
+            for (var i = 0; i < rules.length; i++) {
+                var r = rules[i];
+                try {
+                    if (r.cssRules) walk(r.cssRules);
+                    if (r.style) {
+                        if (hasBlur(r.style.getPropertyValue('filter'))) r.style.setProperty('filter', 'none', 'important');
+                        if (r.style.getPropertyValue('backdrop-filter')) r.style.setProperty('backdrop-filter', 'none', 'important');
+                        if (r.style.getPropertyValue('-webkit-backdrop-filter')) r.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+                    }
+                } catch (e) {}
+            }
+        }
+        function scan() {
+            try {
+                for (var i = 0; i < document.styleSheets.length; i++) walk(document.styleSheets[i].cssRules || document.styleSheets[i].rules);
+            } catch (e) {}
+            var els = document.querySelectorAll('*');
+            for (var j = 0; j < els.length; j++) {
+                var st = els[j].style;
+                try {
+                    if (hasBlur(st.filter)) st.setProperty('filter', 'none', 'important');
+                    if (st.backdropFilter) st.setProperty('backdrop-filter', 'none', 'important');
+                    if (st.webkitBackdropFilter) st.setProperty('-webkit-backdrop-filter', 'none', 'important');
+                } catch (e) {}
+            }
+        }
+        var gs = document.createElement('style');
+        gs.id = 'knf-nofx';
+        gs.textContent = '*, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }';
+        document.head.appendChild(gs);
+        scan();
+        var timer = null;
+        new MutationObserver(function (muts) {
+            for (var i = 0; i < muts.length; i++) {
+                var t = muts[i].target;
+                if (t === document.head || document.head.contains(t)) {
+                    if (!timer) timer = setTimeout(function () { timer = null; scan(); }, 0);
+                    break;
+                }
+            }
+        }).observe(document.head, { childList: true, subtree: true });
+    })();
+
     const style = document.createElement('style');
     style.textContent = `
         /* 隐藏滚动条 */
@@ -214,400 +264,212 @@
     `;
     document.head.appendChild(style);
 
-    // 自定义鼠标指针:自动读取各主题 int.inf,支持 .ani(运行时解析成浏览器可用光标)
-    const csFolders = { light: '%E6%B5%85%E8%89%B2', dark: '%E6%B7%B1%E8%89%B2' };
-    function csParseInf(text) {
-        const map = {};
-        let inStrings = false;
-        String(text).split(/\r?\n/).forEach(function (line) {
-            const t = line.trim();
-            if (/^\[strings\]\s*$/i.test(t)) { inStrings = true; return; }
-            if (/^\[/.test(t)) { inStrings = false; return; }
-            if (!inStrings) return;
-            const m = t.match(/^([A-Za-z0-9_]+)\s*=\s*"?([^"\r\n]*)"?/);
-            if (m) map[m[1].toLowerCase()] = m[2].trim().replace(/\\/g, '/');
-        });
-        return map;
-    }
-    function csPick(map, keys) {
-        for (let i = 0; i < keys.length; i++) { if (map[keys[i]]) return map[keys[i]]; }
-        return '';
-    }
-    function csHash(s) {
-        let h = 0;
-        for (let i = 0; i < s.length; i++) { h = ((h << 5) - h + s.charCodeAt(i)) | 0; }
-        return (h >>> 0).toString(36);
-    }
-    function csParseAni(arrayBuffer) {
-        const u8 = new Uint8Array(arrayBuffer);
-        const dv = new DataView(arrayBuffer);
-        if (u8.length < 16) return [];
-        const chunks = [];
-        for (let i = 12; i + 8 <= u8.length; ) {
-            const cid = String.fromCharCode(u8[i], u8[i + 1], u8[i + 2], u8[i + 3]);
-            const size = dv.getUint32(i + 4, true);
-            chunks.push({ cid: cid, off: i + 8, size: size });
-            i += 8 + size + (size & 1);
-        }
-        const findChunk = function (name) {
-            for (let i = 0; i < chunks.length; i++) { if (chunks[i].cid === name) return chunks[i]; }
-            return null;
-        };
-        let nFrames = 0, dispRate = 0;
-        const anih = findChunk('anih');
-        if (anih && anih.size >= 36) {
-            nFrames = dv.getUint32(anih.off + 4, true);
-            dispRate = dv.getUint32(anih.off + 28, true);
-        }
-        const rateCh = findChunk('rate'), seqCh = findChunk('seq ');
-        const rates = [];
-        if (rateCh) { for (let k = 0; k < Math.floor(rateCh.size / 4); k++) { rates.push(dv.getUint32(rateCh.off + k * 4, true)); } }
-        const seq = [];
-        if (seqCh) { for (let k = 0; k < Math.floor(seqCh.size / 4); k++) { seq.push(u8[seqCh.off + k * 4]); } }
-        const icons = [];
-        const listCh = findChunk('LIST');
-        if (listCh) {
-            let p = listCh.off + 4;
-            const end = listCh.off + listCh.size;
-            while (p + 8 <= end) {
-                const scid = String.fromCharCode(u8[p], u8[p + 1], u8[p + 2], u8[p + 3]);
-                const ssize = dv.getUint32(p + 4, true);
-                if (scid === 'icon') icons.push(new Uint8Array(arrayBuffer, p + 8, ssize));
-                p += 8 + ssize + (ssize & 1);
-            }
-        }
-        const order = seq.length ? seq : icons.map(function (_, idx) { return idx; });
-        const frameMs = dispRate > 0 ? Math.round((dispRate / 60) * 1000) : 60;
-        const frames = [];
-        for (let k = 0; k < order.length; k++) {
-            const idx = order[k];
-            if (!icons[idx]) continue;
-            const ms = rates.length ? Math.max(Math.round((rates[k] / 60) * 1000), 1) : Math.max(frameMs, 1);
-            frames.push({ data: icons[idx], rate: ms });
-        }
-        return frames;
-    }
-    function csCurUrl(curBytes) {
-        let hx = 0, hy = 0;
-        if (curBytes.length >= 22) {
-            const dv = new DataView(curBytes.buffer, curBytes.byteOffset, curBytes.byteLength);
-            hx = dv.getUint16(10, true);
-            hy = dv.getUint16(12, true);
-        }
-        return { url: URL.createObjectURL(new Blob([curBytes], { type: 'image/x-icon' })), hx: hx, hy: hy };
-    }
-    // 动态光标动画管理器
-    const csAnimManager = {
-        timers: {},
-        currentFrame: {},
-        
-        start: function(role, frames) {
-            if (!frames || frames.length <= 1) return;
-            
-            const self = this;
-            let idx = 0;
-            
-            // 清理旧的定时器
-            if (this.timers[role]) {
-                clearInterval(this.timers[role]);
-            }
-            
-            // 为所有帧创建 URL（如果还没创建的话）
-            frames.forEach(function(f) {
-                if (!f.url) {
-                    const c = csCurUrl(f.data);
-                    f.url = c.url;
-                    f.hx = c.hx;
-                    f.hy = c.hy;
-                }
-            });
-            
-            // 设置初始帧
-            this.currentFrame[role] = 0;
-            this.updateCSS(role, frames[0]);
-            
-            // 启动动画循环
-            this.timers[role] = setInterval(function() {
-                idx = (idx + 1) % frames.length;
-                self.currentFrame[role] = idx;
-                self.updateCSS(role, frames[idx]);
-            }, frames[0].rate);
-        },
-        
-        updateCSS: function(role, frame) {
-            const root = document.documentElement;
-            const varName = '--cs-' + role;
-            const value = "url('" + frame.url + "') " + frame.hx + ' ' + frame.hy;
-            root.style.setProperty(varName, value);
-        },
-        
-        stop: function(role) {
-            if (this.timers[role]) {
-                clearInterval(this.timers[role]);
-                delete this.timers[role];
-            }
-        }
-    };
-    
-    function csResolve(map, folder, ver, keys) {
-        const file = csPick(map, keys);
-        if (!file) return Promise.resolve(null);
-        const base = '/localcdn/gzs/cs/' + folder + '/';
-        if (/\.ani$/i.test(file)) {
-            return fetch(base + file + '?v=' + ver, { cache: 'no-store' })
-                .then(function (r) { return r.ok ? r.arrayBuffer() : null; })
-                .then(function (buf) {
-                    if (!buf) return null;
-                    const frames = csParseAni(buf);
-                    if (!frames.length) return null;
-                    return { type: 'ani', frames: frames };
-                })
-                .catch(function () { return null; });
-        }
-        return fetch(base + file + '?v=' + ver, { cache: 'no-store' })
-            .then(function (r) { return r.ok ? r.blob() : null; })
-            .then(function (blob) {
-                if (!blob) return null;
-                return { type: 'static', url: "url('" + base + file + '?v=' + ver + "')" };
-            })
-            .catch(function () { return null; });
-    }
-    function csThemeVars(map, folder, ver, cb) {
-        const roles = [['cursor', ['pointer']], ['link', ['link']], ['text', ['text']], ['move', ['move']], ['unavail', ['unavailiable', 'unavailable']]];
-        const out = {};
-        const jobs = roles.map(function (r) {
-            return csResolve(map, folder, ver, r[1]).then(function (v) {
-                out[r[0]] = v;
-            });
-        });
-        Promise.all(jobs).then(function () { cb(out); });
-    }
-    Promise.all([
-        fetch('/localcdn/gzs/cs/' + csFolders.light + '/int.inf', { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; }),
-        fetch('/localcdn/gzs/cs/' + csFolders.dark + '/int.inf', { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; })
-    ]).then(function (res) {
-        const lightTxt = res[0], darkTxt = res[1];
-        csThemeVars(csParseInf(lightTxt), csFolders.light, csHash(lightTxt), function (L) {
-            csThemeVars(csParseInf(darkTxt), csFolders.dark, csHash(darkTxt), function (D) {
-                // 处理亮色主题光标
-                const lightVars = {};
-                const darkVars = {};
-                const lightAniFrames = {};
-                const darkAniFrames = {};
-                
-                ['cursor', 'link', 'text', 'move', 'unavail'].forEach(function(role) {
-                    // 亮色主题
-                    if (L[role] && L[role].type === 'ani') {
-                        const firstFrame = csCurUrl(L[role].frames[0].data);
-                        lightVars[role] = "url('" + firstFrame.url + "') " + firstFrame.hx + ' ' + firstFrame.hy;
-                        lightAniFrames[role] = L[role].frames;
-                    } else if (L[role] && L[role].type === 'static') {
-                        lightVars[role] = L[role].url;
-                    } else {
-                        lightVars[role] = (role === 'cursor' ? 'auto' : role === 'link' ? 'pointer' : role === 'text' ? 'text' : role === 'move' ? 'move' : 'not-allowed');
-                    }
-                    
-                    // 暗色主题
-                    if (D[role] && D[role].type === 'ani') {
-                        const firstFrame = csCurUrl(D[role].frames[0].data);
-                        darkVars[role] = "url('" + firstFrame.url + "') " + firstFrame.hx + ' ' + firstFrame.hy;
-                        darkAniFrames[role] = D[role].frames;
-                    } else if (D[role] && D[role].type === 'static') {
-                        darkVars[role] = D[role].url;
-                    } else {
-                        darkVars[role] = (role === 'cursor' ? 'auto' : role === 'link' ? 'pointer' : role === 'text' ? 'text' : role === 'move' ? 'move' : 'not-allowed');
-                    }
-                });
-                
-                let css = 'html,body{'
-                    + '--cs-cursor:' + lightVars.cursor + ';'
-                    + '--cs-link:' + lightVars.link + ';'
-                    + '--cs-text:' + lightVars.text + ';'
-                    + '--cs-move:' + lightVars.move + ';'
-                    + '--cs-unavail:' + lightVars.unavail + ';}';
-                css += 'body.dark-mode,body.theme-dark{'
-                    + '--cs-cursor:' + darkVars.cursor + ';'
-                    + '--cs-link:' + darkVars.link + ';'
-                    + '--cs-text:' + darkVars.text + ';'
-                    + '--cs-move:' + darkVars.move + ';'
-                    + '--cs-unavail:' + darkVars.unavail + ';}';
-                css += 'html,body,body *{cursor:var(--cs-cursor),auto !important;}';
-                css += 'a,button,[onclick],[role="button"],[role="menuitem"],[role="link"],input[type="button"],input[type="submit"],input[type="reset"],input[type="checkbox"],input[type="radio"],summary,label,.btn,.badge-btn,.glass-btn,.icon-btn,.lang-item,.qr-tab,.tp-item,.ft-tab,.carousel-nav,.carousel-dots button,.cr-tab,.dl-m-btn,.dl-col,.ext-install,.fl-link,.st-col,.stack-card,.feat-panel,.dot,.m-back-btn,.m-dl-btn,.m-dl-tool,.qr-modal-close,.nav-links a,.nav-more-btn,.mk-pop-btn,.mk-menu-item,.mk-sort-btn,.mk-filter-btn,.mk-card,.mk-dl,.mk-view,.mk-login,.mk-pg-btn,.mk-cat-btn,.mk-tab,.user-avatar,.mdui-tab-item,.gallery-image,.st-nav-btn,.look-perf,#backTop{cursor:var(--cs-link),pointer !important;}';
-                css += 'input:not([type]),input[type="text"],input[type="search"],input[type="url"],input[type="email"],input[type="password"],input[type="number"],textarea,select,[contenteditable="true"]{cursor:var(--cs-text),text !important;}';
-                css += '[draggable="true"],[data-cursor="move"]{cursor:var(--cs-move),move !important;}';
-                css += '[disabled],:disabled,[aria-disabled="true"]{cursor:var(--cs-unavail),not-allowed !important;}';
-                const st = document.createElement('style');
-                st.textContent = css;
-                document.head.appendChild(st);
-                
-                // 启动动态光标动画
-                ['cursor', 'link', 'text', 'move', 'unavail'].forEach(function(role) {
-                    if (lightAniFrames[role] && lightAniFrames[role].length > 1) {
-                        csAnimManager.start(role, lightAniFrames[role]);
-                    }
-                });
-            });
-        });
-    });
+    var MQ_MOBILE = window.matchMedia('(max-width: 640px)');
+    var KE_MBD_FLAG = 'knf-ke-mbd';
 
-    // 根据当前URL确定高亮项
-    function getActiveIndex() {
-        const path = window.location.pathname;
-        if (path === '/' || path === '/index') return 0;
-        if (path.startsWith('/workpool')) return 1;
-        if (path.startsWith('/team')) return 2;
-        if (path.startsWith('/forum')) return 3;
-        if (path.startsWith('/mk/')) return 4;
-        return -1;
+    function loadMbd() {
+        if (window.__KNKE_MBD || document.getElementById('keHeader')) return;
+        window.__KNKE_MBD = true;
+        var s = document.createElement('script');
+        s.src = '/localcdn/gzs/mbd.js';
+        s.id = KE_MBD_FLAG;
+        s.onload = function () { setTimeout(patchKeAvatar, 0); };
+        document.head.appendChild(s);
     }
 
-    const navItems = [
-        { text: '首页', href: '/', icon: 'home' },
-        { text: '发现', href: '/workpool', icon: 'explore' },
-        { text: '工作室', href: '/team', icon: 'business_center' },
-        { text: '论坛', href: '/forum', icon: 'forum' },
-        { text: '市场', href: '/mk/kn', icon: 'storefront' }
-    ];
-
-    // 注入 Material Icons 图标库
-    if (!document.querySelector('link[href*="material-icons"]')) {
-        var iconLink = document.createElement('link');
-        iconLink.rel = 'stylesheet';
-        iconLink.href = 'https://cdn.jsdelivr.net/npm/material-icons@1.0.0/iconfont/material-icons.min.css';
-        document.head.appendChild(iconLink);
+    function patchKeAvatar() {
+        var pop = document.getElementById('keAvatarPop');
+        var my = document.getElementById('keMyHome');
+        if (!pop || !my) { setTimeout(patchKeAvatar, 120); return; }
+        if (document.getElementById('knfKeWb')) return;
+        var a = document.createElement('a');
+        a.className = 'ke-pop-item';
+        a.id = 'knfKeWb';
+        a.href = '/workbench';
+        a.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>工作台</span>';
+        my.parentNode.insertBefore(a, my.nextSibling);
     }
 
-    const activeIndex = getActiveIndex();
+    if (MQ_MOBILE.matches) {
+        /* ===== 移动端:保持原生顶栏(搜索 / 底栏 / 侧栏) ===== */
 
-    // 生成导航菜单HTML
-    let navHtml = '';
-    navItems.forEach(function(item, idx) {
-        const activeClass = idx === activeIndex ? ' active' : '';
-        navHtml += '<a class="knf-rpl' + activeClass + '" href="' + item.href + '">' + item.text + '</a>';
-    });
+        // 根据当前URL确定高亮项
+        function getActiveIndex() {
+            const path = window.location.pathname;
+            if (path === '/' || path === '/index') return 0;
+            if (path.startsWith('/workpool')) return 1;
+            if (path.startsWith('/team')) return 2;
+            if (path.startsWith('/forum')) return 3;
+            if (path.startsWith('/mk/')) return 4;
+            return -1;
+        }
 
-    const hv2 = document.getElementById('hv2');
-    if (hv2) {
-        // 渲染基础HTML（未登录状态）
-        hv2.innerHTML = '<div class="header-nav">' +
-            '<a class="logo-text" href="/">猫的社区</a>' +
-            '<div class="nav-menu">' + navHtml + '</div>' +
-            '<div class="header-right">' +
-                '<a class="login-btn knf-rpl" href="/login">登录</a>' +
-                '<div id="userArea"></div>' +
-                '<div class="mob-search">' +
-                    '<button class="mob-search-scope" type="button">帖子</button>' +
-                    '<span class="mob-search-div"></span>' +
-                    '<input class="mob-search-input" type="search" placeholder="搜索帖子 / 作品 / 插件" autocomplete="off">' +
-                    '<button class="mob-search-go" type="button" aria-label="搜索">' +
-                        '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
-                    '</button>' +
-                '</div>' +
-            '</div>' +
-        '</div>';
-
-        // 移动端搜索:帖子 / 作品 / 插件 范围切换
-        var scopes = [
-            { name: '帖子', url: '/forum?q=' },
-            { name: '作品', url: '/workpool?search=' },
-            { name: '插件', url: '/mk/kn?search=' }
+        const navItems = [
+            { text: '首页', href: '/', icon: 'home' },
+            { text: '发现', href: '/workpool', icon: 'explore' },
+            { text: '工作室', href: '/team', icon: 'business_center' },
+            { text: '论坛', href: '/forum', icon: 'forum' },
+            { text: '市场', href: '/mk/kn', icon: 'storefront' }
         ];
-        var scopeBtn = hv2.querySelector('.mob-search-scope');
-        var scopeInput = hv2.querySelector('.mob-search-input');
-        var scopeGo = hv2.querySelector('.mob-search-go');
-        var scopeIdx = 0;
-        if (scopeBtn && scopeInput && scopeGo) {
-            scopeBtn.addEventListener('click', function () {
-                scopeIdx = (scopeIdx + 1) % scopes.length;
-                scopeBtn.textContent = scopes[scopeIdx].name;
-                scopeInput.placeholder = '搜索' + scopes[scopeIdx].name;
-            });
-            function mobSearchGo() {
-                var v = scopeInput.value.trim();
-                if (!v) { scopeInput.focus(); return; }
-                location.href = scopes[scopeIdx].url + encodeURIComponent(v);
-            }
-            scopeGo.addEventListener('click', mobSearchGo);
-            scopeInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') mobSearchGo();
-            });
+
+        // 注入 Material Icons 图标库
+        if (!document.querySelector('link[href*="material-icons"]')) {
+            var iconLink = document.createElement('link');
+            iconLink.rel = 'stylesheet';
+            iconLink.href = 'https://cdn.jsdelivr.net/npm/material-icons@1.0.0/iconfont/material-icons.min.css';
+            document.head.appendChild(iconLink);
         }
 
-        // 移动端底部导航栏(统一 JS 绘制)
-        var tabbar = document.createElement('nav');
-        tabbar.className = 'knf-tabbar';
-        tabbar.innerHTML = navItems.map(function (item, idx) {
-            return '<a class="knf-rpl" href="' + item.href + '"><i class="material-icons">' + item.icon + '</i><span>' + item.text + '</span></a>';
-        }).join('');
-        document.body.appendChild(tabbar);
-        var tbActive = tabbar.querySelector('a:nth-child(' + (activeIndex + 1) + ')');
-        if (tbActive) tbActive.className = 'active';
+        const activeIndex = getActiveIndex();
 
-        // 注入元素涟漪:pointerdown 委托,轻量 transform 动画
-        document.addEventListener('pointerdown', function (e) {
-            var el = e.target && e.target.closest ? e.target.closest('.knf-rpl') : null;
-            if (!el) return;
-            var rect = el.getBoundingClientRect();
-            if (!rect.width) return;
-            var wave = document.createElement('span');
-            wave.className = 'knf-rpl-wave';
-            var d = Math.max(rect.width, rect.height) * 2.2;
-            wave.style.width = d + 'px';
-            wave.style.height = d + 'px';
-            wave.style.left = (e.clientX - rect.left - d / 2) + 'px';
-            wave.style.top = (e.clientY - rect.top - d / 2) + 'px';
-            if (el.closest('.header-dropdown-content')) wave.style.background = 'rgba(0,0,0,.08)';
-            el.appendChild(wave);
-            requestAnimationFrame(function () { wave.classList.add('done'); });
-            setTimeout(function () { if (wave.parentNode) wave.parentNode.removeChild(wave); }, 700);
+        // 生成导航菜单HTML
+        let navHtml = '';
+        navItems.forEach(function(item, idx) {
+            const activeClass = idx === activeIndex ? ' active' : '';
+            navHtml += '<a class="knf-rpl' + activeClass + '" href="' + item.href + '">' + item.text + '</a>';
         });
 
-        // 通过API检查登录状态
-        fetch('/api/user/current?t=' + Date.now())
-            .then(res => res.json())
-            .then(data => {
-                if (data.logged_in) {
-                    const avatarUrl = data.avatar || (data.qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + data.qq + '&s=100' : '/localcdn/gzs/default-avatar.png');
-                    const userArea = document.getElementById('userArea');
-                    const loginBtn = document.querySelector('.login-btn');
-                    
-                    // 隐藏登录按钮
-                    if (loginBtn) loginBtn.style.display = 'none';
-                    
-                    // 显示头像和下拉菜单
-                    if (userArea) {
-                        userArea.innerHTML = '<div class="header-dropdown">' +
-                            '<div class="sd-overlay"></div>' +
-                            '<span class="knf-rpl av-wrp"><img class="user-avatar" src="' + avatarUrl + '" alt="' + data.username + '" onerror="this.src=\'/localcdn/gzs/default-avatar.png\'"></span>' +
-                            '<div class="header-dropdown-content">' +
-                                '<div class="sd-head"><img class="sd-avatar" src="' + avatarUrl + '" alt="' + data.username + '" onerror="this.src=\'/localcdn/gzs/default-avatar.png\'"><span class="sd-name">' + data.username + '</span></div>' +
-                                '<a class="knf-rpl" href="/workbench"><i class="material-icons">dashboard</i>工作台</a>' +
-                                '<a class="knf-rpl" href="/u/' + data.username + '"><i class="material-icons">person</i>我的主页</a>' +
-                                '<a class="knf-rpl" href="/workpool/my"><i class="material-icons">work</i>我的作品</a>' +
-                                '<a class="knf-rpl" href="/messages"><i class="material-icons">mail</i>消息中心</a>' +
-                                '<a class="knf-rpl" href="/change_password"><i class="material-icons">lock</i>修改密码</a>' +
-                                '<a class="knf-rpl" href="/logout"><i class="material-icons">logout</i>退出登录</a>' +
-                            '</div>' +
-                        '</div>';
-                    }
+        let hv2 = document.getElementById('hv2');
+        if (!hv2) {
+            hv2 = document.createElement('div');
+            hv2.id = 'hv2';
+            document.body.insertBefore(hv2, document.body.firstChild);
+        }
+        if (hv2) {
+            // 容器本身带顶栏类时移除,避免双层绿条(如首页模板)
+            if (hv2.classList && hv2.classList.contains('header-nav')) hv2.removeAttribute('class');
+            // 渲染基础HTML（未登录状态）
+            hv2.innerHTML = '<div class="header-nav">' +
+                '<a class="logo-text" href="/">猫的社区</a>' +
+                '<div class="nav-menu">' + navHtml + '</div>' +
+                '<div class="header-right">' +
+                    '<a class="login-btn knf-rpl" href="/login">登录</a>' +
+                    '<div id="userArea"></div>' +
+                    '<div class="mob-search">' +
+                        '<button class="mob-search-scope" type="button">帖子</button>' +
+                        '<span class="mob-search-div"></span>' +
+                        '<input class="mob-search-input" type="search" placeholder="搜索帖子 / 作品 / 插件" autocomplete="off">' +
+                        '<button class="mob-search-go" type="button" aria-label="搜索">' +
+                            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' +
+                        '</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
 
-                    // 触屏设备点头像切换下拉菜单(点击他处关闭)
-                    var drop = document.querySelector('.header-dropdown');
-                    if (drop) {
-                        drop.addEventListener('click', function (e) {
-                            e.stopPropagation();
-                            var c = this.querySelector('.header-dropdown-content');
-                            if (c) this.classList.toggle('open');
+            // 移动端搜索:帖子 / 作品 / 插件 范围切换
+            var scopes = [
+                { name: '帖子', url: '/forum?q=' },
+                { name: '作品', url: '/workpool?search=' },
+                { name: '插件', url: '/mk/kn?search=' }
+            ];
+            var scopeBtn = hv2.querySelector('.mob-search-scope');
+            var scopeInput = hv2.querySelector('.mob-search-input');
+            var scopeGo = hv2.querySelector('.mob-search-go');
+            var scopeIdx = 0;
+            if (scopeBtn && scopeInput && scopeGo) {
+                scopeBtn.addEventListener('click', function () {
+                    scopeIdx = (scopeIdx + 1) % scopes.length;
+                    scopeBtn.textContent = scopes[scopeIdx].name;
+                    scopeInput.placeholder = '搜索' + scopes[scopeIdx].name;
+                });
+                function mobSearchGo() {
+                    var v = scopeInput.value.trim();
+                    if (!v) { scopeInput.focus(); return; }
+                    location.href = scopes[scopeIdx].url + encodeURIComponent(v);
+                }
+                scopeGo.addEventListener('click', mobSearchGo);
+                scopeInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') mobSearchGo();
+                });
+            }
+
+            // 移动端底部导航栏(统一 JS 绘制)
+            var tabbar = document.createElement('nav');
+            tabbar.className = 'knf-tabbar';
+            tabbar.innerHTML = navItems.map(function (item, idx) {
+                return '<a class="knf-rpl" href="' + item.href + '"><i class="material-icons">' + item.icon + '</i><span>' + item.text + '</span></a>';
+            }).join('');
+            document.body.appendChild(tabbar);
+            var tbActive = tabbar.querySelector('a:nth-child(' + (activeIndex + 1) + ')');
+            if (tbActive) tbActive.className = 'active';
+
+            // 注入元素涟漪:pointerdown 委托,轻量 transform 动画
+            document.addEventListener('pointerdown', function (e) {
+                var el = e.target && e.target.closest ? e.target.closest('.knf-rpl') : null;
+                if (!el) return;
+                var rect = el.getBoundingClientRect();
+                if (!rect.width) return;
+                var wave = document.createElement('span');
+                wave.className = 'knf-rpl-wave';
+                var d = Math.max(rect.width, rect.height) * 2.2;
+                wave.style.width = d + 'px';
+                wave.style.height = d + 'px';
+                wave.style.left = (e.clientX - rect.left - d / 2) + 'px';
+                wave.style.top = (e.clientY - rect.top - d / 2) + 'px';
+                if (el.closest('.header-dropdown-content')) wave.style.background = 'rgba(0,0,0,.08)';
+                el.appendChild(wave);
+                requestAnimationFrame(function () { wave.classList.add('done'); });
+                setTimeout(function () { if (wave.parentNode) wave.parentNode.removeChild(wave); }, 700);
+            });
+
+            // 通过API检查登录状态
+            fetch('/api/user/current?t=' + Date.now())
+                .then(res => res.json())
+                .then(data => {
+                    if (data.logged_in) {
+                        const avatarUrl = data.avatar || (data.qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + data.qq + '&s=100' : '/localcdn/gzs/default-avatar.png');
+                        const userArea = document.getElementById('userArea');
+                        const loginBtn = document.querySelector('.login-btn');
+                        
+                        // 隐藏登录按钮
+                        if (loginBtn) loginBtn.style.display = 'none';
+                        
+                        // 显示头像和下拉菜单
+                        if (userArea) {
+                            userArea.innerHTML = '<div class="header-dropdown">' +
+                                '<div class="sd-overlay"></div>' +
+                                '<span class="knf-rpl av-wrp"><img class="user-avatar" src="' + avatarUrl + '" alt="' + data.username + '" onerror="this.src=\'/localcdn/gzs/default-avatar.png\'"></span>' +
+                                '<div class="header-dropdown-content">' +
+                                    '<div class="sd-head"><img class="sd-avatar" src="' + avatarUrl + '" alt="' + data.username + '" onerror="this.src=\'/localcdn/gzs/default-avatar.png\'"><span class="sd-name">' + data.username + '</span></div>' +
+                                    '<a class="knf-rpl" href="/workbench"><i class="material-icons">dashboard</i>工作台</a>' +
+                                    '<a class="knf-rpl" href="/u/' + data.username + '"><i class="material-icons">person</i>我的主页</a>' +
+                                    '<a class="knf-rpl" href="/workpool/my"><i class="material-icons">work</i>我的作品</a>' +
+                                    '<a class="knf-rpl" href="/messages"><i class="material-icons">mail</i>消息中心</a>' +
+                                    '<a class="knf-rpl" href="/change_password"><i class="material-icons">lock</i>修改密码</a>' +
+                                    '<a class="knf-rpl" href="/logout"><i class="material-icons">logout</i>退出登录</a>' +
+                                '</div>' +
+                            '</div>';
+                        }
+
+                        // 触屏设备点头像切换下拉菜单(点击他处关闭)
+                        var drop = document.querySelector('.header-dropdown');
+                        if (drop) {
+                            drop.addEventListener('click', function (e) {
+                                e.stopPropagation();
+                                var c = this.querySelector('.header-dropdown-content');
+                                if (c) this.classList.toggle('open');
+                            });
+                        }
+                        document.addEventListener('click', function (e) {
+                            var c = document.querySelector('.header-dropdown');
+                            if (!c) return;
+                            if (e.target === c.querySelector('.sd-overlay')) { c.classList.remove('open'); return; }
+                            if (c.classList.contains('open') && !c.contains(e.target)) c.classList.remove('open');
                         });
                     }
-                    document.addEventListener('click', function (e) {
-                        var c = document.querySelector('.header-dropdown');
-                        if (!c) return;
-                        if (e.target === c.querySelector('.sd-overlay')) { c.classList.remove('open'); return; }
-                        if (c.classList.contains('open') && !c.contains(e.target)) c.classList.remove('open');
-                    });
-                }
-            })
-            .catch(err => console.log('获取用户信息失败:', err));
+                })
+                .catch(err => console.log('获取用户信息失败:', err));
+        }
+    } else {
+        /* ===== PC 端:顶栏由 mbd.js(KE 顶栏)绘制 ===== */
+        var hv = document.getElementById('hv2');
+        if (hv) hv.removeAttribute('class');
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadMbd);
+        else loadMbd();
     }
+
+    /* 跨断点动态切换:刷新页面以切换顶栏渲染脚本 */
+    var onMqChange = function () { location.reload(); };
+    if (MQ_MOBILE.addEventListener) MQ_MOBILE.addEventListener('change', onMqChange);
+    else if (MQ_MOBILE.addListener) MQ_MOBILE.addListener(onMqChange);
 })();

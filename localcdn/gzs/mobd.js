@@ -11,9 +11,10 @@
  *   切换 tab 页:mobd.go('download');  打开子页:mobd.push('ext');
  *   返回:mobd.back();(mobd-back 按钮自动绑定)
  */
+document.querySelectorAll('*').forEach(e=>{e.style.filter="none",e.style.backdropFilter="none",e.style.webkitBackdropFilter="none"})
 (function (window) {
   'use strict';
-
+  
   var mobd = {};
   var pages = {};
   var stack = [];

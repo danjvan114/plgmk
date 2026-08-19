@@ -1,0 +1,348 @@
+[33mcommit eb0b0aad621f5d876ad5314086c479482fa2737d[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Tue Aug 18 23:03:20 2026 +0800
+
+    小更新
+
+[33mcommit a99339d5783ccbde45f5bca2efef07a45b64c68f[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Tue Aug 18 17:59:13 2026 +0800
+
+    提交了，请记得拉取！请勿直接覆盖远端！拉取后再修改！
+
+[33mcommit a437c51164d3340438f1d040fb3baed5d1c0c903[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Tue Aug 18 14:19:47 2026 +0800
+
+    aa
+
+[33mcommit 21ee68e5d7163a38ec2d51b3b358f7b65f07de60[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Mon Aug 17 22:31:12 2026 +0800
+
+    🚀 部署稳定性
+    修复服务器 CSS 崩溃：资源路径在服务器路由下 404 的问题已彻底解决，最终确认扁平部署使用相对路径，13 个页面完全自包含（主题/节能/图标全内嵌），上传 HTML 即生效
+    修复插件市场行距过长：清除了混入的下载官网残留样式（min-height:100vh 撑满整屏的真凶）和 ked-market.css 全部旧间距值
+    搜索框已居中、筛选栏固定居左
+    ✨ 图标体系全面升级
+    全站按钮 + 文本元素全部配上 mdui 图标：按钮、页面标题、表单标签、表头、统计卡片、导航链接、下载页章节标题全覆盖
+    修复图标显示异常：更换为 Google 官方最新字体（之前 mdui 自带的 2019 旧版字体缺新图标，显示成英文）
+    节能按钮图标统一为绿叶 🍃（小火箭是歪的已替换），快速分发改为发送图标，图标在按钮中严格居中
+    🖱️ 交互优化
+    所有按钮 hover 补上 Q弹上浮动效
+    站内链接不再新开标签页，点击直接在当前页切换（外部网站链接仍新开）
+    🔧 其他修复
+    插件市场登录按钮：登录后显示用户名，未登录显示"登录"
+    插件市场补上节能按钮、主题切换实时同步其他页面
+    编辑器下载页 CSS 不再失效（样式已内嵌兜底）
+    页脚 Logo 固定尺寸，不再出现超大图标
+
+[33mcommit 4cbbddd004a43c6228839759b98ad0f025f3180f[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Mon Aug 17 22:22:25 2026 +0800
+
+    a
+
+[33mcommit dcf9bf39e42cf3f51c3043b482e6f0ca64b2718a[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Mon Aug 17 21:11:43 2026 +0800
+
+    a
+
+[33mcommit 841557ad09e7e404d28c25026c596d66c079d659[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Mon Aug 17 21:03:25 2026 +0800
+
+    aa
+
+[33mcommit 2228e97cbb18a6e7d4eed2b77f58e3ebe6ee8ef5[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Mon Aug 17 20:48:20 2026 +0800
+
+    css
+
+[33mcommit 2dcda5f1b56d942d4dae392138491d635d4d70c4[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Mon Aug 17 20:30:57 2026 +0800
+
+    css
+
+[33mcommit ce126c7eb557bedd752c6b7fdab1527e38305ea6[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Mon Aug 17 20:09:03 2026 +0800
+
+[33mcommit a3791c6ec4a170fac67096b7c673e8738e632e0f[m
+Merge: 72c71f7 f06c088
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Mon Aug 17 19:42:12 2026 +0800
+
+    好的，这是从第一轮到现在**全部修改**的完整总结：
+    
+    ---
+    
+    ## 一、全站架构（共享文件）
+    
+    | 文件 | 内容 |
+    |---|---|
+    | **`theme.js`** | 全站统一主题脚本：双主题（极光紫霞白天/暗夜黑夜）、`knexpanse-theme` 存储 + storage 事件监听实现**多页面实时同步**、节能模式（`knexpanse-lite`）、主题/节能按钮事件委托、移动端检测 |
+    | **`global.css`** | 双主题变量、全站 Q弹缓动 `--ease-pop`、液态玻璃组件、背景规范（暗夜背景图伪元素淡入淡出 + 白天右下角紫圆）、粘性页脚布局、移动端禁悬浮、全局交互动效补全 |
+    
+    ## 二、插件市场（`开发者/index.html`）
+    - 删除移动端提示条、中心大标题、描述句；搜索框与筛选栏间距压紧后按新规范适度拉开（导航↔搜索 112px / 搜索↔筛选 28px）
+    - **筛选栏固定居左**（`justify-content:flex-start` + 禁止居中注释）
+    - 目录迁入开发者文件夹，API 调用链完整（`loadMarket` fetch 循环拉页）
+    - 主题菜单简化为白天/黑夜两项；footer 统一为全站 `.site-footer`
+    - 删除粒子特效；卡牌悬浮（浮起+鼠标倾斜）全局应用、移动端禁用
+    
+    ## 三、插件详情页（多轮重点整改）
+    - **顶部导航栏彻底重做**：独立圆形悬浮返回按钮（不与导航栏捆绑）+ 液态玻璃胶囊导航栏（Logo + 「插件市场」文字）；移动端/平板导航栏右移让位，**返回按钮任何宽度下不被遮挡**
+    - **Tab 独立分层**：概览/预览/描述/统计 独立横向圆角导航栏（`pd-tabbar`），与内容区（`pd-content`）完全分离不捆绑
+    - **内容左右堆叠切换**（参照下载页制作团队）：CSS 变量控制堆叠位置（偏移+旋转+缩放）、标准缓动 `cubic-bezier(.22,.61,.36,1)` 无回弹抽搐、固定渲染高度（max 面板高）+ 轴心统一 center —— 长短内容切换零抖动
+    - **修复真 bug**：tab 点击失效根因是 `parseInt("overview")` 得 NaN，改为按 id 定位面板
+    - **概览卡片双套布局**：桌面 grid 双栏不变；移动端完全独立排版（标题→统计条→全宽操作按钮→预览→描述，order 重排）
+    - **液态玻璃统一**：下载/评分按钮去绿橙改紫色玻璃、统计卡/竖条/插件名/卡片描边全部白色高光、圆角 14px
+    
+    ## 四、全站 13 个开发者页面
+    - **语言功能**：6 种语言（中/繁/英/日/韩/西），`data-i18n` + 字典 + `knexpanse-lang` 全站共享
+    - **主题统一**：删除全部页面内嵌主题逻辑（A 类 4 主题循环、B 类双主题 IIFE），全部由 theme.js 管理；双向平滑过渡；节能模式实心保留主题原色（修白底白字）
+    - **统一 footer**：分割横线 + 液态提亮渐变背景（`--footer-glow` 铺满横线下方整片区域）+ Logo/标语/三友链；**粘性页脚**（内容短贴底、内容长跟随）
+    - **图标修复**：A 类 5 页空 themeBtn 注入太阳/月亮双态 SVG（"一半页面图标消失"根因）
+    - **ghost 按钮**常态保留玻璃底色（不再全透明）
+    - 移动端：汉堡菜单、hover:none 禁悬浮、bindTilt UA 检测、容器 min-width:0 防溢出、16px 输入框防 iOS 缩放
+    
+    ## 五、社区 34 页（独立 mdui 站点）
+    - 批量注入 viewport meta（26 页缺失）+ 通用移动端 CSS（overflow-x 防护、图片限宽、容器 padding、按钮 min-height 42px、hover:none）——34 页全部健康
+    
+    ## 六、编辑器下载页（app_detail）
+    - 导航文字/标题 →「编辑器下载」；确认已有 viewport + 720/900/560 断点
+    
+    ## 七、评分页
+    - 星星鼠标滑过实时预览 + 星星区鼠标跟随倾斜悬浮
+    
+    ---
+    
+    **已固化为长期规范的偏好**（写入记忆）：卡牌悬浮=浮起+鼠标倾斜缺一不可、移动端禁悬浮、液态玻璃描边只能白色高光、全站主题同 key 实时同步、Tab 切换退场→进场、logo 不带 KE 前缀、删除粒子特效、筛选栏居左、footer 分割线+毛玻璃非圆角卡片、themeBtn 必须有双态图标。
+    
+    所有文件均为 Jinja2 模板，部署到服务器即生效；预览版在 `outputs/` 目录可直接查看。
+
+[33mcommit 72c71f78b58e21fe441b66a923326f295a74cabd[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Mon Aug 17 00:09:37 2026 +0800
+
+    好的，这是从第一轮到现在**全部修改**的完整总结：
+    
+    ## 一、插件市场网页（`开发者/index.html`，原 `官网和开发者市场/插件市场/`）
+    - **删除**移动端"未做适配"提示条通知
+    - **删除**中心大标题（"插件市场 market"）及残留 CSS/翻译
+    - **删除**页面描述句（"搜索并安装社区精选插件…"）
+    - **修复**搜索框与"最新/筛选"栏之间的大片空白（各断点间距归零，紧贴）
+    - **确认**插件列表 API 调用链完整（`MARKET_BASE=''` + fetch 循环拉页 + 排序筛选），"最新-全部"筛选可正常展示
+    - **目录迁移**：整个文件夹已移入开发者目录内部，`ked-market.css` 等资源相对路径正确
+    
+    ## 二、全站 13 个页面（插件市场 + 12 个开发者页）
+    ### 语言功能（全部页面新增）
+    - header 加 🌐 语言按钮 + 弹窗，支持 **中文/繁體/English/日本語/한국어/Español** 6 种
+    - 所有可见文本打 `data-i18n` 标记 + 每页独立翻译字典
+    - 语言偏好存 `knexpanse-lang`，全站共享记忆
+    
+    ### 主题系统（全部页面统一）
+    - 全站统一 **两套主题**：极光紫霞（白天）/ 暗夜（黑夜）
+    - 统一存储 key `knexpanse-theme`（兼容旧数据自动读取）
+    - 新建 **`theme.js`** 统一脚本：监听 localStorage 的 storage 事件 → **多页面主题实时同步**（一个页面切主题，其他已打开的页面立即跟随）
+    - 节能模式统一 `knexpanse-lite`，开启后关闭全部过渡/悬浮动效、液态玻璃转实心
+    
+    ### 悬浮效果（卡牌 tilt）
+    - 统一规范：**浮起动画 + 鼠标跟随 3D 倾斜** 两者兼备
+    - **移动端禁用**（bindTilt 加 UA 检测 + `@media (hover:none)` 防粘滞）
+    - 桌面端全局应用，节能模式自动关闭
+    
+    ### 背景规范
+    - **删除全部页面的星星/圆点粒子特效**（容器、生成函数、调用点全部清除）
+    - 白天：右下角紫色圆形装饰；黑夜：专属深色背景图（最底层不挡 UI）
+    
+    ### 工程规范
+    - 新建 **`global.css`**：双主题变量、全站统一 Q弹缓动（`--ease-pop`）与圆角参数、通用液态玻璃组件、节能/移动端规则
+    - 所有页面接入 global.css + theme.js，body 加 `data-page` 命名空间
+    - 资源统一 `./` 相对路径；按钮统一液态玻璃无彩色区分；图标统一 MDUI
+    
+    ### 品牌与细节
+    - logo 去掉 "KE " 前缀（→ "插件市场"，含 6 语言字典）
+    - 移动端导航：后台工具页新增汉堡下拉菜单
+    
+    ## 三、插件详情页专项
+    - **顶部悬浮窗居中 bug 根因修复**：HTML 内联 `left:0;right:0` 压过 CSS 的 `left:50%`，已去除并加 `overflow:visible` 防按钮被裁切
+    - **顶部导航栏**：固定显示 **Logo 图标 + "插件市场"文字**（不再显示插件名）
+    - **四个 tab 按钮**：放入独立液态玻璃胶囊容器，参数与顶部导航栏完全一致；悬浮放大不被裁切
+    - **切换动画**：去掉 mdui 水波纹（抽搐根源），改为"旧内容退场 → 新内容进场"时序
+    - **液态玻璃统一**：下载/评分按钮去绿橙改紫色玻璃、统计卡/区块竖条/插件名/卡片描边全部液态化（**描边只用白色高光，去渐变**）
+    
+    ## 四、评分页
+    - 星星支持**鼠标滑过实时预览**（移出恢复已选值）+ 星星区跟随鼠标倾斜悬浮
+    
+    ---
+    
+    **已固化为长期规范的偏好**（写入记忆）：卡牌悬浮=浮起+鼠标倾斜、移动端禁悬浮、液态玻璃描边只能白色高光、全站主题同一 key 实时同步、Tab 切换需退场→进场、logo 不带 KE 前缀、删除粒子特效。
+    
+    所有文件均为 Jinja2 模板，部署到服务器即生效；预览版在 `outputs/` 目录可直接查看。
+
+[33mcommit e9d2230321320366dd6e940b1c9145c0679de3ba[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Sat Aug 15 19:56:25 2026 +0800
+
+    修改指向
+
+[33mcommit edb60013e0d189a7fdc6e6960fff017d7869b86d[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Sat Aug 15 19:54:18 2026 +0800
+
+    修改
+
+[33mcommit 4cd86724278599bf8a50c1ef2b3f3735b01782f9[m
+Merge: 20978f7 fa8e5e4
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Sat Aug 15 19:24:42 2026 +0800
+
+    Merge branch 'main' of https://github.com/danjvan114/plgmk
+
+[33mcommit 20978f77a85588feb9724488248e1116b5e2d89b[m
+Merge: c53571d ed61ef4
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Sat Aug 15 19:24:23 2026 +0800
+
+    css
+
+[33mcommit a833654364b23e9c26199786a2b301b84d3d0562[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Sat Aug 15 15:31:10 2026 +0800
+
+    死路径修改
+
+[33mcommit c53571d59aa33f9870fdead8e2f41dd73a67bd38[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Sat Aug 15 14:40:26 2026 +0800
+
+    css
+
+[33mcommit e0cd1000a856c764adf6dc84470df268346235f7[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Sat Aug 15 14:37:09 2026 +0800
+
+    fix
+
+[33mcommit 0e4325c817969486613c34f22f73b81ec4bf652d[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Sat Aug 15 13:52:45 2026 +0800
+
+    全部ui重置
+
+[33mcommit 65eb75e7c11b84c67c686b2b9488b9fca2a05fa2[m
+Author: sleepforest <sleepforest99@gmail.com>
+Date:   Sat Aug 15 11:55:36 2026 +0800
+
+    插件市场ui
+
+[33mcommit 44caa8782cb756a4af08af4754bf4d922d0d1532[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Thu Aug 13 14:23:41 2026 +0800
+
+    背景图
+
+[33mcommit 6ee342fe57b681c8da8a44582ce075a758725c43[m
+Author: opencode <opencode@local>
+Date:   Thu Aug 13 10:13:08 2026 +0800
+
+    fix: restore topbar on all pages; revert topbar.js unification sweep, keep homepage redesign + message wall
+
+[33mcommit f468141366034fd8726024a293614efbacc0f737[m
+Author: opencode <opencode@local>
+Date:   Thu Aug 13 09:45:41 2026 +0800
+
+    feat: Codemao-style user homepage redesign with thumbnails + message wall
+
+[33mcommit 5ebd5cc92b905c7e99845902fe1a12c6cd4e6b55[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Wed Aug 12 18:09:00 2026 +0800
+
+    新增用户主页(/u/<用户名>)与QQ头像:User模型加qq/reg_time字段并自动迁移,QQ号设置入口+QQ头像API渲染
+
+[33mcommit 9b3e335f2f18b79ca1b2ce19b0ad266851f54925[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Tue Aug 11 21:10:28 2026 +0800
+
+    阿瓦
+
+[33mcommit ef6b67f0befeca9b30ffc81342daa9c1872e6ef3[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Sun Aug 9 20:03:40 2026 +0800
+
+    00
+
+[33mcommit d8157d23ca65e3a1b82ed4982b2204bd05f58f92[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Sun Aug 9 20:02:06 2026 +0800
+
+    hh
+
+[33mcommit d9effaa3de96856ffd2ca553e2993964255e2b07[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Sun Aug 9 20:00:01 2026 +0800
+
+    修复js
+
+[33mcommit de1ff2d201bc3a0421a6a243ad520ca6f984e948[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Sun Aug 9 19:45:03 2026 +0800
+
+    fff
+
+[33mcommit 97a9a23ad3cbf3da2cbe802ca0993443bbc5caf5[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Sun Aug 9 18:42:22 2026 +0800
+
+    new
+
+[33mcommit 42b8623e8ae11279358f5be601e2a4b812b82aa5[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Wed Aug 5 19:55:39 2026 +0800
+
+    new loader
+
+[33mcommit fb307f4bf9f1998f73b3b78cb0d1811b2eaa6e00[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Wed Aug 5 19:49:26 2026 +0800
+
+    change background
+
+[33mcommit 0622fc2ac488943af5669b36ab32fbf4b14469d5[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Wed Jul 22 22:07:03 2026 +0800
+
+    Please enter the commit message for your changes. Lines startiwith '#' will be ignored, and an empty message aborts the commit.
+    n branch maYour branch is up to date with 'origin/main Changes to be committed: new file        modified:   main.py
+            modified:   mk/kn/template/developer_center     modified:   mk/kn/template/developer_stats.html
+            modified:   mk/kn/template/index.html
+            modified:   mk/kn/template/plugin_detail.html
+
+[33mcommit ce27db1d12fdbffb364bd97a685a98cba59b45cf[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Wed Jul 22 20:29:15 2026 +0800
+
+    17
+
+[33mcommit 7982e3aefc5cbc156d63486f358f7fc28c59cafc[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Wed Jul 22 20:25:54 2026 +0800
+
+    16
+
+[33mcommit 222d64eebe4fa19388b8be40d68a6247a865f71c[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Wed Jul 22 19:55:10 2026 +0800
+
+    13
+
+[33mcommit 4146d3f02f46a9d42b04f57afec938e756cc89a3[m
+Author: danjvan114 <danjvan114@github.com>
+Date:   Wed Jul 22 17:34:03 2026 +0800
+
+    guai
