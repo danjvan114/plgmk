@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>426 - Upgrade Required</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 48px;
+            max-width: 900px;
+            width: 100%;
+        }
+        .img-box {
+            flex: 0 0 320px;
+        }
+        .img-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .text-wrap {
+            flex: 1;
+            text-align: left;
+        }
+        .code {
+            font-size: 100px;
+            font-weight: 700;
+            color: #4472c4;
+            line-height: 1;
+        }
+        .title {
+            font-size: 26px;
+            margin:12px 0 10px;
+        }
+        .desc {
+            color:#666;
+            font-size:16px;
+            line-height:1.7;
+        }
+        /* mobile */
+        @media(max-width:720px){
+            .container{
+                flex-direction: column;
+                gap:24px;
+            }
+            .img-box{
+                flex:none;
+                max-width:240px;
+            }
+            .text-wrap{
+                text-align:center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="img-box">
+            <img src="/localcdn/ero/426.png" alt="Upgrade Required">
+        </div>
+        <div class="text-wrap">
+            <div class="code">426</div>
+            <h2 class="title">需要升级协议</h2>
+            <p class="desc">Upgrade Required</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import redirect, url_for, send_from_directory, request, jsonify, make_response, session
+from flask import redirect, url_for, send_from_directory, request, jsonify, make_response, session, abort
 import os
 import json
 import urllib
@@ -646,6 +646,32 @@ def register_other_routes():
     def player_ping():
         return {"ok": True}
 
-    @app.errorhandler(404)
-    def page_not_found(e):
-        return render_root_template('404.html'), 404
+    # ===== 错误页面路由：自动跳转 /ero/<code> 对应页面 =====
+    ERROR_CODES = [
+        300, 301, 302, 303, 304, 305, 306, 307, 308,
+        400, 401, 402, 403, 404, 405, 406, 407, 408, 409,
+        410, 411, 412, 413, 414, 415, 416, 417, 418, 421,
+        422, 423, 424, 425, 426, 428, 429, 431, 451,
+        500, 501, 502, 503, 504, 505, 506, 507, 508, 510, 511,
+    ]
+
+    def _render_ero(code):
+        return render_root_template(f'ero/{code}.html')
+
+    @app.route('/ero/<int:code>')
+    def ero_page(code):
+        if code not in ERROR_CODES:
+            abort(404)
+        return _render_ero(code)
+
+    def _ero_error_handler(e):
+        code = getattr(e, 'code', None) or 500
+        if code not in ERROR_CODES:
+            code = 500
+        return _render_ero(code), code
+
+    for _code in ERROR_CODES:
+        try:
+            app.register_error_handler(_code, _ero_error_handler)
+        except ValueError:
+            pass

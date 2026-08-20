@@ -105,6 +105,9 @@ if __name__ == '__main__':
     try:
         from waitress import serve
         print("Running with Waitress production WSGI server...")
+        # 生产模式：关闭 DEBUG / 异常外抛，确保真实错误自动显示对应错误页面
+        app.config['DEBUG'] = False
+        app.config['PROPAGATE_EXCEPTIONS'] = False
         # 尝试双栈模式（IPv6 + IPv4）
         
         
