@@ -6,9 +6,8 @@ import uuid
 import re
 from .config import app, MARKETS, User
 from .utils import set_market, render_root_template, render_market_template
-from .mc_routes import mc_whitelist_add, mc_whitelist_remove, mc_whitelist_list, mc_whitelist_reload, mc_server_info, mc_get_invite_code, mc_store_buy
 from .player_routes import register_player, login_player, logout_player, check_player_login, set_player_password, change_player_password, remove_player_whitelist, register_whitelist, delete_player_account
-from .device_auth import get_device_uuid, set_device_cookie, check_device_bound, bind_device, unbind_device, verify_device_login, execute_rcon_forcelogin
+from .device_auth import get_device_uuid, set_device_cookie, check_device_bound, bind_device, unbind_device, verify_device_login
 
 def register_other_routes():
     @app.route('/')
@@ -38,17 +37,6 @@ def register_other_routes():
     def health_check():
         print(f"DEBUG: /health endpoint called")
         return {'status': 'ok', 'message': 'Server is running'}
-
-    @app.route('/api/mc/test', methods=['GET', 'POST'])
-    def api_mc_test():
-        print(f"DEBUG: /api/mc/test called")
-        print(f"DEBUG: Request method: {request.method}")
-        print(f"DEBUG: Request path: {request.path}")
-        return jsonify({
-            'success': True,
-            'message': 'MC API test endpoint works',
-            'method': request.method
-        })
 
     @app.route('/ping')
     def ping():
@@ -176,37 +164,6 @@ def register_other_routes():
         os.makedirs(doc_dir, exist_ok=True)
         return send_from_directory(doc_dir, filepath)
 
-    @app.route('/api/mc/whitelist/add', methods=['POST'])
-    def api_mc_whitelist_add():
-        print(f"DEBUG: API /api/mc/whitelist/add called")
-        print(f"DEBUG: Request method: {request.method}")
-        print(f"DEBUG: Request path: {request.path}")
-        print(f"DEBUG: Request content type: {request.content_type}")
-        result = mc_whitelist_add()
-        print(f"DEBUG: API /api/mc/whitelist/add result: {result}")
-        return result
-
-    @app.route('/api/mc/invite_code', methods=['GET'])
-    def api_mc_invite_code():
-        print(f"DEBUG: API /api/mc/invite_code called")
-        return mc_get_invite_code()
-
-    @app.route('/api/mc/whitelist/remove', methods=['POST'])
-    def api_mc_whitelist_remove():
-        return mc_whitelist_remove()
-
-    @app.route('/api/mc/whitelist/list', methods=['GET'])
-    def api_mc_whitelist_list():
-        return mc_whitelist_list()
-
-    @app.route('/api/mc/whitelist/reload', methods=['POST'])
-    def api_mc_whitelist_reload():
-        return mc_whitelist_reload()
-
-    @app.route('/api/mc/server/info', methods=['GET'])
-    def api_mc_server_info():
-        return mc_server_info()
-
     @app.route('/api/player/register', methods=['POST'])
     def api_player_register():
         return register_player()
@@ -243,61 +200,6 @@ def register_other_routes():
     def api_player_delete_account():
         return delete_player_account()
 
-    @app.route('/api/mc/store/buy', methods=['POST'])
-    def api_mc_store_buy():
-        return mc_store_buy()
-
-    @app.route('/mc/login')
-    def mc_login():
-        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                              'webapp', 'mcst'), 
-                                 'mclogin.html')
-
-    @app.route('/app/mclog')
-    def mc_device_login_route():
-        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                              'webapp', 'mcst'), 
-                                 'device_login.html')
-
-    @app.route('/mc/device_login')
-    def mc_device_login():
-        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                              'webapp', 'mcst'), 
-                                 'device_login.html')
-
-    @app.route('/mc/register')
-    def mc_register():
-        return render_root_template('mcreg.html')
-
-    @app.route('/app/user')
-    def mc_profile():
-        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                              'webapp', 'mcst'), 
-                                 'profile.html')
-
-    @app.route('/app/mcs')
-    def mc_store():
-        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                              'webapp', 'mcst'), 
-                                 'store.html')
-
-    @app.route('/app/elevator')
-    @app.route('/app/elevator/')
-    def elevator():
-        response = make_response(send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                              'webapp', 'mcst'), 
-                                 'elevator.html'))
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        return response
-
-    @app.route('/app/elevator/admin')
-    def elevator_admin():
-        return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                              'webapp', 'mcst'), 
-                                 'elevator_admin.html')
-
     @app.route('/api/elevator/floors', methods=['GET'])
     def api_elevator_floors():
         floors_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'elevator_floors.json')
@@ -320,49 +222,6 @@ def register_other_routes():
         with open(floors_file, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False)
         return jsonify({'success': True})
-
-    @app.route('/api/elevator/execute', methods=['POST'])
-    def api_elevator_execute():
-        import mcrcon
-        data = request.get_json()
-        elevator_id = data.get('elevator_id', 'elevator1')
-        a = data.get('a', 150)
-        
-        if not isinstance(a, (int, float)):
-            try:
-                a = int(a)
-            except (ValueError, TypeError):
-                return jsonify({'success': False, 'message': '无效的楼层参数'}), 400
-        
-        a = int(a)
-        if a < 0 or a > 300:
-            return jsonify({'success': False, 'message': '楼层参数超出范围'}), 400
-        
-        elevators_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'elevators.json')
-        if not os.path.exists(elevators_file):
-            return jsonify({'success': False, 'message': '电梯配置不存在'}), 404
-            
-        with open(elevators_file, 'r', encoding='utf-8') as f:
-            elevators_data = json.load(f)
-        
-        elevator = None
-        for e in elevators_data.get('elevators', []):
-            if e.get('id') == elevator_id:
-                elevator = e
-                break
-        
-        if not elevator:
-            return jsonify({'success': False, 'message': '电梯不存在'}), 404
-        
-        try:
-            with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-                cmd1 = elevator['point1']
-                cmd2 = elevator['point2'].replace('{a}', str(a))
-                rcon.command(cmd1)
-                result = rcon.command(cmd2)
-                return jsonify({'success': True, 'result': result})
-        except Exception as e:
-            return jsonify({'success': False, 'message': str(e)}), 500
 
     @app.route('/api/elevator/info', methods=['GET'])
     def api_elevator_info():
@@ -407,10 +266,6 @@ def register_other_routes():
             'floors': floors_data.get('floors', [])
         })
 
-    @app.route('/mc')
-    def mc_index():
-        return redirect('/localcdn/project/mc.html')
-    
     # Webmap frontend routes
     @app.route('/app/webmap')
     def webmap_index():

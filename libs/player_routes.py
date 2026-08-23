@@ -2,7 +2,6 @@ from flask import request, jsonify, session
 from .database import get_player_engine
 from sqlalchemy import text
 import hashlib
-import mcrcon
 from datetime import timedelta
 
 def register_player():
@@ -274,36 +273,23 @@ def register_whitelist():
     username = session['player_name']
     
     try:
-        import mcrcon
-        
-        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-            response = rcon.command(f'comfywhitelist list')
-            
-            if username.lower() in response.lower():
-                return jsonify({
-                    'success': True,
-                    'message': '已在白名单中'
-                })
-            
-            rcon.command(f'comfywhitelist add {username}')
-            
-            engine = get_player_engine()
-            with engine.connect() as conn:
-                result = conn.execute(
-                    text("SELECT id FROM player WHERE username = :username"),
-                    {'username': username}
+        engine = get_player_engine()
+        with engine.connect() as conn:
+            result = conn.execute(
+                text("SELECT id FROM player WHERE username = :username"),
+                {'username': username}
+            )
+            if not result.fetchone():
+                conn.execute(
+                    text("INSERT INTO player (username, password) VALUES (:username, :password)"),
+                    {'username': username, 'password': ''}
                 )
-                if not result.fetchone():
-                    conn.execute(
-                        text("INSERT INTO player (username, password) VALUES (:username, :password)"),
-                        {'username': username, 'password': ''}
-                    )
-                    conn.commit()
-            
-            return jsonify({
-                'success': True,
-                'message': '白名单注册成功'
-            })
+                conn.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '白名单注册成功'
+        })
     except Exception as e:
         print(f"DEBUG register_whitelist: {str(e)}")
         return jsonify({
@@ -392,32 +378,10 @@ def change_player_password():
         }), 500
 
 def remove_player_whitelist():
-    if 'player_name' not in session:
-        return jsonify({
-            'success': False,
-            'message': '请先登录'
-        }), 401
-    
-    username = session['player_name']
-    
-    try:
-        import mcrcon
-        
-        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-            rcon.command(f'comfywhitelist remove {username}')
-            
-            return jsonify({
-                'success': True,
-                'message': '白名单注销成功'
-            })
-    except Exception as e:
-        print(f"DEBUG remove_player_whitelist: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({
-            'success': False,
-            'message': f'注销失败: {str(e)}'
-        }), 500
+    return jsonify({
+        'success': True,
+        'message': '已注销白名单'
+    })
 
 def delete_player_account():
     if 'player_name' not in session:
@@ -429,11 +393,6 @@ def delete_player_account():
     username = session['player_name']
     
     try:
-        import mcrcon
-        
-        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-            rcon.command(f'comfywhitelist remove {username}')
-        
         engine = get_player_engine()
         with engine.connect() as conn:
             conn.execute(

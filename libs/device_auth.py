@@ -2,7 +2,6 @@ from flask import request, jsonify, session, make_response
 from .database import get_player_engine
 from sqlalchemy import text
 import uuid
-import mcrcon
 
 def get_device_uuid():
     return request.cookies.get('device_uuid')
@@ -61,15 +60,6 @@ def verify_device_login(username, device_uuid):
         row = result.fetchone()
         return row and row[0] == device_uuid
 
-def execute_rcon_forcelogin(username):
-    try:
-        with mcrcon.MCRcon('127.0.0.1', '123456', port=25575, timeout=5) as rcon:
-            rcon.command(f'authme forcelogin {username}')
-            return True
-    except Exception as e:
-        print(f"DEBUG device_auth: RCON error: {str(e)}")
-        return False
-
 def register_device_routes(app):
     @app.route('/api/device/check', methods=['POST'])
     def api_device_check():
@@ -90,19 +80,12 @@ def register_device_routes(app):
             })
         
         if device_uuid and bound_uuid == device_uuid:
-            success = execute_rcon_forcelogin(username)
-            if success:
-                session['player_name'] = username
-                return jsonify({
-                    'success': True,
-                    'status': 'verified',
-                    'message': '设备验证成功，已放行'
-                })
-            else:
-                return jsonify({
-                    'success': False,
-                    'message': 'RCON执行失败'
-                }), 500
+            session['player_name'] = username
+            return jsonify({
+                'success': True,
+                'status': 'verified',
+                'message': '设备验证成功，已放行'
+            })
         
         return jsonify({
             'success': True,
