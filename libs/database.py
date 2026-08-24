@@ -15,7 +15,8 @@ def _migrate_market_db(engine):
             for col, ddl in [('like_count', 'INTEGER DEFAULT 0'),
                              ('coin_count', 'INTEGER DEFAULT 0'),
                              ('view_count', 'INTEGER DEFAULT 0'),
-                             ('cover_url', "VARCHAR(500) DEFAULT ''")]:
+                             ('cover_url', "VARCHAR(500) DEFAULT ''"),
+                             ('icon_url', "VARCHAR(500) DEFAULT ''")]:
                 if col not in cols:
                     conn.execute(text(f"ALTER TABLE plugin ADD COLUMN {col} {ddl}"))
             conn.commit()
@@ -43,7 +44,8 @@ def _build_plugin(row, market_id, with_images=True):
         'created_at': d.get('created_at', ''), 'updated_at': d.get('updated_at', ''),
         'tags': tag_list, 'ttmp4_path': d.get('ttmp4_path', ''),
         'like_count': d.get('like_count', 0), 'coin_count': d.get('coin_count', 0),
-        'view_count': d.get('view_count', 0), 'cover_url': d.get('cover_url', '')
+        'view_count': d.get('view_count', 0), 'cover_url': d.get('cover_url', ''),
+        'icon_url': d.get('icon_url', '')
     }
     if with_images:
         p['images'] = get_plugin_images(market_id, d['id'])
@@ -118,12 +120,12 @@ def delete_plugin_images(market_id, plugin_id):
         conn.execute(sql_text("DELETE FROM plugin_image WHERE plugin_id = :id"), {'id': plugin_id})
         conn.commit()
 
-def add_plugin(market_id, name, description, author, version, file_path, tags, created_at, updated_at):
+def add_plugin(market_id, name, description, author, version, file_path, tags, created_at, updated_at, icon_url=''):
     engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         conn.execute(
-            sql_text("INSERT INTO plugin (name, description, author, version, download_count, rating, rating_count, status, file_path, created_at, updated_at, tags) VALUES (:name, :desc, :author, :version, 0, 0.0, 0, 'active', :file_path, :created_at, :updated_at, :tags)"),
-            {'name': name, 'desc': description, 'author': author, 'version': version, 'file_path': file_path, 'created_at': created_at, 'updated_at': updated_at, 'tags': tags}
+            sql_text("INSERT INTO plugin (name, description, author, version, download_count, rating, rating_count, status, file_path, created_at, updated_at, tags, icon_url) VALUES (:name, :desc, :author, :version, 0, 0.0, 0, 'active', :file_path, :created_at, :updated_at, :tags, :icon_url)"),
+            {'name': name, 'desc': description, 'author': author, 'version': version, 'file_path': file_path, 'created_at': created_at, 'updated_at': updated_at, 'tags': tags, 'icon_url': icon_url}
         )
         conn.commit()
         result = conn.execute(sql_text("SELECT last_insert_rowid()"))
@@ -250,15 +252,25 @@ def toggle_plugin_status(market_id, plugin_id):
             return new_status
         return None
 
-def update_plugin_info(market_id, plugin_id, name, description, version, tags, file_path=None):
+def update_plugin_info(market_id, plugin_id, name, description, version, tags, file_path=None, icon_url=None):
     engine, sql_text = get_market_db_engine(market_id)
     from datetime import datetime
     updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with engine.connect() as conn:
-        if file_path:
+        if file_path and icon_url is not None:
+            conn.execute(
+                sql_text("UPDATE plugin SET name = :name, description = :desc, version = :version, tags = :tags, file_path = :file_path, icon_url = :icon_url, updated_at = :updated_at WHERE id = :id"),
+                {'name': name, 'desc': description, 'version': version, 'tags': tags, 'file_path': file_path, 'icon_url': icon_url, 'updated_at': updated_at, 'id': plugin_id}
+            )
+        elif file_path:
             conn.execute(
                 sql_text("UPDATE plugin SET name = :name, description = :desc, version = :version, tags = :tags, file_path = :file_path, updated_at = :updated_at WHERE id = :id"),
                 {'name': name, 'desc': description, 'version': version, 'tags': tags, 'file_path': file_path, 'updated_at': updated_at, 'id': plugin_id}
+            )
+        elif icon_url is not None:
+            conn.execute(
+                sql_text("UPDATE plugin SET name = :name, description = :desc, version = :version, tags = :tags, icon_url = :icon_url, updated_at = :updated_at WHERE id = :id"),
+                {'name': name, 'desc': description, 'version': version, 'tags': tags, 'icon_url': icon_url, 'updated_at': updated_at, 'id': plugin_id}
             )
         else:
             conn.execute(
@@ -303,7 +315,8 @@ def init_market_database(market_id):
         like_count INTEGER DEFAULT 0,
         coin_count INTEGER DEFAULT 0,
         view_count INTEGER DEFAULT 0,
-        cover_url VARCHAR(500) DEFAULT ''
+        cover_url VARCHAR(500) DEFAULT '',
+        icon_url VARCHAR(500) DEFAULT ''
     )
     """)
     

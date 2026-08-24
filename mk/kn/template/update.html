@@ -829,6 +829,13 @@ body.lite-mode .ke-lang-item, body.lite-mode .ke-qr-tab, body.lite-mode .ke-dl-a
 <div class="form-group"><label><i class="mdui-icon material-icons">label</i><span data-i18n="tags_comma">标签（用逗号分隔）</span></label><input type="text" name="tags" value="{{ plugin.tags|join(',') }}" required></div>
 <div class="form-group"><label><i class="mdui-icon material-icons">description</i><span data-i18n="plug_desc_ns">插件描述</span></label><textarea name="description" required>{{ plugin.description }}</textarea></div>
 <div class="form-group">
+<label><i class="mdui-icon material-icons">image</i><span data-i18n="plug_icon">插件图标</span></label>
+{% if plugin.icon_url %}<img src="{{ plugin.icon_url }}" style="max-width:90px;max-height:90px;border-radius:12px;margin-bottom:8px;display:block" alt="当前图标">{% endif %}
+<input type="file" name="icon" accept="image/*">
+<input type="hidden" name="icon_url" value="{{ plugin.icon_url or '' }}">
+{% if plugin.icon_url %}<label style="display:flex;align-items:center;gap:6px;margin-top:8px;color:var(--text-3);font-size:13px;cursor:pointer"><input type="checkbox" name="icon_remove"> <span data-i18n="remove_icon">移除当前图标</span></label>{% endif %}
+</div>
+<div class="form-group">
 <label><i class="mdui-icon material-icons">insert_drive_file</i><span data-i18n="file_optional">插件文件（可选，仅当需要更新文件时上传）</span></label>
 <input type="file" name="file">
 <div class="form-hint" data-i18n="file_fmt_hint2">支持的格式: zip, rar, py, tar, gz, js</div>

@@ -245,14 +245,19 @@ def register_market_routes():
             version = sanitize_text(request.form['version'])
             tags = sanitize_text(request.form.get('tags', ''))
             external_url = request.form.get('external_url', '').strip()
-            
+
+            icon_url = request.form.get('icon_url', '').strip()
+            icon_file = request.files.get('icon')
+            if not icon_url and icon_file and icon_file.filename:
+                icon_url = upload_image_to_cdn(icon_file) or ''
+
             from datetime import datetime
             created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             
             file = request.files['file']
             if external_url:
                 file_path = external_url
-                plugin_id = add_plugin(market_id, name, description, session['user'], version, file_path, tags, created_at, created_at)
+                plugin_id = add_plugin(market_id, name, description, session['user'], version, file_path, tags, created_at, created_at, icon_url)
             elif file and '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']:
                 plugin_folder = f"{name.replace('/', '_').replace('\\', '_')[:50]}"
                 plugin_folder_path = os.path.join(upload_folder, plugin_folder)
@@ -268,7 +273,7 @@ def register_market_routes():
                 with open(file_path, 'wb') as f:
                     f.write(file_content)
                 
-                plugin_id = add_plugin(market_id, name, description, session['user'], version, file_path, tags, created_at, created_at)
+                plugin_id = add_plugin(market_id, name, description, session['user'], version, file_path, tags, created_at, created_at, icon_url)
             else:
                 users = {u.username: u.to_dict() for u in User.query.all()}
                 return render_market_template('upload.html', market_id=market_id, users=users, max_images=5, error='请上传插件文件或提供下载链接')
@@ -345,9 +350,16 @@ def register_market_routes():
                     
                     with open(file_path, 'wb') as f:
                         f.write(file_content)
-            
+
+            icon_url = request.form.get('icon_url', '').strip()
+            icon_file = request.files.get('icon')
+            if not icon_url and icon_file and icon_file.filename:
+                icon_url = upload_image_to_cdn(icon_file) or ''
+            elif not icon_url and request.form.get('icon_remove'):
+                icon_url = ''
+
             # 更新数据库（保留旧文件）
-            update_plugin_info(market_id, plugin_id, name, description, version, tags, file_path)
+            update_plugin_info(market_id, plugin_id, name, description, version, tags, file_path, icon_url)
 
             max_images = 5
             new_images = []
@@ -553,28 +565,46 @@ def register_market_routes():
         set_market('kn')
         page = request.args.get('page', 1, type=int)
         per_page = 20
-        
+
         all_plugins = get_market_plugins('kn')
         total = len(all_plugins)
         start = (page - 1) * per_page
         end = start + per_page
         page_plugins = all_plugins[start:end]
-        
+
         result = []
         for p in page_plugins:
-            tags = []
-            if p.get('tags'):
-                tags = [t.strip() for t in p['tags'].split(',') if t.strip()]
-            
+            raw_tags = p.get('tags') or []
+            if isinstance(raw_tags, str):
+                tags = [t.strip() for t in raw_tags.split(',') if t.strip()]
+            else:
+                tags = list(raw_tags)
+
+            images = []
+            try:
+                for img in get_plugin_images('kn', p['id']):
+                    if img.get('url'):
+                        images.append(img['url'])
+            except Exception:
+                images = []
+
+            icon = p.get('icon_url', '') or (images[0] if images else '')
+
             result.append({
                 'id': p['id'],
                 'name': p['name'],
                 'author': p['author'],
                 'download_url': f'/mk/kn/download/{p["id"]}',
                 'tags': tags,
-                'rating': p['rating']
+                'rating': p['rating'],
+                'icon_url': icon,
+                'images': images,
+                'download_count': p.get('downloads', 0),
+                'like_count': p.get('like_count', 0),
+                'coin_count': p.get('coin_count', 0),
+                'view_count': p.get('view_count', 0)
             })
-        
+
         return jsonify({
             'page': page,
             'per_page': per_page,
