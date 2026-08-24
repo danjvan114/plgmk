@@ -44,6 +44,10 @@ with app.app_context():
                 conn.execute(sa_text("ALTER TABLE user ADD COLUMN banner VARCHAR(500) DEFAULT ''"))
             if 'avatar' not in user_cols:
                 conn.execute(sa_text("ALTER TABLE user ADD COLUMN avatar VARCHAR(500) DEFAULT ''"))
+            if 'coins' not in user_cols:
+                conn.execute(sa_text("ALTER TABLE user ADD COLUMN coins INTEGER DEFAULT 0"))
+            if 'last_coin_claim' not in user_cols:
+                conn.execute(sa_text("ALTER TABLE user ADD COLUMN last_coin_claim VARCHAR(20) DEFAULT ''"))
             conn.commit()
         users_engine.dispose()
     except Exception as e:

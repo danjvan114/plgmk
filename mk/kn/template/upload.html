@@ -1015,6 +1015,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   btn.addEventListener('click', function () {
     var fd = new FormData(form);
+    var tagInput = form.querySelector('input[name="tags"]');
+    if (tagInput) {
+      var tv = (tagInput.value || '').trim();
+      if (tv && tv.charAt(0) === '[' && tv.charAt(tv.length - 1) === ']') {
+        fd.set('tags', tv);
+      } else {
+        var tagArr = tv.split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s; });
+        fd.set('tags', JSON.stringify(tagArr));
+      }
+    }
     if (!fd.get('name') || !fd.get('version') || !fd.get('description')) { showToast('请填写插件名称、版本号与描述', false); return; }
     setLoading(true);
     fetch(form.action || location.pathname, { method: 'POST', body: fd })

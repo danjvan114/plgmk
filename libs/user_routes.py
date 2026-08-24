@@ -5,6 +5,14 @@ import requests
 from datetime import datetime
 
 def register_user_routes():
+    def grant_daily_login_coins(user):
+        """每日首次登录由服务器发放 5 硬币（按日期计数，防刷）"""
+        today = datetime.now().strftime('%Y-%m-%d')
+        if user.last_coin_claim != today:
+            user.coins = (user.coins or 0) + 5
+            user.last_coin_claim = today
+            db.session.commit()
+
     @app.route('/auth/redirect')
     def auth_redirect():
         uuid = request.args.get('uuid', '')
@@ -21,6 +29,7 @@ def register_user_routes():
                     if user:
                         session['user'] = user.username
                         session['market'] = 'kn'
+                        grant_daily_login_coins(user)
                         return redirect(url_for('index'))
                     else:
                         return render_market_template('auth_bind.html', uuid=uuid, error=None)
@@ -52,6 +61,7 @@ def register_user_routes():
                     
                     session['user'] = username
                     session['market'] = 'kn'
+                    grant_daily_login_coins(new_user)
                     return redirect(url_for('index'))
         except:
             pass
@@ -69,6 +79,7 @@ def register_user_routes():
                 session['user'] = username
                 session['market'] = 'kn'
                 session.permanent = True
+                grant_daily_login_coins(user)
                 return redirect(url_for('index'))
         
         return render_market_template('login.html', error=None, backurl=request.url_root + 'auth/redirect')
@@ -84,7 +95,8 @@ def register_user_routes():
             'logged_in': True,
             'username': user.username,
             'avatar': user.avatar_url,
-            'qq': user.qq
+            'qq': user.qq,
+            'coins': user.coins or 0
         })
 
     @app.route('/api/users/info', methods=['GET'])

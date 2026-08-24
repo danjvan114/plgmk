@@ -32,6 +32,7 @@ def upload_image_to_cdn(file_storage, allowed=('png', 'jpg', 'jpeg', 'gif', 'web
 import os
 import hashlib
 import re
+import json
 import requests
 
 def sanitize_text(text):
@@ -178,8 +179,13 @@ def register_market_routes():
         plugin = get_plugin_by_id(market_id, plugin_id)
         if not plugin:
             return jsonify({'success': False, 'error': '插件不存在'}), 404
+        user = User.query.get(session['user'])
+        if user.coins < 1:
+            return jsonify({'success': False, 'error': '硬币不足，每日登录可领取5个'}), 400
+        user.coins -= 1
+        db.session.commit()
         cnt = add_plugin_coin(market_id, plugin_id, session['user'])
-        return jsonify({'success': True, 'coin_count': cnt})
+        return jsonify({'success': True, 'coin_count': cnt, 'user_coins': user.coins})
 
     @app.route('/mk/kn/coin/<int:plugin_id>', methods=['POST'])
     def coin_plugin(plugin_id):
@@ -243,7 +249,16 @@ def register_market_routes():
             name = sanitize_text(request.form['name'])
             description = sanitize_description(request.form['description'])
             version = sanitize_text(request.form['version'])
-            tags = sanitize_text(request.form.get('tags', ''))
+            raw_tags = request.form.get('tags', '').strip()
+            if not raw_tags:
+                return jsonify({'error': '标签必须为 JSON 数组格式，例如 [1,2]'}), 400
+            try:
+                tags_val = json.loads(raw_tags)
+            except Exception:
+                return jsonify({'error': '标签格式错误，必须为合法 JSON 数组，例如 [1,2]'}), 400
+            if not isinstance(tags_val, list):
+                return jsonify({'error': '标签必须为数组格式，例如 [1,2]'}), 400
+            tags = ','.join(str(t) for t in tags_val)
             external_url = request.form.get('external_url', '').strip()
 
             icon_url = request.form.get('icon_url', '').strip()
