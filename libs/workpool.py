@@ -841,7 +841,7 @@ def register_workpool_routes():
         thumbnail = sanitize_work_text(data.get('thumbnail', ''))
         file_url = sanitize_work_text(data.get('file_url', ''))
         file_type = (data.get('file_type') or 'player').strip().lower()
-        if file_type not in ('player', 'img', 'html', 'redirect'):
+        if file_type not in ('player', 'img', 'redirect'):
             file_type = 'player'
 
         if not title:
@@ -1216,7 +1216,7 @@ def register_workpool_routes():
                 params.append(sanitize_work_text(data['thumbnail']))
             if data.get('file_type'):
                 ft = (data['file_type'] or 'player').strip().lower()
-                if ft in ('player', 'img', 'html', 'redirect'):
+                if ft in ('player', 'img', 'redirect'):
                     fields.append('file_type = ?')
                     params.append(ft)
             if fields:

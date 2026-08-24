@@ -43,9 +43,11 @@ class User(db.Model):
     bio = db.Column(db.String(500), default='')
     banner = db.Column(db.String(500), default='')
     avatar = db.Column(db.String(500), default='')
+    coins = db.Column(db.Integer, default=0)
+    last_coin_claim = db.Column(db.String(20), default='')
     
     def to_dict(self):
-        return {'username': self.username, 'password': self.password, 'role': self.role, 'qq': self.qq, 'reg_time': self.reg_time, 'bio': self.bio, 'banner': self.banner, 'avatar': self.avatar}
+        return {'username': self.username, 'password': self.password, 'role': self.role, 'qq': self.qq, 'reg_time': self.reg_time, 'bio': self.bio, 'banner': self.banner, 'avatar': self.avatar, 'coins': self.coins or 0, 'last_coin_claim': self.last_coin_claim or ''}
 
     @property
     def avatar_url(self):

@@ -140,14 +140,14 @@
                 <div class="profile-meta">
                     <span><i class="fa-regular fa-calendar"></i>注册时间：{{ profile_user.reg_time or '未知' }}</span>
                     <span><i class="fa-solid fa-box-open"></i>作品：{{ total_works }}</span>
-                    <span><i class="fa-solid fa-users"></i>粉丝：{{ followers|length }}</span>
-                     <span><i class="fa-solid fa-user-plus"></i>关注：{{ following|length }}</span>
-                     <span><i class="fa-regular fa-envelope"></i>未读消息：{{ msg_count }}</span>
+                    <span id="follower-count"><i class="fa-solid fa-users"></i>粉丝：{{ followers|length }}</span>
+                      <span><i class="fa-solid fa-user-plus"></i>关注：{{ following|length }}</span>
+                     {% if session.user == profile_user.username %}<span><i class="fa-regular fa-envelope"></i>未读消息：{{ msg_count }}</span>{% endif %}
                  </div>
                 {% if profile_user.bio %}
                 <div class="profile-bio"><i class="fa-solid fa-quote-left"></i> {{ profile_user.bio|e }}</div>
                 {% endif %}
-                {% if profile_user.qq %}
+                {% if session.user == profile_user.username and profile_user.qq %}
                 <div class="profile-qq"><i class="fa-brands fa-qq"></i>已绑定 QQ：{{ profile_user.qq }}</div>
                 {% endif %}
                 {% if session.user and session.user == profile_user.username %}
@@ -370,22 +370,33 @@
         });
 
         function toggleFollow(username) {
-            fetch('/workpool/follow/' + encodeURIComponent(username), { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        const btn = document.getElementById('follow-btn');
-                        if (data.action === 'followed') {
-                            btn.classList.add('following');
-                            btn.innerHTML = '<i class="fa-solid fa-check"></i> 已关注';
-                        } else {
-                            btn.classList.remove('following');
-                            btn.innerHTML = '<i class="fa-solid fa-plus"></i> 关注';
-                        }
-                    } else {
-                        alert(data.message);
+            fetch('/workpool/follow/' + encodeURIComponent(username), {
+                method: 'POST',
+                credentials: 'same-origin'
+            })
+                .then(r => r.json().then(data => ({ status: r.status, data: data })))
+                .then(({ status, data }) => {
+                    if (status === 401) {
+                        window.location.href = '/login';
+                        return;
                     }
-                });
+                    if (!data.success) {
+                        alert(data.message || '操作失败');
+                        return;
+                    }
+                    const btn = document.getElementById('follow-btn');
+                    const fc = document.getElementById('follower-count');
+                    if (data.action === 'followed') {
+                        btn.classList.add('following');
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> 已关注';
+                        if (fc) fc.innerHTML = '<i class="fa-solid fa-users"></i>粉丝：' + ({{ followers|length }} + 1);
+                    } else {
+                        btn.classList.remove('following');
+                        btn.innerHTML = '<i class="fa-solid fa-plus"></i> 关注';
+                        if (fc) fc.innerHTML = '<i class="fa-solid fa-users"></i>粉丝：' + Math.max(0, {{ followers|length }} - 1);
+                    }
+                })
+                .catch(() => alert('网络错误，请稍后重试'));
         }
 
         function postWall() {
