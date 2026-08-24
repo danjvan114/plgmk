@@ -29,6 +29,32 @@ def upload_image_to_cdn(file_storage, allowed=('png', 'jpg', 'jpeg', 'gif', 'web
     except Exception:
         pass
     return None
+
+
+def parse_tags(raw):
+    """将标签输入规范化为逗号分隔字符串，兼容多种写法：
+       - 合法 JSON 数组: ["a","b"] / [1,2]
+       - 裸逗号列表（可带方括号）: 工具,美化 / [测试,mc,test,官方] / [游戏, 冒险]
+       空输入返回 ''。
+    """
+    if raw is None:
+        return ''
+    s = str(raw).strip()
+    if not s:
+        return ''
+    try:
+        val = json.loads(s)
+        if isinstance(val, list):
+            items = [str(x).strip() for x in val if str(x).strip() != '']
+            return ','.join(items)
+    except Exception:
+        pass
+    if s.startswith('[') and s.endswith(']'):
+        s = s[1:-1]
+    items = [x.strip().strip('"').strip("'") for x in s.split(',')]
+    items = [x for x in items if x != '']
+    return ','.join(items)
+
 import os
 import hashlib
 import re
@@ -250,15 +276,9 @@ def register_market_routes():
             description = sanitize_description(request.form['description'])
             version = sanitize_text(request.form['version'])
             raw_tags = request.form.get('tags', '').strip()
-            if not raw_tags:
-                return jsonify({'error': '标签必须为 JSON 数组格式，例如 [1,2]'}), 400
-            try:
-                tags_val = json.loads(raw_tags)
-            except Exception:
-                return jsonify({'error': '标签格式错误，必须为合法 JSON 数组，例如 [1,2]'}), 400
-            if not isinstance(tags_val, list):
-                return jsonify({'error': '标签必须为数组格式，例如 [1,2]'}), 400
-            tags = ','.join(str(t) for t in tags_val)
+            tags = parse_tags(raw_tags)
+            if not tags:
+                return jsonify({'error': '请至少填写一个标签（多个用逗号分隔，如：工具,美化）'}), 400
             external_url = request.form.get('external_url', '').strip()
 
             icon_url = request.form.get('icon_url', '').strip()
@@ -345,7 +365,7 @@ def register_market_routes():
             name = sanitize_text(request.form['name'])
             description = sanitize_description(request.form['description'])
             version = sanitize_text(request.form['version'])
-            tags = sanitize_text(request.form.get('tags', ''))
+            tags = parse_tags(request.form.get('tags', ''))
             external_url = request.form.get('external_url', '').strip()
             
             file_path = None

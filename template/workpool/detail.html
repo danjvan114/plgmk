@@ -160,7 +160,7 @@
                 <div class="player-area">
                     {% if work.file_type == 'img' and work.file_url %}
                     <img src="{{ work.file_url }}" alt="作品图片" style="max-width:100%;max-height:70vh;display:block;margin:0 auto;border-radius:8px">
-                    {% elif work.file_type in ('html', 'redirect') and work.file_url %}
+                    {% elif work.file_type == 'redirect' and work.file_url %}
                     <div class="player-loading" id="player-loading">
                         <div class="mdui-spinner">
                             <div class="mdui-spinner-layer mdui-spinner-layer-1"></div>
@@ -171,6 +171,8 @@
                         <span>作品播放器正在加载，请稍后...</span>
                     </div>
                     <iframe id="player-frame" src="{{ work.file_url }}" frameborder="0" allowfullscreen onload="playerLoaded()"></iframe>
+                    {% elif work.file_type == 'html' %}
+                    <div class="player-loading" style="color:#999"><span>该作品类型（网页）已停用</span></div>
                     {% elif work.file_url %}
                     <div class="player-loading" id="player-loading">
                         <div class="mdui-spinner">
