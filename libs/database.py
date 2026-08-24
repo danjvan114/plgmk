@@ -1,36 +1,74 @@
 from sqlalchemy import create_engine, text
 import os
 import json
+from datetime import datetime
 from .utils import get_market_db_path, get_market_path
+
+
+def _migrate_market_db(engine):
+    """为已存在的 market.db 补充新表/新字段（点赞、投币、浏览量、封面）"""
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("CREATE TABLE IF NOT EXISTS plugin_like (id INTEGER PRIMARY KEY, plugin_id INTEGER NOT NULL, user_id VARCHAR(50) NOT NULL, created_at VARCHAR(20) DEFAULT '2024-01-01')"))
+            conn.execute(text("CREATE TABLE IF NOT EXISTS plugin_coin (id INTEGER PRIMARY KEY, plugin_id INTEGER NOT NULL, user_id VARCHAR(50) NOT NULL, created_at VARCHAR(20) DEFAULT '2024-01-01')"))
+            cols = [r[1] for r in conn.execute(text("PRAGMA table_info(plugin)")).fetchall()]
+            for col, ddl in [('like_count', 'INTEGER DEFAULT 0'),
+                             ('coin_count', 'INTEGER DEFAULT 0'),
+                             ('view_count', 'INTEGER DEFAULT 0'),
+                             ('cover_url', "VARCHAR(500) DEFAULT ''")]:
+                if col not in cols:
+                    conn.execute(text(f"ALTER TABLE plugin ADD COLUMN {col} {ddl}"))
+            conn.commit()
+    except Exception:
+        pass
+
+
+def _build_plugin(row, market_id, with_images=True):
+    """将 plugin 行统一转换为 dict；tags 拆分为列表，补充点赞/投币/浏览量/封面等字段。"""
+    if hasattr(row, '_mapping'):
+        d = dict(row._mapping)
+    elif hasattr(row, 'keys'):
+        d = dict(zip(row.keys(), row))
+    else:
+        d = row
+    tags_raw = d.get('tags') or ''
+    tag_list = [t.strip() for t in tags_raw.split(',') if t.strip()] if tags_raw else []
+    p = {
+        'id': d['id'], 'name': d['name'], 'description': d['description'],
+        'author': d['author'], 'version': d['version'],
+        'download_count': d.get('download_count', 0),
+        'downloads': d.get('download_count', 0),
+        'rating': d.get('rating', 0), 'rating_count': d.get('rating_count', 0),
+        'status': d.get('status', 'active'), 'file_path': d.get('file_path', ''),
+        'created_at': d.get('created_at', ''), 'updated_at': d.get('updated_at', ''),
+        'tags': tag_list, 'ttmp4_path': d.get('ttmp4_path', ''),
+        'like_count': d.get('like_count', 0), 'coin_count': d.get('coin_count', 0),
+        'view_count': d.get('view_count', 0), 'cover_url': d.get('cover_url', '')
+    }
+    if with_images:
+        p['images'] = get_plugin_images(market_id, d['id'])
+    return p
 
 _engine_cache = {}
 
 def get_market_db_engine(market_id):
     if market_id not in _engine_cache:
         db_path = get_market_db_path(market_id)
-        _engine_cache[market_id] = create_engine(
+        eng = create_engine(
             f'sqlite:///{db_path}',
             connect_args={'timeout': 30, 'check_same_thread': False},
             pool_pre_ping=True,
             pool_recycle=3600
         )
+        _migrate_market_db(eng)
+        _engine_cache[market_id] = eng
     return _engine_cache[market_id], text
 
 def get_market_plugins(market_id):
     engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         result = conn.execute(sql_text("SELECT * FROM plugin WHERE status = 'active'"))
-        plugins = []
-        for row in result:
-            plugin = {
-                'id': row[0], 'name': row[1], 'description': row[2],
-                'author': row[3], 'version': row[4], 'download_count': row[5],
-                'rating': row[6], 'rating_count': row[7], 'status': row[8],
-                'file_path': row[9], 'created_at': row[10], 'updated_at': row[11],
-                'tags': row[12], 'images': get_plugin_images(market_id, row[0])
-            }
-            plugins.append(plugin)
-        return plugins
+        return [_build_plugin(row, market_id) for row in result]
 
 def search_market_plugins(market_id, query):
     engine, sql_text = get_market_db_engine(market_id)
@@ -39,17 +77,7 @@ def search_market_plugins(market_id, query):
             sql_text("SELECT * FROM plugin WHERE status = 'active' AND (name LIKE :name OR description LIKE :desc)"),
             {'name': f'%{query}%', 'desc': f'%{query}%'}
         )
-        plugins = []
-        for row in result:
-            plugin = {
-                'id': row[0], 'name': row[1], 'description': row[2],
-                'author': row[3], 'version': row[4], 'download_count': row[5],
-                'rating': row[6], 'rating_count': row[7], 'status': row[8],
-                'file_path': row[9], 'created_at': row[10], 'updated_at': row[11],
-                'tags': row[12], 'images': get_plugin_images(market_id, row[0])
-            }
-            plugins.append(plugin)
-        return plugins
+        return [_build_plugin(row, market_id) for row in result]
 
 def get_plugin_by_id(market_id, plugin_id):
     engine, sql_text = get_market_db_engine(market_id)
@@ -57,7 +85,8 @@ def get_plugin_by_id(market_id, plugin_id):
         result = conn.execute(sql_text("SELECT * FROM plugin WHERE id = :id"), {'id': plugin_id})
         row = result.fetchone()
         if row:
-            ttmp4_path = row[13] if len(row) > 13 else ''
+            p = _build_plugin(row, market_id)
+            ttmp4_path = p.get('ttmp4_path', '')
             ttmp4_url = ''
             if ttmp4_path:
                 if ttmp4_path.startswith('http'):
@@ -70,16 +99,8 @@ def get_plugin_by_id(market_id, plugin_id):
                                 ttmp4_url = data['url']
                     except Exception:
                         pass
-            
-            return {
-                'id': row[0], 'name': row[1], 'description': row[2],
-                'author': row[3], 'version': row[4], 'download_count': row[5],
-                'rating': row[6], 'rating_count': row[7], 'status': row[8],
-                'file_path': row[9], 'created_at': row[10], 'updated_at': row[11],
-                'tags': row[12], 'images': get_plugin_images(market_id, row[0]),
-                'ttmp4_path': ttmp4_path,
-                'ttmp4_url': ttmp4_url
-            }
+            p['ttmp4_url'] = ttmp4_url
+            return p
         return None
 
 def get_plugin_images(market_id, plugin_id):
@@ -88,8 +109,14 @@ def get_plugin_images(market_id, plugin_id):
         result = conn.execute(sql_text("SELECT * FROM plugin_image WHERE plugin_id = :id"), {'id': plugin_id})
         images = []
         for row in result:
-            images.append({'id': row[0], 'image_path': row[2]})
+            images.append({'id': row[0], 'url': row[2], 'image_path': row[2]})
         return images
+
+def delete_plugin_images(market_id, plugin_id):
+    engine, sql_text = get_market_db_engine(market_id)
+    with engine.connect() as conn:
+        conn.execute(sql_text("DELETE FROM plugin_image WHERE plugin_id = :id"), {'id': plugin_id})
+        conn.commit()
 
 def add_plugin(market_id, name, description, author, version, file_path, tags, created_at, updated_at):
     engine, sql_text = get_market_db_engine(market_id)
@@ -168,17 +195,48 @@ def get_all_plugins(market_id):
     engine, sql_text = get_market_db_engine(market_id)
     with engine.connect() as conn:
         result = conn.execute(sql_text("SELECT * FROM plugin"))
-        plugins = []
-        for row in result:
-            plugin = {
-                'id': row[0], 'name': row[1], 'description': row[2],
-                'author': row[3], 'version': row[4], 'download_count': row[5],
-                'rating': row[6], 'rating_count': row[7], 'status': row[8],
-                'file_path': row[9], 'created_at': row[10], 'updated_at': row[11],
-                'tags': row[12], 'images': get_plugin_images(market_id, row[0])
-            }
-            plugins.append(plugin)
-        return plugins
+        return [_build_plugin(row, market_id) for row in result]
+
+def toggle_plugin_like(market_id, plugin_id, user_id):
+    engine, sql_text = get_market_db_engine(market_id)
+    with engine.connect() as conn:
+        r = conn.execute(sql_text("SELECT id FROM plugin_like WHERE plugin_id = :pid AND user_id = :uid"),
+                         {'pid': plugin_id, 'uid': user_id}).fetchone()
+        if r:
+            conn.execute(sql_text("DELETE FROM plugin_like WHERE plugin_id = :pid AND user_id = :uid"),
+                         {'pid': plugin_id, 'uid': user_id})
+            liked = 0
+        else:
+            conn.execute(sql_text("INSERT INTO plugin_like (plugin_id, user_id, created_at) VALUES (:pid, :uid, :t)"),
+                         {'pid': plugin_id, 'uid': user_id, 't': datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+            liked = 1
+        cnt = conn.execute(sql_text("SELECT COUNT(*) FROM plugin_like WHERE plugin_id = :pid"), {'pid': plugin_id}).fetchone()[0]
+        conn.execute(sql_text("UPDATE plugin SET like_count = :c WHERE id = :pid"), {'c': cnt, 'pid': plugin_id})
+        conn.commit()
+        return liked, cnt
+
+def add_plugin_coin(market_id, plugin_id, user_id):
+    engine, sql_text = get_market_db_engine(market_id)
+    with engine.connect() as conn:
+        conn.execute(sql_text("INSERT INTO plugin_coin (plugin_id, user_id, created_at) VALUES (:pid, :uid, :t)"),
+                     {'pid': plugin_id, 'uid': user_id, 't': datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+        cnt = conn.execute(sql_text("SELECT COUNT(*) FROM plugin_coin WHERE plugin_id = :pid"), {'pid': plugin_id}).fetchone()[0]
+        conn.execute(sql_text("UPDATE plugin SET coin_count = :c WHERE id = :pid"), {'c': cnt, 'pid': plugin_id})
+        conn.commit()
+        return cnt
+
+def get_user_plugin_like(market_id, plugin_id, user_id):
+    engine, sql_text = get_market_db_engine(market_id)
+    with engine.connect() as conn:
+        r = conn.execute(sql_text("SELECT id FROM plugin_like WHERE plugin_id = :pid AND user_id = :uid"),
+                         {'pid': plugin_id, 'uid': user_id}).fetchone()
+        return bool(r)
+
+def increment_plugin_view(market_id, plugin_id):
+    engine, sql_text = get_market_db_engine(market_id)
+    with engine.connect() as conn:
+        conn.execute(sql_text("UPDATE plugin SET view_count = view_count + 1 WHERE id = :pid"), {'pid': plugin_id})
+        conn.commit()
 
 def toggle_plugin_status(market_id, plugin_id):
     engine, sql_text = get_market_db_engine(market_id)
@@ -241,7 +299,11 @@ def init_market_database(market_id):
         created_at VARCHAR(20) DEFAULT '2024-01-01',
         updated_at VARCHAR(20) DEFAULT '2024-01-01',
         tags VARCHAR(255) DEFAULT '',
-        ttmp4_path VARCHAR(500) DEFAULT ''
+        ttmp4_path VARCHAR(500) DEFAULT '',
+        like_count INTEGER DEFAULT 0,
+        coin_count INTEGER DEFAULT 0,
+        view_count INTEGER DEFAULT 0,
+        cover_url VARCHAR(500) DEFAULT ''
     )
     """)
     
@@ -249,7 +311,7 @@ def init_market_database(market_id):
     CREATE TABLE IF NOT EXISTS plugin_image (
         id INTEGER PRIMARY KEY,
         plugin_id INTEGER NOT NULL,
-        image_path VARCHAR(255) NOT NULL
+        image_path VARCHAR(500) NOT NULL
     )
     """)
     
@@ -262,11 +324,31 @@ def init_market_database(market_id):
         created_at VARCHAR(20) DEFAULT '2024-01-01'
     )
     """)
+
+    like_table = text("""
+    CREATE TABLE IF NOT EXISTS plugin_like (
+        id INTEGER PRIMARY KEY,
+        plugin_id INTEGER NOT NULL,
+        user_id VARCHAR(50) NOT NULL,
+        created_at VARCHAR(20) DEFAULT '2024-01-01'
+    )
+    """)
+
+    coin_table = text("""
+    CREATE TABLE IF NOT EXISTS plugin_coin (
+        id INTEGER PRIMARY KEY,
+        plugin_id INTEGER NOT NULL,
+        user_id VARCHAR(50) NOT NULL,
+        created_at VARCHAR(20) DEFAULT '2024-01-01'
+    )
+    """)
     
     with engine.connect() as conn:
         conn.execute(plugin_table)
         conn.execute(image_table)
         conn.execute(rating_table)
+        conn.execute(like_table)
+        conn.execute(coin_table)
         conn.commit()
 
 def init_player_database():

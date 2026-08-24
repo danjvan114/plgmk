@@ -5,11 +5,34 @@ from .database import (
     get_market_plugins, search_market_plugins, get_plugin_by_id,
     update_plugin_download_count, add_rating, add_plugin, add_plugin_image,
     add_plugin_ttmp4, get_all_plugins, toggle_plugin_status, delete_plugin,
-    get_plugin_images, update_plugin_info
+    get_plugin_images, update_plugin_info, delete_plugin_images,
+    toggle_plugin_like, add_plugin_coin, get_user_plugin_like, increment_plugin_view
 )
+
+
+def upload_image_to_cdn(file_storage, allowed=('png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp')):
+    """将图片上传到外部 CDN（api.pgaot.com），返回可访问的 URL，失败返回 None。"""
+    if not file_storage or not file_storage.filename:
+        return None
+    ext = file_storage.filename.rsplit('.', 1)[-1].lower() if '.' in file_storage.filename else ''
+    if ext not in allowed:
+        return None
+    try:
+        resp = requests.post(
+            'https://api.pgaot.com/user/up_cat_file',
+            files={'file': (file_storage.filename, file_storage.stream, file_storage.mimetype or 'image/jpeg')},
+            timeout=30
+        )
+        data = resp.json()
+        if data.get('code') == 200 and data.get('url'):
+            return data['url']
+    except Exception:
+        pass
+    return None
 import os
 import hashlib
 import re
+import requests
 
 def sanitize_text(text):
     """移除文本中的所有 HTML 标签和 JavaScript 代码，用于 name、version、tags 等字段"""
@@ -80,9 +103,13 @@ def register_market_routes():
         compact_mode = request.args.get('c') == '1'
         users = {u.username: u.to_dict() for u in User.query.all()}
         is_owner = session.get('user') == plugin['author']
-        return render_market_template('plugin_detail.html', market_id=market_id, 
+        liked = False
+        if session.get('user'):
+            liked = get_user_plugin_like(market_id, plugin_id, session['user'])
+        increment_plugin_view(market_id, plugin_id)
+        return render_market_template('plugin_detail.html', market_id=market_id,
                                       plugin=plugin, users=users, is_owner=is_owner,
-                                      compact_mode=compact_mode)
+                                      liked=liked, compact_mode=compact_mode)
 
     @app.route('/mk/kn/plugin/<int:plugin_id>')
     def plugin_detail(plugin_id):
@@ -123,6 +150,40 @@ def register_market_routes():
     @app.route('/mk/kn/download/<int:plugin_id>')
     def download_plugin(plugin_id):
         return market_download_plugin('kn', plugin_id)
+
+    @app.route('/mk/<market_id>/like/<int:plugin_id>', methods=['POST'])
+    def market_like_plugin(market_id, plugin_id):
+        if market_id not in MARKETS:
+            return render_root_template('404.html'), 404
+        if 'user' not in session:
+            return jsonify({'success': False, 'error': '请先登录'}), 401
+        set_market(market_id)
+        plugin = get_plugin_by_id(market_id, plugin_id)
+        if not plugin:
+            return jsonify({'success': False, 'error': '插件不存在'}), 404
+        liked, cnt = toggle_plugin_like(market_id, plugin_id, session['user'])
+        return jsonify({'success': True, 'liked': bool(liked), 'like_count': cnt})
+
+    @app.route('/mk/kn/like/<int:plugin_id>', methods=['POST'])
+    def like_plugin(plugin_id):
+        return market_like_plugin('kn', plugin_id)
+
+    @app.route('/mk/<market_id>/coin/<int:plugin_id>', methods=['POST'])
+    def market_coin_plugin(market_id, plugin_id):
+        if market_id not in MARKETS:
+            return render_root_template('404.html'), 404
+        if 'user' not in session:
+            return jsonify({'success': False, 'error': '请先登录'}), 401
+        set_market(market_id)
+        plugin = get_plugin_by_id(market_id, plugin_id)
+        if not plugin:
+            return jsonify({'success': False, 'error': '插件不存在'}), 404
+        cnt = add_plugin_coin(market_id, plugin_id, session['user'])
+        return jsonify({'success': True, 'coin_count': cnt})
+
+    @app.route('/mk/kn/coin/<int:plugin_id>', methods=['POST'])
+    def coin_plugin(plugin_id):
+        return market_coin_plugin('kn', plugin_id)
 
     @app.route('/mk/<market_id>/rate/<int:plugin_id>', methods=['GET', 'POST'])
     def market_rate_plugin(market_id, plugin_id):
@@ -287,29 +348,32 @@ def register_market_routes():
             
             # 更新数据库（保留旧文件）
             update_plugin_info(market_id, plugin_id, name, description, version, tags, file_path)
-            
-            images = request.files.getlist('images')
+
             max_images = 5
-            existing_images = get_plugin_images(market_id, plugin_id)
-            existing_count = len(existing_images)
-            
-            for i, image_file in enumerate(images):
-                if existing_count + i >= max_images:
-                    break
-                if image_file and '.' in image_file.filename and image_file.filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'webp'}:
-                    img_content = image_file.read()
-                    img_hash = hashlib.md5(img_content).hexdigest()
-                    img_ext = image_file.filename.rsplit('.', 1)[1].lower()
-                    img_filename = f"{img_hash}.{img_ext}"
-                    
-                    plugin_folder_path = os.path.dirname(plugin['file_path'])
-                    img_path = os.path.join(plugin_folder_path, img_filename)
-                    
-                    with open(img_path, 'wb') as f:
-                        f.write(img_content)
-                    
-                    add_plugin_image(market_id, plugin_id, img_path)
-            
+            new_images = []
+            for i in range(1, max_images + 1):
+                url = request.form.get(f'image_url{i}', '').strip()
+                img_file = request.files.get(f'image{i}')
+                if url:
+                    new_images.append(url)
+                elif img_file and img_file.filename:
+                    cdn_url = upload_image_to_cdn(img_file)
+                    if cdn_url:
+                        new_images.append(cdn_url)
+
+            if new_images:
+                old_images = get_plugin_images(market_id, plugin_id)
+                for old in old_images:
+                    try:
+                        if old['image_path'] and not old['image_path'].startswith('http'):
+                            if os.path.exists(old['image_path']):
+                                os.remove(old['image_path'])
+                    except Exception:
+                        pass
+                delete_plugin_images(market_id, plugin_id)
+                for url in new_images[:max_images]:
+                    add_plugin_image(market_id, plugin_id, url)
+
             return redirect(url_for('market_plugin_detail', market_id=market_id, plugin_id=plugin_id))
         
         users = {u.username: u.to_dict() for u in User.query.all()}

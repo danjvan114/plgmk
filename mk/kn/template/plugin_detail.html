@@ -1902,6 +1902,7 @@ body.lite-mode .ke-lang-item, body.lite-mode .ke-qr-tab, body.lite-mode .ke-dl-a
     <span class="meta-badge rating">★ {{ '%.1f'|format(plugin.rating) if plugin.rating is not none else '无数据' }}</span>
     <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></svg>{{ plugin.rating_count if plugin.rating_count is not none else '无数据' }} 评价</span>
     <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>{{ plugin.created_at or '无数据' }}</span>
+    <span class="meta-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>{{ plugin.view_count if plugin.view_count is not none else 0 }} 浏览</span>
   </div>
   <div class="tag-list">{% for tag in plugin.tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
 </div>
@@ -1950,6 +1951,14 @@ body.lite-mode .ke-lang-item, body.lite-mode .ke-qr-tab, body.lite-mode .ke-dl-a
         </div>
         
         <div class="detail-actions">
+        <button type="button" class="btn ghost" id="likeBtn" onclick="toggleLike({{ plugin.id }})">
+          <i class="mdui-icon material-icons" id="likeIcon">{% if liked %}thumb_up{% else %}thumb_up_off_alt{% endif %}</i>
+          <span id="likeCount">{{ plugin.like_count if plugin.like_count is not none else 0 }}</span>
+        </button>
+        <button type="button" class="btn ghost" id="coinBtn" onclick="coinPlugin({{ plugin.id }})">
+          <i class="mdui-icon material-icons">monetization_on</i>
+          <span id="coinCount">{{ plugin.coin_count if plugin.coin_count is not none else 0 }}</span>
+        </button>
         {% if plugin.status == 'active' %}
         <a href="/mk/{{ current_market or 'kn' }}/download/{{ plugin.id }}" class="btn success"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg><span data-i18n="pd_dl_now">立即下载</span></a>
         <a href="/mk/{{ current_market or 'kn' }}/rate/{{ plugin.id }}{% if compact_mode %}?c=1{% endif %}" class="btn warn"><i class="mdui-icon material-icons">star</i><span data-i18n="pd_stat_rate">评分</span></a>
@@ -2103,6 +2112,29 @@ function confirmDelete() {
   if (confirm('确定要擦除此插件吗？此操作将永久删除插件记录，不可恢复！')) {
     window.location.href = '/mk/{{ current_market or "kn" }}/delete/{{ plugin.id }}';
   }
+}
+function toggleLike(id) {
+  fetch('/mk/kn/like/' + id, {method: 'POST'})
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.success) {
+        document.getElementById('likeCount').textContent = d.like_count;
+        document.getElementById('likeIcon').textContent = d.liked ? 'thumb_up' : 'thumb_up_off_alt';
+      } else if (d.error) {
+        alert(d.error);
+      }
+    });
+}
+function coinPlugin(id) {
+  fetch('/mk/kn/coin/' + id, {method: 'POST'})
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.success) {
+        document.getElementById('coinCount').textContent = d.coin_count;
+      } else if (d.error) {
+        alert(d.error);
+      }
+    });
 }
 
 /* ===== 悬浮卡片:鼠标跟随倾斜(tilt) ===== */
