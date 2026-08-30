@@ -1,0 +1,34 @@
+/* 图标基础容器 */
+.myicon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  position: relative;
+  font-size: 0; /* 清除文本干扰 */
+}
+.myicon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* ========== 在这里注册你的所有图标 ========== */
+/* 选择箭头 */
+.myicon[data-name="add"]::before {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMzYzIDEwMjQiPgogICAgICAgICAgICAgICAgPHBhdGggZD0iTTQ3Ny40NjQ3IDEwMjRhMTQwLjY3OTA1MSAxNDAuNjc5MDUxIDAgMCAxLTk5LjUwNjk4Mi00MS4xNzIwNjlMNDEuMTcyMDY5IDY0Ni4wNDIyODJhMTQwLjY3OTA1MSAxNDAuNjc5MDUxIDAgMCAxIDE5OS4wMTM5NjQtMTk4LjkyMDE3OGwyMzcuMjc4NjY3IDIzNy4yNzg2NjYgNjQxLjQ5NjQ3My02NDEuNDk2NDczYTE0MC42NzkwNTEgMTQwLjY3OTA1MSAwIDEgMSAxOTguOTIwMTc5IDE5OC45MjAxNzhsLTc0MC45MDk2NyA3NDAuOTA5NjdhMTQwLjY3OTA1MSAxNDAuNjc5MDUxIDAgMCAxLTk5LjUwNjk4MiA0MS4yNjU4NTV6IiBwLWlkPSI0MDI1Ii8+CiAgICAgICAgPC9zdmc+");
+}
+/* 手型移动 */
+.myicon[data-name="hand"]::before {
+  background-image: url("data:image/svg+xml;base64,你的svgbase64");
+}
+/* 铅笔 */
+.myicon[data-name="pen"]::before {
+  background-image: url("data:image/svg+xml;base64,你的svgbase64");
+}
+/* 橡皮 */
+.myicon[data-name="eraser"]::before {
+  background-image: url("data:image/svg+xml;base64,你的svgbase64");
+}
