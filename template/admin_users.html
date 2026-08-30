@@ -1,33 +1,33 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>用户管理</title>
-<link rel="stylesheet" href="vendor/mdui.min.css">
-<link rel="stylesheet" href="vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../env.css">
-<link rel="stylesheet" href="../styles.css">
-<link rel="stylesheet" href="community-layout.css">
-<link rel="stylesheet" href="community-enhance.css">
+<title>鐢ㄦ埛绠＄悊</title>
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="main-box mdui-typo">
 <div class="card">
 <div class="admin-header">
-<h1>用户管理</h1>
+<h1>鐢ㄦ埛绠＄悊</h1>
 </div>
 <table class="user-table">
 <thead>
 <tr>
-<th>用户名</th>
-<th>角色</th>
-<th>操作</th>
+<th>鐢ㄦ埛鍚?/th>
+<th>瑙掕壊</th>
+<th>鎿嶄綔</th>
 </tr>
 </thead>
 <tbody>
@@ -36,69 +36,70 @@
 <td>{{ username }}</td>
 <td>
 <span class="role-{{ info.role }}">
-{{ {'admin':'管理员', 'developer':'开发者', 'user':'普通用户'}[info.role] }}
+{{ {'admin':'绠＄悊鍛?, 'developer':'寮€鍙戣€?, 'user':'鏅€氱敤鎴?}[info.role] }}
 </span>
 </td>
 <td>
-<button class="btn mdui-ripple" onclick="showEditModal('{{ username }}', '{{ info.role }}')">编辑</button>
-<button class="btn btn-success mdui-ripple" onclick="getToken('{{ username }}')">获取Token</button>
-<a href="javascript:;" class="btn btn-danger mdui-ripple" onclick="if(confirm('确定删除用户？'))fetch('/op/user/delete/{{ username }}',{method:'POST'}).then(()=>location.reload())">删除</a>
+<button class="btn mdui-ripple" onclick="showEditModal('{{ username }}', '{{ info.role }}')">缂栬緫</button>
+<button class="btn btn-success mdui-ripple" onclick="getToken('{{ username }}')">鑾峰彇Token</button>
+<a href="javascript:;" class="btn btn-danger mdui-ripple" onclick="if(confirm('纭畾鍒犻櫎鐢ㄦ埛锛?))fetch('/op/user/delete/{{ username }}',{method:'POST'}).then(()=>location.reload())">鍒犻櫎</a>
 </td>
 </tr>
 {% endfor %}
 </tbody>
 </table>
 <div class="add-section">
-<h2 class="mdui-typo-headline">添加用户</h2>
+<h2 class="mdui-typo-headline">娣诲姞鐢ㄦ埛</h2>
 <form action="/op/user/add" method="post">
 <div class="form-group">
-<label>用户名</label>
-<input type="text" name="username" required placeholder="请输入用户名">
+<label>鐢ㄦ埛鍚?/label>
+<input type="text" name="username" required placeholder="璇疯緭鍏ョ敤鎴峰悕">
 </div>
 <div class="form-group">
-<label>密码</label>
-<input type="password" name="password" required placeholder="请输入密码">
+<label>瀵嗙爜</label>
+<input type="password" name="password" required placeholder="璇疯緭鍏ュ瘑鐮?>
 </div>
 <div class="form-group">
-<label>角色</label>
+<label>瑙掕壊</label>
 <select name="role">
-<option value="user">普通用户</option>
-<option value="developer">开发者</option>
-<option value="admin">管理员</option>
+<option value="user">鏅€氱敤鎴?/option>
+<option value="developer">寮€鍙戣€?/option>
+<option value="admin">绠＄悊鍛?/option>
 </select>
 </div>
-<button type="submit" class="btn btn-success mdui-ripple">添加用户</button>
+<button type="submit" class="btn btn-success mdui-ripple">娣诲姞鐢ㄦ埛</button>
 </form>
 </div>
 </div>
 </div>
 <div class="modal" id="editModal">
 <div class="modal-content">
-<h3 class="mdui-typo-headline">编辑用户</h3>
+<h3 class="mdui-typo-headline">缂栬緫鐢ㄦ埛</h3>
 <form action="" method="post" id="editForm">
 <div class="form-group">
-<label>新密码（留空则不修改）</label>
-<input type="password" name="password" placeholder="请输入新密码">
+<label>鏂板瘑鐮侊紙鐣欑┖鍒欎笉淇敼锛?/label>
+<input type="password" name="password" placeholder="璇疯緭鍏ユ柊瀵嗙爜">
 </div>
 <div class="form-group">
-<label>角色</label>
+<label>瑙掕壊</label>
 <select name="role">
-<option value="user">普通用户</option>
-<option value="developer">开发者</option>
-<option value="admin">管理员</option>
+<option value="user">鏅€氱敤鎴?/option>
+<option value="developer">寮€鍙戣€?/option>
+<option value="admin">绠＄悊鍛?/option>
 </select>
 </div>
-<button type="submit" class="btn mdui-ripple">保存修改</button>
-<button type="button" class="btn btn-danger mdui-ripple" onclick="closeModal()">取消</button>
+<button type="submit" class="btn mdui-ripple">淇濆瓨淇敼</button>
+<button type="button" class="btn btn-danger mdui-ripple" onclick="closeModal()">鍙栨秷</button>
 </form>
 </div>
 </div>
 
-<script src="vendor/mdui.min.js"></script>
-<script src="../nav.js"></script>
-<script src="community-tilt.js"></script>
-<script src="community-mdui.js"></script>
-<script src="community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+

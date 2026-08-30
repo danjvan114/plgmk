@@ -1,27 +1,27 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader"><div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div></div>
     
     <div class="team-wrap">
 
-        <!-- 顶部：封面 + 团队图标 + 名称信息 -->
+        <!-- 椤堕儴锛氬皝闈?+ 鍥㈤槦鍥炬爣 + 鍚嶇О淇℃伅 -->
         <div class="team-header">
             <div class="cover-box">
                 {% if team.cover %}<img src="{{ team.cover }}" alt="cover">{% else %}<div class="blank"><i class="fa-solid fa-image"></i></div>{% endif %}
@@ -37,11 +37,11 @@
                 <div class="team-title">
                     {{ team.name|e }}
                     {% if team.qq %}<span class="tea-badge">QQ {{ team.qq }}</span>{% endif %}
-                    <span class="tea-badge"><i class="fa-solid fa-user-group"></i> {{ members_total }} 人</span>
+                    <span class="tea-badge"><i class="fa-solid fa-user-group"></i> {{ members_total }} 浜?/span>
                 </div>
                 <div class="team-meta-sub">
-                    创建者：<span class="mdui-text-color-blue">{{ team.created_by }}</span>
-                    · 成立：<span class="mdui-text-color-blue">{{ team.created_at }}</span>
+                    鍒涘缓鑰咃細<span class="mdui-text-color-blue">{{ team.created_by }}</span>
+                    路 鎴愮珛锛?span class="mdui-text-color-blue">{{ team.created_at }}</span>
                 </div>
                 {% if team.description %}
                 <div class="team-desc">{{ team.description|e }}</div>
@@ -49,59 +49,59 @@
             </div>
         </div>
 
-        <!-- 告示牌 -->
+        <!-- 鍛婄ず鐗?-->
         <div class="card">
             <div class="card-body mdui-typo">
                 {% if is_admin %}
                 <form id="bulletin-form">
                     <div class="mdui-textfield">
-                        <textarea name="bulletin" class="mdui-textfield-input" rows="3" placeholder="编写告示牌内容...">{{ team.bulletin }}</textarea>
+                        <textarea name="bulletin" class="mdui-textfield-input" rows="3" placeholder="缂栧啓鍛婄ず鐗屽唴瀹?..">{{ team.bulletin }}</textarea>
                     </div>
                     <div class="section-gap">
-                        <button type="submit" class="mdui-btn mdui-btn-raised">保存告示牌</button>
+                        <button type="submit" class="mdui-btn mdui-btn-raised">淇濆瓨鍛婄ず鐗?/button>
                     </div>
                 </form>
                 <div id="bulletin-tip" class="mdui-text-color-red" style="font-size:13px"></div>
                 {% else %}
                 <div class="bulletin">
-                    {% if team.bulletin %}<div style="color:var(--text-1);line-height:1.7">{{ team.bulletin|e }}</div>{% else %}<div class="empty">（团队暂未发布公告）</div>{% endif %}
+                    {% if team.bulletin %}<div style="color:var(--text-1);line-height:1.7">{{ team.bulletin|e }}</div>{% else %}<div class="empty">锛堝洟闃熸殏鏈彂甯冨叕鍛婏級</div>{% endif %}
                 </div>
                 {% endif %}
             </div>
         </div>
 
-        <!-- MDUI 选项卡 -->
+        <!-- MDUI 閫夐」鍗?-->
         <div class="mdui-tab" mdui-tab id="team-tabs" style="margin-top:20px">
-            <a href="#tab-posts" class="mdui-ripple"><i class="fa-solid fa-pen-nib"></i> 帖子</a>
-            <a href="#tab-members" class="mdui-ripple"><i class="fa-solid fa-users"></i> 成员</a>
-            <a href="#tab-works" class="mdui-ripple"><i class="fa-solid fa-cube"></i> 作品</a>
-            {% if is_admin %}<a href="#tab-invites" class="mdui-ripple"><i class="fa-solid fa-envelope-open-text"></i> 邀请</a>{% endif %}
-            {% if is_owner %}<a href="#tab-settings" class="mdui-ripple"><i class="fa-solid fa-gear"></i> 设置</a>{% endif %}
+            <a href="#tab-posts" class="mdui-ripple"><i class="fa-solid fa-pen-nib"></i> 甯栧瓙</a>
+            <a href="#tab-members" class="mdui-ripple"><i class="fa-solid fa-users"></i> 鎴愬憳</a>
+            <a href="#tab-works" class="mdui-ripple"><i class="fa-solid fa-cube"></i> 浣滃搧</a>
+            {% if is_admin %}<a href="#tab-invites" class="mdui-ripple"><i class="fa-solid fa-envelope-open-text"></i> 閭€璇?/a>{% endif %}
+            {% if is_owner %}<a href="#tab-settings" class="mdui-ripple"><i class="fa-solid fa-gear"></i> 璁剧疆</a>{% endif %}
         </div>
 
-        <!-- 帖子选项卡 -->
+        <!-- 甯栧瓙閫夐」鍗?-->
         <div id="tab-posts" class="tab-content">
             <div class="card">
                 <div class="tab-actions" style="padding:14px 18px;border-bottom:1px solid var(--border)">
-                    <span style="font-size:15px;color:var(--text-1);font-weight:600">帖子（<span id="posts-count">{{ posts_total }}</span>）</span>
-                    {% if is_member %}<span class="mdui-text-color-blue" style="cursor:pointer" onclick="document.getElementById('post-form-box').style.display='block'"><i class="fa-solid fa-plus"></i> 发帖</span>{% endif %}
+                    <span style="font-size:15px;color:var(--text-1);font-weight:600">甯栧瓙锛?span id="posts-count">{{ posts_total }}</span>锛?/span>
+                    {% if is_member %}<span class="mdui-text-color-blue" style="cursor:pointer" onclick="document.getElementById('post-form-box').style.display='block'"><i class="fa-solid fa-plus"></i> 鍙戝笘</span>{% endif %}
                 </div>
                 <div class="card-body mdui-typo">
                     {% if is_member %}
                     <div id="post-form-box" class="mgr-form" style="display:none">
                         <div class="mdui-textfield mdui-textfield-floating">
-                            <input type="text" name="title" id="new-post-title" class="mdui-textfield-input" placeholder="标题（可选）">
+                            <input type="text" name="title" id="new-post-title" class="mdui-textfield-input" placeholder="鏍囬锛堝彲閫夛級">
                         </div>
                         <div class="mdui-textfield mdui-textfield-floating">
-                            <textarea name="content" id="new-post-content" class="mdui-textfield-input" rows="4" placeholder="帖子内容..."></textarea>
+                            <textarea name="content" id="new-post-content" class="mdui-textfield-input" rows="4" placeholder="甯栧瓙鍐呭..."></textarea>
                         </div>
                         {% if is_admin %}
                         <label style="font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:6px;margin:4px 0 10px">
-                            <input type="checkbox" id="new-post-pin"> 置顶
+                            <input type="checkbox" id="new-post-pin"> 缃《
                         </label>
                         {% endif %}
                         <div class="section-gap">
-                            <button class="mdui-btn mdui-btn-raised" onclick="addPost()">发布</button>
+                            <button class="mdui-btn mdui-btn-raised" onclick="addPost()">鍙戝竷</button>
                             <span id="post-tip" class="mdui-text-color-red" style="margin-left:10px;font-size:13px"></span>
                         </div>
                     </div>
@@ -110,7 +110,7 @@
                         {{ posts_html|safe }}
                         {% if p_has_more %}
                         <div style="text-align:center;padding-top:6px">
-                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="post-more-btn">加载更多帖子</button>
+                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="post-more-btn">鍔犺浇鏇村甯栧瓙</button>
                         </div>
                         {% endif %}
                     </div>
@@ -118,21 +118,21 @@
             </div>
         </div>
 
-        <!-- 成员选项卡 -->
+        <!-- 鎴愬憳閫夐」鍗?-->
         <div id="tab-members" class="tab-content">
             <div class="card">
                 <div class="tab-actions" style="padding:14px 18px;border-bottom:1px solid var(--border)">
-                    <span style="font-size:15px;color:var(--text-1);font-weight:600">成员列表（{{ members_total }} 人）</span>
-                    {% if is_admin %}<span class="mdui-text-color-blue" style="cursor:pointer" onclick="document.getElementById('member-add-form').style.display='block'"><i class="fa-solid fa-user-plus"></i> 添加成员</span>{% endif %}
+                    <span style="font-size:15px;color:var(--text-1);font-weight:600">鎴愬憳鍒楄〃锛坽{ members_total }} 浜猴級</span>
+                    {% if is_admin %}<span class="mdui-text-color-blue" style="cursor:pointer" onclick="document.getElementById('member-add-form').style.display='block'"><i class="fa-solid fa-user-plus"></i> 娣诲姞鎴愬憳</span>{% endif %}
                 </div>
                 <div class="card-body mdui-typo">
                     {% if is_admin %}
                     <div id="member-add-form" class="mgr-form" style="display:none">
                         <div class="mdui-textfield mdui-textfield-floating">
                             <input type="text" name="username" id="new-member-username" class="mdui-textfield-input" required>
-                            <label class="mdui-textfield-label">成员用户名</label>
+                            <label class="mdui-textfield-label">鎴愬憳鐢ㄦ埛鍚?/label>
                         </div>
-                        <div class="section-gap"><button class="mdui-btn mdui-btn-raised" onclick="addMember()">添加</button></div>
+                        <div class="section-gap"><button class="mdui-btn mdui-btn-raised" onclick="addMember()">娣诲姞</button></div>
                         <div id="member-tip" class="mdui-text-color-red" style="font-size:13px"></div>
                     </div>
                     {% endif %}
@@ -140,7 +140,7 @@
                         {{ members_html|safe }}
                         {% if m_has_more %}
                         <div style="text-align:center;padding-top:6px">
-                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="member-more-btn">加载更多成员</button>
+                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="member-more-btn">鍔犺浇鏇村鎴愬憳</button>
                         </div>
                         {% endif %}
                     </ul>
@@ -148,12 +148,12 @@
             </div>
         </div>
 
-        <!-- 作品选项卡 -->
+        <!-- 浣滃搧閫夐」鍗?-->
         <div id="tab-works" class="tab-content">
             <div class="card">
                 <div class="tab-actions" style="padding:14px 18px;border-bottom:1px solid var(--border)">
-                    <span style="font-size:15px;color:var(--text-1);font-weight:600">团队共有作品（<span id="works-count">{{ works_total }}</span>）</span>
-                    {% if is_member and my_works %}<span class="mdui-text-color-blue" style="cursor:pointer" onclick="document.getElementById('work-add-form').style.display='block'"><i class="fa-solid fa-plus"></i> 添加作品</span>{% endif %}
+                    <span style="font-size:15px;color:var(--text-1);font-weight:600">鍥㈤槦鍏辨湁浣滃搧锛?span id="works-count">{{ works_total }}</span>锛?/span>
+                    {% if is_member and my_works %}<span class="mdui-text-color-blue" style="cursor:pointer" onclick="document.getElementById('work-add-form').style.display='block'"><i class="fa-solid fa-plus"></i> 娣诲姞浣滃搧</span>{% endif %}
                 </div>
                 <div class="card-body mdui-typo">
                     {% if is_member and my_works %}
@@ -161,11 +161,11 @@
                         <div class="mdui-textfield mdui-textfield-floating">
                             <select name="work_id" id="new-work-select" class="mdui-textfield-input select-arrow">
                                 {% for w in my_works %}
-                                <option value="{{ w.id }}">{{ w.title|e }}（{{ w.author }}）</option>
+                                <option value="{{ w.id }}">{{ w.title|e }}锛坽{ w.author }}锛?/option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="section-gap"><button class="mdui-btn mdui-btn-raised" onclick="addWork()">添加到共有作品</button></div>
+                        <div class="section-gap"><button class="mdui-btn mdui-btn-raised" onclick="addWork()">娣诲姞鍒板叡鏈変綔鍝?/button></div>
                         <div id="work-tip" class="mdui-text-color-red" style="font-size:13px"></div>
                     </div>
                     {% endif %}
@@ -173,7 +173,7 @@
                         {{ works_html|safe }}
                         {% if w_has_more %}
                         <div style="text-align:center;padding-top:6px">
-                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="work-more-btn">加载更多作品</button>
+                            <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="work-more-btn">鍔犺浇鏇村浣滃搧</button>
                         </div>
                         {% endif %}
                     </div>
@@ -181,25 +181,25 @@
             </div>
         </div>
 
-        <!-- 邀请管理选项卡（管理员） -->
+        <!-- 閭€璇风鐞嗛€夐」鍗★紙绠＄悊鍛橈級 -->
         {% if is_admin %}
         <div id="tab-invites" class="tab-content">
             <div class="card">
                 <div class="card-body mdui-typo">
                     <div class="mdui-textfield mdui-textfield-floating">
-                        <input type="text" name="username" id="invite-username" class="mdui-textfield-input" placeholder="输入要邀请的用户名">
+                        <input type="text" name="username" id="invite-username" class="mdui-textfield-input" placeholder="杈撳叆瑕侀個璇风殑鐢ㄦ埛鍚?>
                     </div>
                     <div class="section-gap">
-                        <button class="mdui-btn mdui-btn-raised" onclick="sendInvite()">发送邀请</button>
+                        <button class="mdui-btn mdui-btn-raised" onclick="sendInvite()">鍙戦€侀個璇?/button>
                         <span id="invite-tip" class="mdui-text-color-red" style="margin-left:10px;font-size:13px"></span>
                     </div>
                     <div class="section-gap">
-                        <div style="font-size:13px;color:var(--text-2);font-weight:600;margin:12px 0 4px">待处理邀请</div>
+                        <div style="font-size:13px;color:var(--text-2);font-weight:600;margin:12px 0 4px">寰呭鐞嗛個璇?/div>
                         <div id="invite-list">
                             {{ invites_html|safe }}
                             {% if i_has_more %}
                             <div style="text-align:center;padding-top:6px">
-                                <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="invite-more-btn">加载更多邀请</button>
+                                <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="invite-more-btn">鍔犺浇鏇村閭€璇?/button>
                             </div>
                             {% endif %}
                         </div>
@@ -209,7 +209,7 @@
         </div>
         {% endif %}
 
-        <!-- 管理设置选项卡（团长） -->
+        <!-- 绠＄悊璁剧疆閫夐」鍗★紙鍥㈤暱锛?-->
         {% if is_owner %}
         <div id="tab-settings" class="tab-content">
             <div class="card">
@@ -219,38 +219,38 @@
                             <div class="mgr-row">
                                 <div class="mdui-textfield mdui-textfield-floating">
                                     <input type="text" name="name" class="mdui-textfield-input" value="{{ team.name }}" required>
-                                    <label class="mdui-textfield-label">团队名称</label>
+                                    <label class="mdui-textfield-label">鍥㈤槦鍚嶇О</label>
                                 </div>
                                 <div class="mdui-textfield mdui-textfield-floating">
                                     <input type="text" name="cover" class="mdui-textfield-input" placeholder="https://..." value="{{ team.cover or '' }}">
-                                    <label class="mdui-textfield-label">头图 URL</label>
+                                    <label class="mdui-textfield-label">澶村浘 URL</label>
                                 </div>
                             </div>
                             <div class="mgr-row">
                                 <div class="mdui-textfield mdui-textfield-floating">
                                     <input type="text" name="description" class="mdui-textfield-input" value="{{ team.description or '' }}">
-                                    <label class="mdui-textfield-label">介绍</label>
+                                    <label class="mdui-textfield-label">浠嬬粛</label>
                                 </div>
                                 <div class="mdui-textfield mdui-textfield-floating">
-                                    <input type="text" name="qq" class="mdui-textfield-input" placeholder="QQ 号" value="{{ team.qq or '' }}">
-                                    <label class="mdui-textfield-label">QQ 号（团队图标）</label>
+                                    <input type="text" name="qq" class="mdui-textfield-input" placeholder="QQ 鍙? value="{{ team.qq or '' }}">
+                                    <label class="mdui-textfield-label">QQ 鍙凤紙鍥㈤槦鍥炬爣锛?/label>
                                 </div>
                             </div>
                             <div class="mgr-row full">
                                 <div class="mdui-textfield mdui-textfield-floating">
-                                    <textarea name="bulletin" class="mdui-textfield-input" rows="3" placeholder="团队公告">{{ team.bulletin }}</textarea>
-                                    <label class="mdui-textfield-label">告示牌内容</label>
+                                    <textarea name="bulletin" class="mdui-textfield-input" rows="3" placeholder="鍥㈤槦鍏憡">{{ team.bulletin }}</textarea>
+                                    <label class="mdui-textfield-label">鍛婄ず鐗屽唴瀹?/label>
                                 </div>
                             </div>
                             <div class="section-gap">
-                                <button type="submit" class="mdui-btn mdui-btn-raised">保存设置</button>
+                                <button type="submit" class="mdui-btn mdui-btn-raised">淇濆瓨璁剧疆</button>
                                 <span id="edit-tip" class="mdui-text-color-red" style="margin-left:10px;font-size:13px"></span>
                             </div>
                         </div>
                     </form>
                     <div class="section-gap">
-                        <form action="/team/{{ team.id }}/delete" method="post" onsubmit="return confirm('删除团队后不可恢复，确定吗？')">
-                            <button type="submit" class="mdui-btn mdui-btn-raised danger"><i class="fa-solid fa-trash-can"></i> 删除团队</button>
+                        <form action="/team/{{ team.id }}/delete" method="post" onsubmit="return confirm('鍒犻櫎鍥㈤槦鍚庝笉鍙仮澶嶏紝纭畾鍚楋紵')">
+                            <button type="submit" class="mdui-btn mdui-btn-raised danger"><i class="fa-solid fa-trash-can"></i> 鍒犻櫎鍥㈤槦</button>
                         </form>
                     </div>
                 </div>
@@ -259,11 +259,13 @@
         {% endif %}
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+

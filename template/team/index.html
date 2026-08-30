@@ -1,36 +1,36 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader"><div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div></div>
     
     <div class="team-wrap">
-        <div class="page-title"><i class="fa-solid fa-users-rectangle"></i> 团队中心</div>
+        <div class="page-title"><i class="fa-solid fa-users-rectangle"></i> 鍥㈤槦涓績</div>
 
         {% if session.user %}
         {% if my_team %}
         <div class="mdui-card" style="margin-bottom:18px">
             <div class="mdui-card-primary">
-                <div class="mdui-card-header-title">隶属团队：{{ my_team.name }}</div>
+                <div class="mdui-card-header-title">闅跺睘鍥㈤槦锛歿{ my_team.name }}</div>
                 <div class="mdui-card-header-text">
-                    <a href="/team/{{ my_team.id }}" class="mdui-text-color-blue">前往 {{ my_team.name }} 主页</a>
+                    <a href="/team/{{ my_team.id }}" class="mdui-text-color-blue">鍓嶅線 {{ my_team.name }} 涓婚〉</a>
                     <form action="/team/{{ my_team.id }}/leave" method="post" style="display:inline">
-                        <button class="mdui-btn mdui-btn-dense danger" style="width:auto;padding:4px 10px;font-size:12px">退出团队</button>
+                        <button class="mdui-btn mdui-btn-dense danger" style="width:auto;padding:4px 10px;font-size:12px">閫€鍑哄洟闃?/button>
                     </form>
                 </div>
             </div>
@@ -39,39 +39,39 @@
         <div class="mdui-card" style="margin-bottom:18px">
             <div class="mdui-card-header">
                 <div class="mdui-card-header-text">
-                    <div class="mdui-card-title">还没有加入任何团队</div>
-                    <div class="mdui-card-text">创建你的团队，组织成员、共建共有作品与帖子。</div>
+                    <div class="mdui-card-title">杩樻病鏈夊姞鍏ヤ换浣曞洟闃?/div>
+                    <div class="mdui-card-text">鍒涘缓浣犵殑鍥㈤槦锛岀粍缁囨垚鍛樸€佸叡寤哄叡鏈変綔鍝佷笌甯栧瓙銆?/div>
                 </div>
             </div>
             <div class="mdui-card-content" style="padding-top:0">
-                <button class="mdui-btn mdui-btn-raised" mdui-dialog="{target: '#create-dialog'}"><i class="fa-solid fa-plus"></i> 创建团队</button>
+                <button class="mdui-btn mdui-btn-raised" mdui-dialog="{target: '#create-dialog'}"><i class="fa-solid fa-plus"></i> 鍒涘缓鍥㈤槦</button>
             </div>
         </div>
         {% endif %}
 
         {% if not my_team %}
         <div class="mdui-dialog" id="create-dialog">
-            <div class="mdui-dialog-title"><i class="fa-solid fa-users-rectangle"></i> 创建团队</div>
+            <div class="mdui-dialog-title"><i class="fa-solid fa-users-rectangle"></i> 鍒涘缓鍥㈤槦</div>
             <div class="mdui-dialog-content">
                 <form id="team-create-form">
                     <div class="mdui-textfield mdui-textfield-floating">
                         <input type="text" name="name" class="mdui-textfield-input" required>
-                        <label class="mdui-textfield-label">团队名称</label>
+                        <label class="mdui-textfield-label">鍥㈤槦鍚嶇О</label>
                     </div>
                     <div class="mdui-textfield mdui-textfield-floating" style="margin-top:10px">
                         <textarea name="description" class="mdui-textfield-input" rows="2"></textarea>
-                        <label class="mdui-textfield-label">团队介绍</label>
+                        <label class="mdui-textfield-label">鍥㈤槦浠嬬粛</label>
                     </div>
                     <div class="mdui-textfield mdui-textfield-floating" style="margin-top:10px">
                         <input type="text" name="cover" class="mdui-textfield-input" placeholder="https://...">
-                        <label class="mdui-textfield-label">头图 URL</label>
+                        <label class="mdui-textfield-label">澶村浘 URL</label>
                     </div>
                     <div class="mdui-textfield mdui-textfield-floating" style="margin-top:10px">
-                        <input type="text" name="qq" class="mdui-textfield-input" placeholder="QQ 号（用于团队图标）">
-                        <label class="mdui-textfield-label">QQ 号</label>
+                        <input type="text" name="qq" class="mdui-textfield-input" placeholder="QQ 鍙凤紙鐢ㄤ簬鍥㈤槦鍥炬爣锛?>
+                        <label class="mdui-textfield-label">QQ 鍙?/label>
                     </div>
                     <div style="margin-top:14px">
-                        <button type="submit" class="mdui-btn mdui-btn-raised">创建团队</button>
+                        <button type="submit" class="mdui-btn mdui-btn-raised">鍒涘缓鍥㈤槦</button>
                         <span id="create-tip" class="mdui-text-color-red" style="margin-left:10px;font-size:13px"></span>
                     </div>
                 </form>
@@ -82,16 +82,16 @@
         {% if my_invites and my_invites|length > 0 %}
         <div class="card" style="margin-bottom:18px">
             <div class="card-body mdui-typo">
-                <div class="section-title"><i class="fa-solid fa-envelope-open-text"></i> 收到的团队邀请</div>
+                <div class="section-title"><i class="fa-solid fa-envelope-open-text"></i> 鏀跺埌鐨勫洟闃熼個璇?/div>
                 {% for iv in my_invites %}
                 <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
                     <div class="mdui-avatar" style="background:var(--glass-tint-2);color:var(--accent-1);width:36px;height:36px;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-building"></i></div>
                     <div style="flex:1;min-width:0">
                         <div style="font-size:15px;font-weight:600;color:var(--text-1)"><a href="/team/{{ iv.team_id }}" class="mdui-text-color-blue">{{ iv.team_name }}</a></div>
-                        <div style="font-size:12px;color:var(--text-3)">来自 {{ iv.from_user }} · {{ iv.created_at }}</div>
+                        <div style="font-size:12px;color:var(--text-3)">鏉ヨ嚜 {{ iv.from_user }} 路 {{ iv.created_at }}</div>
                     </div>
-                    <button class="mdui-btn mdui-btn-raised mdui-btn-dense" style="padding:4px 14px;font-size:12px" onclick="acceptInvite({{ iv.id }})">接受</button>
-                    <button class="mdui-btn mdui-btn-dense" style="background:var(--glass-tint);color:var(--text-2);font-size:12px" onclick="rejectInvite({{ iv.id }})">拒绝</button>
+                    <button class="mdui-btn mdui-btn-raised mdui-btn-dense" style="padding:4px 14px;font-size:12px" onclick="acceptInvite({{ iv.id }})">鎺ュ彈</button>
+                    <button class="mdui-btn mdui-btn-dense" style="background:var(--glass-tint);color:var(--text-2);font-size:12px" onclick="rejectInvite({{ iv.id }})">鎷掔粷</button>
                 </div>
                 {% endfor %}
             </div>
@@ -99,17 +99,17 @@
         {% endif %}
         {% else %}
         <div class="mdui-card" style="text-align:center;padding:30px">
-            <p style="color:var(--text-2);margin-bottom:14px">登录后即可创建或加入团队</p>
-            <a href="/login" class="mdui-btn mdui-btn-raised">立即登录</a>
+            <p style="color:var(--text-2);margin-bottom:14px">鐧诲綍鍚庡嵆鍙垱寤烘垨鍔犲叆鍥㈤槦</p>
+            <a href="/login" class="mdui-btn mdui-btn-raised">绔嬪嵆鐧诲綍</a>
         </div>
         {% endif %}
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 <script>
 (function () {
     var form = document.getElementById('team-create-form');
@@ -129,8 +129,8 @@
                 })
             }).then(function (r) { return r.json(); }).then(function (d) {
                 if (d && d.ok) { location.href = '/team/' + (d.team_id || d.id || ''); }
-                else { tip.textContent = (d && d.msg) || '创建失败'; }
-            }).catch(function () { tip.textContent = '网络错误，请重试'; });
+                else { tip.textContent = (d && d.msg) || '鍒涘缓澶辫触'; }
+            }).catch(function () { tip.textContent = '缃戠粶閿欒锛岃閲嶈瘯'; });
         });
     }
     window.acceptInvite = function (id) {
@@ -144,3 +144,5 @@
 
 </body>
 </html>
+
+

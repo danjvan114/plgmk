@@ -1,22 +1,22 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="vendor/mdui.min.css">
-<link rel="stylesheet" href="vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../env.css">
-<link rel="stylesheet" href="../styles.css">
-<link rel="stylesheet" href="community-layout.css">
-<link rel="stylesheet" href="community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 <style>
-/* ===== 社区首页 page-specific 样式 ===== */
+/* ===== 绀惧尯棣栭〉 page-specific 鏍峰紡 ===== */
 .page { position:relative; z-index:1; padding:108px 0 60px; }
 .container { max-width:1280px; margin:0 auto; padding:0 16px; }
 
-/* Banner 轮播 */
+/* Banner 杞挱 */
 .banner-wrap { position:relative; width:100%; height:260px; border-radius:22px; overflow:hidden; margin-bottom:34px; }
 .banner-bg { position:absolute; inset:0; background-size:cover; background-position:center; filter:blur(30px) brightness(1.08); transform:scale(1.15); z-index:0; transition:background-image .6s ease; }
 .banner-img { position:relative; z-index:1; width:100%; height:100%; object-fit:contain; display:block; opacity:1; transition:opacity .5s ease; }
@@ -29,14 +29,14 @@
 .dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.45); cursor:pointer; transition:transform .35s cubic-bezier(.34,1.56,.64,1),background .25s; }
 .dot.active { background:#fff; transform:scale(1.35); }
 
-/* 标题行 */
+/* 鏍囬琛?*/
 .section-title-row { display:flex; justify-content:space-between; align-items:center; margin:44px 0 18px; }
 .section-title { display:flex; align-items:center; gap:8px; font-size:22px; font-weight:800; color:var(--text-1); letter-spacing:-.3px; }
 .sec-ico { color:var(--accent-1); display:flex; }
 .more-link { display:inline-flex; align-items:center; gap:4px; font-size:14px; font-weight:700; color:var(--accent-1); transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
 .more-link:hover { transform:translateX(4px); }
 
-/* 项目卡片网格 */
+/* 椤圭洰鍗＄墖缃戞牸 */
 .projects-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:22px; margin-top:20px; }
 .project-card { display:block; border-radius:20px; overflow:hidden; text-decoration:none; }
 .project-card img { width:100%; height:180px; object-fit:cover; display:block; }
@@ -49,7 +49,7 @@
 .featured-meta i { color:var(--accent-1); font-size:12px; }
 .work-thumb { height:180px; display:flex; align-items:center; justify-content:center; background:var(--glass-tint); color:var(--text-3); font-size:34px; }
 
-/* 导航"更多"菜单动画修正:基础态 visibility:hidden,show 时才 visible */
+/* 瀵艰埅"鏇村"鑿滃崟鍔ㄧ敾淇:鍩虹鎬?visibility:hidden,show 鏃舵墠 visible */
 .nav-more-menu { visibility:hidden !important; }
 .nav-more-menu.show { visibility:visible !important; }
 
@@ -66,19 +66,19 @@
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <main class="page">
 
-    <!-- Banner 轮播 -->
+    <!-- Banner 杞挱 -->
     <div class="banner-wrap" id="banner">
       <div class="banner-bg" id="bannerBg"></div>
       <img class="banner-img" id="bannerImg" alt="">
-      <button class="banner-arrow arrow-left" id="btnPrev" aria-label="上一张">
+      <button class="banner-arrow arrow-left" id="btnPrev" aria-label="涓婁竴寮?>
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg>
       </button>
-      <button class="banner-arrow arrow-right" id="btnNext" aria-label="下一张">
+      <button class="banner-arrow arrow-right" id="btnNext" aria-label="涓嬩竴寮?>
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg>
       </button>
       <div class="dots-wrap" id="dotsWrap"></div>
@@ -86,11 +86,11 @@
 
   <div class="container">
 
-    <!-- 全部项目 -->
+    <!-- 鍏ㄩ儴椤圭洰 -->
     <div class="section-title-row">
       <div class="section-title">
         <span class="sec-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg></span>
-        <span data-i18n="sec_all">全部项目</span>
+        <span data-i18n="sec_all">鍏ㄩ儴椤圭洰</span>
       </div>
     </div>
     <div class="projects-grid">
@@ -98,82 +98,82 @@
         <img src="/localcdn/gzs/{93D330BB-21E1-46CF-8EDB-262229E1024D}.png" alt="KE Hub" loading="lazy">
         <div class="project-card-content">
           <h3 data-i18n="p_bcm">KE Hub</h3>
-          <p data-i18n="p_bcm_desc">不会凉凉发社区~~</p>
+          <p data-i18n="p_bcm_desc">涓嶄細鍑夊噳鍙戠ぞ鍖簙~</p>
         </div>
       </a>
       <a href="/po/mc" class="project-card card">
-        <img src="/localcdn/gzs/mc1.png" alt="铁路mc服务器" loading="lazy">
+        <img src="/localcdn/gzs/mc1.png" alt="閾佽矾mc鏈嶅姟鍣? loading="lazy">
         <div class="project-card-content">
-          <h3 data-i18n="p_mc">铁路mc服务器</h3>
-          <p data-i18n="p_mc_desc">一个基于minecraft的铁路服务器，为玩家提供铁路玩法~</p>
+          <h3 data-i18n="p_mc">閾佽矾mc鏈嶅姟鍣?/h3>
+          <p data-i18n="p_mc_desc">涓€涓熀浜巑inecraft鐨勯搧璺湇鍔″櫒锛屼负鐜╁鎻愪緵閾佽矾鐜╂硶~</p>
         </div>
       </a>
       <a href="/app/ccvue" class="project-card card">
-        <img src="/localcdn/gzs/%7BBF5BFB2D-FE5A-49C2-8C2D-8D0E1781D4EC%7D.png" alt="CCvue框架" loading="lazy">
+        <img src="/localcdn/gzs/%7BBF5BFB2D-FE5A-49C2-8C2D-8D0E1781D4EC%7D.png" alt="CCvue妗嗘灦" loading="lazy">
         <div class="project-card-content">
-          <h3 data-i18n="p_ccvue">CCvue框架</h3>
-          <p data-i18n="p_ccvue_desc">一个基于vue的框架，用于快速开发web游戏应用</p>
+          <h3 data-i18n="p_ccvue">CCvue妗嗘灦</h3>
+          <p data-i18n="p_ccvue_desc">涓€涓熀浜巚ue鐨勬鏋讹紝鐢ㄤ簬蹇€熷紑鍙憌eb娓告垙搴旂敤</p>
         </div>
       </a>
       <a onclick="window.open('/localcdn/gzs/q2.png')" class="project-card card">
         <img src="/localcdn/gzs/q2.png" alt="Crafting Table" loading="lazy">
         <div class="project-card-content">
           <h3 data-i18n="p_ct">Crafting Table</h3>
-          <p data-i18n="p_ct_desc">一站式编程工具，方便快捷的编程（扫码体验）</p>
+          <p data-i18n="p_ct_desc">涓€绔欏紡缂栫▼宸ュ叿锛屾柟渚垮揩鎹风殑缂栫▼锛堟壂鐮佷綋楠岋級</p>
         </div>
       </a>
       <a onclick="window.open('https://pan1.pgrm.run')" class="project-card card">
         <img src="localcdn/gzs/{93D330BB-21E1-46CF-8EDB-262229E1024D}.png" alt="kitten cloud" loading="lazy">
         <div class="project-card-content">
           <h3 data-i18n="p_cloud">kitten cloud</h3>
-          <p data-i18n="p_cloud_desc">KE云盘，存储你的项目文件</p>
+          <p data-i18n="p_cloud_desc">KE浜戠洏锛屽瓨鍌ㄤ綘鐨勯」鐩枃浠?/p>
         </div>
       </a>
     </div>
 
-    <!-- 优秀作品 -->
+    <!-- 浼樼浣滃搧 -->
     <div class="section-title-row">
       <div class="section-title">
         <span class="sec-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2.6 2.9 5.8 6.4.9-4.6 4.5 1.1 6.4L12 17.3l-5.8 2.9 1.1-6.4L2.7 9.3l6.4-.9Z"/></svg></span>
-        <span data-i18n="sec_featured">优秀作品</span>
+        <span data-i18n="sec_featured">浼樼浣滃搧</span>
       </div>
-      <a class="more-link" href="/workpool"><span data-i18n="view_more">查看更多</span>
+      <a class="more-link" href="/workpool"><span data-i18n="view_more">鏌ョ湅鏇村</span>
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg>
       </a>
     </div>
     <div class="projects-grid" id="featuredGrid">
-      <div class="featured-loading" data-i18n="loading">加载中…</div>
+      <div class="featured-loading" data-i18n="loading">鍔犺浇涓€?/div>
     </div>
 
   </div>
 </main>
 
-<script src="vendor/mdui.min.js"></script>
-<script src="../nav.js"></script>
-<script src="community-tilt.js"></script>
-<script src="community-mdui.js"></script>
-<script src="community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 <script>
-/* ===== 社区页 i18n 翻译(复用 nav.js 的 data-i18n 体系) ===== */
+/* ===== 绀惧尯椤?i18n 缈昏瘧(澶嶇敤 nav.js 鐨?data-i18n 浣撶郴) ===== */
 (function () {
   'use strict';
   var LANGS = ['zh','tw','en','ja','ko','es'];
   var curLang = 'zh';
   try { var lsLang = localStorage.getItem('knexpanse-lang'); if (LANGS.indexOf(lsLang) >= 0) curLang = lsLang; } catch (e) {}
   var I18N_COMMUNITY = {
-    sec_all:      {zh:'全部项目',tw:'全部項目',en:'All Projects',ja:'全プロジェクト',ko:'전체 프로젝트',es:'Todos los Proyectos'},
-    sec_featured: {zh:'优秀作品',tw:'優秀作品',en:'Featured Works',ja:'優秀作品',ko:'우수 작품',es:'Obras Destacadas'},
-    view_more:    {zh:'查看更多',tw:'查看更多',en:'View More',ja:'もっと見る',ko:'더 보기',es:'Ver Más'},
+    sec_all:      {zh:'鍏ㄩ儴椤圭洰',tw:'鍏ㄩ儴闋呯洰',en:'All Projects',ja:'鍏ㄣ儣銉偢銈с偗銉?,ko:'鞝勳泊 頂勲鞝濏姼',es:'Todos los Proyectos'},
+    sec_featured: {zh:'浼樼浣滃搧',tw:'鍎浣滃搧',en:'Featured Works',ja:'鍎浣滃搧',ko:'鞖办垬 鞛戫拡',es:'Obras Destacadas'},
+    view_more:    {zh:'鏌ョ湅鏇村',tw:'鏌ョ湅鏇村',en:'View More',ja:'銈傘仯銇ㄨ銈?,ko:'雿?氤搓赴',es:'Ver M谩s'},
     p_bcm:        {zh:'KE Hub',en:'KE Hub',ja:'KE Hub',ko:'KE Hub',es:'KE Hub',tw:'KE Hub'},
-    p_bcm_desc:   {zh:'不会凉凉发社区~~',tw:'不會涼涼發社區~~',en:'Community that won\'t fade~~',ja:'消えないコミュニティ~~',ko:'사라지지 않는 커뮤니티~~',es:'Comunidad que no se apaga~~'},
-    p_mc:         {zh:'铁路mc服务器',tw:'鐵路mc伺服器',en:'Railway MC Server',ja:'鉄道MCサーバー',ko:'철도 MC 서버',es:'Servidor MC Ferrocarril'},
-    p_mc_desc:    {zh:'一个基于minecraft的铁路服务器，为玩家提供铁路玩法~',tw:'一個基於minecraft的鐵路伺服器，為玩家提供鐵路玩法~',en:'A Minecraft railway server offering rail gameplay~',ja:'Minecraft鉄道サーバー,鉄道プレイを提供~',ko:'마인크래프트 철도 서버, 철도 플레이 제공~',es:'Servidor de ferrocarril Minecraft con jugabilidad ferroviaria~'},
-    p_ccvue:      {zh:'CCvue框架',tw:'CCvue框架',en:'CCvue Framework',ja:'CCvueフレームワーク',ko:'CCvue 프레임워크',es:'Framework CCvue'},
-    p_ccvue_desc: {zh:'一个基于vue的框架，用于快速开发web游戏应用',tw:'一個基於vue的框架，用於快速開發web遊戲應用',en:'A Vue-based framework for rapid web game development',ja:'Vueベースのフレームワーク,Webゲームを高速開発',ko:'Vue 기반 프레임워크, 웹 게임 빠르게 개발',es:'Framework basado en Vue para desarrollo rápido de juegos web'},
+    p_bcm_desc:   {zh:'涓嶄細鍑夊噳鍙戠ぞ鍖簙~',tw:'涓嶆渻娑兼都鐧肩ぞ鍗€~~',en:'Community that won\'t fade~~',ja:'娑堛亪銇亜銈炽儫銉ャ儖銉嗐偅~~',ko:'靷澕歆€歆€ 鞎婋姅 旎る雼堩嫲~~',es:'Comunidad que no se apaga~~'},
+    p_mc:         {zh:'閾佽矾mc鏈嶅姟鍣?,tw:'閻佃矾mc浼烘湇鍣?,en:'Railway MC Server',ja:'閴勯亾MC銈点兗銉愩兗',ko:'觳犽弰 MC 靹滊矂',es:'Servidor MC Ferrocarril'},
+    p_mc_desc:    {zh:'涓€涓熀浜巑inecraft鐨勯搧璺湇鍔″櫒锛屼负鐜╁鎻愪緵閾佽矾鐜╂硶~',tw:'涓€鍊嬪熀鏂糾inecraft鐨勯惖璺己鏈嶅櫒锛岀偤鐜╁鎻愪緵閻佃矾鐜╂硶~',en:'A Minecraft railway server offering rail gameplay~',ja:'Minecraft閴勯亾銈点兗銉愩兗,閴勯亾銉椼儸銈ゃ倰鎻愪緵~',ko:'毵堨澑韥灅頂勴姼 觳犽弰 靹滊矂, 觳犽弰 頂岆爤鞚?鞝滉车~',es:'Servidor de ferrocarril Minecraft con jugabilidad ferroviaria~'},
+    p_ccvue:      {zh:'CCvue妗嗘灦',tw:'CCvue妗嗘灦',en:'CCvue Framework',ja:'CCvue銉曘儸銉笺儬銉兗銈?,ko:'CCvue 頂勲爤鞛勳泴韥?,es:'Framework CCvue'},
+    p_ccvue_desc: {zh:'涓€涓熀浜巚ue鐨勬鏋讹紝鐢ㄤ簬蹇€熷紑鍙憌eb娓告垙搴旂敤',tw:'涓€鍊嬪熀鏂紇ue鐨勬鏋讹紝鐢ㄦ柤蹇€熼枊鐧紈eb閬婃埐鎳夌敤',en:'A Vue-based framework for rapid web game development',ja:'Vue銉欍兗銈广伄銉曘儸銉笺儬銉兗銈?Web銈层兗銉犮倰楂橀€熼枊鐧?,ko:'Vue 旮半皹 頂勲爤鞛勳泴韥? 鞗?瓴岇瀯 牍犽ゴ瓴?臧滊皽',es:'Framework basado en Vue para desarrollo r谩pido de juegos web'},
     p_ct:         {zh:'Crafting Table',en:'Crafting Table',ja:'Crafting Table',ko:'Crafting Table',es:'Crafting Table',tw:'Crafting Table'},
-    p_ct_desc:    {zh:'一站式编程工具，方便快捷的编程（扫码体验）',tw:'一站式編程工具，方便快捷的編程（掃碼體驗）',en:'All-in-one coding tool, quick and easy programming (scan to try)',ja:'ワンストッププログラミングツール,簡単编程（QRコードで体験）',ko:'올인원 코딩 도구, 간편한 프로그래밍 (QR코드로 체험)',es:'Herramienta de programación todo en uno, fácil y rápida (escanea para probar)'},
+    p_ct_desc:    {zh:'涓€绔欏紡缂栫▼宸ュ叿锛屾柟渚垮揩鎹风殑缂栫▼锛堟壂鐮佷綋楠岋級',tw:'涓€绔欏紡绶ㄧ▼宸ュ叿锛屾柟渚垮揩鎹风殑绶ㄧ▼锛堟巸纰奸珨椹楋級',en:'All-in-one coding tool, quick and easy programming (scan to try)',ja:'銉兂銈广儓銉冦儣銉椼儹銈般儵銉熴兂銈般儎銉笺儷,绨″崢缂栫▼锛圦R銈炽兗銉夈仹浣撻〒锛?,ko:'鞓澑鞗?旖旊敥 霃勱惮, 臧勴幐頃?頂勲攴鸽灅氚?(QR旖旊摐搿?觳错棙)',es:'Herramienta de programaci贸n todo en uno, f谩cil y r谩pida (escanea para probar)'},
     p_cloud:      {zh:'kitten cloud',en:'kitten cloud',ja:'kitten cloud',ko:'kitten cloud',es:'kitten cloud',tw:'kitten cloud'},
-    p_cloud_desc: {zh:'KE云盘，存储你的项目文件',tw:'KE雲盤，存儲你的項目檔案',en:'KE Cloud Drive, store your project files',ja:'KEクラウドドライブ,プロジェクトファイルを保存',ko:'KE 클라우드 드라이브, 프로젝트 파일 저장',es:'KE Nube, almacena tus archivos de proyecto'}
+    p_cloud_desc: {zh:'KE浜戠洏锛屽瓨鍌ㄤ綘鐨勯」鐩枃浠?,tw:'KE闆茬洡锛屽瓨鍎蹭綘鐨勯爡鐩獢妗?,en:'KE Cloud Drive, store your project files',ja:'KE銈儵銈︺儔銉夈儵銈ゃ儢,銉椼儹銈搞偋銈儓銉曘偂銈ゃ儷銈掍繚瀛?,ko:'KE 韥措澕鞖半摐 霌滊澕鞚措笇, 頂勲鞝濏姼 韺岇澕 鞝€鞛?,es:'KE Nube, almacena tus archivos de proyecto'}
   };
   function applyCommunityLang() {
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
@@ -183,7 +183,7 @@
     });
   }
   applyCommunityLang();
-  /* 监听语言切换(其他页面切换语言时同步) */
+  /* 鐩戝惉璇█鍒囨崲(鍏朵粬椤甸潰鍒囨崲璇█鏃跺悓姝? */
   window.addEventListener('storage', function (e) {
     if (e.key === 'knexpanse-lang') {
       try { var lsLang = localStorage.getItem('knexpanse-lang'); if (LANGS.indexOf(lsLang) >= 0) curLang = lsLang; } catch (e) {}
@@ -193,7 +193,7 @@
 })();
 </script>
 <script>
-/* ===== 优秀作品:拉取作品池最新作品(/workpool?sort=new)并渲染 ===== */
+/* ===== 浼樼浣滃搧:鎷夊彇浣滃搧姹犳渶鏂颁綔鍝?/workpool?sort=new)骞舵覆鏌?===== */
 (function () {
   'use strict';
   var grid = document.getElementById('featuredGrid');
@@ -202,9 +202,9 @@
   var curLang = 'zh';
   try { var l = localStorage.getItem('knexpanse-lang'); if (LANGS.indexOf(l) >= 0) curLang = l; } catch (e) {}
   var TXT = {
-    loading:   {zh:'加载中…',tw:'載入中…',en:'Loading…',ja:'読み込み中…',ko:'로딩 중…',es:'Cargando…'},
-    empty:     {zh:'暂无作品',tw:'暫無作品',en:'No works yet',ja:'作品なし',ko:'작품 없음',es:'Sin obras'},
-    err:       {zh:'暂时无法加载作品',tw:'暫時無法載入作品',en:'Unable to load works',ja:'作品を読み込めません',ko:'작품을 불러올 수 없음',es:'No se pueden cargar las obras'}
+    loading:   {zh:'鍔犺浇涓€?,tw:'杓夊叆涓€?,en:'Loading鈥?,ja:'瑾伩杈笺伩涓€?,ko:'搿滊敥 欷戔€?,es:'Cargando鈥?},
+    empty:     {zh:'鏆傛棤浣滃搧',tw:'鏆劇浣滃搧',en:'No works yet',ja:'浣滃搧銇仐',ko:'鞛戫拡 鞐嗢潓',es:'Sin obras'},
+    err:       {zh:'鏆傛椂鏃犳硶鍔犺浇浣滃搧',tw:'鏆檪鐒℃硶杓夊叆浣滃搧',en:'Unable to load works',ja:'浣滃搧銈掕銇胯炯銈併伨銇涖倱',ko:'鞛戫拡鞚?攵堧煬鞓?靾?鞐嗢潓',es:'No se pueden cargar las obras'}
   };
   function t(k) { return (TXT[k] && TXT[k][curLang]) || TXT[k].zh; }
   function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
@@ -229,7 +229,7 @@
     }
     grid.innerHTML = html;
     if (window.dispatchEvent) {
-      /* 通知 tilt 脚本重新收集卡片 */
+      /* 閫氱煡 tilt 鑴氭湰閲嶆柊鏀堕泦鍗＄墖 */
       document.body.appendChild(document.createComment('knx-refresh'));
     }
   }
@@ -272,7 +272,7 @@
 })();
 </script>
 <script>
-/* ===== Banner 轮播(带淡入淡出动画) ===== */
+/* ===== Banner 杞挱(甯︽贰鍏ユ贰鍑哄姩鐢? ===== */
 (function () {
   'use strict';
   var imgList = [
@@ -310,17 +310,17 @@
   function fadeTo(index) {
     if (transitioning || index === currentIndex) return;
     transitioning = true;
-    /* 1. 淡出当前图片 */
+    /* 1. 娣″嚭褰撳墠鍥剧墖 */
     bannerImg.classList.add('fade-out');
     setTimeout(function () {
-      /* 2. 切换图片源 */
+      /* 2. 鍒囨崲鍥剧墖婧?*/
       currentIndex = index;
       var url = imgList[currentIndex];
       bannerBg.style.backgroundImage = 'url(' + url + ')';
       bannerImg.src = url;
       bannerImg.alt = 'banner ' + (currentIndex + 1);
       updateDots();
-      /* 3. 浏览器加载完新图后淡入 */
+      /* 3. 娴忚鍣ㄥ姞杞藉畬鏂板浘鍚庢贰鍏?*/
       function fadeIn() {
         bannerImg.classList.remove('fade-out');
         transitioning = false;
@@ -345,7 +345,7 @@
   bannerDom.addEventListener('mouseleave', startAuto);
 
   createDots();
-  /* 初始渲染(不带动画) */
+  /* 鍒濆娓叉煋(涓嶅甫鍔ㄧ敾) */
   var url0 = imgList[0];
   bannerBg.style.backgroundImage = 'url(' + url0 + ')';
   bannerImg.src = url0;
@@ -355,3 +355,4 @@
 
 </body>
 </html>
+

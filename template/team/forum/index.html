@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader">
@@ -25,22 +25,22 @@
     
     <div class="main-box mdui-typo">
         <div class="main-col">
-            <div class="page-title"><i class="fa-solid fa-comments"></i>KE Hub 论坛</div>
+            <div class="page-title"><i class="fa-solid fa-comments"></i>KE Hub 璁哄潧</div>
             
             <div class="community-search">
                 <form action="/forum" method="get" style="display:flex;width:100%;align-items:center">
                     <input type="hidden" name="tab" value="{{ tab }}">
-                    <input type="text" name="q" placeholder="搜索帖子" value="{{ q }}" style="width:100%;border:none;outline:none">
+                    <input type="text" name="q" placeholder="鎼滅储甯栧瓙" value="{{ q }}" style="width:100%;border:none;outline:none">
                 </form>
             </div>
             <ul class="post-list">
                 {% for p in posts %}
                 <li class="post-item mdui-ripple" onclick="location.href='/forum/post/{{ p.id }}'">
-                    <div class="post-avatar" data-username="{{ p.author|e }}"><img src="https://static-platform.codemao.cn/avatar/default/v1_user_006.png" alt="头像"></div>
+                    <div class="post-avatar" data-username="{{ p.author|e }}"><img src="https://static-platform.codemao.cn/avatar/default/v1_user_006.png" alt="澶村儚"></div>
                     <div class="post-main">
                         <div class="post-title">
                             {{ p.title|e }}
-                            {% if p.is_pinned %}<span class="post-tag">置顶</span>{% endif %}
+                            {% if p.is_pinned %}<span class="post-tag">缃《</span>{% endif %}
                         </div>
                         {% if p.preview %}<div class="post-preview">{{ p.preview|e }}</div>{% endif %}
                         <div class="post-author" data-username="{{ p.author|e }}">@{{ p.author|e }}</div>
@@ -53,15 +53,15 @@
                 </li>
                 {% endfor %}
                 {% if posts|length == 0 %}
-                <div class="empty-tip">暂时没有帖子，快去发布第一帖吧！</div>
+                <div class="empty-tip">鏆傛椂娌℃湁甯栧瓙锛屽揩鍘诲彂甯冪涓€甯栧惂锛?/div>
                 {% endif %}
             </ul>
             {% if total_pages > 1 %}
             <div class="pagination">
                 {% if page > 1 %}
-                <a href="/forum?tab={{ tab }}&q={{ q }}&page={{ page - 1 }}">上一页</a>
+                <a href="/forum?tab={{ tab }}&q={{ q }}&page={{ page - 1 }}">涓婁竴椤?/a>
                 {% else %}
-                <span class="disabled">上一页</span>
+                <span class="disabled">涓婁竴椤?/span>
                 {% endif %}
                 {% for pg in range(1, total_pages + 1) %}
                 {% if pg == page %}
@@ -71,40 +71,42 @@
                 {% endif %}
                 {% endfor %}
                 {% if page < total_pages %}
-                <a href="/forum?tab={{ tab }}&q={{ q }}&page={{ page + 1 }}">下一页</a>
+                <a href="/forum?tab={{ tab }}&q={{ q }}&page={{ page + 1 }}">涓嬩竴椤?/a>
                 {% else %}
-                <span class="disabled">下一页</span>
+                <span class="disabled">涓嬩竴椤?/span>
                 {% endif %}
             </div>
             {% endif %}
         </div>
         <div class="right-col">
             <div class="right-card">
-                <div class="hd"><i class="fa-solid fa-grip"></i> 论坛广场</div>
+                <div class="hd"><i class="fa-solid fa-grip"></i> 璁哄潧骞垮満</div>
                 <div class="bd">
                     {% for f in forums %}
                     <div class="mdui-ripple board-item" onclick="location.href='/forum/{{ f.id }}'"><span class="board-dot"></span>{{ f.name|e }}</div>
                     {% endfor %}
                     {% if forums|length == 0 %}
-                    <div class="board-item">暂无分区</div>
+                    <div class="board-item">鏆傛棤鍒嗗尯</div>
                     {% endif %}
                 </div>
             </div>
             <div class="publish-card">
-                <div class="hd">发布</div>
+                <div class="hd">鍙戝竷</div>
                 <div class="bd">
-                    <a href="/forum/new" class="mdui-ripple mdui-btn">发布帖子</a>
+                    <a href="/forum/new" class="mdui-ripple mdui-btn">鍙戝竷甯栧瓙</a>
                 </div>
             </div>
             <div id="forumUserSection"></div>
         </div>
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+

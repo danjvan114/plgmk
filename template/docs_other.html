@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="vendor/mdui.min.css">
-<link rel="stylesheet" href="vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../env.css">
-<link rel="stylesheet" href="../styles.css">
-<link rel="stylesheet" href="community-layout.css">
-<link rel="stylesheet" href="community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="progress-container" id="progressBar">
@@ -25,7 +25,7 @@
 
 <div class="sidebar" id="sidebar">
     <div class="doc-tree">
-        <h3 style="padding:8px;margin-bottom:12px;color:var(--text-1);font-size:14px">文档目录</h3>
+        <h3 style="padding:8px;margin-bottom:12px;color:var(--text-1);font-size:14px">鏂囨。鐩綍</h3>
         <ul>
             {{ tree_html|safe }}
         </ul>
@@ -35,9 +35,9 @@
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
 <ul class="context-menu" id="contextMenu">
-    <li onclick="downloadFile()">下载</li>
+    <li onclick="downloadFile()">涓嬭浇</li>
     <li class="separator"></li>
-    <li onclick="openInNewTab()">在新标签页打开</li>
+    <li onclick="openInNewTab()">鍦ㄦ柊鏍囩椤垫墦寮€</li>
 </ul>
 
 <div class="main-content" id="mainContent">
@@ -45,16 +45,17 @@
         <div class="breadcrumb" id="breadcrumb"></div>
         <div class="empty-state">
             <i class="mdui-icon material-icons">description</i>
-            <p>请从左侧选择一个文档查看</p>
+            <p>璇蜂粠宸︿晶閫夋嫨涓€涓枃妗ｆ煡鐪?/p>
         </div>
     </div>
 </div>
 
-<script src="vendor/mdui.min.js"></script>
-<script src="../nav.js"></script>
-<script src="community-tilt.js"></script>
-<script src="community-mdui.js"></script>
-<script src="community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+

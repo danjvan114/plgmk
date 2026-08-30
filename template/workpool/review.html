@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader">
@@ -24,73 +24,75 @@
     </div>
     
     <div class="main-box mdui-typo">
-        <a href="/workpool" class="back-link" title="返回作品池"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
+        <a href="/workpool" class="back-link" title="杩斿洖浣滃搧姹?><i class="fa-solid fa-arrow-left"></i>杩斿洖浣滃搧姹?/a>
         <div class="card">
             <div class="card-body mdui-typo">
                 <div class="stats-row">
                     <div class="stat-card">
                         <div class="num">{{ total_works }}</div>
-                        <div class="label"><i class="fa-solid fa-layer-group"></i> 全站作品数</div>
+                        <div class="label"><i class="fa-solid fa-layer-group"></i> 鍏ㄧ珯浣滃搧鏁?/div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="card">
             <div class="card-head">
-                <h2 class="mdui-typo-headline"><i class="fa-solid fa-flag" style="color:#e53935"></i>待处理举报</h2>
+                <h2 class="mdui-typo-headline"><i class="fa-solid fa-flag" style="color:#e53935"></i>寰呭鐞嗕妇鎶?/h2>
             </div>
             <div class="card-body mdui-typo">
                 {% for r in reports %}
                 <div class="report-item">
-                    <span class="report-work">作品 #{{ r.work_id }}</span>
+                    <span class="report-work">浣滃搧 #{{ r.work_id }}</span>
                     <div class="report-info">
-                        <div>举报人：{{ r.user_id|e }} &nbsp;|&nbsp; 时间：{{ r.created_at }}</div>
-                        <div class="report-reason"><i class="fa-regular fa-comment-dots"></i> 原因：{{ r.reason|e }}</div>
+                        <div>涓炬姤浜猴細{{ r.user_id|e }} &nbsp;|&nbsp; 鏃堕棿锛歿{ r.created_at }}</div>
+                        <div class="report-reason"><i class="fa-regular fa-comment-dots"></i> 鍘熷洜锛歿{ r.reason|e }}</div>
                     </div>
                     <div class="report-actions">
-                        <a class="mini-btn" href="/workpool/{{ r.work_id }}"><i class="fa-solid fa-eye"></i> 查看作品</a>
-                        <button class="mini-btn danger" onclick="hideWork({{ r.work_id }})"><i class="fa-solid fa-eye-slash"></i> 隐藏作品</button>
+                        <a class="mini-btn" href="/workpool/{{ r.work_id }}"><i class="fa-solid fa-eye"></i> 鏌ョ湅浣滃搧</a>
+                        <button class="mini-btn danger" onclick="hideWork({{ r.work_id }})"><i class="fa-solid fa-eye-slash"></i> 闅愯棌浣滃搧</button>
                     </div>
                 </div>
                 {% endfor %}
                 {% if reports|length == 0 %}
-                <p class="empty"><i class="fa-regular fa-circle-check"></i> 暂无待处理举报</p>
+                <p class="empty"><i class="fa-regular fa-circle-check"></i> 鏆傛棤寰呭鐞嗕妇鎶?/p>
                 {% endif %}
             </div>
         </div>
         <div class="card">
             <div class="card-head">
-                <h2 class="mdui-typo-headline"><i class="fa-solid fa-shuffle" style="color:var(--accent-1)"></i>随机抽查</h2>
-                <button class="mini-btn" onclick="location.reload()"><i class="fa-solid fa-rotate"></i> 刷新抽查</button>
+                <h2 class="mdui-typo-headline"><i class="fa-solid fa-shuffle" style="color:var(--accent-1)"></i>闅忔満鎶芥煡</h2>
+                <button class="mini-btn" onclick="location.reload()"><i class="fa-solid fa-rotate"></i> 鍒锋柊鎶芥煡</button>
             </div>
             <div class="card-body mdui-typo">
                 <div class="grid">
                     {% for w in samples %}
                     <div class="sample-card">
                         <h3 class="mdui-typo-headline">{{ w.title|e }}</h3>
-                        <p>作者：{{ w.author|e }}</p>
+                        <p>浣滆€咃細{{ w.author|e }}</p>
                         <div class="sample-meta">
-                            <span title="点赞"><i class="fa-solid fa-thumbs-up"></i> {{ w.like_count if w.like_count is defined else 0 }}</span>
-                            <span title="收藏"><i class="fa-solid fa-heart"></i> {{ w.fav_count if w.fav_count is defined else 0 }}</span>
-                            <span title="投币"><i class="fa-solid fa-coins"></i> {{ w.coin_count if w.coin_count is defined else 0 }}</span>
+                            <span title="鐐硅禐"><i class="fa-solid fa-thumbs-up"></i> {{ w.like_count if w.like_count is defined else 0 }}</span>
+                            <span title="鏀惰棌"><i class="fa-solid fa-heart"></i> {{ w.fav_count if w.fav_count is defined else 0 }}</span>
+                            <span title="鎶曞竵"><i class="fa-solid fa-coins"></i> {{ w.coin_count if w.coin_count is defined else 0 }}</span>
                         </div>
                         <div class="sample-actions">
-                            <a class="mini-btn" href="/workpool/{{ w.id }}"><i class="fa-solid fa-eye"></i> 查看</a>
-                            <button class="mini-btn danger" onclick="hideWork({{ w.id }})"><i class="fa-solid fa-eye-slash"></i> 隐藏</button>
+                            <a class="mini-btn" href="/workpool/{{ w.id }}"><i class="fa-solid fa-eye"></i> 鏌ョ湅</a>
+                            <button class="mini-btn danger" onclick="hideWork({{ w.id }})"><i class="fa-solid fa-eye-slash"></i> 闅愯棌</button>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
-                <p class="note"><i class="fa-regular fa-circle-info"></i> 抽查为随机抽取，用于审核违规内容</p>
+                <p class="note"><i class="fa-regular fa-circle-info"></i> 鎶芥煡涓洪殢鏈烘娊鍙栵紝鐢ㄤ簬瀹℃牳杩濊鍐呭</p>
             </div>
         </div>
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+

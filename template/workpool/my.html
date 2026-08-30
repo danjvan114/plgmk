@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader">
@@ -24,13 +24,13 @@
     </div>
     
     <div class="main-box mdui-typo">
-        <h1 class="page-title"><i class="fa-solid fa-folder"></i>我的作品</h1>
+        <h1 class="page-title"><i class="fa-solid fa-folder"></i>鎴戠殑浣滃搧</h1>
         {% if works|length > 0 %}
         <div class="grid">
             {% for work in works %}
             <div class="card work-card" onclick="location.href='/workpool/{{ work.id }}'">
                 {% if work.thumbnail %}
-                <div class="work-thumb"><img src="{{ work.thumbnail|e }}" alt="缩略图" onerror="this.remove()"></div>
+                <div class="work-thumb"><img src="{{ work.thumbnail|e }}" alt="缂╃暐鍥? onerror="this.remove()"></div>
                 {% else %}
                 <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
                 {% endif %}
@@ -52,11 +52,11 @@
                 <div style="margin-top:12px;text-align:right">
                     <button class="mdui-ripple action-btn mdui-btn" style="color:var(--accent-1);border-color:var(--accent-1);font-size:12px;padding:6px 12px;margin-right:6px" onclick="event.stopPropagation();updateWork({{ work.id }})">
                         <i class="fa-solid fa-rotate" style="font-size:16px"></i>
-                        更新文件
+                        鏇存柊鏂囦欢
                     </button>
                     <button class="mdui-ripple action-btn mdui-btn" style="color:var(--danger);border-color:var(--danger);font-size:12px;padding:6px 12px" onclick="event.stopPropagation();deleteWork({{ work.id }})">
                         <i class="fa-solid fa-trash-can" style="font-size:16px"></i>
-                        擦除
+                        鎿﹂櫎
                     </button>
                 </div>
             </div>
@@ -65,16 +65,18 @@
         {% else %}
         <div class="empty-state">
             <i class="fa-regular fa-folder-open"></i>
-            <p>你还没有发布任何作品</p>
+            <p>浣犺繕娌℃湁鍙戝竷浠讳綍浣滃搧</p>
         </div>
         {% endif %}
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+

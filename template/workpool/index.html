@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader">
@@ -25,13 +25,13 @@
     
     <div class="main-box mdui-typo">
         <div class="sort-bar">
-            <a href="/workpool?sort=new{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'new' %}active{% endif %}">最新</a>
-            <a href="/workpool?sort=hot{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'hot' %}active{% endif %}">最热</a>
-            <a href="/workpool?sort=like{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'like' %}active{% endif %}">最多赞</a>
-            <a href="/workpool?sort=fav{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'fav' %}active{% endif %}">最多藏</a>
-            <a href="/workpool?sort=coin{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'coin' %}active{% endif %}">最多币</a>
-            <a href="/workpool?sort=comment{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'comment' %}active{% endif %}">最多评</a>
-            <a href="/forum" class="forum-link">论坛 <i class="fa-solid fa-comments"></i></a>
+            <a href="/workpool?sort=new{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'new' %}active{% endif %}">鏈€鏂?/a>
+            <a href="/workpool?sort=hot{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'hot' %}active{% endif %}">鏈€鐑?/a>
+            <a href="/workpool?sort=like{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'like' %}active{% endif %}">鏈€澶氳禐</a>
+            <a href="/workpool?sort=fav{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'fav' %}active{% endif %}">鏈€澶氳棌</a>
+            <a href="/workpool?sort=coin{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'coin' %}active{% endif %}">鏈€澶氬竵</a>
+            <a href="/workpool?sort=comment{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'comment' %}active{% endif %}">鏈€澶氳瘎</a>
+            <a href="/forum" class="forum-link">璁哄潧 <i class="fa-solid fa-comments"></i></a>
         </div>
         {% if all_tags %}
         
@@ -40,7 +40,7 @@
             {% for work in works %}
             <div class="mdui-ripple card work-card" onclick="location.href='/workpool/{{ work.id }}'">
                 {% if work.thumbnail %}
-                <div class="work-thumb"><img src="{{ work.thumbnail|e }}" alt="缩略图" onerror="this.remove()"></div>
+                <div class="work-thumb"><img src="{{ work.thumbnail|e }}" alt="缂╃暐鍥? onerror="this.remove()"></div>
                 {% else %}
                 <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
                 {% endif %}
@@ -65,14 +65,14 @@
         </div>
         <div class="page-box">
             {% if works|length == 0 %}
-            <p>暂无作品</p>
+            <p>鏆傛棤浣滃搧</p>
             {% endif %}
             {% if total_pages > 1 %}
             <div class="pagination">
                 {% if page > 1 %}
-                <a href="/workpool?page={{ page - 1 }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort != 'new' %}&sort={{ sort }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}">上一页</a>
+                <a href="/workpool?page={{ page - 1 }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort != 'new' %}&sort={{ sort }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}">涓婁竴椤?/a>
                 {% else %}
-                <span class="disabled">上一页</span>
+                <span class="disabled">涓婁竴椤?/span>
                 {% endif %}
                 {% for p in range(1, total_pages + 1) %}
                 {% if p == page %}
@@ -84,20 +84,22 @@
                 {% endif %}
                 {% endfor %}
                 {% if page < total_pages %}
-                <a href="/workpool?page={{ page + 1 }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort != 'new' %}&sort={{ sort }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}">下一页</a>
+                <a href="/workpool?page={{ page + 1 }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort != 'new' %}&sort={{ sort }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}">涓嬩竴椤?/a>
                 {% else %}
-                <span class="disabled">下一页</span>
+                <span class="disabled">涓嬩竴椤?/span>
                 {% endif %}
             </div>
             {% endif %}
         </div>
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+

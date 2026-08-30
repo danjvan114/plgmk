@@ -1,91 +1,91 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="vendor/mdui.min.css">
-<link rel="stylesheet" href="vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../env.css">
-<link rel="stylesheet" href="../styles.css">
-<link rel="stylesheet" href="community-layout.css">
-<link rel="stylesheet" href="community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div><div class="main-box mdui-typo">
-        <a href="javascript:history.back()" class="back-link" title="返回"><i class="fa-solid fa-arrow-left"></i>返回</a>
+        <a href="javascript:history.back()" class="back-link" title="杩斿洖"><i class="fa-solid fa-arrow-left"></i>杩斿洖</a>
         <div class="banner">
-            {% if profile_user.banner %}<img src="{{ profile_user.banner|e }}" alt="头图">{% else %}<img src="https://cdn-community.bcmcdn.com/47/community/qHrkuIrcIWh1dXcSsjX8WoP63amM6qZxqtwiZXtTQV44.avif?hash=Fplr0V7Sahn9Wrt-W-vquxg9bOu5" alt="默认头图">{% endif %}
+            {% if profile_user.banner %}<img src="{{ profile_user.banner|e }}" alt="澶村浘">{% else %}<img src="https://cdn-community.bcmcdn.com/47/community/qHrkuIrcIWh1dXcSsjX8WoP63amM6qZxqtwiZXtTQV44.avif?hash=Fplr0V7Sahn9Wrt-W-vquxg9bOu5" alt="榛樿澶村浘">{% endif %}
         </div>
         <div class="profile-card">
             <div class="profile-avatar" data-username="{{ profile_user.username|e }}">
-                <img src="https://static.codemao.cn/FjCi6RLz1-HB5C47m7M_0gZqJNDG" alt="默认头像">
+                <img src="https://static.codemao.cn/FjCi6RLz1-HB5C47m7M_0gZqJNDG" alt="榛樿澶村儚">
             </div>
             <div class="profile-info">
                 <div class="profile-name">
                     {{ profile_user.username|e }}
                     {% set _t = user_team(profile_user.username) %}{% if _t %}<span class="tea-badge"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}
                     {% if profile_user.role == 'admin' %}
-                    <span class="role-tag admin">管理员</span>
+                    <span class="role-tag admin">绠＄悊鍛?/span>
                     {% else %}
-                    <span class="role-tag">用户</span>
+                    <span class="role-tag">鐢ㄦ埛</span>
                     {% endif %}
                     {% if session.user and session.user != profile_user.username %}
                     <button class="follow-btn {% if is_following %}following{% endif %}" id="follow-btn" onclick="toggleFollow('{{ profile_user.username|e }}')">
-                        {% if is_following %}<i class="fa-solid fa-check"></i> 已关注{% else %}<i class="fa-solid fa-plus"></i> 关注{% endif %}
+                        {% if is_following %}<i class="fa-solid fa-check"></i> 宸插叧娉▄% else %}<i class="fa-solid fa-plus"></i> 鍏虫敞{% endif %}
                     </button>
                     {% endif %}
                 </div>
                 <div class="profile-meta">
-                    <span><i class="fa-regular fa-calendar"></i>注册时间：{{ profile_user.reg_time or '未知' }}</span>
-                    <span><i class="fa-solid fa-box-open"></i>作品：{{ total_works }}</span>
-                    <span id="follower-count"><i class="fa-solid fa-users"></i>粉丝：{{ followers|length }}</span>
-                      <span><i class="fa-solid fa-user-plus"></i>关注：{{ following|length }}</span>
-                     {% if session.user == profile_user.username %}<span><i class="fa-regular fa-envelope"></i>未读消息：{{ msg_count }}</span>{% endif %}
+                    <span><i class="fa-regular fa-calendar"></i>娉ㄥ唽鏃堕棿锛歿{ profile_user.reg_time or '鏈煡' }}</span>
+                    <span><i class="fa-solid fa-box-open"></i>浣滃搧锛歿{ total_works }}</span>
+                    <span id="follower-count"><i class="fa-solid fa-users"></i>绮変笣锛歿{ followers|length }}</span>
+                      <span><i class="fa-solid fa-user-plus"></i>鍏虫敞锛歿{ following|length }}</span>
+                     {% if session.user == profile_user.username %}<span><i class="fa-regular fa-envelope"></i>鏈娑堟伅锛歿{ msg_count }}</span>{% endif %}
                  </div>
                 {% if profile_user.bio %}
                 <div class="profile-bio"><i class="fa-solid fa-quote-left"></i> {{ profile_user.bio|e }}</div>
                 {% endif %}
                 {% if session.user == profile_user.username and profile_user.qq %}
-                <div class="profile-qq"><i class="fa-brands fa-qq"></i>已绑定 QQ：{{ profile_user.qq }}</div>
+                <div class="profile-qq"><i class="fa-brands fa-qq"></i>宸茬粦瀹?QQ锛歿{ profile_user.qq }}</div>
                 {% endif %}
                 {% if session.user and session.user == profile_user.username %}
-                <button class="mdui-btn mdui-btn-raised mdui-ripple" style="margin-top:10px;font-size:13px;padding:0 16px;height:32px" mdui-dialog="{target:'#edit-profile-dialog'}"><i class="fa-solid fa-pen"></i> 编辑资料</button>
+                <button class="mdui-btn mdui-btn-raised mdui-ripple" style="margin-top:10px;font-size:13px;padding:0 16px;height:32px" mdui-dialog="{target:'#edit-profile-dialog'}"><i class="fa-solid fa-pen"></i> 缂栬緫璧勬枡</button>
                 {% endif %}
             </div>
         </div>
         <div class="mdui-tab" mdui-tab id="profile-tabs">
-            <a href="#tab-works" class="mdui-ripple {% if tab == 'works' %}mdui-tab-active{% endif %}" data-tab="works">作品 </a>
-            <a href="#tab-followers" class="mdui-ripple {% if tab == 'followers' %}mdui-tab-active{% endif %}" data-tab="followers">粉丝</a>
-            <a href="#tab-following" class="mdui-ripple {% if tab == 'following' %}mdui-tab-active{% endif %}" data-tab="following">关注</a>
-            <a href="#tab-favorites" class="mdui-ripple {% if tab == 'favorites' %}mdui-tab-active{% endif %}" data-tab="favorites">收藏</a>
-            <a href="#tab-wall" class="mdui-ripple {% if tab == 'wall' %}mdui-tab-active{% endif %}" data-tab="wall">留言</a>
+            <a href="#tab-works" class="mdui-ripple {% if tab == 'works' %}mdui-tab-active{% endif %}" data-tab="works">浣滃搧 </a>
+            <a href="#tab-followers" class="mdui-ripple {% if tab == 'followers' %}mdui-tab-active{% endif %}" data-tab="followers">绮変笣</a>
+            <a href="#tab-following" class="mdui-ripple {% if tab == 'following' %}mdui-tab-active{% endif %}" data-tab="following">鍏虫敞</a>
+            <a href="#tab-favorites" class="mdui-ripple {% if tab == 'favorites' %}mdui-tab-active{% endif %}" data-tab="favorites">鏀惰棌</a>
+            <a href="#tab-wall" class="mdui-ripple {% if tab == 'wall' %}mdui-tab-active{% endif %}" data-tab="wall">鐣欒█</a>
         </div>
 
         <div id="tab-works" class="tab-content {% if tab == 'works' %}active{% endif %}">
-            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 鍔犺浇涓?..</div>
             <div class="tab-loaded">
                 <form class="toolbar" method="get" action="/u/{{ profile_user.username }}">
                     <input type="hidden" name="tab" value="works">
-                    <input type="text" name="q" placeholder="搜索作品名称/标签" value="{{ q }}">
+                    <input type="text" name="q" placeholder="鎼滅储浣滃搧鍚嶇О/鏍囩" value="{{ q }}">
                     <select name="sort">
-                        <option value="new" {% if sort == 'new' %}selected{% endif %}>最新发布</option>
-                        <option value="hot" {% if sort == 'hot' %}selected{% endif %}>最热</option>
-                        <option value="like" {% if sort == 'like' %}selected{% endif %}>最多赞</option>
-                        <option value="fav" {% if sort == 'fav' %}selected{% endif %}>最多藏</option>
-                        <option value="coin" {% if sort == 'coin' %}selected{% endif %}>最多币</option>
+                        <option value="new" {% if sort == 'new' %}selected{% endif %}>鏈€鏂板彂甯?/option>
+                        <option value="hot" {% if sort == 'hot' %}selected{% endif %}>鏈€鐑?/option>
+                        <option value="like" {% if sort == 'like' %}selected{% endif %}>鏈€澶氳禐</option>
+                        <option value="fav" {% if sort == 'fav' %}selected{% endif %}>鏈€澶氳棌</option>
+                        <option value="coin" {% if sort == 'coin' %}selected{% endif %}>鏈€澶氬竵</option>
                     </select>
-                    <button type="submit">筛选</button>
+                    <button type="submit">绛涢€?/button>
                 </form>
                 {% if workpool_works %}
                 <div class="work-grid">
                     {% for w in workpool_works %}
                     <div class="work-card" onclick="location.href='/workpool/{{ w.id }}'" style="animation:cardUp .4s ease both">
                         {% if w.thumbnail %}
-                        <img class="work-thumb" src="{{ w.thumbnail|e }}" alt="缩略图" onerror="this.style.display='none'">
+                        <img class="work-thumb" src="{{ w.thumbnail|e }}" alt="缂╃暐鍥? onerror="this.style.display='none'">
                         {% else %}
                         <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
                         {% endif %}
@@ -103,7 +103,7 @@
                 {% if total_pages > 1 %}
                 <div class="pagination">
                     {% if page > 1 %}
-                    <a href="/u/{{ profile_user.username }}?tab=works&page={{ page - 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">上一页</a>
+                    <a href="/u/{{ profile_user.username }}?tab=works&page={{ page - 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">涓婁竴椤?/a>
                     {% endif %}
                     {% for p in range(1, total_pages + 1) %}
                     {% if p == page %}
@@ -113,18 +113,18 @@
                     {% endif %}
                     {% endfor %}
                     {% if page < total_pages %}
-                    <a href="/u/{{ profile_user.username }}?tab=works&page={{ page + 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">下一页</a>
+                    <a href="/u/{{ profile_user.username }}?tab=works&page={{ page + 1 }}&sort={{ sort }}{% if q %}&q={{ q }}{% endif %}">涓嬩竴椤?/a>
                     {% endif %}
                 </div>
                 {% endif %}
                 {% else %}
-                <div class="empty-tip">还没有发布作品</div>
+                <div class="empty-tip">杩樻病鏈夊彂甯冧綔鍝?/div>
                 {% endif %}
             </div>
         </div>
 
         <div id="tab-followers" class="tab-content {% if tab == 'followers' %}active{% endif %}">
-            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 鍔犺浇涓?..</div>
             <div class="tab-loaded">
                 {% if followers %}
                 <div class="user-list">
@@ -136,13 +136,13 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="empty-tip">还没有粉丝</div>
+                <div class="empty-tip">杩樻病鏈夌矇涓?/div>
                 {% endif %}
             </div>
         </div>
 
         <div id="tab-following" class="tab-content {% if tab == 'following' %}active{% endif %}">
-            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 鍔犺浇涓?..</div>
             <div class="tab-loaded">
                 {% if following %}
                 <div class="user-list">
@@ -154,20 +154,20 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="empty-tip">还没有关注任何人</div>
+                <div class="empty-tip">杩樻病鏈夊叧娉ㄤ换浣曚汉</div>
                 {% endif %}
             </div>
         </div>
 
         <div id="tab-favorites" class="tab-content {% if tab == 'favorites' %}active{% endif %}">
-            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 鍔犺浇涓?..</div>
             <div class="tab-loaded">
                 {% if favorites %}
                 <div class="work-grid">
                     {% for w in favorites %}
                     <div class="work-card" onclick="location.href='/workpool/{{ w.id }}'" style="animation:cardUp .4s ease both">
                         {% if w.thumbnail %}
-                        <img class="work-thumb" src="{{ w.thumbnail|e }}" alt="缩略图" onerror="this.style.display='none'">
+                        <img class="work-thumb" src="{{ w.thumbnail|e }}" alt="缂╃暐鍥? onerror="this.style.display='none'">
                         {% else %}
                         <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
                         {% endif %}
@@ -183,21 +183,21 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="empty-tip">还没有收藏任何作品</div>
+                <div class="empty-tip">杩樻病鏈夋敹钘忎换浣曚綔鍝?/div>
                 {% endif %}
             </div>
         </div>
 
         <div id="tab-wall" class="tab-content {% if tab == 'wall' %}active{% endif %}">
-            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 鍔犺浇涓?..</div>
             <div class="tab-loaded">
                 {% if session.user %}
                 <div class="wall-box">
-                    <textarea class="wall-input" id="wall-input" placeholder="留下一条友善的留言... (最多1000字)" maxlength="1000"></textarea>
-                    <button class="wall-send" id="wall-send" onclick="postWall()">发布留言</button>
+                    <textarea class="wall-input" id="wall-input" placeholder="鐣欎笅涓€鏉″弸鍠勭殑鐣欒█... (鏈€澶?000瀛?" maxlength="1000"></textarea>
+                    <button class="wall-send" id="wall-send" onclick="postWall()">鍙戝竷鐣欒█</button>
                 </div>
                 {% else %}
-                <div class="wall-box"><div class="empty-tip">登录后才能留言</div></div>
+                <div class="wall-box"><div class="empty-tip">鐧诲綍鍚庢墠鑳界暀瑷€</div></div>
                 {% endif %}
                 <div class="wall-list" id="wall-list">
                     {% if wall_messages %}
@@ -207,24 +207,25 @@
                             <span class="wall-author-avatar" data-username="{{ m.from_user|e }}">{{ m.from_user[:1].upper() }}</span>
                             {{ m.from_user|e }}
                             <span class="time">{{ m.created_at }}</span>
-                            <span class="del" data-wall-id="{{ m.id }}" data-wall-from="{{ m.from_user|e }}" style="display:none" onclick="deleteWall({{ m.id }})"><i class="fa-solid fa-xmark"></i> 删除</span>
+                            <span class="del" data-wall-id="{{ m.id }}" data-wall-from="{{ m.from_user|e }}" style="display:none" onclick="deleteWall({{ m.id }})"><i class="fa-solid fa-xmark"></i> 鍒犻櫎</span>
                         </div>
                         <div class="content">{{ m.content|e }}</div>
                     </div>
                     {% endfor %}
                     {% else %}
-                    <div class="empty-tip">还没有留言，来说一句吧</div>
+                    <div class="empty-tip">杩樻病鏈夌暀瑷€锛屾潵璇翠竴鍙ュ惂</div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-<script src="vendor/mdui.min.js"></script>
-<script src="../nav.js"></script>
-<script src="community-tilt.js"></script>
-<script src="community-mdui.js"></script>
-<script src="community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+

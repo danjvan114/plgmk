@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader">
@@ -25,7 +25,7 @@
     
     <div class="main-box mdui-typo">
         <div class="breadcrumb">
-            <a href="/forum"><i class="fa-solid fa-comments"></i> 论坛</a>
+            <a href="/forum"><i class="fa-solid fa-comments"></i> 璁哄潧</a>
             <span><i class="fa-solid fa-chevron-right" style="font-size:10px"></i></span>
             {% if forum %}
             <a href="/forum/{{ forum.id }}">{{ forum.name|e }}</a>
@@ -35,36 +35,36 @@
         </div>
         <div class="post-card">
             <div class="post-head">
-                <h1 class="post-title">{% if post.is_pinned %}<i class="fa-solid fa-thumbtack" style="color:var(--accent-1);margin-right:6px"></i>{% endif %}{{ post.title|e }}{% if post.is_pinned %}<span class="pin-badge"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}</h1>
+                <h1 class="post-title">{% if post.is_pinned %}<i class="fa-solid fa-thumbtack" style="color:var(--accent-1);margin-right:6px"></i>{% endif %}{{ post.title|e }}{% if post.is_pinned %}<span class="pin-badge"><i class="fa-solid fa-thumbtack"></i> 缃《</span>{% endif %}</h1>
                 <div class="post-info">
                     <a href="/u/{{ post.author|e }}"><i class="fa-solid fa-user"></i> {{ post.author|e }}{% set _t = user_team(post.author) %}{% if _t %}<span class="tea-badge"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</a>
                     <span><i class="fa-regular fa-clock"></i>{{ post.created_at }}</span>
-                    <span><i class="fa-regular fa-eye"></i>{{ post.view_count }} 浏览</span>
-                    <span><i class="fa-regular fa-comment"></i>{{ post.comment_count }} 回帖</span>
+                    <span><i class="fa-regular fa-eye"></i>{{ post.view_count }} 娴忚</span>
+                    <span><i class="fa-regular fa-comment"></i>{{ post.comment_count }} 鍥炲笘</span>
                 </div>
             </div>
             <div class="post-content">
                 <div>{{ post.content_html|safe }}</div>
             </div>
             <div class="post-op-row" id="postOpRow" data-author="{{ post.author|e }}" data-post-id="{{ post.id }}">
-                <button class="op-link warn" id="btnReport" style="display:none" onclick="reportPost({{ post.id }})"><i class="fa-regular fa-flag"></i> 举报</button>
-                <button class="op-link danger" id="btnDelete" style="display:none" onclick="deletePost({{ post.id }})"><i class="fa-solid fa-trash-can"></i> 删帖</button>
-                <button class="op-link warn" id="btnPin" style="display:none" onclick="pinPost({{ post.id }})"><i class="fa-solid fa-thumbtack"></i> 置顶</button>
+                <button class="op-link warn" id="btnReport" style="display:none" onclick="reportPost({{ post.id }})"><i class="fa-regular fa-flag"></i> 涓炬姤</button>
+                <button class="op-link danger" id="btnDelete" style="display:none" onclick="deletePost({{ post.id }})"><i class="fa-solid fa-trash-can"></i> 鍒犲笘</button>
+                <button class="op-link warn" id="btnPin" style="display:none" onclick="pinPost({{ post.id }})"><i class="fa-solid fa-thumbtack"></i> 缃《</button>
             </div>
         </div>
         {% for r in top_responses %}
         <div class="floor" id="floor-{{ r.id }}">
             <div class="floor-head">
                 <div class="floor-user">
-                    <span class="floor-no">{{ loop.index + (page - 1) * per_page }}楼</span>
+                    <span class="floor-no">{{ loop.index + (page - 1) * per_page }}妤?/span>
                     <a href="/u/{{ r.username|e }}">{{ r.username|e }}</a>
-                    {% if r.is_pinned %}<span class="floor-pin"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}
+                    {% if r.is_pinned %}<span class="floor-pin"><i class="fa-solid fa-thumbtack"></i> 缃《</span>{% endif %}
                 </div>
                 <div class="floor-ops">
                     <span class="floor-time">{{ r.created_at }}</span>
-                    <a class="reply-btn" data-reply-id="{{ r.id }}" style="display:none"><i class="fa-solid fa-reply"></i> 回复</a>
-                    <a class="delete-btn" data-delete-id="{{ r.id }}" data-username="{{ r.username|e }}" style="display:none"><i class="fa-solid fa-trash-can"></i> 删除</a>
-                    <a class="pin-btn" data-pin-id="{{ r.id }}" style="display:none"><i class="fa-solid fa-thumbtack"></i> 置顶</a>
+                    <a class="reply-btn" data-reply-id="{{ r.id }}" style="display:none"><i class="fa-solid fa-reply"></i> 鍥炲</a>
+                    <a class="delete-btn" data-delete-id="{{ r.id }}" data-username="{{ r.username|e }}" style="display:none"><i class="fa-solid fa-trash-can"></i> 鍒犻櫎</a>
+                    <a class="pin-btn" data-pin-id="{{ r.id }}" style="display:none"><i class="fa-solid fa-thumbtack"></i> 缃《</a>
                 </div>
             </div>
             <div class="floor-content">{{ r.content|e }}</div>
@@ -77,9 +77,9 @@
                     </div>
                     <div class="floor-ops">
                         <span class="floor-time">{{ rep.created_at }}</span>
-                        <a class="reply-btn" data-reply-id="{{ r.id }}" style="display:none"><i class="fa-solid fa-reply"></i> 回复</a>
-                        <a class="delete-btn" data-delete-id="{{ rep.id }}" data-username="{{ rep.username|e }}" style="display:none"><i class="fa-solid fa-trash-can"></i> 删除</a>
-                        <a class="pin-btn" data-pin-id="{{ rep.id }}" style="display:none"><i class="fa-solid fa-thumbtack"></i> 置顶</a>
+                        <a class="reply-btn" data-reply-id="{{ r.id }}" style="display:none"><i class="fa-solid fa-reply"></i> 鍥炲</a>
+                        <a class="delete-btn" data-delete-id="{{ rep.id }}" data-username="{{ rep.username|e }}" style="display:none"><i class="fa-solid fa-trash-can"></i> 鍒犻櫎</a>
+                        <a class="pin-btn" data-pin-id="{{ rep.id }}" style="display:none"><i class="fa-solid fa-thumbtack"></i> 缃《</a>
                     </div>
                 </div>
                 <div class="reply-content">{{ rep.content|e }}</div>
@@ -88,14 +88,14 @@
         </div>
         {% endfor %}
         {% if top_responses|length == 0 %}
-        <div class="floor"><p class="empty">暂无跟帖，来抢沙发！</p></div>
+        <div class="floor"><p class="empty">鏆傛棤璺熷笘锛屾潵鎶㈡矙鍙戯紒</p></div>
         {% endif %}
         {% if total_reply_pages and total_reply_pages > 1 %}
         <div class="pagination">
             {% if page > 1 %}
-            <a href="?page={{ page - 1 }}#comments">上一页</a>
+            <a href="?page={{ page - 1 }}#comments">涓婁竴椤?/a>
             {% else %}
-            <span class="disabled">上一页</span>
+            <span class="disabled">涓婁竴椤?/span>
             {% endif %}
             {% for pg in range(1, total_reply_pages + 1) %}
             {% if pg == page %}
@@ -107,22 +107,24 @@
             {% endif %}
             {% endfor %}
             {% if page < total_reply_pages %}
-            <a href="?page={{ page + 1 }}#comments">下一页</a>
+            <a href="?page={{ page + 1 }}#comments">涓嬩竴椤?/a>
             {% else %}
-            <span class="disabled">下一页</span>
+            <span class="disabled">涓嬩竴椤?/span>
             {% endif %}
         </div>
         {% endif %}
         <div id="replySection">
-            <div class="floor"><p class="login-tip"><a href="/login">登录</a>后参与讨论</p></div>
+            <div class="floor"><p class="login-tip"><a href="/login">鐧诲綍</a>鍚庡弬涓庤璁?/p></div>
         </div>
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+

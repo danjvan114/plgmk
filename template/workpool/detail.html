@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader">
@@ -24,12 +24,12 @@
     </div>
     
     <div class="main-box mdui-typo">
-        <a href="/workpool" class="back-link" title="返回作品池"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
+        <a href="/workpool" class="back-link" title="杩斿洖浣滃搧姹?><i class="fa-solid fa-arrow-left"></i>杩斿洖浣滃搧姹?/a>
         <div class="detail-layout">
             <div class="detail-main">
                 <div class="player-area">
                     {% if work.file_type == 'img' and work.file_url %}
-                    <img src="{{ work.file_url }}" alt="作品图片" style="max-width:100%;max-height:70vh;display:block;margin:0 auto;border-radius:8px">
+                    <img src="{{ work.file_url }}" alt="浣滃搧鍥剧墖" style="max-width:100%;max-height:70vh;display:block;margin:0 auto;border-radius:8px">
                     {% elif work.file_type == 'redirect' and work.file_url %}
                     <div class="player-loading" id="player-loading">
                         <div class="mdui-spinner">
@@ -38,11 +38,11 @@
                             <div class="mdui-spinner-layer mdui-spinner-layer-3"></div>
                             <div class="mdui-spinner-layer mdui-spinner-layer-4"></div>
                         </div>
-                        <span>作品播放器正在加载，请稍后...</span>
+                        <span>浣滃搧鎾斁鍣ㄦ鍦ㄥ姞杞斤紝璇风◢鍚?..</span>
                     </div>
                     <iframe id="player-frame" src="{{ work.file_url }}" frameborder="0" allowfullscreen onload="playerLoaded()"></iframe>
                     {% elif work.file_type == 'html' %}
-                    <div class="player-loading" style="color:var(--text-3)"><span>该作品类型（网页）已停用</span></div>
+                    <div class="player-loading" style="color:var(--text-3)"><span>璇ヤ綔鍝佺被鍨嬶紙缃戦〉锛夊凡鍋滅敤</span></div>
                     {% elif work.file_url %}
                     <div class="player-loading" id="player-loading">
                         <div class="mdui-spinner">
@@ -51,27 +51,27 @@
                             <div class="mdui-spinner-layer mdui-spinner-layer-3"></div>
                             <div class="mdui-spinner-layer mdui-spinner-layer-4"></div>
                         </div>
-                        <span>作品加载中...</span>
+                        <span>浣滃搧鍔犺浇涓?..</span>
                     </div>
                     <iframe id="player-frame" src="/app/player/?f={{ work.file_url|urlencode }}" frameborder="0" allowfullscreen onload="playerLoaded()"></iframe>
                     {% else %}
                     <div class="player-placeholder">
                         <i class="fa-regular fa-circle-play"></i>
-                        <span>该作品暂无预览</span>
+                        <span>璇ヤ綔鍝佹殏鏃犻瑙?/span>
                     </div>
                     {% endif %}
                 </div>
                 <div class="player-bar">
-                    <button onclick="replay()" title="重新运行"><i class="fa-solid fa-rotate-right"></i></button>
+                    <button onclick="replay()" title="閲嶆柊杩愯"><i class="fa-solid fa-rotate-right"></i></button>
                     <div>
-                        <button title="手机模式"><i class="fa-solid fa-mobile-screen-button"></i></button>
-                        <button onclick="fullscreenPlayer()" title="全屏"><i class="fa-solid fa-expand"></i></button>
+                        <button title="鎵嬫満妯″紡"><i class="fa-solid fa-mobile-screen-button"></i></button>
+                        <button onclick="fullscreenPlayer()" title="鍏ㄥ睆"><i class="fa-solid fa-expand"></i></button>
                     </div>
                 </div>
                 <div class="info-section">
                     <h2 class="info-title">{{ work.title|e }}</h2>
                     <div class="info-meta">
-                        {{ work.author|e }} &nbsp;|&nbsp; 更新于 {{ work.created_at }}
+                        {{ work.author|e }} &nbsp;|&nbsp; 鏇存柊浜?{{ work.created_at }}
                     </div>
                     {% if work.tags %}
                     <div class="info-tags">
@@ -84,29 +84,29 @@
                         <span class="action-item {% if user_liked %}active like-active{% endif %}" id="like-action" onclick="toggleLike({{ work.id }})">
                             <i class="fa-regular fa-thumbs-up icon-off"></i>
                             <i class="fa-solid fa-thumbs-up icon-on"></i>
-                            点赞 <b id="like-count">{{ work.like_count }}</b>
+                            鐐硅禐 <b id="like-count">{{ work.like_count }}</b>
                         </span>
                         <span class="action-item {% if user_faved %}active fav-active{% endif %}" id="fav-action" onclick="toggleFav({{ work.id }})">
                             <i class="fa-regular fa-star icon-off"></i>
                             <i class="fa-solid fa-star icon-on"></i>
-                            收藏 <b id="fav-count">{{ work.fav_count }}</b>
+                            鏀惰棌 <b id="fav-count">{{ work.fav_count }}</b>
                         </span>
                         <span class="action-item share-action" onclick="shareWork()">
-                            <i class="fa-solid fa-share"></i>分享
+                            <i class="fa-solid fa-share"></i>鍒嗕韩
                         </span>
-                        <span class="action-item coin-action {% if user_coined %}active{% endif %}" id="coin-action" onclick="toggleCoin({{ work.id }})" title="投币（土特产），每人限投 1 个">
-                            <i class="fa-solid fa-coins"></i>投币 <b id="coin-count">{{ work.coin_count if work.coin_count is defined else 0 }}</b>
+                        <span class="action-item coin-action {% if user_coined %}active{% endif %}" id="coin-action" onclick="toggleCoin({{ work.id }})" title="鎶曞竵锛堝湡鐗逛骇锛夛紝姣忎汉闄愭姇 1 涓?>
+                            <i class="fa-solid fa-coins"></i>鎶曞竵 <b id="coin-count">{{ work.coin_count if work.coin_count is defined else 0 }}</b>
                         </span>
-                        <span class="action-item report-action" onclick="reportWork({{ work.id }})" title="举报违规内容">
-                            <i class="fa-regular fa-flag"></i>举报
+                        <span class="action-item report-action" onclick="reportWork({{ work.id }})" title="涓炬姤杩濊鍐呭">
+                            <i class="fa-regular fa-flag"></i>涓炬姤
                         </span>
                         {% if work.file_url %}
                         <a class="action-item" href="{{ work.file_url }}" target="_blank" style="text-decoration:none">
-                            <i class="fa-solid fa-up-right-from-square" style="font-size:20px"></i>在新窗口打开
+                            <i class="fa-solid fa-up-right-from-square" style="font-size:20px"></i>鍦ㄦ柊绐楀彛鎵撳紑
                         </a>
                         {% endif %}
                         <span class="action-item delete-action action-spacer" id="btnDeleteWork" style="display:none" onclick="deleteWork({{ work.id }})">
-                            <i class="fa-solid fa-trash-can" style="font-size:20px"></i>擦除作品
+                            <i class="fa-solid fa-trash-can" style="font-size:20px"></i>鎿﹂櫎浣滃搧
                         </span>
                     </div>
                 </div>
@@ -114,14 +114,14 @@
                 <div class="detail-desc">{{ work.description|e }}</div>
                 {% endif %}
                 <div class="comments-section">
-                    <h2 class="comments-title"><i class="fa-regular fa-comment"></i>评论 ({{ work.comment_count }})</h2>
+                    <h2 class="comments-title"><i class="fa-regular fa-comment"></i>璇勮 ({{ work.comment_count }})</h2>
                     {% if session.user %}
                     <div class="comment-input">
-                        <textarea id="comment-content" placeholder="写下你的评论..."></textarea>
-                        <button class="comment-submit" onclick="submitComment({{ work.id }})">发布</button>
+                        <textarea id="comment-content" placeholder="鍐欎笅浣犵殑璇勮..."></textarea>
+                        <button class="comment-submit" onclick="submitComment({{ work.id }})">鍙戝竷</button>
                     </div>
                     {% else %}
-                    <p class="comment-login-tip"><a href="/login">登录</a>后参与评论</p>
+                    <p class="comment-login-tip"><a href="/login">鐧诲綍</a>鍚庡弬涓庤瘎璁?/p>
                     {% endif %}
                     <div id="comments-list">
                         {% for comment in comments %}
@@ -130,13 +130,13 @@
                             <div class="comment-header">
                                 <span class="comment-user">
                                      <a href="/u/{{ comment.username|e }}" style="color:var(--text-1);text-decoration:none">{{ comment.username|e }}{% set _t = user_team(comment.username) %}{% if _t %}<span class="tea-badge"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</a>
-                                    {% if comment.is_pinned %}<span class="comment-pinned"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}
+                                    {% if comment.is_pinned %}<span class="comment-pinned"><i class="fa-solid fa-thumbtack"></i> 缃《</span>{% endif %}
                                 </span>
                                 <span class="comment-time">{{ comment.created_at }}
-                                    <a href="javascript:void(0)" class="comment-reply" onclick="replyComment({{ work.id }}, {{ comment.id }})">回复</a>
-                                    <a href="javascript:void(0)" class="comment-op comment-delete-btn" data-comment-id="{{ comment.id }}" data-username="{{ comment.username|e }}" style="display:none" onclick="deleteComment({{ work.id }}, {{ comment.id }})">删除</a>
-                                    <a href="javascript:void(0)" class="comment-op comment-pin-btn" data-comment-id="{{ comment.id }}" style="display:none" onclick="pinComment({{ work.id }}, {{ comment.id }})">{% if comment.is_pinned %}取消置顶{% else %}置顶{% endif %}</a>
-                                    <a href="javascript:void(0)" class="comment-op" onclick="reportComment({{ work.id }}, {{ comment.id }})">举报</a>
+                                    <a href="javascript:void(0)" class="comment-reply" onclick="replyComment({{ work.id }}, {{ comment.id }})">鍥炲</a>
+                                    <a href="javascript:void(0)" class="comment-op comment-delete-btn" data-comment-id="{{ comment.id }}" data-username="{{ comment.username|e }}" style="display:none" onclick="deleteComment({{ work.id }}, {{ comment.id }})">鍒犻櫎</a>
+                                    <a href="javascript:void(0)" class="comment-op comment-pin-btn" data-comment-id="{{ comment.id }}" style="display:none" onclick="pinComment({{ work.id }}, {{ comment.id }})">{% if comment.is_pinned %}鍙栨秷缃《{% else %}缃《{% endif %}</a>
+                                    <a href="javascript:void(0)" class="comment-op" onclick="reportComment({{ work.id }}, {{ comment.id }})">涓炬姤</a>
                                 </span>
                             </div>
                             <div class="comment-content">{{ comment.content|e }}</div>
@@ -146,9 +146,9 @@
                                 <div class="comment-header">
                                     <span class="comment-user"><a href="/u/{{ reply.username|e }}" style="color:var(--text-2);text-decoration:none">{{ reply.username|e }}</a></span>
                                     <span class="comment-time">{{ reply.created_at }}
-                                        <a href="javascript:void(0)" class="comment-reply" onclick="replyComment({{ work.id }}, {{ comment.id }})">回复</a>
-                                        <a href="javascript:void(0)" class="comment-op comment-delete-btn" data-comment-id="{{ reply.id }}" data-username="{{ reply.username|e }}" style="display:none" onclick="deleteComment({{ work.id }}, {{ reply.id }})">删除</a>
-                                        <a href="javascript:void(0)" class="comment-op" onclick="reportComment({{ work.id }}, {{ reply.id }})">举报</a>
+                                        <a href="javascript:void(0)" class="comment-reply" onclick="replyComment({{ work.id }}, {{ comment.id }})">鍥炲</a>
+                                        <a href="javascript:void(0)" class="comment-op comment-delete-btn" data-comment-id="{{ reply.id }}" data-username="{{ reply.username|e }}" style="display:none" onclick="deleteComment({{ work.id }}, {{ reply.id }})">鍒犻櫎</a>
+                                        <a href="javascript:void(0)" class="comment-op" onclick="reportComment({{ work.id }}, {{ reply.id }})">涓炬姤</a>
                                     </span>
                                 </div>
                                 <div class="comment-content">{{ reply.content|e }}</div>
@@ -159,16 +159,16 @@
                         {% endif %}
                         {% endfor %}
                         {% if comments|length == 0 %}
-                        <p style="color:var(--text-3);text-align:center;padding:14px">暂无评论，快来抢沙发吧！</p>
+                        <p style="color:var(--text-3);text-align:center;padding:14px">鏆傛棤璇勮锛屽揩鏉ユ姠娌欏彂鍚э紒</p>
                         {% endif %}
                     </div>
                 </div>
                 {% if total_comment_pages and total_comment_pages > 1 %}
                 <div class="pagination">
                     {% if c_page > 1 %}
-                    <a href="/workpool/{{ work.id }}?page={{ c_page - 1 }}">上一页</a>
+                    <a href="/workpool/{{ work.id }}?page={{ c_page - 1 }}">涓婁竴椤?/a>
                     {% else %}
-                    <span class="disabled">上一页</span>
+                    <span class="disabled">涓婁竴椤?/span>
                     {% endif %}
                     {% for pg in range(1, total_comment_pages + 1) %}
                     {% if pg == c_page %}
@@ -180,9 +180,9 @@
                     {% endif %}
                     {% endfor %}
                     {% if c_page < total_comment_pages %}
-                    <a href="/workpool/{{ work.id }}?page={{ c_page + 1 }}">下一页</a>
+                    <a href="/workpool/{{ work.id }}?page={{ c_page + 1 }}">涓嬩竴椤?/a>
                     {% else %}
-                    <span class="disabled">下一页</span>
+                    <span class="disabled">涓嬩竴椤?/span>
                     {% endif %}
                 </div>
                 {% endif %}
@@ -191,12 +191,12 @@
                 <div class="author-card">
                     <div class="author-head">
                         <span class="author-name" style="cursor:pointer" onclick="location.href='/u/{{ work.author|e }}'" data-username="{{ work.author|e }}">{{ work.author|e }}</span>
-                        <div class="author-avatar" onclick="location.href='/u/{{ work.author|e }}'" style="cursor:pointer;overflow:hidden" data-username="{{ work.author|e }}">加载中...</div>
+                        <div class="author-avatar" onclick="location.href='/u/{{ work.author|e }}'" style="cursor:pointer;overflow:hidden" data-username="{{ work.author|e }}">鍔犺浇涓?..</div>
                     </div>
-                    <p class="author-sign" id="authorSign">加载中...</p>
+                    <p class="author-sign" id="authorSign">鍔犺浇涓?..</p>
                     {% if session.user and session.user != work.author %}
                     <button class="author-follow {% if user_follows_author %}following{% endif %}" id="follow-btn" onclick="toggleFollow('{{ work.author|e }}')">
-                        {% if user_follows_author %}<i class="fa-solid fa-check"></i> 已关注{% else %}<i class="fa-solid fa-plus"></i> 关注{% endif %}
+                        {% if user_follows_author %}<i class="fa-solid fa-check"></i> 宸插叧娉▄% else %}<i class="fa-solid fa-plus"></i> 鍏虫敞{% endif %}
                     </button>
                     {% endif %}
                 </div>
@@ -204,11 +204,13 @@
         </div>
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+

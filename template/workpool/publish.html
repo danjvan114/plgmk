@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader">
@@ -24,53 +24,55 @@
     </div>
     
     <div class="main-box mdui-typo">
-        <a href="/workpool" class="back-link" title="返回作品池"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
+        <a href="/workpool" class="back-link" title="杩斿洖浣滃搧姹?><i class="fa-solid fa-arrow-left"></i>杩斿洖浣滃搧姹?/a>
         <div class="form-card">
-            <h1 class="form-title">发布作品
+            <h1 class="form-title">鍙戝竷浣滃搧
                 <span id="teamBadge"></span>
             </h1>
             {% if file_url %}
             <div class="file-url-display">
-                <strong>作品文件：</strong>{{ file_url }}
+                <strong>浣滃搧鏂囦欢锛?/strong>{{ file_url }}
             </div>
             {% endif %}
             <form id="publish-form">
                 <div class="form-group">
-                    <label>作品标题 *</label>
-                    <input type="text" id="title" name="title" required placeholder="输入作品标题">
+                    <label>浣滃搧鏍囬 *</label>
+                    <input type="text" id="title" name="title" required placeholder="杈撳叆浣滃搧鏍囬">
                 </div>
                 <div class="form-group">
-                    <label>作品简介</label>
-                    <textarea id="description" name="description" placeholder="简单介绍一下你的作品"></textarea>
+                    <label>浣滃搧绠€浠?/label>
+                    <textarea id="description" name="description" placeholder="绠€鍗曚粙缁嶄竴涓嬩綘鐨勪綔鍝?></textarea>
                 </div>
                 <div class="form-group">
-                    <label>标签</label>
-                    <input type="text" id="tags" name="tags" placeholder="用逗号分隔，如：游戏,冒险,像素">
-                    <div class="hint">多个标签用逗号分隔</div>
+                    <label>鏍囩</label>
+                    <input type="text" id="tags" name="tags" placeholder="鐢ㄩ€楀彿鍒嗛殧锛屽锛氭父鎴?鍐掗櫓,鍍忕礌">
+                    <div class="hint">澶氫釜鏍囩鐢ㄩ€楀彿鍒嗛殧</div>
                 </div>
                 <div class="form-group">
-                    <label>缩略图 URL（可选）</label>
+                    <label>缂╃暐鍥?URL锛堝彲閫夛級</label>
                     <input type="url" id="thumbnail" name="thumbnail" placeholder="https://example.com/thumbnail.png">
                 </div>
                 <div class="form-group">
-                    <label>作品类型</label>
+                    <label>浣滃搧绫诲瀷</label>
                     <select id="file_type" name="file_type">
-                        <option value="player" selected>播放器（默认）</option>
-                        <option value="img">图片</option>
-                        <option value="redirect">重定向</option>
+                        <option value="player" selected>鎾斁鍣紙榛樿锛?/option>
+                        <option value="img">鍥剧墖</option>
+                        <option value="redirect">閲嶅畾鍚?/option>
                     </select>
-                    <div class="hint">图片类型将直接展示，重定向类型将跳转到外部链接，二者均不经过播放器</div>
+                    <div class="hint">鍥剧墖绫诲瀷灏嗙洿鎺ュ睍绀猴紝閲嶅畾鍚戠被鍨嬪皢璺宠浆鍒板閮ㄩ摼鎺ワ紝浜岃€呭潎涓嶇粡杩囨挱鏀惧櫒</div>
                 </div>
-                <button type="submit" class="submit-btn">发布作品</button>
+                <button type="submit" class="submit-btn">鍙戝竷浣滃搧</button>
             </form>
         </div>
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+

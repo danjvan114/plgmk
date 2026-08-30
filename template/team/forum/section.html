@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader">
@@ -24,13 +24,13 @@
     </div>
     
     <div class="main-box mdui-typo">
-        <a href="/forum" class="back-link" title="返回论坛"><i class="fa-solid fa-arrow-left"></i>返回论坛</a>
+        <a href="/forum" class="back-link" title="杩斿洖璁哄潧"><i class="fa-solid fa-arrow-left"></i>杩斿洖璁哄潧</a>
         <div class="section-head">
             <div>
                 <h1><i class="fa-solid fa-folder-open"></i>{{ forum.name|e }}</h1>
                 {% if forum.description %}<div class="section-desc">{{ forum.description|e }}</div>{% endif %}
             </div>
-            <a href="/forum/new" class="primary-btn"><i class="fa-solid fa-pen"></i> 发帖</a>
+            <a href="/forum/new" class="primary-btn"><i class="fa-solid fa-pen"></i> 鍙戝笘</a>
         </div>
         <div class="card">
             <div class="card-body mdui-typo">
@@ -48,18 +48,18 @@
                     </li>
                     {% endfor %}
                     {% if posts|length == 0 %}
-                    <p class="empty">本分区暂无帖子</p>
+                    <p class="empty">鏈垎鍖烘殏鏃犲笘瀛?/p>
                     {% endif %}
                 </ul>
             </div>
         </div>
-        <p class="post-count">共 <strong>{{ total_posts }}</strong> 个帖子</p>
+        <p class="post-count">鍏?<strong>{{ total_posts }}</strong> 涓笘瀛?/p>
         {% if total_pages and total_pages > 1 %}
         <div class="pagination">
             {% if page > 1 %}
-            <a href="/forum/{{ forum.id }}/page/{{ page - 1 }}">上一页</a>
+            <a href="/forum/{{ forum.id }}/page/{{ page - 1 }}">涓婁竴椤?/a>
             {% else %}
-            <span class="disabled">上一页</span>
+            <span class="disabled">涓婁竴椤?/span>
             {% endif %}
             {% for pg in range(1, total_pages + 1) %}
             {% if pg == page %}
@@ -69,19 +69,21 @@
             {% endif %}
             {% endfor %}
             {% if page < total_pages %}
-            <a href="/forum/{{ forum.id }}/page/{{ page + 1 }}">下一页</a>
+            <a href="/forum/{{ forum.id }}/page/{{ page + 1 }}">涓嬩竴椤?/a>
             {% else %}
-            <span class="disabled">下一页</span>
+            <span class="disabled">涓嬩竴椤?/span>
             {% endif %}
         </div>
         {% endif %}
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+

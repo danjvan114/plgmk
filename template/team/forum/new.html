@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KE Hub</title>
-<link rel="stylesheet" href="../vendor/mdui.min.css">
-<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="../../env.css">
-<link rel="stylesheet" href="../../styles.css">
-<link rel="stylesheet" href="../community-layout.css">
-<link rel="stylesheet" href="../community-enhance.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/mdui.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/env.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/styles.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-layout.css">
+<link rel="stylesheet" href="/localcdn/gzs/n2/community-enhance.css">
 <link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
 <body class="theme-aurora" data-page="community">
 
-<!-- 全局统一顶栏导航(挂载点) -->
+<!-- 鍏ㄥ眬缁熶竴椤舵爮瀵艰埅(鎸傝浇鐐? -->
 <div id="hv2"></div>
 
 <div class="loader" id="loader">
@@ -24,46 +24,48 @@
     </div>
     
     <div class="main-box mdui-typo">
-        <a href="/forum" class="back-link" title="返回论坛"><i class="fa-solid fa-arrow-left"></i>返回论坛</a>
+        <a href="/forum" class="back-link" title="杩斿洖璁哄潧"><i class="fa-solid fa-arrow-left"></i>杩斿洖璁哄潧</a>
         <div class="form-card">
-            <h1 class="form-title"><i class="fa-solid fa-pen-nib" style="color:var(--accent-1)"></i>发布新帖
+            <h1 class="form-title"><i class="fa-solid fa-pen-nib" style="color:var(--accent-1)"></i>鍙戝竷鏂板笘
                 <span id="teamBadge"></span>
             </h1>
             <form id="new-post-form">
                 <div class="form-group">
-                    <label>选择分区 *</label>
+                    <label>閫夋嫨鍒嗗尯 *</label>
                     <select id="forum_id" name="forum_id" required>
-                        <option value="">请选择分区</option>
+                        <option value="">璇烽€夋嫨鍒嗗尯</option>
                         {% for f in forums %}
                         <option value="{{ f.id }}">{{ f.name|e }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>帖子标题 *（80 字以内）</label>
-                    <input type="text" id="title" name="title" required maxlength="80" placeholder="输入帖子标题">
+                    <label>甯栧瓙鏍囬 *锛?0 瀛椾互鍐咃級</label>
+                    <input type="text" id="title" name="title" required maxlength="80" placeholder="杈撳叆甯栧瓙鏍囬">
                 </div>
                 <div class="form-group">
-                    <label>帖子内容 *（支持 Markdown）</label>
-                    <textarea id="content" name="content" required placeholder="# 标题&#10;**加粗**&#10;```代码块```"></textarea>
+                    <label>甯栧瓙鍐呭 *锛堟敮鎸?Markdown锛?/label>
+                    <textarea id="content" name="content" required placeholder="# 鏍囬&#10;**鍔犵矖**&#10;```浠ｇ爜鍧梎``"></textarea>
                 </div>
-                <button type="submit" class="submit-btn mdui-ripple"><i class="fa-solid fa-paper-plane"></i> 发布</button>
+                <button type="submit" class="submit-btn mdui-ripple"><i class="fa-solid fa-paper-plane"></i> 鍙戝竷</button>
             </form>
             <div class="md-hint">
-                <strong><i class="fa-solid fa-circle-info" style="color:var(--accent-1)"></i> Markdown 语法说明：</strong><br>
-                <code># 标题</code> 一级标题 &nbsp; <code>## 二级标题</code> &nbsp; <code>**加粗**</code> 加粗 &nbsp;
-                <code>*斜体*</code> 斜体<br>
-                <code>- 列表项</code> 无序列表 &nbsp; <code>> 引用</code> 引用块 &nbsp;
-                <code>```代码```</code> 代码块 &nbsp; <code>[文字](链接)</code> 超链接 &nbsp; <code>![图片](链接)</code> 图片
+                <strong><i class="fa-solid fa-circle-info" style="color:var(--accent-1)"></i> Markdown 璇硶璇存槑锛?/strong><br>
+                <code># 鏍囬</code> 涓€绾ф爣棰?&nbsp; <code>## 浜岀骇鏍囬</code> &nbsp; <code>**鍔犵矖**</code> 鍔犵矖 &nbsp;
+                <code>*鏂滀綋*</code> 鏂滀綋<br>
+                <code>- 鍒楄〃椤?/code> 鏃犲簭鍒楄〃 &nbsp; <code>> 寮曠敤</code> 寮曠敤鍧?&nbsp;
+                <code>```浠ｇ爜```</code> 浠ｇ爜鍧?&nbsp; <code>[鏂囧瓧](閾炬帴)</code> 瓒呴摼鎺?&nbsp; <code>![鍥剧墖](閾炬帴)</code> 鍥剧墖
             </div>
         </div>
     </div>
 
-<script src="../vendor/mdui.min.js"></script>
-<script src="../../nav.js"></script>
-<script src="../community-tilt.js"></script>
-<script src="../community-mdui.js"></script>
-<script src="../community-i18n.js"></script>
+<script src="/localcdn/gzs/n2/vendor/mdui.min.js"></script>
+<script src="/localcdn/gzs/n2/nav.js"></script>
+<script src="/localcdn/gzs/n2/community-tilt.js"></script>
+<script src="/localcdn/gzs/n2/community-mdui.js"></script>
+<script src="/localcdn/gzs/n2/community-i18n.js"></script>
 
 </body>
 </html>
+
+
