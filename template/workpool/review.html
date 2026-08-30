@@ -1,113 +1,32 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>作品审核台</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('https://static.codemao.cn/pickduck/Sy66FO12T.png?hash=Fnz3s9dC0vq-zsTZeQG0A08A-H0Z') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
-        body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
-        @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-        header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
-        @keyframes headerSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
-        .wrap{max-width:1400px;margin:https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX70 auto;width:100%;display:flex;align-items:center}
-        .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;animation:logoFadeIn .5s .1s both}
-        @keyframes logoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-        .logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
-        .logo-icon img{width:100%;height:100%;object-fit:cover}
-        .head-space{flex:1}
-        .search{height:36px;width:280px;background:rgba(255,255,255,.2);border-radius:18px;display:flex;align-items:center;padding:0 16px;animation:searchFadeIn .5s .15s both}
-        @keyframes searchFadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-        .search input{background:transparent;border:none;outline:none;color:#fff;width:100%;font-size:14px}
-        .search input::placeholder{color:rgba(255,255,255,.7)}
-        .nav-links{display:flex;gap:24px}
-        .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
-        .nav-links a:hover{color:#fff;transform:translateY(-1px)}
-        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
-        .nav-links a:hover::after{width:100%}
-        .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
-        .btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
-        .btn:active{transform:scale(.95)}
-        .btn-danger{background:#fff;color:#e53935;border:1px solid #e53935}
-        .btn-danger:hover{background:#e53935;color:#fff}
-        .dropdown{position:relative;display:inline-block}
-        .dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
-        .dropbtn:hover{color:#fff}
-        .dropbtn:focus{outline:none}
-        .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:dropdownFade .2s}
-        @keyframes dropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-        .dropdown-content.show{display:block}
-        .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s}
-        .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
-        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
-        @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-        .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both;position:relative}
-        @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-        .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
-        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
-        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
-        #loader .mdui-progress{margin:0;border-radius:0}
-        .main-box{max-width:1200px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
-        .back-link{display:inline-flex;align-items:center;gap:4px;color:#4caf50;text-decoration:none;margin-bottom:16px;font-size:14px}
-        .back-link:hover{text-decoration:underline}
-        .card{background:rgba(255,255,255,.95);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(0,0,0,.05);animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0;margin-bottom:20px}
-        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-        .card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #eee;flex-wrap:wrap;gap:10px}
-        .card-head h2{font-size:17px;color:#333;display:flex;align-items:center;gap:8px}
-        .card-body{padding:20px}
-        .stats-row{display:flex;gap:16px;flex-wrap:wrap}
-        .stat-card{flex:1;min-width:220px;background:linear-gradient(135deg,#4caf50,#2e7d32);border-radius:10px;padding:22px;color:#fff;text-align:center;box-shadow:0 6px 18px rgba(76,175,80,.3);transition:transform .2s}
-        .stat-card:hover{transform:translateY(-3px)}
-        .stat-card .num{font-size:34px;font-weight:bold;margin-bottom:4px}
-        .stat-card .label{font-size:13px;opacity:.9}
-        .report-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid #eee;border-radius:8px;margin-bottom:10px;flex-wrap:wrap;transition:all .2s}
-        .report-item:hover{border-color:#ef9a9a;background:#fff8f8}
-        .report-work{display:inline-flex;align-items:center;gap:6px;background:rgba(76,175,80,.1);color:#2e7d32;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:600;white-space:nowrap}
-        .report-info{flex:1;min-width:200px;font-size:13px;color:#888;line-height:1.7}
-        .report-reason{color:#555;font-size:13px;background:#fff8e1;border-radius:6px;padding:6px 12px;margin:4px 0}
-        .report-actions{display:flex;gap:8px;flex-wrap:wrap}
-        .mini-btn{padding:6px 14px;border-radius:14px;font-size:13px;text-decoration:none;border:1px solid #4caf50;color:#4caf50;background:#fff;cursor:pointer;transition:all .2s}
-        .mini-btn:hover{background:#4caf50;color:#fff}
-        .mini-btn.danger{border-color:#e53935;color:#e53935}
-        .mini-btn.danger:hover{background:#e53935;color:#fff}
-        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-        .sample-card{background:#fff;border:1px solid #eee;border-radius:8px;padding:16px;transition:all .2s}
-        .sample-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
-        .sample-card h3{font-size:15px;color:#333;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .sample-card p{font-size:12px;color:#999;margin-bottom:10px}
-        .sample-card .sample-meta{font-size:12px;color:#888;margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap}
-        .sample-card .sample-actions{display:flex;gap:8px;flex-wrap:wrap}
-        .note{font-size:12px;color:#999;margin-top:14px;text-align:center}
-        .empty{text-align:center;color:#999;padding:40px 0;font-size:14px}
-    
-        @media (max-width:640px){
-            .main-box{padding-left:10px;padding-right:10px}
-            .stat-card{min-width:140px;padding:16px}
-            .stat-card .num{font-size:26px}
-            .report-info{min-width:0;width:100%}
-            .report-item{padding:12px}
-            .card-head{padding:12px 14px}
-            .card-body{padding:14px}
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="../vendor/mdui.min.css">
+<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../../env.css">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../community-layout.css">
+<link rel="stylesheet" href="../community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
-<body>
-    <div class="loader" id="loader">
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="loader" id="loader">
         <div class="mdui-progress">
             <div class="mdui-progress-indeterminate"></div>
         </div>
     </div>
-    <div id="hv2"></div>
-    <div class="main-box">
-        <a href="/workpool" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
+    
+    <div class="main-box mdui-typo">
+        <a href="/workpool" class="back-link" title="返回作品池"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
         <div class="card">
-            <div class="card-body">
+            <div class="card-body mdui-typo">
                 <div class="stats-row">
                     <div class="stat-card">
                         <div class="num">{{ total_works }}</div>
@@ -118,9 +37,9 @@
         </div>
         <div class="card">
             <div class="card-head">
-                <h2><i class="fa-solid fa-flag" style="color:#e53935"></i>待处理举报</h2>
+                <h2 class="mdui-typo-headline"><i class="fa-solid fa-flag" style="color:#e53935"></i>待处理举报</h2>
             </div>
-            <div class="card-body">
+            <div class="card-body mdui-typo">
                 {% for r in reports %}
                 <div class="report-item">
                     <span class="report-work">作品 #{{ r.work_id }}</span>
@@ -141,14 +60,14 @@
         </div>
         <div class="card">
             <div class="card-head">
-                <h2><i class="fa-solid fa-shuffle" style="color:#ff9800"></i>随机抽查</h2>
+                <h2 class="mdui-typo-headline"><i class="fa-solid fa-shuffle" style="color:var(--accent-1)"></i>随机抽查</h2>
                 <button class="mini-btn" onclick="location.reload()"><i class="fa-solid fa-rotate"></i> 刷新抽查</button>
             </div>
-            <div class="card-body">
+            <div class="card-body mdui-typo">
                 <div class="grid">
                     {% for w in samples %}
                     <div class="sample-card">
-                        <h3>{{ w.title|e }}</h3>
+                        <h3 class="mdui-typo-headline">{{ w.title|e }}</h3>
                         <p>作者：{{ w.author|e }}</p>
                         <div class="sample-meta">
                             <span title="点赞"><i class="fa-solid fa-thumbs-up"></i> {{ w.like_count if w.like_count is defined else 0 }}</span>
@@ -167,57 +86,11 @@
         </div>
     </div>
 
-    <script>
-        window.addEventListener('load', function(){
-            document.getElementById('loader').style.display='none';
-            document.body.classList.add('page-enter');
-            setTimeout(function(){document.body.classList.remove('page-enter');},400);
-        });
+<script src="../vendor/mdui.min.js"></script>
+<script src="../../nav.js"></script>
+<script src="../community-tilt.js"></script>
+<script src="../community-mdui.js"></script>
+<script src="../community-i18n.js"></script>
 
-        function hideWork(workId) {
-            if (!confirm('确定隐藏该作品？隐藏后用户将无法看到')) return;
-            fetch('/workpool/review/hide/' + workId, { method: 'POST' })
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    alert(data.message);
-                    if (data.success) location.reload();
-                });
-        }
-
-        function loadUnread() {
-            fetch('/messages/unread')
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    var badge = document.getElementById('unread-badge');
-                    if (badge && data.count > 0) {
-                        badge.textContent = data.count > 99 ? '99+' : data.count;
-                        badge.style.display = 'block';
-                    }
-                });
-        }
-        loadUnread();
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var dropdowns = document.querySelectorAll('.dropdown');
-            dropdowns.forEach(function(dropdown) {
-                var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
-                var content = dropdown.querySelector('.dropdown-content');
-                if (trigger && content) {
-                    trigger.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        content.classList.toggle('show');
-                    });
-                    content.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                    });
-                }
-            });
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.dropdown-content').forEach(function(content) {
-                    content.classList.remove('show');
-                });
-            });
-        });
-    </script>
-<script src="/localcdn/gzs/knf.js?v=19"></script></body>
+</body>
 </html>

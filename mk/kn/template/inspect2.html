@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body>
+<pre id="out">loading...</pre>
+<script>
+setTimeout(function(){
+  var m=document.querySelector('.page-box');
+  var c=document.querySelector('.content-wrapper');
+  var p=document.querySelector('.pd-content');
+  var a=document.querySelector('.pd-pane.active');
+  var l=document.querySelector('.detail-layout');
+  var r=document.querySelector('.detail-main');
+  var s=document.querySelector('.detail-sidebar');
+  var cs = l ? getComputedStyle(l) : null;
+  document.getElementById('out').textContent = [
+    'page-box w='+(m?m.offsetWidth:'?'),
+    'content-wrapper w='+(c?c.offsetWidth:'?'),
+    'pd-content w='+(p?p.offsetWidth:'?'),
+    'pd-pane.active w='+(a?a.offsetWidth:'?'),
+    'detail-layout w='+(l?l.offsetWidth:'?')+' display='+(cs?cs.display:'?')+' gridCols='+(cs?cs.gridTemplateColumns:'?'),
+    'detail-main w='+(r?r.offsetWidth:'?'),
+    'detail-sidebar w='+(s?s.offsetWidth:'?')
+  ].join('\n');
+}, 500);
+</script>
+</body></html>

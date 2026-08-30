@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<style>
+body { margin:0; padding:0; }
+.page-box { max-width:960px; margin:0 auto; padding:118px 20px 70px; position:relative; z-index:1; }
+.content-wrapper { max-width:none; margin:0 auto; padding:0; }
+.pd-content { position:relative; margin:0 auto; }
+.pd-pane { position:absolute; left:0; right:0; top:0; }
+.pd-pane.active { position:relative; opacity:1; visibility:visible; }
+.detail-layout { display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:18px; align-items:start; background:rgba(255,255,255,.05); }
+.detail-main { background:rgba(255,0,0,.1); padding:20px; min-height:200px; }
+.detail-sidebar { background:rgba(0,0,255,.1); padding:20px; min-height:200px; }
+</style></head>
+<body class="theme-aurora">
+<main class="page-box"><div class="content-wrapper">
+<div class="detail-layout">
+  <div class="detail-main">MAIN (left)</div>
+  <div class="detail-sidebar">SIDEBAR (right 360px)</div>
+</div>
+</div></main>
+</body></html>

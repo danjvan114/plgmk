@@ -1,160 +1,30 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>{{ work.title }} - 作品池</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
-        body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
-        @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-        header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
-        @keyframes headerSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
-        .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
-        .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;animation:logoFadeIn .5s .1s both}
-        @keyframes logoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-        .logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
-        .logo-icon img{width:100%;height:100%;object-fit:cover}
-        .head-space{flex:1}
-        .nav-links{display:flex;gap:24px}
-        .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
-        .nav-links a:hover{color:#fff;transform:translateY(-1px)}
-        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
-        .nav-links a:hover::after{width:100%}
-        .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
-        .btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
-        .btn:active{transform:scale(.95)}
-        .dropdown{position:relative;display:inline-block}
-        .dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
-        .dropbtn:hover{color:#fff}
-        .dropbtn:focus{outline:none}
-        .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:dropdownFade .2s}
-        @keyframes dropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-        .dropdown-content.show{display:block}
-        .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s}
-        .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
-        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
-        @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-        .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both}
-        @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-        .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
-        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
-        #loader .mdui-progress{margin:0;border-radius:0}
-        .main-box{max-width:1400px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
-        .back-link{display:inline-flex;align-items:center;gap:4px;color:#4caf50;text-decoration:none;margin-bottom:16px;font-size:14px}
-        .back-link:hover{text-decoration:underline}
-        .detail-layout{display:flex;gap:20px;align-items:flex-start}
-        .detail-main{flex:1;min-width:0}
-        .player-area{background:#2c2c38;width:100%;aspect-ratio:16/10;overflow:hidden;position:relative;border-radius:8px 8px 0 0}
-        .player-area iframe{width:100%;height:100%;border:none}
-        .player-loading{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#aaa;font-size:14px;background:#2c2c38;z-index:5}
-        .player-loading.hide{display:none}
-        .player-loading .mdui-spinner{width:48px;height:48px;color:#4caf50}
-        .player-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#999;gap:10px}
-        .player-placeholder i{font-size:56px;color:#666}
-        .player-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 8px;background:#fff;border:1px solid #eee;border-top:none;border-radius:0 0 8px 8px}
-        .player-bar button{border:none;background:none;font-size:20px;cursor:pointer;color:#555}
-        .info-section{padding:12px 0}
-        .info-title{font-size:22px;color:#333;margin-bottom:8px}
-        .info-meta{color:#777;font-size:14px;margin-bottom:10px}
-        .info-tags{margin-bottom:14px}
-        .info-tags span{background:#eee;padding:4px 10px;border-radius:12px;font-size:13px;margin-right:6px;color:#555}
-        .action-row{display:flex;gap:18px;align-items:center;font-size:15px;color:#333;flex-wrap:wrap}
-        .action-item{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;color:#555;transition:color .2s,transform .2s}
-        .action-item:hover{color:#4caf50;transform:translateY(-1px)}
-        .action-item.active{color:#4caf50}
-        .action-item b{font-weight:700}
-        .action-item.delete-action{color:#f44336}
-        .action-item.delete-action:hover{color:#d32f2f}
-        .action-item .fa{font-size:20px;line-height:1}
-        .action-item .icon-on{display:none}
-        .action-item.active .icon-off{display:none}
-        .action-item.active .icon-on{display:inline-block}
-        .action-item.active.like-active{color:#e53935}
-        .action-item.active.fav-active{color:#f9a825}
-        .action-item.share-action{color:#43a047}
-        .action-item.share-action:hover{color:#2e7d32}
-        .action-spacer{margin-left:auto}
-        .action-item.coin-action{color:#e65100}
-        .action-item.coin-action:hover{color:#bf360c}
-        .action-item.report-action{color:#999}
-        .action-item.report-action:hover{color:#e53935}
-        .detail-desc{color:#555;line-height:1.8;margin:14px 0 0;font-size:14px;background:#fff;padding:14px;border-radius:8px;border:1px solid #eee}
-        .side-col{width:280px;flex-shrink:0}
-        .author-card{background:#fff;padding:12px;border-radius:8px;border:1px solid #eee;animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
-        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-        .author-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
-        .author-name{font-weight:bold;font-size:16px;color:#333}
-        .author-avatar{width:40px;height:40px;border-radius:50%;background:#4caf50;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;flex-shrink:0}
-        .author-sign{font-size:12px;color:#666;margin-top:8px;line-height:1.5;word-break:break-all}
-        .comments-section{background:#fff;border-radius:8px;border:1px solid #eee;margin-top:20px;padding:20px;animation:cardSlideUp .5s .1s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
-        .comments-title{font-size:17px;color:#333;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-        .comment-input{display:flex;gap:10px;margin-bottom:18px}
-        .comment-input textarea{flex:1;padding:10px 12px;border:1px solid #ddd;border-radius:8px;resize:vertical;min-height:70px;font-size:14px;font-family:inherit}
-        .comment-input textarea:focus{outline:none;border-color:#4caf50}
-        .comment-submit{padding:10px 22px;background:#4caf50;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;transition:all .2s;align-self:flex-end}
-        .comment-submit:hover{background:#43a047}
-        .comment-item{padding:14px 0;border-bottom:1px solid #eee}
-        .comment-item:last-child{border-bottom:none}
-        .comment-header{display:flex;justify-content:space-between;margin-bottom:6px}
-        .comment-user{font-weight:bold;color:#333}
-        .comment-time{color:#999;font-size:12px}
-        .comment-content{color:#555;line-height:1.6}
-        .comment-login-tip{color:#999;text-align:center;padding:14px}
-        .comment-login-tip a{color:#4caf50}
-        .comment-reply{font-size:12px;color:#42a5f5;cursor:pointer;margin-left:10px}
-        .comment-reply:hover{color:#1565c0;text-decoration:underline}
-        .comment-op{font-size:12px;color:#bbb;cursor:pointer;margin-left:10px}
-        .comment-op:hover{color:#e53935}
-        .comment-op.pin{color:#ffb300}
-        .comment-op.pin:hover{color:#f57f17}
-        .comment-pinned{display:inline-block;font-size:11px;background:#fff8e1;color:#f57f17;border:1px solid #ffe082;border-radius:10px;padding:0 8px;margin-left:6px}
-        .comment-deleted{color:#bbb;font-style:italic}
-        .reply-box{margin:8px 0 0 24px;padding:8px 12px;background:#f5f5f5;border-radius:8px}
-        .reply-item{border-left:3px solid #e0e0e0;margin:8px 0 0 24px;padding:6px 12px;background:#fafafa;border-radius:6px}
-        .author-follow{display:inline-block;margin-top:10px;background:#4caf50;color:#fff;border:none;border-radius:16px;padding:6px 16px;cursor:pointer;font-size:13px}
-        .author-follow.following{background:#ef5350}
-        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
-        .icon-btn{position:relative}
-        .pagination{display:flex;justify-content:center;gap:8px;margin-top:24px}
-        .pagination a,.pagination span{padding:8px 16px;border-radius:4px;text-decoration:none;font-size:14px;transition:all .2s}
-        .pagination a{background:rgba(255,255,255,.9);color:#4caf50}
-        .pagination a:hover{background:#4caf50;color:#fff}
-        .pagination .current{background:#4caf50;color:#fff}
-        .pagination .disabled{background:rgba(255,255,255,.5);color:#999;cursor:not-allowed}
-    
-        @media (max-width:640px){
-            .main-box{padding-left:10px;padding-right:10px}
-            .detail-layout{flex-direction:column}
-            .side-col{width:100%}
-            .info-title{font-size:19px}
-            .action-row{gap:12px 14px}
-            .action-item{font-size:14px}
-            .comments-section{padding:14px}
-            .comment-input{flex-direction:column}
-            .comment-submit{align-self:stretch;width:100%}
-            .reply-box{margin-left:10px;padding:8px 10px}
-            .reply-item{margin-left:10px;padding:6px 10px}
-            .pagination{gap:4px}
-            .pagination a,.pagination span{padding:7px 11px}
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="../vendor/mdui.min.css">
+<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../../env.css">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../community-layout.css">
+<link rel="stylesheet" href="../community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
-<body>
-    <div class="loader" id="loader">
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="loader" id="loader">
         <div class="mdui-progress">
             <div class="mdui-progress-indeterminate"></div>
         </div>
     </div>
-    <div id="hv2"></div>
-    <div class="main-box">
-        <a href="/workpool" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
+    
+    <div class="main-box mdui-typo">
+        <a href="/workpool" class="back-link" title="返回作品池"><i class="fa-solid fa-arrow-left"></i>返回作品池</a>
         <div class="detail-layout">
             <div class="detail-main">
                 <div class="player-area">
@@ -172,7 +42,7 @@
                     </div>
                     <iframe id="player-frame" src="{{ work.file_url }}" frameborder="0" allowfullscreen onload="playerLoaded()"></iframe>
                     {% elif work.file_type == 'html' %}
-                    <div class="player-loading" style="color:#999"><span>该作品类型（网页）已停用</span></div>
+                    <div class="player-loading" style="color:var(--text-3)"><span>该作品类型（网页）已停用</span></div>
                     {% elif work.file_url %}
                     <div class="player-loading" id="player-loading">
                         <div class="mdui-spinner">
@@ -192,10 +62,10 @@
                     {% endif %}
                 </div>
                 <div class="player-bar">
-                    <button onclick="replay()">⟳</button>
+                    <button onclick="replay()" title="重新运行"><i class="fa-solid fa-rotate-right"></i></button>
                     <div>
-                        <button title="手机模式">📱</button>
-                        <button onclick="fullscreenPlayer()">⛶</button>
+                        <button title="手机模式"><i class="fa-solid fa-mobile-screen-button"></i></button>
+                        <button onclick="fullscreenPlayer()" title="全屏"><i class="fa-solid fa-expand"></i></button>
                     </div>
                 </div>
                 <div class="info-section">
@@ -259,7 +129,7 @@
                         <div class="comment-item" id="comment-{{ comment.id }}">
                             <div class="comment-header">
                                 <span class="comment-user">
-                                     <a href="/u/{{ comment.username|e }}" style="color:#333;text-decoration:none">{{ comment.username|e }}{% set _t = user_team(comment.username) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:1px 6px;margin-left:4px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</a>
+                                     <a href="/u/{{ comment.username|e }}" style="color:var(--text-1);text-decoration:none">{{ comment.username|e }}{% set _t = user_team(comment.username) %}{% if _t %}<span class="tea-badge"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</a>
                                     {% if comment.is_pinned %}<span class="comment-pinned"><i class="fa-solid fa-thumbtack"></i> 置顶</span>{% endif %}
                                 </span>
                                 <span class="comment-time">{{ comment.created_at }}
@@ -274,7 +144,7 @@
                             {% if not reply.is_deleted %}
                             <div class="reply-item">
                                 <div class="comment-header">
-                                    <span class="comment-user"><a href="/u/{{ reply.username|e }}" style="color:#666;text-decoration:none">{{ reply.username|e }}</a></span>
+                                    <span class="comment-user"><a href="/u/{{ reply.username|e }}" style="color:var(--text-2);text-decoration:none">{{ reply.username|e }}</a></span>
                                     <span class="comment-time">{{ reply.created_at }}
                                         <a href="javascript:void(0)" class="comment-reply" onclick="replyComment({{ work.id }}, {{ comment.id }})">回复</a>
                                         <a href="javascript:void(0)" class="comment-op comment-delete-btn" data-comment-id="{{ reply.id }}" data-username="{{ reply.username|e }}" style="display:none" onclick="deleteComment({{ work.id }}, {{ reply.id }})">删除</a>
@@ -289,7 +159,7 @@
                         {% endif %}
                         {% endfor %}
                         {% if comments|length == 0 %}
-                        <p style="color:#999;text-align:center;padding:14px">暂无评论，快来抢沙发吧！</p>
+                        <p style="color:var(--text-3);text-align:center;padding:14px">暂无评论，快来抢沙发吧！</p>
                         {% endif %}
                     </div>
                 </div>
@@ -334,351 +204,11 @@
         </div>
     </div>
 
-    <script>
-        window.addEventListener('load', function(){
-            document.getElementById('loader').style.display='none';
-            document.body.classList.add('page-enter');
-            setTimeout(()=>document.body.classList.remove('page-enter'),400);
-        });
+<script src="../vendor/mdui.min.js"></script>
+<script src="../../nav.js"></script>
+<script src="../community-tilt.js"></script>
+<script src="../community-mdui.js"></script>
+<script src="../community-i18n.js"></script>
 
-        function playerLoaded() {
-            const el = document.getElementById('player-loading');
-            if (el) el.classList.add('hide');
-        }
-
-        function showPlayerLoading() {
-            const el = document.getElementById('player-loading');
-            if (el) el.classList.remove('hide');
-        }
-
-        function replay() {
-            const frame = document.getElementById('player-frame');
-            if (frame) {
-                showPlayerLoading();
-                frame.src = frame.src;
-            }
-        }
-
-        function fullscreenPlayer() {
-            const el = document.querySelector('.player-area');
-            if (!el) return;
-            if (el.requestFullscreen) el.requestFullscreen();
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-        }
-
-        function toggleLike(workId) {
-            fetch('/workpool/like/' + workId, { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('like-count').textContent = data.like_count;
-                        document.getElementById('like-action').classList.toggle('active');
-                    } else {
-                        alert(data.message);
-                    }
-                });
-        }
-
-        function toggleFav(workId) {
-            fetch('/workpool/fav/' + workId, { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('fav-count').textContent = data.fav_count;
-                        document.getElementById('fav-action').classList.toggle('active');
-                    } else {
-                        alert(data.message);
-                    }
-                });
-        }
-
-        function shareWork() {
-            const url = location.href;
-            navigator.clipboard.writeText(url).then(function() {
-                alert('链接已复制到剪贴板！');
-            }).catch(function() {
-                const ta = document.createElement('textarea');
-                ta.value = url;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                alert('链接已复制到剪贴板！');
-            });
-        }
-
-        function submitComment(workId) {
-            const content = document.getElementById('comment-content').value.trim();
-            if (!content) {
-                alert('评论内容不能为空');
-                return;
-            }
-            fetch('/workpool/comment/' + workId, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: content })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('comment-content').value = '';
-                    const commentCount = document.querySelector('.comments-title b, .comments-title');
-                    if (commentCount) {
-                        const text = commentCount.textContent;
-                        const match = text.match(/\d+/);
-                        if (match) commentCount.textContent = text.replace(match[0], parseInt(match[0]) + 1);
-                    }
-                    const commentsList = document.getElementById('comments-list');
-                    const noComment = commentsList.querySelector('p[style*="text-align:center"]');
-                    if (noComment) noComment.remove();
-                    const commentHTML = `
-                        <div class="comment-item" id="comment-${data.comment.id}" style="animation:commentSlideIn .3s ease">
-                            <div class="comment-header">
-                                <span class="comment-user">
-                                    <a href="/u/${data.comment.username}" style="color:#333;text-decoration:none">${data.comment.username}</a>
-                                </span>
-                                <span class="comment-time">${data.comment.created_at}
-                                    <a href="javascript:void(0)" class="comment-reply" onclick="replyComment(${workId}, ${data.comment.id})">回复</a>
-                                    <a href="javascript:void(0)" class="comment-op" onclick="deleteComment(${workId}, ${data.comment.id})">删除</a>
-                                    <a href="javascript:void(0)" class="comment-op" onclick="reportComment(${workId}, ${data.comment.id})">举报</a>
-                                </span>
-                            </div>
-                            <div class="comment-content">${data.comment.content}</div>
-                        </div>`;
-                    commentsList.insertAdjacentHTML('beforeend', commentHTML);
-                } else {
-                    alert(data.message);
-                }
-            });
-        }
-
-        function deleteWork(workId) {
-            if (!confirm('确定要擦除此作品吗？此操作将删除作品索引和数据库，不可恢复！')) {
-                return;
-            }
-            fetch('/workpool/delete/' + workId, { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('作品已擦除');
-                        window.location.href = '/workpool';
-                    } else {
-                        alert(data.message);
-                    }
-                });
-        }
-
-        function toggleCoin(workId) {
-            fetch('/workpool/coin/' + workId, { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('coin-count').textContent = data.coin_count;
-                        document.getElementById('coin-action').classList.add('active');
-                        alert('投币成功！');
-                    } else {
-                        alert(data.message);
-                    }
-                });
-        }
-
-        function toggleFollow(username) {
-            fetch('/workpool/follow/' + encodeURIComponent(username), { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        const btn = document.getElementById('follow-btn');
-                        if (data.action === 'followed') {
-                            btn.classList.add('following');
-                            btn.innerHTML = '<i class="fa-solid fa-check"></i> 已关注';
-                        } else {
-                            btn.classList.remove('following');
-                            btn.innerHTML = '<i class="fa-solid fa-plus"></i> 关注';
-                        }
-                    } else {
-                        alert(data.message);
-                    }
-                });
-        }
-
-        function reportWork(workId) {
-            const reason = prompt('请填写举报原因：');
-            if (reason === null) return;
-            if (!reason.trim()) { alert('举报原因不能为空'); return; }
-            fetch('/workpool/report/' + workId, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reason: reason })
-            })
-            .then(r => r.json())
-            .then(data => alert(data.message));
-        }
-
-        function replyComment(workId, commentId) {
-            if (!confirm('回复该评论？（确定后输入内容）')) return;
-            const content = prompt('回复内容：');
-            if (!content || !content.trim()) return;
-            fetch('/workpool/comment/' + workId, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: content, parent_id: commentId })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    const commentItem = document.getElementById('comment-' + commentId);
-                    if (commentItem) {
-                        const replyHTML = `
-                            <div class="reply-item" style="animation:commentSlideIn .3s ease">
-                                <div class="comment-header">
-                                    <span class="comment-user"><a href="/u/${data.comment.username}" style="color:#666;text-decoration:none">${data.comment.username}</a></span>
-                                    <span class="comment-time">${data.comment.created_at}
-                                        <a href="javascript:void(0)" class="comment-reply" onclick="replyComment(${workId}, ${commentId})">回复</a>
-                                        <a href="javascript:void(0)" class="comment-op" onclick="deleteComment(${workId}, ${data.comment.id})">删除</a>
-                                        <a href="javascript:void(0)" class="comment-op" onclick="reportComment(${workId}, ${data.comment.id})">举报</a>
-                                    </span>
-                                </div>
-                                <div class="comment-content">${data.comment.content}</div>
-                            </div>`;
-                        commentItem.insertAdjacentHTML('beforeend', replyHTML);
-                    }
-                } else {
-                    alert(data.message);
-                }
-            });
-        }
-
-        function deleteComment(workId, commentId) {
-            if (!confirm('确定删除该评论？')) return;
-            fetch('/workpool/comment/delete/' + workId + '/' + commentId, { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        const el = document.getElementById('comment-' + commentId);
-                        if (el) el.remove();
-                    } else {
-                        alert(data.message);
-                    }
-                });
-        }
-
-        function pinComment(workId, commentId) {
-            fetch('/workpool/comment/pin/' + workId + '/' + commentId, { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert(data.message);
-                    }
-                });
-        }
-
-        function reportComment(workId, commentId) {
-            const reason = prompt('请填写举报原因：');
-            if (reason === null) return;
-            if (!reason.trim()) { alert('举报原因不能为空'); return; }
-            fetch('/workpool/comment/report/' + workId + '/' + commentId, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reason: reason })
-            })
-            .then(r => r.json())
-            .then(data => alert(data.message));
-        }
-
-        function loadUnread() {
-            fetch('/messages/unread')
-                .then(r => r.json())
-                .then(data => {
-                    const badge = document.getElementById('unread-badge');
-                    if (badge && data.count > 0) {
-                        badge.textContent = data.count > 99 ? '99+' : data.count;
-                        badge.style.display = 'block';
-                    }
-                });
-        }
-        loadUnread();
-
-        // 动态加载作者头像、签名和用户权限
-        (function(){
-            var workAuthor = '{{ work.author|e }}';
-            var workId = {{ work.id }};
-            
-            // 获取作者信息
-            fetch('/api/users/info?usernames=' + encodeURIComponent(workAuthor))
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    if(data[workAuthor]){
-                        var u = data[workAuthor];
-                        // 加载头像
-                        var avatarEls = document.querySelectorAll('.author-avatar[data-username="' + workAuthor + '"]');
-                        avatarEls.forEach(function(el){
-                            var avatarUrl = u.avatar || (u.qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + u.qq + '&s=100' : '');
-                            if(avatarUrl){
-                                el.innerHTML = '<img src="' + avatarUrl + '" style="width:100%;height:100%;object-fit:cover" alt="头像">';
-                            } else {
-                                el.innerHTML = workAuthor.charAt(0).toUpperCase();
-                            }
-                        });
-                        // 加载签名
-                        var signEl = document.getElementById('authorSign');
-                        if(signEl){
-                            signEl.textContent = u.bio || '作者 ID：' + workAuthor;
-                        }
-                    }
-                });
-            
-            // 获取当前用户权限
-            fetch('/api/user/current?t=' + Date.now())
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    if(!data.logged_in) return;
-                    var isAuthor = data.username === workAuthor;
-                    var isAdmin = data.role === 'admin';
-                    
-                    // 显示删除按钮（作者或管理员）
-                    var deleteBtn = document.getElementById('btnDeleteWork');
-                    if(deleteBtn && (isAuthor || isAdmin)){
-                        deleteBtn.style.display = 'inline-block';
-                    }
-                    
-                    // 显示评论删除/置顶按钮
-                    document.querySelectorAll('.comment-delete-btn').forEach(function(btn){
-                        var commentUsername = btn.getAttribute('data-username');
-                        if(commentUsername === data.username || isAuthor || isAdmin){
-                            btn.style.display = 'inline-block';
-                        }
-                    });
-                    document.querySelectorAll('.comment-pin-btn').forEach(function(btn){
-                        if(isAuthor || isAdmin){
-                            btn.style.display = 'inline-block';
-                        }
-                    });
-                });
-        })();
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var dropdowns = document.querySelectorAll('.dropdown');
-            dropdowns.forEach(function(dropdown) {
-                var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
-                var content = dropdown.querySelector('.dropdown-content');
-                if (trigger && content) {
-                    trigger.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        content.classList.toggle('show');
-                    });
-                    content.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                    });
-                }
-            });
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.dropdown-content').forEach(function(content) {
-                    content.classList.remove('show');
-                });
-            });
-        });
-    </script>
-<script src="/localcdn/gzs/knf.js?v=19"></script></body>
+</body>
 </html>

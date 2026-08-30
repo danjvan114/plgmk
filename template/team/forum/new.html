@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="../vendor/mdui.min.css">
+<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../../env.css">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../community-layout.css">
+<link rel="stylesheet" href="../community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
+</head>
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="loader" id="loader">
+        <div class="mdui-progress">
+            <div class="mdui-progress-indeterminate"></div>
+        </div>
+    </div>
+    
+    <div class="main-box mdui-typo">
+        <a href="/forum" class="back-link" title="返回论坛"><i class="fa-solid fa-arrow-left"></i>返回论坛</a>
+        <div class="form-card">
+            <h1 class="form-title"><i class="fa-solid fa-pen-nib" style="color:var(--accent-1)"></i>发布新帖
+                <span id="teamBadge"></span>
+            </h1>
+            <form id="new-post-form">
+                <div class="form-group">
+                    <label>选择分区 *</label>
+                    <select id="forum_id" name="forum_id" required>
+                        <option value="">请选择分区</option>
+                        {% for f in forums %}
+                        <option value="{{ f.id }}">{{ f.name|e }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>帖子标题 *（80 字以内）</label>
+                    <input type="text" id="title" name="title" required maxlength="80" placeholder="输入帖子标题">
+                </div>
+                <div class="form-group">
+                    <label>帖子内容 *（支持 Markdown）</label>
+                    <textarea id="content" name="content" required placeholder="# 标题&#10;**加粗**&#10;```代码块```"></textarea>
+                </div>
+                <button type="submit" class="submit-btn mdui-ripple"><i class="fa-solid fa-paper-plane"></i> 发布</button>
+            </form>
+            <div class="md-hint">
+                <strong><i class="fa-solid fa-circle-info" style="color:var(--accent-1)"></i> Markdown 语法说明：</strong><br>
+                <code># 标题</code> 一级标题 &nbsp; <code>## 二级标题</code> &nbsp; <code>**加粗**</code> 加粗 &nbsp;
+                <code>*斜体*</code> 斜体<br>
+                <code>- 列表项</code> 无序列表 &nbsp; <code>> 引用</code> 引用块 &nbsp;
+                <code>```代码```</code> 代码块 &nbsp; <code>[文字](链接)</code> 超链接 &nbsp; <code>![图片](链接)</code> 图片
+            </div>
+        </div>
+    </div>
+
+<script src="../vendor/mdui.min.js"></script>
+<script src="../../nav.js"></script>
+<script src="../community-tilt.js"></script>
+<script src="../community-mdui.js"></script>
+<script src="../community-i18n.js"></script>
+
+</body>
+</html>

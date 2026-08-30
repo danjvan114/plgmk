@@ -1,7 +1,7 @@
 {% for m in members %}
 <li class="mdui-list-item">
     <div class="mdui-list-item-avatar">
-        {% if m.avatar_url %}<img src="{{ m.avatar_url }}" alt="avatar">{% else %}<div class="mdui-avatar" style="width:40px;height:40px;background:#e8f5e9;display:flex;align-items:center;justify-content:center">{{ m.username[:1].upper() }}</div>{% endif %}
+        {% if m.avatar_url %}<img src="{{ m.avatar_url }}" alt="avatar">{% else %}<div class="mdui-avatar" style="width:40px;height:40px;background:var(--glass-tint);display:flex;align-items:center;justify-content:center">{{ m.username[:1].upper() }}</div>{% endif %}
     </div>
     <div class="mdui-list-item-text">
         <div><a href="/u/{{ m.username }}" class="mdui-text-color-blue">{{ m.username }}</a>
@@ -13,7 +13,7 @@
         </div>
     </div>
     {% if is_admin and m.username != created_by %}
-    <div class="mdui-btn mdui-btn-dense" style="margin-left:auto;background:#eee;color:#666" onclick="removeMember('{{ m.username }}')"><i class="fa-solid fa-trash-can"></i> 移除</div>
+    <div class="mdui-btn mdui-btn-dense" style="margin-left:auto;background:var(--glass-tint);color:var(--text-2)" onclick="removeMember('{{ m.username }}')"><i class="fa-solid fa-trash-can"></i> 移除</div>
     {% endif %}
 </li>
 {% endfor %}

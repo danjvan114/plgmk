@@ -1,7 +1,7 @@
 {% for p in posts %}
 <div class="post-item">
     <div class="post-title">
-        {% if p.is_pin %}<i class="fa-solid fa-thumbtack" style="color:#e65100"></i>{% endif %}
+        {% if p.is_pin %}<i class="fa-solid fa-thumbtack" style="color:var(--accent-1)"></i>{% endif %}
         {{ (p.title or '（无标题）')|e }}
         <span class="post-pin">{{ p.author }}</span>
     </div>

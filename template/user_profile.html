@@ -1,120 +1,22 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>{{ profile_user.username|e }} - 用户主页</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px}
-        header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-        .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
-        .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px}
-        .logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
-        .logo-icon img{width:100%;height:100%;object-fit:cover}
-        .nav-links{display:flex;gap:24px}
-        .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s}
-        .nav-links a:hover{color:#fff}
-        .head-space{flex:1}
-        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;overflow:hidden}
-        .user-avatar img{width:100%;height:100%;object-fit:cover}
-        .user-avatar:hover{transform:scale(1.1)}
-        .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
-        .btn:hover{background:rgba(255,255,255,.9)}
-        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
-        .icon-btn{position:relative}
-        .dropdown{position:relative;display:inline-block}
-        .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0}
-        .dropdown-content.show{display:block}
-        .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px}
-        .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50}
-        .main-box{max-width:95%;margin:0 auto;padding-top:76px;padding-left:24px;padding-right:24px}
-        .back-link{display:inline-flex;align-items:center;gap:4px;color:#4caf50;text-decoration:none;margin-bottom:16px;font-size:14px}
-        .banner{width:100%;height:220px;border-radius:12px 12px 0 0;background:linear-gradient(135deg,#a5d6a7,#4caf50);overflow:hidden;position:relative}
-        .banner img{width:100%;height:100%;object-fit:cover}
-        .banner .banner-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:48px}
-        .profile-card{background:#fff;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none;padding:0 32px 32px;display:flex;gap:28px;align-items:center;margin-top:-44px;position:relative;z-index:2}
-        .profile-avatar{width:110px;height:110px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:bold;color:#4caf50;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.15);margin-top:-55px}
-        .profile-avatar img{width:100%;height:100%;object-fit:cover}
-        .profile-info{flex:1;min-width:0;padding-top:8px}
-        .profile-name{font-size:24px;color:#333;font-weight:bold;display:flex;align-items:center;gap:10px}
-        .role-tag{font-size:12px;background:#e8f5e9;color:#2e7d32;padding:2px 10px;border-radius:10px;font-weight:normal}
-        .role-tag.admin{background:#fce4ec;color:#c62828}
-        .profile-meta{color:#777;font-size:14px;margin-top:8px;display:flex;gap:20px;flex-wrap:wrap}
-        .profile-meta span{display:flex;align-items:center;gap:5px}
-        .profile-bio{color:#555;font-size:14px;margin-top:10px;line-height:1.7;background:#f5f5f5;border-radius:8px;padding:10px 14px}
-        .profile-qq{font-size:13px;color:#999;margin-top:10px}
-        .follow-btn{background:#4caf50;color:#fff;border:none;border-radius:16px;padding:8px 20px;cursor:pointer;font-size:14px;font-weight:500;transition:all .2s}
-        .follow-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(76,175,80,.3)}
-        .follow-btn.following{background:#ef5350}
-        .tabs{display:flex;gap:8px;margin:24px 0 14px;flex-wrap:wrap}
-        .tabs a{background:rgba(255,255,255,.9);color:#4caf50;padding:8px 20px;border-radius:20px;text-decoration:none;font-size:14px;transition:all .2s}
-        .tabs a:hover{transform:translateY(-1px)}
-        .tabs a.active{background:#4caf50;color:#fff;font-weight:600}
-        .tab-content{display:none}
-        .tab-content.active{display:block}
-        .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-        .toolbar input{border:1px solid #ddd;border-radius:8px;padding:8px 14px;font-size:14px;outline:none;flex:1;max-width:300px}
-        .toolbar input:focus{border-color:#4caf50}
-        .toolbar select{border:1px solid #ddd;border-radius:8px;padding:8px 14px;font-size:14px;outline:none;background:#fff}
-        .toolbar button{background:#4caf50;color:#fff;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:14px}
-        .section-title{font-size:18px;color:#333;margin:24px 0 14px;display:flex;align-items:center;gap:8px}
-        .work-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-        .work-card{background:#fff;border-radius:10px;border:1px solid #eee;padding:16px;cursor:pointer;transition:all .25s;animation:cardUp .4s ease both}
-        .work-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.1);border-color:#a5d6a7}
-        .work-card h3{font-size:16px;color:#333;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .work-card p{font-size:13px;color:#777;display:flex;gap:14px}
-        .work-card p span{display:flex;align-items:center;gap:4px}
-        .empty-tip{background:#fff;border:1px dashed #ddd;border-radius:10px;text-align:center;color:#999;padding:40px;font-size:14px}
-        .user-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-        .user-item{background:#fff;border:1px solid #eee;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
-        
-        .user-item-avatar{width:44px;height:44px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#4caf50;overflow:hidden;flex-shrink:0}
-        .user-item-avatar img{width:100%;height:100%;object-fit:cover}
-        .pagination{display:flex;justify-content:center;gap:8px;margin-top:24px}
-        .pagination a,.pagination span{padding:8px 16px;border-radius:4px;text-decoration:none;font-size:14px;transition:all .2s}
-        .pagination a{background:rgba(255,255,255,.9);color:#4caf50}
-        .pagination a:hover{background:#4caf50;color:#fff}
-        .pagination .current{background:#4caf50;color:#fff}
-        @keyframes cardUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-        .work-thumb{width:100%;height:160px;object-fit:cover;background:#f5f5f5;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:28px;border-radius:8px;margin-bottom:10px}
-        .work-card h3{margin-bottom:8px}
-        .wall-box{background:#f5f5f5;border-radius:8px;padding:12px;margin:14px 0}
-        .wall-input{border:1px solid #ddd;border-radius:8px;padding:10px 14px;font-size:14px;width:100%;min-height:70px;outline:none;resize:vertical;background:#fff}
-        .wall-input:focus{border-color:#4caf50}
-        .wall-send{background:#4caf50;color:#fff;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:14px;margin-top:8px}
-        .wall-send:disabled{background:#9ccc65;cursor:not-allowed}
-        .wall-list{max-height:480px;overflow-y:auto;background:#fff;border-radius:0 0 8px 8px;border:1px solid #eee;border-top:none}
-        .wall-item{padding:12px;border-bottom:1px solid #f0f0f0;font-size:14px}
-        .wall-item:last-child{border-bottom:none}
-        .wall-item .from-user{font-weight:600;color:#4caf50;margin-bottom:4px;font-size:13px;display:flex;align-items:center;gap:8px}
-        .wall-item .content{color:#333;line-height:1.6;margin:4px 0;word-break:break-word}
-        .wall-item .time{color:#999;font-size:12px;text-align:right}
-        .wall-item .del{cursor:pointer;color:#e53935;font-size:12px;margin-left:8px;float:right}
-        .wall-author-avatar{width:24px;height:24px;border-radius:50%;background:#e8f5e9;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:#4caf50;overflow:hidden;margin-right:4px}
-        .wall-author-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
-    
-        @media (max-width:640px){
-            .main-box{padding-left:10px;padding-right:10px}
-            .banner{height:150px}
-            .profile-card{padding:0 14px 20px;flex-direction:column;align-items:flex-start;gap:8px;margin-top:-32px}
-            .profile-avatar{width:84px;height:84px;font-size:34px;margin-top:-46px;border-width:3px}
-            .profile-name{font-size:19px}
-            .profile-meta{gap:10px}
-            .profile-bio{font-size:13px}
-            .tabs a{padding:8px 14px;font-size:13px}
-            .work-grid{gap:12px}
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="vendor/mdui.min.css">
+<link rel="stylesheet" href="vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../env.css">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="community-layout.css">
+<link rel="stylesheet" href="community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
-<body>
-    <div id="hv2"></div>
-    <div class="main-box">
-        <a href="javascript:history.back()" class="back-link"><i class="fa-solid fa-arrow-left"></i>返回</a>
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div><div class="main-box mdui-typo">
+        <a href="javascript:history.back()" class="back-link" title="返回"><i class="fa-solid fa-arrow-left"></i>返回</a>
         <div class="banner">
             {% if profile_user.banner %}<img src="{{ profile_user.banner|e }}" alt="头图">{% else %}<img src="https://cdn-community.bcmcdn.com/47/community/qHrkuIrcIWh1dXcSsjX8WoP63amM6qZxqtwiZXtTQV44.avif?hash=Fplr0V7Sahn9Wrt-W-vquxg9bOu5" alt="默认头图">{% endif %}
         </div>
@@ -125,7 +27,7 @@
             <div class="profile-info">
                 <div class="profile-name">
                     {{ profile_user.username|e }}
-                    {% set _t = user_team(profile_user.username) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}
+                    {% set _t = user_team(profile_user.username) %}{% if _t %}<span class="tea-badge"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}
                     {% if profile_user.role == 'admin' %}
                     <span class="role-tag admin">管理员</span>
                     {% else %}
@@ -151,7 +53,7 @@
                 <div class="profile-qq"><i class="fa-brands fa-qq"></i>已绑定 QQ：{{ profile_user.qq }}</div>
                 {% endif %}
                 {% if session.user and session.user == profile_user.username %}
-                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" style="margin-top:10px;font-size:13px;padding:0 16px;height:32px" mdui-dialog="{target:'#edit-profile-dialog'}"><i class="fa-solid fa-pen"></i> 编辑资料</button>
+                <button class="mdui-btn mdui-btn-raised mdui-ripple" style="margin-top:10px;font-size:13px;padding:0 16px;height:32px" mdui-dialog="{target:'#edit-profile-dialog'}"><i class="fa-solid fa-pen"></i> 编辑资料</button>
                 {% endif %}
             </div>
         </div>
@@ -164,7 +66,7 @@
         </div>
 
         <div id="tab-works" class="tab-content {% if tab == 'works' %}active{% endif %}">
-            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
             <div class="tab-loaded">
                 <form class="toolbar" method="get" action="/u/{{ profile_user.username }}">
                     <input type="hidden" name="tab" value="works">
@@ -187,7 +89,7 @@
                         {% else %}
                         <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
                         {% endif %}
-                        <h3>{{ w.title|e }}</h3>
+                        <h3 class="mdui-typo-headline">{{ w.title|e }}</h3>
                         <p>
                             <span><i class="fa-solid fa-eye"></i>{{ w.view_count }}</span>
                             <span><i class="fa-solid fa-thumbs-up"></i>{{ w.like_count }}</span>
@@ -222,7 +124,7 @@
         </div>
 
         <div id="tab-followers" class="tab-content {% if tab == 'followers' %}active{% endif %}">
-            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
             <div class="tab-loaded">
                 {% if followers %}
                 <div class="user-list">
@@ -240,7 +142,7 @@
         </div>
 
         <div id="tab-following" class="tab-content {% if tab == 'following' %}active{% endif %}">
-            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
             <div class="tab-loaded">
                 {% if following %}
                 <div class="user-list">
@@ -258,7 +160,7 @@
         </div>
 
         <div id="tab-favorites" class="tab-content {% if tab == 'favorites' %}active{% endif %}">
-            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
             <div class="tab-loaded">
                 {% if favorites %}
                 <div class="work-grid">
@@ -269,7 +171,7 @@
                         {% else %}
                         <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
                         {% endif %}
-                        <h3>{{ w.title|e }}</h3>
+                        <h3 class="mdui-typo-headline">{{ w.title|e }}</h3>
                         <p>
                             <span><i class="fa-solid fa-eye"></i>{{ w.view_count }}</span>
                             <span><i class="fa-solid fa-thumbs-up"></i>{{ w.like_count }}</span>
@@ -287,7 +189,7 @@
         </div>
 
         <div id="tab-wall" class="tab-content {% if tab == 'wall' %}active{% endif %}">
-            <div class="tab-loading" style="display:none;text-align:center;padding:40px;color:#999"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+            <div class="tab-loading" style="display:none"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
             <div class="tab-loaded">
                 {% if session.user %}
                 <div class="wall-box">
@@ -317,240 +219,12 @@
             </div>
         </div>
     </div>
-    <script>
-        var currentTab = '{{ tab }}';
-        var username = '{{ profile_user.username }}';
-        var loadedTabs = { '{{ tab }}': true };
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
-            document.querySelectorAll('#profile-tabs a').forEach(function(el) { el.classList.remove('mdui-tab-active'); });
+<script src="vendor/mdui.min.js"></script>
+<script src="../nav.js"></script>
+<script src="community-tilt.js"></script>
+<script src="community-mdui.js"></script>
+<script src="community-i18n.js"></script>
 
-            var tabEl = document.getElementById('tab-' + tabName);
-            var linkEl = document.querySelector('#profile-tabs a[data-tab="' + tabName + '"]');
-            if (tabEl) tabEl.classList.add('active');
-            if (linkEl) linkEl.classList.add('mdui-tab-active');
-
-            if (!loadedTabs[tabName]) {
-                var loadingEl = tabEl.querySelector('.tab-loading');
-                var loadedEl = tabEl.querySelector('.tab-loaded');
-                if (loadingEl) loadingEl.style.display = 'block';
-                if (loadedEl) loadedEl.style.display = 'none';
-
-                fetch('/u/' + username + '?tab=' + tabName)
-                    .then(r => r.text())
-                    .then(html => {
-                        var parser = new DOMParser();
-                        var doc = parser.parseFromString(html, 'text/html');
-                        var newContent = doc.querySelector('#tab-' + tabName + ' .tab-loaded');
-                        if (newContent && loadedEl) {
-                            loadedEl.innerHTML = newContent.innerHTML;
-                            loadedEl.style.display = 'block';
-                            if (loadingEl) loadingEl.style.display = 'none';
-                            loadedTabs[tabName] = true;
-                        }
-                    })
-                    .catch(() => {
-                        if (loadingEl) loadingEl.innerHTML = '<span style="color:#e53935">加载失败，请刷新重试</span>';
-                    });
-            }
-
-            history.replaceState(null, '', '/u/' + username + '?tab=' + tabName);
-            currentTab = tabName;
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('#profile-tabs a').forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var tabName = this.getAttribute('data-tab');
-                    switchTab(tabName);
-                });
-            });
-        });
-
-        function toggleFollow(username) {
-            fetch('/workpool/follow/' + encodeURIComponent(username), {
-                method: 'POST',
-                credentials: 'same-origin'
-            })
-                .then(r => r.json().then(data => ({ status: r.status, data: data })))
-                .then(({ status, data }) => {
-                    if (status === 401) {
-                        window.location.href = '/login';
-                        return;
-                    }
-                    if (!data.success) {
-                        alert(data.message || '操作失败');
-                        return;
-                    }
-                    const btn = document.getElementById('follow-btn');
-                    const fc = document.getElementById('follower-count');
-                    if (data.action === 'followed') {
-                        btn.classList.add('following');
-                        btn.innerHTML = '<i class="fa-solid fa-check"></i> 已关注';
-                        if (fc) fc.innerHTML = '<i class="fa-solid fa-users"></i>粉丝：' + ({{ followers|length }} + 1);
-                    } else {
-                        btn.classList.remove('following');
-                        btn.innerHTML = '<i class="fa-solid fa-plus"></i> 关注';
-                        if (fc) fc.innerHTML = '<i class="fa-solid fa-users"></i>粉丝：' + Math.max(0, {{ followers|length }} - 1);
-                    }
-                })
-                .catch(() => alert('网络错误，请稍后重试'));
-        }
-
-        function postWall() {
-            const btn = document.getElementById('wall-send');
-            const input = document.getElementById('wall-input');
-            const content = (input.value || '').trim();
-            if (!content) { alert('请输入留言内容'); return; }
-            btn.disabled = true; btn.textContent = '发布中…';
-            fetch('/u/{{ profile_user.username }}/wall', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'content=' + encodeURIComponent(content)
-            }).then(r => r.json()).then(data => {
-                btn.disabled = false; btn.textContent = '发布留言';
-                if (data.success) {
-                    input.value = '';
-                    alert('留言发布成功');
-                    location.reload();
-                } else {
-                    alert(data.message || '发布失败');
-                }
-            });
-        }
-
-        function deleteWall(msgId) {
-            if (!confirm('确定删除这条留言吗？')) return;
-            fetch('/u/{{ profile_user.username }}/wall/delete/' + msgId, {
-                method: 'POST',
-                credentials: 'same-origin'
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    const el = document.getElementById('wall-' + msgId);
-                    if (el) el.remove();
-                } else {
-                    alert(data.message || '删除失败');
-                }
-            });
-        }
-
-        function loadUnread() {
-            fetch('/messages/unread')
-                .then(r => r.json())
-                .then(data => {
-                    const badge = document.getElementById('unread-badge');
-                    if (badge && data.count > 0) {
-                        badge.textContent = data.count > 99 ? '99+' : data.count;
-                        badge.style.display = 'block';
-                    }
-                });
-        }
-        loadUnread();
-
-        // 动态加载用户头像
-        (function(){
-            var profileUsername = '{{ profile_user.username|e }}';
-            
-            // 收集所有需要加载头像的用户名
-            var allUsernames = [];
-            document.querySelectorAll('[data-username]').forEach(function(el){
-                var u = el.getAttribute('data-username');
-                if(u) allUsernames.push(u);
-            });
-            if(allUsernames.length === 0) return;
-            
-            var uniqueNames = allUsernames.filter(function(v,i,a){ return a.indexOf(v) === i; });
-            fetch('/api/users/info?usernames=' + encodeURIComponent(uniqueNames.join(',')))
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    // 加载所有头像
-                    document.querySelectorAll('[data-username]').forEach(function(el){
-                        var u = el.getAttribute('data-username');
-                        if(data[u]){
-                            var avatarUrl = data[u].avatar || (data[u].qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + data[u].qq + '&s=100' : '');
-                            if(avatarUrl){
-                                el.innerHTML = '<img src="' + avatarUrl + '" alt="头像">';
-                            }
-                        }
-                    });
-                });
-            
-            // 获取当前用户权限，控制按钮显示
-            fetch('/api/user/current?t=' + Date.now())
-                .then(function(r){ return r.json(); })
-                .then(function(currentData){
-                    if(!currentData.logged_in) return;
-                    
-                    // 控制留言板删除按钮显示
-                    document.querySelectorAll('.del[data-wall-from]').forEach(function(btn){
-                        var wallFrom = btn.getAttribute('data-wall-from');
-                        if(currentData.username === wallFrom || currentData.username === profileUsername){
-                            btn.style.display = 'inline-block';
-                        }
-                    });
-                });
-        })();
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var dropdowns = document.querySelectorAll('.dropdown');
-            dropdowns.forEach(function(dropdown) {
-                var trigger = dropdown.querySelector('.user-avatar');
-                var content = dropdown.querySelector('.dropdown-content');
-                if (trigger && content) {
-                    trigger.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        content.classList.toggle('show');
-                    });
-                }
-            });
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.dropdown-content').forEach(function(content) {
-                    content.classList.remove('show');
-                });
-            });
-        });
-    </script>
-
-    <div class="mdui-dialog" id="edit-profile-dialog">
-        <div class="mdui-dialog-title">编辑个人资料</div>
-        <div class="mdui-dialog-content">
-            <form id="edit-avatar-form" method="post" action="/user/set_avatar" style="margin-bottom:16px">
-                <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">自定义头像 URL（优先于 QQ 头像）</label>
-                    <input class="mdui-textfield-input" type="text" name="avatar" placeholder="输入图片外链，留空则使用 QQ 头像" value="{{ profile_user.avatar }}" maxlength="500">
-                </div>
-                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存头像</button>
-            </form>
-            <form id="edit-qq-form" method="post" action="/user/set_qq" style="margin-bottom:16px">
-                <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">QQ号（设置头像/头图）</label>
-                    <input class="mdui-textfield-input" type="text" name="qq" placeholder="输入QQ号" value="{{ profile_user.qq }}" maxlength="20">
-                </div>
-                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存 QQ 头像</button>
-            </form>
-            <form id="edit-bio-form" method="post" action="/user/set_bio" style="margin-bottom:16px">
-                <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">个人简介</label>
-                    <input class="mdui-textfield-input" type="text" name="bio" placeholder="介绍一下自己" value="{{ profile_user.bio }}" maxlength="500">
-                </div>
-                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存简介</button>
-            </form>
-            <form id="edit-banner-form" method="post" action="/user/set_banner">
-                <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">头图 URL（图片直链）</label>
-                    <input class="mdui-textfield-input" type="text" name="banner" placeholder="输入头图链接" value="{{ profile_user.banner }}" maxlength="500">
-                </div>
-                <button class="mdui-btn mdui-btn-raised mdui-color-green mdui-ripple" type="submit" style="margin-top:8px">保存头图</button>
-            </form>
-        </div>
-        <div class="mdui-dialog-actions">
-            <button class="mdui-btn mdui-ripple" mdui-dialog-close>关闭</button>
-        </div>
-    </div>
-
-    <script src="/localcdn/gzs/knf.js?v=19"></script>
 </body>
 </html>

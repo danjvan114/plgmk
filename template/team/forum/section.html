@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="../vendor/mdui.min.css">
+<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../../env.css">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../community-layout.css">
+<link rel="stylesheet" href="../community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
+</head>
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="loader" id="loader">
+        <div class="mdui-progress">
+            <div class="mdui-progress-indeterminate"></div>
+        </div>
+    </div>
+    
+    <div class="main-box mdui-typo">
+        <a href="/forum" class="back-link" title="返回论坛"><i class="fa-solid fa-arrow-left"></i>返回论坛</a>
+        <div class="section-head">
+            <div>
+                <h1><i class="fa-solid fa-folder-open"></i>{{ forum.name|e }}</h1>
+                {% if forum.description %}<div class="section-desc">{{ forum.description|e }}</div>{% endif %}
+            </div>
+            <a href="/forum/new" class="primary-btn"><i class="fa-solid fa-pen"></i> 发帖</a>
+        </div>
+        <div class="card">
+            <div class="card-body mdui-typo">
+                <ul class="post-list">
+                    {% for p in posts %}
+                    <li class="post-item" onclick="location.href='/forum/post/{{ p.id }}'">
+                        {% if p.is_pinned %}<span class="pin-tag"><i class="fa-solid fa-thumbtack"></i></span>{% endif %}
+                        <span class="post-title">{{ p.title|e }}</span>
+                        <a class="post-author" href="/u/{{ p.author|e }}" onclick="event.stopPropagation()" data-username="{{ p.author|e }}">{{ p.author|e }}</a>
+                        <span class="post-meta">
+                            <span><i class="fa-regular fa-comment"></i>{{ p.comment_count }}</span>
+                            <span><i class="fa-regular fa-eye"></i>{{ p.view_count }}</span>
+                        </span>
+                        <span class="post-time">{{ p.created_at }}</span>
+                    </li>
+                    {% endfor %}
+                    {% if posts|length == 0 %}
+                    <p class="empty">本分区暂无帖子</p>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        <p class="post-count">共 <strong>{{ total_posts }}</strong> 个帖子</p>
+        {% if total_pages and total_pages > 1 %}
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="/forum/{{ forum.id }}/page/{{ page - 1 }}">上一页</a>
+            {% else %}
+            <span class="disabled">上一页</span>
+            {% endif %}
+            {% for pg in range(1, total_pages + 1) %}
+            {% if pg == page %}
+            <span class="current">{{ pg }}</span>
+            {% elif pg == 1 or pg == total_pages or (pg >= page - 2 and pg <= page + 2) %}
+            <a href="/forum/{{ forum.id }}/page/{{ pg }}">{{ pg }}</a>
+            {% endif %}
+            {% endfor %}
+            {% if page < total_pages %}
+            <a href="/forum/{{ forum.id }}/page/{{ page + 1 }}">下一页</a>
+            {% else %}
+            <span class="disabled">下一页</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+<script src="../vendor/mdui.min.js"></script>
+<script src="../../nav.js"></script>
+<script src="../community-tilt.js"></script>
+<script src="../community-mdui.js"></script>
+<script src="../community-i18n.js"></script>
+
+</body>
+</html>

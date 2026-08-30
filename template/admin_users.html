@@ -1,76 +1,27 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
-    <link rel="icon" type="image/x-icon" href="/localcdn/ico.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>用户管理</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:url('https://cdn-community.bcmcdn.com/47/community/dwnLvzZWaQw60Me4Xr1qU6KmjuYIRNHdbRO68VxRyKPI.png?hash=Fqw8kL43C6kSrmGjhkBtUcXGvOco') no-repeat center center fixed;background-size:cover;min-height:100vh}
-.loader{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.9);display:flex;justify-content:center;align-items:center;z-index:9999}
-.loader img{width:64px;height:64px;border-radius:50%}
-header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown 0.5s ease-out}
-.wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
-.logo{display:flex;align-items:center;color:#2196f3;font-size:24px;font-weight:bold;margin-right:20px}
-.logo-icon{width:32px;height:32px;margin-right:8px;border-radius:6px;overflow:hidden}
-.logo-icon img{width:100%;height:100%;object-fit:cover}
-.head-space{flex:1}
-.search{height:36px;width:280px;background:rgba(0,0,0,.05);border-radius:4px;display:flex;align-items:center;padding:0 10px}
-.search input{background:transparent;border:none;outline:none;color:#333;width:100%}
-.search input::placeholder{color:#999}
-.main-box{max-width:1200px;margin:0 auto;padding-top:80px;padding-left:16px;padding-right:16px}
-.card{background:rgba(255,255,255,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(255,255,255,.5);margin-bottom:20px;animation:slideDown 0.5s ease-out}
-@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-.nav-links{display:flex;gap:16px}
-.nav-links a{color:#333;text-decoration:none}
-.nav-links a:hover{color:#2196f3}
-.admin-header{padding:24px;border-bottom:1px solid rgba(0,0,0,.05)}
-.admin-header h1{color:#333;margin-bottom:24px}
-.user-table{width:100%;border-collapse:collapse}
-.user-table th, .user-table td{padding:12px;text-align:left;border-bottom:1px solid rgba(0,0,0,.05)}
-.user-table th{background:rgba(0,0,0,.02);color:#333}
-.btn{background:#2196f3;color:#fff;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;font-size:14px}
-.btn:hover{background:#1976d2}
-.btn-danger{background:#f44336}
-.btn-danger:hover{background:#d32f2f}
-.btn-success{background:#4caf50}
-.btn-success:hover{background:#388e3c}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;color:#333;margin-bottom:8px}
-.form-group input, .form-group select{width:100%;padding:12px;border:1px solid rgba(0,0,0,.1);border-radius:4px;font-size:14px;background:rgba(255,255,255,.6)}
-.add-section{padding:24px;border-top:1px solid rgba(0,0,0,.05)}
-.add-section h2{color:#333;margin-bottom:16px}
-.role-admin{color:#f44336}
-.role-developer{color:#ff9800}
-.role-user{color:#2196f3}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);justify-content:center;align-items:center}
-.modal.active{display:flex}
-.modal-content{background:rgba(255,255,255,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:24px;border-radius:8px;width:400px;border:1px solid rgba(255,255,255,.5)}
-.modal-content h3{margin-bottom:16px;color:#333}
-</style>
+<link rel="stylesheet" href="vendor/mdui.min.css">
+<link rel="stylesheet" href="vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../env.css">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="community-layout.css">
+<link rel="stylesheet" href="community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
-<body>
-<header>
-<div class="wrap">
-<div class="logo">用户管理</div>
-<div class="nav-links">
-<a href="/mk/kn">KN插件市场</a>
-<a href="/op/user" class="active">用户管理</a>
-<a href="/logout">退出</a>
-</div>
-<div style="margin-left:16px">
-<a href="/change_password" class="btn mdui-ripple">修改密码</a>
-<a href="/logout" class="btn mdui-ripple">退出</a>
-</div>
-</div>
-</header>
-<div class="main-box">
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="main-box mdui-typo">
 <div class="card">
 <div class="admin-header">
 <h1>用户管理</h1>
+</div>
 <table class="user-table">
 <thead>
 <tr>
@@ -98,7 +49,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </tbody>
 </table>
 <div class="add-section">
-<h2>添加用户</h2>
+<h2 class="mdui-typo-headline">添加用户</h2>
 <form action="/op/user/add" method="post">
 <div class="form-group">
 <label>用户名</label>
@@ -123,7 +74,7 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </div>
 <div class="modal" id="editModal">
 <div class="modal-content">
-<h3>编辑用户</h3>
+<h3 class="mdui-typo-headline">编辑用户</h3>
 <form action="" method="post" id="editForm">
 <div class="form-group">
 <label>新密码（留空则不修改）</label>
@@ -142,33 +93,12 @@ header{width:100%;height:64px;background:rgba(255,255,255,.8);backdrop-filter:bl
 </form>
 </div>
 </div>
-<script>
-window.addEventListener('load', function() {
-    document.getElementById('loader').style.display = 'none';
-});
-function showEditModal(username, role) {
-    document.getElementById('editForm').action = `/op/user/edit/${username}`;
-    document.getElementById('editForm').querySelector('select[name="role"]').value = role;
-    document.getElementById('editModal').classList.add('active');
-}
-function closeModal() {
-    document.getElementById('editModal').classList.remove('active');
-}
-function getToken(username) {
-    fetch(`/op/user/token/${username}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert(`用户 "${username}" 的长期Token：\n\n${data.token}\n\n请妥善保存此Token！`);
-        } else {
-            alert('获取Token失败：' + data.message);
-        }
-    })
-    .catch(err => alert('请求失败：' + err));
-}
-</script>
+
+<script src="vendor/mdui.min.js"></script>
+<script src="../nav.js"></script>
+<script src="community-tilt.js"></script>
+<script src="community-mdui.js"></script>
+<script src="community-i18n.js"></script>
+
 </body>
 </html>

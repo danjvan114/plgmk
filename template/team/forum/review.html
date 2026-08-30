@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="../vendor/mdui.min.css">
+<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../../env.css">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../community-layout.css">
+<link rel="stylesheet" href="../community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
+</head>
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="loader" id="loader">
+        <div class="mdui-progress">
+            <div class="mdui-progress-indeterminate"></div>
+        </div>
+    </div>
+    
+    <div class="main-box mdui-typo">
+        <a href="/forum" class="back-link" title="返回论坛"><i class="fa-solid fa-arrow-left"></i>返回论坛</a>
+        <div class="card">
+            <div class="card-head">
+                <h2 class="mdui-typo-headline"><i class="fa-solid fa-hourglass-half" style="color:var(--accent-1)"></i>待审核 / 已屏蔽帖子</h2>
+            </div>
+            <div class="card-body mdui-typo">
+                {% for p in pending %}
+                <div class="pending-item">
+                    <div class="pending-main">
+                        <div class="pending-title">{{ p.title|e }}</div>
+                        <div class="pending-meta">
+                            作者：{{ p.author|e }} &nbsp;|&nbsp; 时间：{{ p.created_at }}
+                            {% if p.status == 'blocked' %}<span class="status-tag status-blocked">已屏蔽</span>{% else %}<span class="status-tag status-pending">待审核</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="pending-actions">
+                        <button class="mini-btn approve" onclick="reviewPost({{ p.id }}, 'approve')"><i class="fa-solid fa-check"></i> 通过</button>
+                        <button class="mini-btn reject" onclick="reviewPost({{ p.id }}, 'reject')"><i class="fa-solid fa-ban"></i> 屏蔽</button>
+                        <a class="mini-btn" href="/forum/post/{{ p.id }}"><i class="fa-solid fa-eye"></i> 查看</a>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if pending|length == 0 %}
+                <p class="empty"><i class="fa-regular fa-circle-check"></i> 暂无待审核帖子</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-head">
+                <h2 class="mdui-typo-headline"><i class="fa-solid fa-flag" style="color:#e53935"></i>帖子举报</h2>
+            </div>
+            <div class="card-body mdui-typo">
+                {% for r in reports %}
+                <div class="report-item">
+                    <span class="report-type"><i class="fa-solid fa-file-lines"></i>{{ r.target_type|e }} #{{ r.target_id }}</span>
+                    <div class="report-info">
+                        <div>举报人：{{ r.user_id|e }} &nbsp;|&nbsp; 时间：{{ r.created_at }}</div>
+                        <div class="report-reason"><i class="fa-regular fa-comment-dots"></i> 原因：{{ r.reason|e }}</div>
+                    </div>
+                    {% if r.target_type == 'post' %}
+                    <a class="mini-btn" href="/forum/post/{{ r.target_id }}"><i class="fa-solid fa-eye"></i> 查看</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% if reports|length == 0 %}
+                <p class="empty"><i class="fa-regular fa-circle-check"></i> 暂无举报</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-head">
+                <h2 class="mdui-typo-headline"><i class="fa-solid fa-shuffle" style="color:var(--accent-1)"></i>随机抽查</h2>
+                <button class="mini-btn" onclick="location.reload()"><i class="fa-solid fa-rotate"></i> 刷新抽查</button>
+            </div>
+            <div class="card-body mdui-typo">
+                <div class="grid">
+                    {% for p in samples %}
+                    <div class="sample-card">
+                        <h3 class="mdui-typo-headline">{{ p.title|e }}</h3>
+                        <div class="sample-author">作者：{{ p.author|e }}</div>
+                        <div class="sample-meta">
+                            <span><i class="fa-regular fa-comment"></i> {{ p.comment_count }}</span>
+                            <span><i class="fa-regular fa-eye"></i> {{ p.view_count }}</span>
+                            <span class="sample-status">{% if p.status == 'blocked' %}<span class="status-tag status-blocked">已屏蔽</span>{% elif p.status == 'pending' %}<span class="status-tag status-pending">待审核</span>{% endif %}</span>
+                        </div>
+                        <div class="sample-actions">
+                            <button class="mini-btn approve" onclick="reviewPost({{ p.id }}, 'approve')"><i class="fa-solid fa-check"></i> 通过</button>
+                            <button class="mini-btn reject" onclick="reviewPost({{ p.id }}, 'reject')"><i class="fa-solid fa-ban"></i> 屏蔽</button>
+                            <a class="mini-btn" href="/forum/post/{{ p.id }}"><i class="fa-solid fa-eye"></i> 查看</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if samples|length == 0 %}
+                    <p class="empty" style="grid-column:1/-1">暂无可抽查帖子</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="../vendor/mdui.min.js"></script>
+<script src="../../nav.js"></script>
+<script src="../community-tilt.js"></script>
+<script src="../community-mdui.js"></script>
+<script src="../community-i18n.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="../vendor/mdui.min.css">
+<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../../env.css">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../community-layout.css">
+<link rel="stylesheet" href="../community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
+</head>
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="loader" id="loader"><div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div></div>
+    
+    <div class="main-box mdui-typo">
+        <div class="page-title"><i class="fa-solid fa-cube"></i> 板块管理</div>
+
+        {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
+
+        <div class="form-card">
+            <div class="hd"><i class="fa-solid fa-plus"></i> 新增板块</div>
+            <form action="/forum/admin/boards" method="post">
+                <div class="form-row">
+                    <div>
+                        <label>板块名称</label>
+                        <input type="text" name="name" placeholder="如：综合讨论" required>
+                    </div>
+                    <div>
+                        <label>排序</label>
+                        <input type="number" name="sort" value="0" min="0">
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div>
+                        <label>描述</label>
+                        <textarea name="description" placeholder="板块描述（可选）"></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="actions">
+                        <label><input type="checkbox" name="admin_only" value="1"> 管理员发帖模式</label>
+                        <button type="submit" class="btn-primary">添加</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-card">
+            <div class="hd"><i class="fa-solid fa-grip"></i> 板块列表</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>名称</th>
+                        <th>描述</th>
+                        <th>排序</th>
+                        <th>权限</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in boards %}
+                    <tr>
+                        <td>{{ b['id'] }}</td>
+                        <td>{{ b['name'] }}</td>
+                        <td class="tip">{{ b['description'] or '（无）' }}</td>
+                        <td>{{ b['sort'] }}</td>
+                        <td>{% if b['admin_only'] %}<span class="badge admin">管理员专享</span>{% else %}<span class="badge">全员可发</span>{% endif %}</td>
+                        <td>
+                            <div class="tip">
+                                <form action="/forum/admin/boards/edit/{{ b['id'] }}" method="post" style="display:none" id="edit-{{ b['id'] }}">
+                                    <div class="form-row"><input type="text" name="name" value="{{ b['name'] }}"></div>
+                                    <div class="form-row"><input type="text" name="description" value="{{ b['description'] or '' }}"></div>
+                                    <div class="form-row"><input type="number" name="sort" value="{{ b['sort'] }}"></div>
+                                    <div class="form-row"><label><input type="checkbox" name="admin_only" value="1" {% if b['admin_only'] %}checked{% endif %}> 管理员发帖模式</label></div>
+                                    <button class="btn-primary" type="submit">保存</button>
+                                </form>
+                                <a class="toggle" title="编辑" onclick="document.getElementById('edit-{{ b['id'] }}').style.display='block';this.style.display='none'"><i class="fa-solid fa-pen"></i></a>
+                                <form action="/forum/admin/boards/delete/{{ b['id'] }}" method="post" onsubmit="return confirm('删除该板块吗？删除后不可恢复。')" style="display:inline">
+                                    <button class="btn-danger" type="submit" title="删除"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="tip" style="text-align:center;padding:24px">暂无板块。</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if total_pages and total_pages > 1 %}
+            <div class="pagination">
+                {% if page > 1 %}
+                <a href="/forum/admin/boards?page={{ page - 1 }}">上一页</a>
+                {% else %}
+                <span class="disabled">上一页</span>
+                {% endif %}
+                {% for pg in range(1, total_pages + 1) %}
+                {% if pg == page %}
+                <span class="current">{{ pg }}</span>
+                {% elif pg == 1 or pg == total_pages or (pg >= page - 2 and pg <= page + 2) %}
+                <a href="/forum/admin/boards?page={{ pg }}">{{ pg }}</a>
+                {% endif %}
+                {% endfor %}
+                {% if page < total_pages %}
+                <a href="/forum/admin/boards?page={{ page + 1 }}">下一页</a>
+                {% else %}
+                <span class="disabled">下一页</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+<script src="../vendor/mdui.min.js"></script>
+<script src="../../nav.js"></script>
+<script src="../community-tilt.js"></script>
+<script src="../community-mdui.js"></script>
+<script src="../community-i18n.js"></script>
+
+</body>
+</html>

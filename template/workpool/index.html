@@ -1,109 +1,29 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>作品池</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
-        body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
-        @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-        header{width:100%;height:56px;background:rgba(76,175,80,.85);position:fixed;top:0;left:0;display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);animation:headerSlideDown .4s cubic-bezier(.4,0,.2,1)}
-        @keyframes headerSlideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:translateY(0)}}
-        .wrap{max-width:1400px;margin:0 auto;width:100%;display:flex;align-items:center}
-        .logo{display:flex;align-items:center;color:#fff;font-size:22px;font-weight:bold;margin-right:32px;letter-spacing:1px;animation:logoFadeIn .5s .1s both}
-        @keyframes logoFadeIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-        .logo-icon{width:36px;height:36px;margin-right:10px;border-radius:8px;overflow:hidden;padding:2px}
-        .logo-icon img{width:100%;height:100%;object-fit:cover}
-        .head-space{flex:1}
-        .search{height:36px;width:280px;background:rgba(255,255,255,.2);border-radius:18px;display:flex;align-items:center;padding:0 16px;animation:searchFadeIn .5s .15s both}
-        @keyframes searchFadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-        .search input{background:transparent;border:none;outline:none;color:#fff;width:100%;font-size:14px}
-        .search input::placeholder{color:rgba(255,255,255,.7)}
-        .main-box{max-width:1400px;margin:0 auto;padding-top:72px;padding-left:16px;padding-right:16px}
-        .card{background:rgba(255,255,255,.95);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(0,0,0,.05);opacity:0;animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards}
-        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-        .grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:20px}
-        .page-box{margin-top:40px;text-align:center;animation:fadeIn .6s .5s both}
-        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        .work-card{padding:16px;cursor:pointer;transition:transform .2s,box-shadow .2s}
-        .work-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 12px 40px rgba(0,0,0,.2)}
-        .work-card:active{transform:scale(.98)}
-        .work-card h3{color:#333;margin-bottom:8px}
-        .work-card p{color:#666;font-size:14px;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-        .work-thumb{width:100%;height:160px;object-fit:cover;background:#f5f5f5;border-radius:6px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:40px;overflow:hidden}
-        .work-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-        .work-card .meta{display:flex;align-items:center;gap:12px;font-size:12px;color:#999}
-        .meta-item{display:flex;align-items:center;gap:4px}
-        .tag{background:rgba(76,175,80,.1);color:#4caf50;padding:2px 8px;border-radius:4px;font-size:12px;transition:all .2s}
-        .tag:hover{background:rgba(76,175,80,.2);transform:scale(1.05)}
-        .tag-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-        .nav-links{display:flex;gap:24px}
-        .nav-links a{color:rgba(255,255,255,.9);text-decoration:none;font-size:15px;transition:color .2s,transform .2s;position:relative}
-        .nav-links a:hover{color:#fff;transform:translateY(-1px)}
-        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:#fff;transition:width .3s}
-        .nav-links a:hover::after{width:100%}
-        .btn{background:#fff;color:#4caf50;padding:8px 16px;border:none;border-radius:18px;cursor:pointer;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s}
-        .btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
-        .btn:active{transform:scale(.95)}
-        .dropdown{position:relative;display:inline-block}
-        .dropbtn{background:none;border:none;color:rgba(255,255,255,.9);font-size:15px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color .2s}
-        .dropbtn:hover{color:#fff}
-        .dropbtn:focus{outline:none}
-        .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:160px;box-shadow:0 8px 16px rgba(0,0,0,.15);z-index:200;border-radius:8px;margin-top:8px;padding:8px 0;animation:dropdownFade .2s}
-        @keyframes dropdownFade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-        .dropdown-content.show{display:block}
-        .dropdown-content a{color:#333;padding:10px 16px;text-decoration:none;display:block;font-size:14px;transition:all .2s}
-        .dropdown-content a:hover{background:rgba(76,175,80,.1);color:#4caf50;padding-left:20px}
-        .user-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;animation:avatarPop .5s .3s both}
-        @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-        .user-avatar:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
-        .icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9);cursor:pointer;transition:all .2s;margin-left:8px;animation:iconFade .5s .25s both}
-        @keyframes iconFade{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-        .icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
-        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999}
-        #loader .mdui-progress{margin:0;border-radius:0}
-        .pagination{display:flex;justify-content:center;gap:8px;margin-top:24px}
-        .pagination a,.pagination span{padding:8px 16px;border-radius:4px;text-decoration:none;font-size:14px;transition:all .2s}
-        .pagination a{background:rgba(255,255,255,.9);color:#4caf50}
-        .pagination a:hover{background:#4caf50;color:#fff}
-        .pagination .current{background:#4caf50;color:#fff}
-        .pagination .disabled{background:rgba(255,255,255,.5);color:#999;cursor:not-allowed}
-        .sort-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-        .sort-bar a{background:rgba(255,255,255,.9);color:#4caf50;padding:6px 16px;border-radius:16px;text-decoration:none;font-size:13px;transition:all .2s}
-        .sort-bar a:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
-        .sort-bar a.active{background:#4caf50;color:#fff;font-weight:600}
-        .tag-chip{display:inline-block;background:rgba(255,255,255,.85);color:#f57f17;border:1px solid #ffe0b2;padding:4px 12px;border-radius:14px;font-size:12px;margin:0 6px 0 0;text-decoration:none;transition:all .2s}
-        .tag-chip:hover{background:#fff3e0}
-        .tag-chip.active{background:#f57f17;color:#fff;border-color:#f57f17}
-        .notify-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;font-size:11px;border-radius:50%;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
-        .icon-btn{position:relative}
-    
-        @media (max-width:640px){
-            .main-box{padding-left:10px;padding-right:10px}
-            .sort-bar{gap:6px}
-            .sort-bar a{padding:6px 12px;font-size:12px}
-            .grid{gap:12px}
-            .work-card{padding:14px}
-            .work-card h3{font-size:16px}
-            .pagination{gap:4px}
-            .pagination a,.pagination span{padding:7px 11px;font-size:13px}
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="../vendor/mdui.min.css">
+<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../../env.css">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../community-layout.css">
+<link rel="stylesheet" href="../community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
-<body>
-    <div class="loader" id="loader">
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="loader" id="loader">
         <div class="mdui-progress">
             <div class="mdui-progress-indeterminate"></div>
         </div>
     </div>
-    <div id="hv2"></div>
-    <div class="main-box">
+    
+    <div class="main-box mdui-typo">
         <div class="sort-bar">
             <a href="/workpool?sort=new{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'new' %}active{% endif %}">最新</a>
             <a href="/workpool?sort=hot{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'hot' %}active{% endif %}">最热</a>
@@ -111,7 +31,7 @@
             <a href="/workpool?sort=fav{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'fav' %}active{% endif %}">最多藏</a>
             <a href="/workpool?sort=coin{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'coin' %}active{% endif %}">最多币</a>
             <a href="/workpool?sort=comment{% if search_query %}&search={{ search_query }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}" class="{% if sort == 'comment' %}active{% endif %}">最多评</a>
-            <a href="/forum" style="background:#ffb300;color:#fff">论坛 <i class="fa-solid fa-comments"></i></a>
+            <a href="/forum" class="forum-link">论坛 <i class="fa-solid fa-comments"></i></a>
         </div>
         {% if all_tags %}
         
@@ -124,7 +44,7 @@
                 {% else %}
                 <div class="work-thumb"><i class="fa-regular fa-image"></i></div>
                 {% endif %}
-                <h3>{{ work.title|e }}</h3>
+                <h3 class="mdui-typo-headline">{{ work.title|e }}</h3>
                 <p>{{ work.description|e }}</p>
                 {% if work.tags %}
                 <div class="tag-list">
@@ -134,7 +54,7 @@
                 </div>
                 {% endif %}
                 <div class="meta">
-                    <span class="meta-item"><i class="fa-solid fa-user" style="font-size:16px"></i>{{ work.author|e }}{% set _t = user_team(work.author) %}{% if _t %}<span class="tea-badge" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px;margin-left:6px;vertical-align:middle"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</span>
+                    <span class="meta-item"><i class="fa-solid fa-user" style="font-size:16px"></i>{{ work.author|e }}{% set _t = user_team(work.author) %}{% if _t %}<span class="tea-badge"><i class="fa-solid fa-building"></i> {{ _t.name }}</span>{% endif %}</span>
                     <span class="meta-item"><i class="fa-solid fa-thumbs-up" style="font-size:16px"></i>{{ work.like_count }}</span>
                     <span class="meta-item"><i class="fa-solid fa-heart" style="font-size:16px"></i>{{ work.fav_count }}</span>
                     <span class="meta-item"><i class="fa-solid fa-coins" style="font-size:16px"></i>{{ work.coin_count if work.coin_count is defined else 0 }}</span>
@@ -173,54 +93,11 @@
         </div>
     </div>
 
-    <script>
-        window.addEventListener('load', function(){
-            document.getElementById('loader').style.display='none';
-            document.body.classList.add('page-enter');
-            setTimeout(()=>document.body.classList.remove('page-enter'),400);
-        });
+<script src="../vendor/mdui.min.js"></script>
+<script src="../../nav.js"></script>
+<script src="../community-tilt.js"></script>
+<script src="../community-mdui.js"></script>
+<script src="../community-i18n.js"></script>
 
-        document.querySelectorAll('.work-card').forEach((card,i)=>{
-            card.style.animationDelay=(0.05*i)+'s';
-        });
-
-        function loadUnread() {
-            fetch('/messages/unread')
-                .then(r => r.json())
-                .then(data => {
-                    const badge = document.getElementById('unread-badge');
-                    if (badge && data.count > 0) {
-                        badge.textContent = data.count > 99 ? '99+' : data.count;
-                        badge.style.display = 'block';
-                    }
-                });
-        }
-        loadUnread();
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var dropdowns = document.querySelectorAll('.dropdown');
-            dropdowns.forEach(function(dropdown) {
-                var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
-                var content = dropdown.querySelector('.dropdown-content');
-                
-                if (trigger && content) {
-                    trigger.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        content.classList.toggle('show');
-                    });
-                    
-                    content.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                    });
-                }
-            });
-            
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.dropdown-content').forEach(function(content) {
-                    content.classList.remove('show');
-                });
-            });
-        });
-    </script>
-<script src="/localcdn/gzs/knf.js?v=19"></script></body>
+</body>
 </html>

@@ -1,65 +1,33 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>消息中心</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('https://cdn-community.bcmcdn.com/47/community/OgneOV5nxD4XUr5XY9sJm55OmhSJ9QtD8AYQWRyYSjhW.png?hash=FlJ5Wa_ObKYVdPojuGh0_rXSdKX7') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
-        body.page-enter{animation:slideInFromRight .35s cubic-bezier(.4,0,.2,1)}
-        @keyframes slideInFromRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-        .main-box{max-width:95%;margin:0 auto;padding-top:72px;padding-left:24px;padding-right:24px}
-        .tabs{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border-radius:8px;padding:6px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.1)}
-        .tab{flex:1;text-align:center;padding:12px 0;border-radius:6px;cursor:pointer;color:#666;font-size:15px;font-weight:500;transition:all .2s}
-        .tab:hover{background:rgba(76,175,80,.08);color:#4caf50}
-        .tab.active{background:#4caf50;color:#fff;box-shadow:0 2px 8px rgba(76,175,80,.3)}
-        .read-all-btn{background:#fff;color:#4caf50;border:1px solid #4caf50;padding:8px 16px;border-radius:16px;cursor:pointer;font-size:13px;white-space:nowrap;transition:all .2s}
-        .read-all-btn:hover{background:#4caf50;color:#fff}
-        .msg-item{display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,.95);border-radius:8px;padding:14px 16px;margin-bottom:10px;cursor:pointer;border:2px solid transparent;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:all .2s;animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
-        .msg-item:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
-        .msg-item.unread{border-color:#4caf50;background:#fff}
-        @keyframes cardSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-        .msg-tag{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:500;background:rgba(76,175,80,.12);color:#4caf50}
-        .msg-tag i{font-size:12px}
-        .msg-main{flex:1;min-width:0}
-        .msg-content{font-size:14px;color:#444;line-height:1.7;word-break:break-all}
-        .msg-meta{display:flex;gap:14px;margin-top:6px;font-size:12px;color:#999;flex-wrap:wrap}
-        .msg-from{display:inline-flex;align-items:center;gap:4px}
-        .view-work{margin-left:8px;color:#4caf50;text-decoration:none;font-size:13px;display:inline-block;padding:2px 10px;border:1px solid #4caf50;border-radius:12px;transition:all .2s;white-space:nowrap}
-        .view-work:hover{background:#4caf50;color:#fff}
-        .announce-card{background:rgba(255,255,255,.95);border-radius:8px;padding:18px 20px;margin-bottom:12px;border-left:4px solid #ffb300;box-shadow:0 2px 10px rgba(0,0,0,.06);animation:cardSlideUp .5s cubic-bezier(.4,0,.2,1) forwards;opacity:0}
-        .announce-card h3{font-size:16px;color:#333;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-        .announce-card h3::before{content:'📢';font-size:14px}
-        .announce-card p{font-size:14px;color:#555;line-height:1.8;white-space:pre-wrap;word-break:break-all}
-        .announce-card .msg-time{display:block;margin-top:10px;font-size:12px;color:#999}
-        .empty{text-align:center;color:#999;padding:60px 0;font-size:14px}
-    
-        @media (max-width:640px){
-            .main-box{padding-left:10px;padding-right:10px}
-            .tabs{overflow-x:auto}
-            .msg-item{padding:12px}
-            .read-all-btn{padding:6px 12px;font-size:12px}
-            .announce-card{padding:14px}
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="vendor/mdui.min.css">
+<link rel="stylesheet" href="vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../env.css">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="community-layout.css">
+<link rel="stylesheet" href="community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
-<body>
-    <div class="loader" id="loader">
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="loader" id="loader">
         <div class="mdui-progress">
             <div class="mdui-progress-indeterminate"></div>
         </div>
     </div>
-    <div id="hv2"></div>
-    <div class="main-box">
+    
+    <div class="main-box mdui-typo">
         {% set type_map = {'like': ['被点赞', 'fa-thumbs-up'], 'fav': ['被收藏', 'fa-heart'], 'coin': ['被投币', 'fa-coins'], 'follow': ['被关注', 'fa-user-plus'], 'comment': ['作品评论', 'fa-comment'], 'reply': ['评论/跟帖回复', 'fa-reply'], 'official': ['官方私信', 'fa-envelope']} %}
         <div class="mdui-tab" mdui-tab>
-            <a href="#tab-notify" class="mdui-ripple mdui-tab-active">通知</a>
-            <a href="#tab-announce" class="mdui-ripple">全局公告</a>
+            <a href="#panel-notify" class="mdui-ripple mdui-tab-active">通知</a>
+            <a href="#panel-announce" class="mdui-ripple">全局公告</a>
         </div>
         <div style="display:flex;justify-content:flex-end;margin-bottom:12px;margin-top:8px">
             <button class="read-all-btn" onclick="readAll()"><i class="fa-solid fa-check-double"></i> 全部已读</button>
@@ -84,7 +52,7 @@
         <div id="panel-announce" style="display:none">
             {% for a in announcements %}
             <div class="announce-card">
-                <h3>{{ a.title|e }}</h3>
+                <h3 class="mdui-typo-headline">{{ a.title|e }}</h3>
                 <p>{{ a.content|e }}</p>
                 <span class="msg-time"><i class="fa-regular fa-clock"></i>{{ a.created_at }}</span>
             </div>
@@ -95,125 +63,11 @@
         </div>
     </div>
 
-    <script>
-        window.addEventListener('load', function(){
-            document.getElementById('loader').style.display='none';
-            document.body.classList.add('page-enter');
-            setTimeout(function(){document.body.classList.remove('page-enter');},400);
-        });
+<script src="vendor/mdui.min.js"></script>
+<script src="../nav.js"></script>
+<script src="community-tilt.js"></script>
+<script src="community-mdui.js"></script>
+<script src="community-i18n.js"></script>
 
-        function switchTab(name) {
-            document.querySelectorAll('.mdui-tab a').forEach(function(el) { el.classList.remove('mdui-tab-active'); });
-            if (name === 'notify') {
-                document.querySelector('.mdui-tab a[href="#tab-notify"]').classList.add('mdui-tab-active');
-                document.getElementById('panel-notify').style.display = 'block';
-                document.getElementById('panel-announce').style.display = 'none';
-            } else {
-                document.querySelector('.mdui-tab a[href="#tab-announce"]').classList.add('mdui-tab-active');
-                document.getElementById('panel-notify').style.display = 'none';
-                document.getElementById('panel-announce').style.display = 'block';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.mdui-tab a').forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var href = this.getAttribute('href');
-                    if (href === '#tab-notify') switchTab('notify');
-                    else if (href === '#tab-announce') switchTab('announce');
-                });
-            });
-        });
-
-        function readMsg(id, el) {
-            if (el && !el.classList.contains('unread')) return;
-            fetch('/messages/read/' + id, { method: 'POST' })
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    if (data.success && el) {
-                        el.classList.remove('unread');
-                        var badge = document.getElementById('unread-badge');
-                        if (badge) {
-                            var n = parseInt(badge.textContent) || 0;
-                            n = Math.max(0, n - 1);
-                            if (n <= 0) { badge.style.display = 'none'; }
-                            else { badge.textContent = n > 99 ? '99+' : n; }
-                        }
-                    }
-                });
-        }
-
-        function readAll() {
-            fetch('/messages/read_all', { method: 'POST' })
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    if (data.success) { location.reload(); } else { alert('操作失败'); }
-                });
-        }
-
-        function loadUnread() {
-            fetch('/messages/unread')
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    var badge = document.getElementById('unread-badge');
-                    if (badge && data.count > 0) {
-                        badge.textContent = data.count > 99 ? '99+' : data.count;
-                        badge.style.display = 'block';
-                    }
-                });
-        }
-        loadUnread();
-
-        // 动态加载用户头像
-        (function(){
-            var avatarEls = document.querySelectorAll('[data-username]');
-            if(avatarEls.length === 0) return;
-            
-            var usernames = [];
-            avatarEls.forEach(function(el){
-                var u = el.getAttribute('data-username');
-                if(u) usernames.push(u);
-            });
-            var uniqueNames = usernames.filter(function(v,i,a){ return a.indexOf(v) === i; });
-            
-            fetch('/api/users/info?usernames=' + encodeURIComponent(uniqueNames.join(',')))
-                .then(function(r){ return r.json(); })
-                .then(function(data){
-                    avatarEls.forEach(function(el){
-                        var u = el.getAttribute('data-username');
-                        if(data[u]){
-                            var avatarUrl = data[u].avatar || (data[u].qq ? 'https://q1.qlogo.cn/g?b=qq&nk=' + data[u].qq + '&s=100' : '');
-                            if(avatarUrl){
-                                el.innerHTML = '<img src="' + avatarUrl + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="头像">';
-                            }
-                        }
-                    });
-                });
-        })();
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var dropdowns = document.querySelectorAll('.dropdown');
-            dropdowns.forEach(function(dropdown) {
-                var trigger = dropdown.querySelector('.dropbtn') || dropdown.querySelector('.user-avatar');
-                var content = dropdown.querySelector('.dropdown-content');
-                if (trigger && content) {
-                    trigger.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        content.classList.toggle('show');
-                    });
-                    content.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                    });
-                }
-            });
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.dropdown-content').forEach(function(content) {
-                    content.classList.remove('show');
-                });
-            });
-        });
-    </script>
-    <script src="/localcdn/gzs/knf.js?v=19"></script>
 </body>
 </html>

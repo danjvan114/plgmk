@@ -1,48 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <script src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/mdui@1.0.2/dist/css/mdui.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/mk/kn/uploads/kn.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>团队 - 菠菜面</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{background:url('/localcdn/gzs/2026-07-25_10.37.53.png') no-repeat center center fixed;background-size:cover;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
-        #loader{position:fixed;top:0;left:0;width:100%;z-index:9999;background:#fff}
-        #loader .mdui-progress{margin:0;border-radius:0}
-        .wrap{max-width:1100px;margin:0 auto;padding-top:72px;padding:72px 16px 40px}
-        .team-wrap{max-width:1100px;margin:0 auto;padding:72px 16px 40px}
-        .page-title{font-size:22px;color:#fff;font-weight:bold;margin-bottom:18px;display:flex;align-items:center;gap:10px;text-shadow:0 2px 8px rgba(0,0,0,.3)}
-        .team-card.mdui-card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden;margin-bottom:16px}
-        .team-cover{height:140px;background:rgba(76,175,80,.12);display:flex;align-items:center;justify-content:center}
-        .team-cover img{max-width:100%;max-height:100%;object-fit-cover}
-        .team-cover-blank{width:80px;height:80px;border-radius:50%;background:rgba(76,175,80,.15);display:flex;align-items:center;justify-content:center;font-size:28px;color:#4caf50}
-        .team-body{padding:16px}
-        .team-name{font-size:18px;font-weight:600;color:#1565c0;margin-bottom:6px}
-        .team-desc{font-size:13px;color:#777;line-height:1.6}
-        .team-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-        .tea-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#1976d2;background:#e3f2fd;border:1px solid #bbdefb;border-radius:12px;padding:2px 8px}
-        .mdui-btn-raised{background:#2196f3;color:#fff}
-        .mdui-btn-raised:hover{background:#1976d2}
-        .create-card .mdui-textfield-input,.create-card textarea{border:1px solid #ddd !important}
-        .empty{text-align:center;color:#999;padding:40px;font-size:14px}
-    
-        @media (max-width:640px){
-            .team-wrap,.wrap{padding:56px 10px 30px}
-            .page-title{font-size:18px}
-            .team-name{font-size:16px}
-            .team-desc{font-size:12px}
-            .team-foot{flex-direction:column;align-items:flex-start;gap:8px}
-            .mdui-card-primary,.mdui-card-content{padding:14px}
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE Hub</title>
+<link rel="stylesheet" href="../vendor/mdui.min.css">
+<link rel="stylesheet" href="../vendor/fontawesome/all.min.css">
+<link rel="stylesheet" href="../../env.css">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../community-layout.css">
+<link rel="stylesheet" href="../community-enhance.css">
+<link rel="icon" type="image/png" href="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEY6vNqecDlOuUX-l2BERk5bPziylNSIAACwCAAAmsm0Fc-qj9K0pP0Lz0E.png">
 </head>
-<body>
-    <div class="loader" id="loader"><div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div></div>
-    <div id="hv2"></div>
+<body class="theme-aurora" data-page="community">
+
+<!-- 全局统一顶栏导航(挂载点) -->
+<div id="hv2"></div>
+
+<div class="loader" id="loader"><div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div></div>
+    
     <div class="team-wrap">
         <div class="page-title"><i class="fa-solid fa-users-rectangle"></i> 团队中心</div>
 
@@ -54,7 +30,7 @@
                 <div class="mdui-card-header-text">
                     <a href="/team/{{ my_team.id }}" class="mdui-text-color-blue">前往 {{ my_team.name }} 主页</a>
                     <form action="/team/{{ my_team.id }}/leave" method="post" style="display:inline">
-                        <button class="mdui-btn mdui-btn-raised mdui-btn-dense" style="background:#ff9800;width:auto;padding:4px 10px;font-size:12px">退出团队</button>
+                        <button class="mdui-btn mdui-btn-dense danger" style="width:auto;padding:4px 10px;font-size:12px">退出团队</button>
                     </form>
                 </div>
             </div>
@@ -101,116 +77,70 @@
                 </form>
             </div>
         </div>
-        <script>
-            (function(){
-                var f = document.getElementById('team-create-form');
-                if (!f) return;
-                f.addEventListener('submit', function(e){
-                    e.preventDefault();
-                    var tip = document.getElementById('create-tip');
-                    var formData = new FormData(f);
-                    fetch('/team/create', {method:'POST', body: formData})
-                        .then(function(r){ return r.json(); })
-                        .then(function(d){
-                            tip.textContent = d.message || '';
-                            if (d.success) { setTimeout(function(){ location.href = '/team/' + d.team_id; }, 400); }
-                        });
-                });
-            })();
-        </script>
         {% endif %}
 
-        {% if invites|length > 0 %}
-        <div class="mdui-card" style="margin-bottom:18px">
-            <div class="mdui-card-header">
-                <div class="mdui-card-header-text">
-                    <div class="mdui-card-title"><i class="fa-solid fa-envelope-open-text" style="color:#ff9800"></i> 收到的邀请（{{ invites|length }}）</div>
-                    <div class="mdui-card-text" style="font-size:13px">接受邀请后你将加入对应团队（每人只能属于一个团队）。</div>
-                </div>
-            </div>
-            <div class="mdui-card-content" style="padding-top:0" id="invite-list">
-                {% for iv in invites %}
-                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0">
-                    <div class="mdui-avatar" style="background:#fff3e0;color:#e65100;width:36px;height:36px;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-building"></i></div>
+        {% if my_invites and my_invites|length > 0 %}
+        <div class="card" style="margin-bottom:18px">
+            <div class="card-body mdui-typo">
+                <div class="section-title"><i class="fa-solid fa-envelope-open-text"></i> 收到的团队邀请</div>
+                {% for iv in my_invites %}
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+                    <div class="mdui-avatar" style="background:var(--glass-tint-2);color:var(--accent-1);width:36px;height:36px;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-building"></i></div>
                     <div style="flex:1;min-width:0">
-                        <div style="font-size:15px;font-weight:600;color:#333"><a href="/team/{{ iv.team_id }}" class="mdui-text-color-blue">{{ iv.team_name }}</a></div>
-                        <div style="font-size:12px;color:#999">来自 {{ iv.from_user }} · {{ iv.created_at }}</div>
+                        <div style="font-size:15px;font-weight:600;color:var(--text-1)"><a href="/team/{{ iv.team_id }}" class="mdui-text-color-blue">{{ iv.team_name }}</a></div>
+                        <div style="font-size:12px;color:var(--text-3)">来自 {{ iv.from_user }} · {{ iv.created_at }}</div>
                     </div>
                     <button class="mdui-btn mdui-btn-raised mdui-btn-dense" style="padding:4px 14px;font-size:12px" onclick="acceptInvite({{ iv.id }})">接受</button>
-                    <button class="mdui-btn mdui-btn-dense" style="background:#eee;color:#666;font-size:12px" onclick="rejectInvite({{ iv.id }})">拒绝</button>
+                    <button class="mdui-btn mdui-btn-dense" style="background:var(--glass-tint);color:var(--text-2);font-size:12px" onclick="rejectInvite({{ iv.id }})">拒绝</button>
                 </div>
                 {% endfor %}
             </div>
-            {% if inv_has_more %}
-            <div style="text-align:center;padding:10px 0">
-                <button class="mdui-btn mdui-btn-raised mdui-btn-dense" id="inv-more-btn">加载更多邀请</button>
-            </div>
-            {% endif %}
-        </div>
-        <script>
-            function setupMore(btnId, url, contId, page){
-                var btn = document.getElementById(btnId), cont = document.getElementById(contId);
-                if (!btn || !cont) return;
-                btn.addEventListener('click', function(){
-                    fetch(url + '?page=' + page).then(function(r){ return r.json(); }).then(function(d){
-                        cont.insertAdjacentHTML('beforeend', d.html);
-                        page++;
-                        if (!d.has_more) btn.style.display = 'none';
-                    });
-                });
-            }
-            function acceptInvite(id){
-                if (!confirm('接受该团队的邀请？')) return;
-                fetch('/team/invite/accept/' + id, {method:'POST'}).then(function(r){ return r.json(); })
-                    .then(function(d){ if(d.success) setTimeout(function(){ location.reload(); }, 300); else alert(d.message); });
-            }
-            function rejectInvite(id){
-                fetch('/team/invite/reject/' + id, {method:'POST'}).then(function(r){ return r.json(); })
-                    .then(function(d){ if(d.success) setTimeout(function(){ location.reload(); }, 300); });
-            }
-            setupMore('inv-more-btn', '/team/invites/ajax', 'invite-list', 2);
-        </script>
-        {% endif %}
-        {% else %}
-        <p class="mdui-text-color-white" style="margin-bottom:14px">登录后可创建与加入团队。</p>
-        {% endif %}
-
-        <div class="mdui-divider" style="margin:18px 0;border-color:rgba(255,255,255,.2)"></div>
-        <div style="color:#fff;font-size:16px;margin-bottom:12px"><i class="fa-solid fa-grip"></i> 现有团队</div>
-
-        {% if teams|length == 0 %}
-        <p class="empty">暂无团队，成为第一个团队的创始人吧！</p>
-        {% else %}
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
-            {% for t in teams %}
-            <div class="team-card mdui-card">
-                <div class="team-cover">
-                    {% if t.cover %}<img src="{{ t.cover }}" alt="cover">{% else %}<div class="team-cover-blank"><i class="fa-solid fa-building"></i></div>{% endif %}
-                </div>
-                <div class="team-body">
-                    <div class="team-name">{{ t.name|e }} <span class="tea-badge"><i class="fa-solid fa-user-group"></i> {{ t.member_count }} 人</span></div>
-                    {% if t.description %}<div class="team-desc">{{ t.description|e }}</div>{% endif %}
-                    <div class="team-foot">
-                        <span class="mdui-text-color-blue" style="font-size:13px"><i class="fa-solid fa-clock"></i> {{ t.created_at }}</span>
-                        <a href="/team/{{ t.id }}" class="mdui-btn mdui-btn-raised mdui-btn-dense" style="padding:4px 14px;font-size:12px">进入团队主页</a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
         </div>
         {% endif %}
-
-        {% if total_pages > 1 %}
-        <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin:22px 0 6px">
-            {% if page > 1 %}<a href="/team?page={{ page - 1 }}" class="mdui-btn mdui-btn-raised mdui-btn-dense" style="padding:4px 16px;font-size:13px">上一页</a>{% endif %}
-            <span style="color:#fff;font-size:13px">第 {{ page }} / {{ total_pages }} 页</span>
-            {% if has_more %}<a href="/team?page={{ page + 1 }}" class="mdui-btn mdui-btn-raised mdui-btn-dense" style="padding:4px 16px;font-size:13px">下一页</a>{% endif %}
+        {% else %}
+        <div class="mdui-card" style="text-align:center;padding:30px">
+            <p style="color:var(--text-2);margin-bottom:14px">登录后即可创建或加入团队</p>
+            <a href="/login" class="mdui-btn mdui-btn-raised">立即登录</a>
         </div>
         {% endif %}
     </div>
-    <script src="/localcdn/gzs/knf.js?v=19"></script>
-    <script>
-        window.addEventListener('load', function(){ document.getElementById('loader').style.display='none'; });
-    </script>
+
+<script src="../vendor/mdui.min.js"></script>
+<script src="../../nav.js"></script>
+<script src="../community-tilt.js"></script>
+<script src="../community-mdui.js"></script>
+<script src="../community-i18n.js"></script>
+<script>
+(function () {
+    var form = document.getElementById('team-create-form');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var tip = document.getElementById('create-tip');
+            var fd = new FormData(form);
+            fetch('/team/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: fd.get('name'),
+                    description: fd.get('description'),
+                    cover: fd.get('cover'),
+                    qq: fd.get('qq')
+                })
+            }).then(function (r) { return r.json(); }).then(function (d) {
+                if (d && d.ok) { location.href = '/team/' + (d.team_id || d.id || ''); }
+                else { tip.textContent = (d && d.msg) || '创建失败'; }
+            }).catch(function () { tip.textContent = '网络错误，请重试'; });
+        });
+    }
+    window.acceptInvite = function (id) {
+        fetch('/team/invite/' + id + '/accept', { method: 'POST' }).then(function () { location.reload(); });
+    };
+    window.rejectInvite = function (id) {
+        fetch('/team/invite/' + id + '/reject', { method: 'POST' }).then(function () { location.reload(); });
+    };
+})();
+</script>
+
 </body>
 </html>
