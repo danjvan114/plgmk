@@ -1,0 +1,713 @@
+/* ===== 社区增强:对齐插件市场(index.html)蓝色液态玻璃规范 =====
+   液态玻璃 = 低透明实底 + 上下高光描边(inset box-shadow),禁用 backdrop-filter 模糊 */
+
+/* 主题切换平滑过渡(禁止硬切) */
+html, body, header, .page, .container, .card, .right-card,
+.mdui-card, .mdui-tab a, .mdui-menu, .dropdown-content, .board-item,
+.page-title, .search, .btn, button, a {
+  transition: background-color .55s cubic-bezier(.4,0,.2,1),
+              background .55s cubic-bezier(.4,0,.2,1),
+              color .45s ease,
+              border-color .5s ease,
+              box-shadow .5s ease !important;
+}
+/* body 背景交由 styles.css(env.css 变量)统一控制,此处仅兜底 */
+body:not([data-page]) { background: var(--bg-base, #eaf2fc); }
+
+/* ---------- 卡片发光体系(照搬 index.html 的 mk-card 方案) ---------- */
+:root { --glow-c1:rgba(147,197,253,.35); --glow-c2:rgba(59,130,246,.12); }
+body.dark-mode { --glow-c1:rgba(255,255,255,.38); --glow-c2:rgba(125,211,252,.10); }
+
+.knx-glow { position:relative; overflow:hidden; transform-style:preserve-3d; will-change:transform; }
+.knx-glow > * { position:relative; z-index:1; }
+/* 跟随光标的亮斑(纯径向渐变,无模糊) */
+.knx-glow::after {
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), var(--glow-c1), var(--glow-c2) 46%, transparent 70%);
+  opacity:0; transition:opacity .35s ease; pointer-events:none; z-index:0;
+}
+.knx-glow.knx-on::after { opacity:1; }
+.knx-glow.knx-soft::after { opacity:.45; }
+/* 边缘光:只有光标碰到的那段边缘发亮(mask 环),不是整圈描边 */
+.knx-glow .knx-edge, .knx-glow::before {
+  content:''; position:absolute; inset:0; border-radius:inherit; padding:2.5px; pointer-events:none; z-index:2;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite:exclude;
+  background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%), rgba(96,165,250,.9), rgba(59,130,246,.55) 45%, transparent 75%);
+  opacity:0; transition:opacity .3s ease;
+}
+.knx-glow.knx-on::before { opacity:1; }
+.knx-glow.knx-soft::before { opacity:.4; }
+body.dark-mode .knx-glow::before {
+  background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.9), rgba(125,211,252,.45) 45%, transparent 75%);
+}
+/* 悬浮(拿起)时卡片更通透一点(按钮等交互元素除外,保留自身 hover 色) */
+.knx-glow.knx-on:not(.knx-notilt) { background:rgba(255,255,255,.6) !important; }
+body.dark-mode .knx-glow.knx-on:not(.knx-notilt) { background:rgba(21,27,51,.6) !important; }
+
+/* ---------- Tab 堆叠卡片切换动效(参照 plugin_detail .pd-pane) ---------- */
+.tab-content.ke-entering { animation: kePaneIn .6s cubic-bezier(.22,.61,.36,1) both; }
+.tab-content.ke-leaving, [id^="panel-"].ke-leaving { animation: kePaneOut .6s cubic-bezier(.22,.61,.36,1) both; }
+[id^="panel-"].ke-entering { animation: kePaneIn .6s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes kePaneIn {
+  from { opacity:0; transform:perspective(1000px) translateX(calc(var(--dir,1) * 72px)) rotateY(calc(var(--dir,1) * -9deg)) scale(.96); }
+  to   { opacity:1; transform:perspective(1000px) translateX(0) rotateY(0) scale(1); }
+}
+@keyframes kePaneOut {
+  from { opacity:1; transform:perspective(1000px) translateX(0) rotateY(0) scale(1); }
+  to   { opacity:0; transform:perspective(1000px) translateX(calc(var(--dir,1) * 72px)) rotateY(calc(var(--dir,1) * -9deg)) scale(.96); }
+}
+
+/* ---------- 业务卡片:液态玻璃(无模糊,上下描边) ---------- */
+.card, .right-card, .mdui-card, .board-item, .post-card, .project-card,
+.work-card, .mdui-list-item, .form-card, .info-section, .comments-section,
+.author-card, .msg-item, .table-card, .stat-card, .user-item, .pending-item,
+.report-item, .sample-card, .announce-card, .wall-box, .publish-card,
+.team-header, .profile-card, .post-item, .sidebar, .pdf-container {
+  background: var(--glass-card, rgba(255,255,255,.48)) !important;
+  box-shadow: inset 0 1px 0 var(--glass-hi-top),
+              inset 0 -1px 0 var(--glass-hi-bot),
+              var(--shadow) !important;
+  transition: transform .5s cubic-bezier(.34,1.56,.64,1),
+              box-shadow .45s ease,
+              background-color .55s ease !important;
+}
+.card:hover, .right-card:hover, .mdui-card:hover, .board-item:hover,
+.post-card:hover, .project-card:hover, .work-card:hover,
+.form-card:hover, .info-section:hover, .comments-section:hover,
+.author-card:hover, .msg-item:hover, .table-card:hover, .stat-card:hover,
+.user-item:hover, .pending-item:hover, .report-item:hover, .sample-card:hover,
+.announce-card:hover, .wall-box:hover, .publish-card:hover,
+.team-header:hover, .profile-card:hover, .post-item:hover, .pdf-container:hover {
+  box-shadow: var(--shadow-hover),
+              inset 0 1px 0 var(--glass-hi-top),
+              inset 0 -1px 0 var(--glass-hi-bot) !important;
+}
+@media (hover: none) {
+  .card:hover, .right-card:hover, .mdui-card:hover, .board-item:hover,
+  .post-card:hover, .project-card:hover, .work-card:hover,
+  .mdui-list-item:hover { transform: none !important; }
+}
+
+/* ---------- 按钮:液态玻璃透明(低透明蓝 tint + 上下描边,无模糊,禁止实心) ---------- */
+/* 运行时自动补的 mdui-btn:去掉 MDUI 默认大写/最小宽度,保留业务按钮自身内边距 */
+.mdui-btn { text-transform:none; min-width:0; }
+.submit-btn.mdui-btn, .comment-submit.mdui-btn, .primary-btn.mdui-btn, .mini-btn.mdui-btn,
+.follow-btn.mdui-btn, .read-all-btn.mdui-btn, .wall-send.mdui-btn, .action-item.mdui-btn,
+.approve.mdui-btn, .reject.mdui-btn, .btn-danger.mdui-btn, .btn-success.mdui-btn,
+.author-follow.mdui-btn, .modal-content button.mdui-btn { height:auto; line-height:1.4; }
+.mdui-btn.mdui-btn-raised, .btn, button.btn {
+  background:var(--glass-tint) !important;
+  color:var(--accent-1) !important;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), var(--shadow) !important;
+  border:none !important;
+  transition:background .35s ease, color .35s ease, transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .4s ease !important;
+}
+.mdui-btn.mdui-btn-raised:hover, .btn:hover, button.btn:hover {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+  transform:translateY(-2px) scale(1.02);
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 8px 22px var(--accent-glow) !important;
+}
+.mdui-btn:active, .btn:active, button.btn:active { transform:scale(.97); }
+/* 主操作按钮(发布/提交/保存):蓝色 tint 玻璃 */
+.mdui-btn.mdui-btn-raised.mdui-btn-primary,
+form button[type="submit"].mdui-btn, .publish-card .mdui-btn,
+.btn-primary {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+  font-weight:700;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 8px 20px var(--accent-glow) !important;
+}
+.mdui-btn.mdui-btn-raised.mdui-btn-primary:hover,
+form button[type="submit"].mdui-btn:hover, .publish-card .mdui-btn:hover {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+}
+/* 危险类按钮保持语义色但同样玻璃化 */
+.mdui-btn.danger, .mdui-btn-raised.danger, .btn-danger, .btn[style*="ff9800"] {
+  background:rgba(239,68,68,.12) !important;
+  color:var(--danger) !important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.25), inset 0 -2px 0 rgba(0,0,0,.06) !important;
+}
+.mdui-btn.danger:hover, .mdui-btn-raised.danger:hover, .btn-danger:hover {
+  background:rgba(239,68,68,.22) !important;
+  color:var(--danger) !important;
+}
+body.dark-mode .mdui-btn.danger, body.dark-mode .btn-danger {
+  background:rgba(239,68,68,.18) !important;
+}
+
+/* ---------- 社区二级菜单/悬浮窗:高实底,无模糊 ---------- */
+.mdui-menu, .mdui-dropdown-menu, .mdui-popover, .mdui-select-menu,
+.mdui-toolbar-popover, [class*="mdui-menu"], [class*="mdui-popover"] {
+  background: rgba(255,255,255,.94) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55),
+              0 16px 40px rgba(30,64,175,.18) !important;
+  border-radius: 14px !important;
+  animation: keQSpring .42s cubic-bezier(.34,1.56,.64,1) !important;
+  transform-origin: top center;
+}
+body.dark-mode .mdui-menu, body.dark-mode .mdui-dropdown-menu, body.dark-mode .mdui-popover,
+body.dark-mode [class*="mdui-menu"], body.dark-mode [class*="mdui-popover"] {
+  background: rgba(22,27,48,.94) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16),
+              0 16px 40px rgba(0,0,0,.5) !important;
+}
+@keyframes keQSpring {
+  0% { opacity:0; transform: translateY(-12px) scale(.92); }
+  55% { opacity:1; transform: translateY(2px) scale(1.02); }
+  75% { transform: translateY(-1px) scale(.99); }
+  100% { opacity:1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- mdui tab:胶囊导航条 + 堆叠切换(指示条统一蓝色,禁紫色) ---------- */
+.mdui-tab {
+  position:relative;
+  display:flex; justify-content:flex-start; align-items:center; gap:4px;
+  flex-wrap:nowrap;                 /* 禁止换行:空间不足时横向滚动 */
+  overflow-x:auto; overflow-y:hidden;
+  scrollbar-width:none; -ms-overflow-style:none;
+  max-width:100%; margin:0 auto 18px; padding:8px 12px;
+  border-radius:60px;
+  background:var(--glass-card);
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), var(--shadow);
+  border-bottom:none !important;
+}
+.mdui-tab::-webkit-scrollbar { display:none; }
+.mdui-tab .mdui-tab-indicator { background:var(--accent-1) !important; display:none !important; }
+.mdui-tab a { position:relative; flex:none; white-space:nowrap; padding:9px 20px !important; font-weight:700; border-radius:30px; }
+.mdui-tab a:hover { background:var(--glass-tint); color:var(--accent-1); transform:translateY(-2px) scale(1.04); }
+.mdui-tab a.mdui-tab-active {
+  color:var(--accent-1); background:var(--glass-tint-2); position:relative;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 0 12px var(--accent-glow);
+}
+.mdui-tab a.mdui-tab-active::after { content:none; }
+.tab-content, [id^="panel-"] { animation: keTabFade .45s ease; }
+@keyframes keTabFade { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ---------- AI 翻译角标:精致小徽标(与 index.html 完全一致,淡蓝低透明) ---------- */
+.ke-ai-badge {
+  display:inline-block !important;
+  margin-left:4px !important;
+  padding:0 4px !important;
+  font-size:8.5px !important;
+  font-weight:700;
+  line-height:1.5;
+  letter-spacing:.3px;
+  border-radius:3px;
+  color:#3b82f6 !important;
+  background:rgba(59,130,246,.10) !important;
+  border:1px solid rgba(59,130,246,.22) !important;
+  vertical-align:middle;
+  box-shadow:none !important;
+  animation:none !important;
+}
+.ke-ai-badge::before { content:none !important; }
+body.dark-mode .ke-ai-badge { color:#93c5fd; background:rgba(147,197,253,.12) !important; border-color:rgba(147,197,253,.25); }
+/* MDUI 涟漪(ripple)统一蓝色,禁止默认紫色 */
+.mdui-ripple-wave, .mdui-ripple .mdui-ripple-wave { background-color:rgba(59,130,246,.28) !important; }
+
+/* ---------- 节能模式:全局实心 + 禁用增强 ---------- */
+body.lite-mode *, body.lite-mode *::before, body.lite-mode *::after {
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+body.lite-mode .card, body.lite-mode .right-card, body.lite-mode .mdui-card,
+body.lite-mode .board-item, body.lite-mode .post-card, body.lite-mode .project-card,
+body.lite-mode .work-card, body.lite-mode .mdui-list-item {
+  background:var(--solid-glass, #ffffff) !important;
+}
+body.lite-mode .knx-glow::after, body.lite-mode .knx-glow::before { display:none !important; }
+body.lite-mode .card:hover, body.lite-mode .right-card:hover, body.lite-mode .mdui-card:hover,
+body.lite-mode .board-item:hover, body.lite-mode .post-card:hover, body.lite-mode .project-card:hover,
+body.lite-mode .work-card:hover {
+  transform:none !important;
+  box-shadow:0 8px 30px rgba(30,64,175,.08) !important;
+}
+body.lite-mode .mdui-menu, body.lite-mode .mdui-dropdown-menu, body.lite-mode .mdui-popover,
+body.lite-mode [class*="mdui-menu"], body.lite-mode [class*="mdui-popover"] {
+  animation:none !important;
+  background:rgba(255,255,255,.96) !important;
+}
+body.lite-mode.dark-mode .mdui-menu, body.lite-mode.dark-mode .mdui-popover { background:rgba(22,27,48,.96) !important; }
+body.lite-mode .mdui-tab a.mdui-tab-active::after { animation:none !important; }
+
+/* ---------- mdui 蓝色系覆盖 ---------- */
+.mdui-btn:not(.mdui-btn-raised):not([style*="background"]),
+.mdui-pagination a, .mdui-pagination button { color:var(--accent-1) !important; }
+.mdui-pagination .mdui-pagination-active { background:var(--accent-1) !important; color:#fff !important; }
+
+/* ---------- 业务实心按钮统一改液态玻璃(透明底 + 上下描边,无模糊) ---------- */
+/* 次级/普通动作:透明玻璃 */
+.submit-btn, .comment-submit, .primary-btn, .action-item, .follow-btn,
+.read-all-btn, .mini-btn, .btn, .btn-glass,
+.author-follow, .approve, .reject {
+  background:var(--glass-card) !important;
+  color:var(--text-1) !important;
+  border:none !important;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), var(--shadow) !important;
+  transition:background .35s ease, color .35s ease, transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .4s ease !important;
+}
+.submit-btn:hover, .comment-submit:hover, .primary-btn:hover, .action-item:hover,
+.follow-btn:hover, .read-all-btn:hover, .mini-btn:hover, .btn:hover,
+.author-follow:hover {
+  background:var(--glass-tint) !important;
+  color:var(--accent-1) !important;
+  transform:translateY(-2px) scale(1.02);
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), var(--shadow-hover) !important;
+}
+.submit-btn:active, .comment-submit:active, .primary-btn:active, .action-item:active,
+.mini-btn:active, .follow-btn:active { transform:scale(.97); }
+/* 主操作(发布/提交/保存/添加):蓝色 tint 玻璃,更醒目但仍透明 */
+.submit-btn, .comment-submit, .primary-btn, .btn-primary, .approve, .wall-send {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+  font-weight:700;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 8px 20px var(--accent-glow) !important;
+}
+.submit-btn:hover, .comment-submit:hover, .primary-btn:hover, .btn-primary:hover, .approve:hover, .wall-send:hover {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+}
+/* 危险/取消类:语义色玻璃 */
+.btn-danger, .reject, .delete-action {
+  background:rgba(239,68,68,.12) !important;
+  color:var(--danger) !important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.25), inset 0 -2px 0 rgba(0,0,0,.06) !important;
+}
+.btn-danger:hover, .reject:hover, .delete-action:hover {
+  background:rgba(239,68,68,.22) !important; color:var(--danger) !important;
+}
+body.dark-mode .btn-danger, body.dark-mode .reject, body.dark-mode .delete-action {
+  background:rgba(239,68,68,.18) !important;
+}
+/* 成功类(获取Token/添加用户):蓝绿玻璃,避免实心 */
+.btn-success {
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 8px 20px var(--accent-glow) !important;
+}
+.btn-success:hover { background:var(--glass-tint-2) !important; color:var(--accent-1) !important; }
+/* 已关注/激活态:保留语义但玻璃化 */
+.follow-btn.following, .author-follow.following {
+  background:var(--glass-tint) !important; color:var(--text-2) !important;
+}
+.action-item.active, .action-item.like-active, .action-item.fav-active {
+  background:var(--glass-tint-2) !important; color:var(--accent-1) !important;
+}
+/* 表单控件(输入/文本域/下拉):透明玻璃 + 上下描边 */
+.form-card input[type="text"], .form-card input[type="url"], .form-card input[type="password"],
+.form-card textarea, .form-card select,
+.comment-input textarea, .form-group input, .form-group textarea, .form-group select {
+  background:var(--glass-card) !important;
+  color:var(--text-1) !important;
+  border:none !important;
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), inset 0 0 0 1px rgba(59,130,246,.14) !important;
+  transition:box-shadow .3s ease, background .3s ease !important;
+}
+.form-card input:focus, .form-card textarea:focus, .form-card select:focus,
+.comment-input textarea:focus, .form-group input:focus, .form-group textarea:focus {
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot), inset 0 0 0 1.5px var(--accent-1) !important;
+  background:var(--glass-tint) !important;
+}
+
+/* ---------- MDUI 主题变量整体改写:涟漪/指示条/聚焦色等默认靛紫全部归蓝 ---------- */
+:root {
+  --mdui-color-theme:#3b82f6;
+  --mdui-color-theme-aggregate:#3b82f6;
+  --mdui-color-theme-accent:#3b82f6;
+  --mdui-color-theme-error:#ef4444;
+  --mdui-color-theme-primary:#3b82f6;
+  --mdui-color-theme-secondary:#ef4444;
+  --mdui-color-primary-500:#3b82f6;
+  --mdui-color-secondary-500:#ef4444;
+}
+body.dark-mode {
+  --mdui-color-theme:#60a5fa;
+  --mdui-color-theme-aggregate:#60a5fa;
+  --mdui-color-theme-accent:#60a5fa;
+  --mdui-color-theme-error:#f87171;
+  --mdui-color-theme-primary:#60a5fa;
+  --mdui-color-primary-500:#60a5fa;
+}
+
+/* ---------- MDUI 默认靛蓝/紫色系全部归一为蓝色(仅允许蓝/红语义色) ---------- */
+.mdui-tab-indicator, .mdui-textfield-focus .mdui-textfield-input { border-color:var(--accent-1) !important; }
+.mdui-textfield-focus .mdui-textfield-label,
+.mdui-textfield-floating-label.mdui-textfield-focus .mdui-textfield-label { color:var(--accent-1) !important; }
+.mdui-textfield-error { color:var(--danger) !important; }
+.mdui-textfield-has-bottom .mdui-textfield-input { border-bottom:1px solid var(--border); }
+.mdui-progress .mdui-progress-indeterminate { background:var(--accent-1); }
+.mdui-checkbox input[type="checkbox"]:checked + i,
+.mdui-radio input[type="radio"]:checked + i { color:var(--accent-1) !important; }
+.mdui-theme-primary-indigo .mdui-color-theme,
+[class*="mdui-color-indigo"], [class*="mdui-color-deep-purple"],
+[class*="mdui-color-purple"], [class*="mdui-color-blue-grey"] {
+  background-color:var(--accent-1) !important;
+  color:#fff !important;
+}
+.mdui-text-color-indigo, .mdui-text-color-deep-purple, .mdui-text-color-purple { color:var(--accent-1) !important; }
+
+/* ---------- 运行时自动补的 MDUI 组件:保护性覆盖,避免 MDUI 默认样式破坏玻璃风格 ---------- */
+/* mdui-typo:只借排版结构,颜色/字号仍由业务样式控制 */
+.mdui-typo { color:inherit; font-size:inherit; line-height:1.8; }
+.mdui-typo a { color:var(--accent-1); }
+.mdui-typo p, .mdui-typo ul, .mdui-typo ol, .mdui-typo blockquote { color:inherit; }
+.mdui-typo pre, .mdui-typo code {
+  background:var(--glass-strong) !important;
+  color:var(--text-1) !important;
+  border-radius:8px;
+}
+.mdui-typo blockquote { border-left-color:var(--accent-1); color:var(--text-2); }
+/* mdui-chip:缩小为标签尺寸,蓝色玻璃底(禁 MDUI 默认灰底/34px 高) */
+.mdui-chip {
+  height:auto !important;
+  min-height:0 !important;
+  margin:0 4px 0 0 !important;
+  padding:2px 9px !important;
+  border-radius:8px !important;
+  font-size:11.5px !important;
+  font-weight:700;
+  line-height:1.5 !important;
+  background:var(--glass-tint-2) !important;
+  color:var(--accent-1) !important;
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot) !important;
+  transition:background .3s, color .3s, transform .35s var(--ease-pop);
+}
+.mdui-chip:hover { background:var(--accent-1) !important; color:#fff !important; transform:translateY(-1px); }
+.mdui-chip .mdui-chip-icon { display:none; }
+/* mdui-list:去 MDUI 默认内边距,保留业务列表排布 */
+.mdui-list { padding:0 !important; background:transparent !important; }
+.mdui-list .mdui-list-item { padding:0 !important; background:transparent !important; min-height:0 !important; }
+/* mdui-table:玻璃化表头/边框,禁 MDUI 默认白底 */
+.mdui-table, .mdui-table-hoverable { background:transparent !important; }
+.mdui-table th, .mdui-table td {
+  border-bottom:1px solid var(--border) !important;
+  color:var(--text-1) !important;
+  font-size:13px !important;
+}
+.mdui-table th { color:var(--text-2) !important; font-weight:700; }
+.mdui-table tr:hover td { background:var(--glass-tint) !important; }
+/* mdui-card-header-title:作为卡片小标题,不套 MDUI 默认字号 */
+.mdui-card-header-title { font-size:inherit; font-weight:inherit; color:inherit; padding:0 !important; }
+.mdui-card-content { padding:0 !important; }
+
+/* ---------- 注册/登录等 auth 页:卡片固定宽度、水平居中 ---------- */
+.main-box:has(> .card:only-child) { display:block; }
+.main-box > .card:only-child {
+  max-width:520px;
+  margin:24px auto 40px;
+  padding:28px 30px;
+}
+@media (max-width:600px) {
+  .main-box > .card:only-child { max-width:none; margin:16px 0 32px; padding:20px 18px; }
+}
+
+/* ---------- MDUI 对话框:液态玻璃 + 上下描边(无模糊) ---------- */
+.mdui-dialog {
+  background:rgba(255,255,255,.96) !important;
+  border-radius:18px !important;
+  box-shadow:inset 0 2px 0 var(--glass-hi-top), inset 0 -2px 0 var(--glass-hi-bot), 0 24px 60px rgba(30,64,175,.22) !important;
+  color:var(--text-1) !important;
+}
+body.dark-mode .mdui-dialog {
+  background:rgba(21,27,51,.97) !important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.14), inset 0 -2px 0 rgba(0,0,0,.3), 0 24px 60px rgba(0,0,0,.55) !important;
+}
+.mdui-dialog-title { font-weight:800; color:var(--accent-1); }
+.mdui-dialog .mdui-textfield-input { color:var(--text-1) !important; }
+.mdui-dialog label.mdui-textfield-label { color:var(--text-3) !important; }
+
+/* ---------- 分区标题条:导航分区设计感(图标胶囊 + 渐隐分隔线) ---------- */
+.section-title {
+  display:flex; align-items:center; gap:8px;
+  font-size:15px; font-weight:800; color:var(--text-1);
+  margin-bottom:12px;
+}
+.section-title::before {
+  content:''; width:4px; height:16px; border-radius:4px;
+  background:linear-gradient(180deg, var(--accent-1), var(--accent-2));
+  box-shadow:0 0 10px var(--accent-glow);
+}
+.section-title > i { color:var(--accent-1); }
+
+/* ============================================================
+   顶栏修复 v2
+   根因:nav.js 会给顶栏元素补 .mdui-btn / .mdui-ripple 类,
+        社区 CSS 的 .mdui-btn 规则(蓝字 --accent-1 / 圆角 --radius-sm /
+        padding 9px 20px / inline-flex / min-width:88px)
+        与本文件顶部全局 transition !important 污染了全局导航组件。
+   方案:#hv2 内元素用 id 提权;body 下的弹出菜单用三连类提权
+        (与 .mdui-btn:not(...) 同为 0,3,0,靠后加载即胜)。
+   ============================================================ */
+
+/* ---- A. 顶栏右侧圆形图标按钮:灰图标 + 半透明玻璃 + 正圆 ---- */
+#hv2 .icon-btn,
+#hv2 .icon-btn:hover,
+#hv2 .icon-btn:active,
+#hv2 .icon-btn:focus {
+  border-radius:50% !important;
+  color:var(--text-2) !important;
+  background:rgba(255,255,255,.35) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7), inset 0 -1px 0 rgba(0,0,0,.06) !important;
+  min-width:0 !important;
+  padding:0 !important;
+  filter:none !important;
+  text-shadow:none !important;
+}
+#hv2 .icon-btn:hover {
+  color:var(--accent-1) !important;
+  background:rgba(255,255,255,.55) !important;
+  transform:scale(1.1) !important;
+}
+#hv2 .icon-btn > svg { display:block !important; margin:0 auto !important; }
+
+/* ---- B. 顶栏:去外发光 + 补 Q弹过渡 ---- */
+#hv2 header,
+#hv2 header.scrolled {
+  box-shadow:inset 0 -1px 0 rgba(29,78,216,.10) !important;
+}
+#hv2 header,
+#hv2 .icon-btn,
+#hv2 .nav-links a,
+#hv2 .nav-more-btn {
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1),
+             background .3s ease, background-color .3s ease,
+             color .3s ease, box-shadow .3s ease !important;
+}
+
+/* ---- C.「更多」恢复中性色 ---- */
+#hv2 .nav-more-btn { color:var(--text-2) !important; background:transparent !important; }
+#hv2 .nav-more-btn:hover,
+#hv2 .nav-more-btn[aria-expanded="true"] { color:var(--accent-1) !important; }
+
+/* ---- D. 隐藏顶栏「编辑器下载」 ---- */
+#hv2 .nav-links a[href*="编辑器下载"],
+#hv2 .nav-links a:has(span[data-i18n="nav_editor"]) { display:none !important; }
+
+/* ---- E. 左上角漏出的蓝色下载按钮(#mBackBtn) ---- */
+.m-back-btn { display:none !important; }
+
+/* ---- F. 弹出菜单项:完整恢复原样式 ----
+   (菜单挂在 body 下不在 #hv2 内;data-i18n 在内层 span 上) */
+.lang-item.lang-item.lang-item {
+  display:block !important;
+  width:auto !important;
+  min-width:0 !important;
+  padding:8px 12px !important;
+  border-radius:10px !important;
+  font-size:13px !important;
+  font-weight:700 !important;
+  color:var(--text-2) !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  text-align:left !important;
+  line-height:1.5 !important;
+}
+.lang-item.lang-item.lang-item:hover {
+  background:var(--glass-tint) !important;
+  color:var(--accent-1) !important;
+}
+.lang-item.cur.lang-item.cur.lang-item.cur {
+  color:var(--accent-1) !important;
+  background:var(--glass-tint) !important;
+}
+
+.ad-avatar-item.ad-avatar-item.ad-avatar-item {
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  width:auto !important;
+  min-width:0 !important;
+  padding:9px 12px !important;
+  border-radius:14px !important;
+  font-size:13.5px !important;
+  font-weight:600 !important;
+  color:var(--text-2) !important;
+  background:transparent !important;
+  text-align:left !important;
+}
+.ad-avatar-item.ad-avatar-item.ad-avatar-item:hover {
+  background:var(--glass-tint) !important;
+  color:var(--accent-1) !important;
+}
+
+.tp-item.tp-item.tp-item {
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  width:auto !important;
+  min-width:0 !important;
+  padding:9px 12px !important;
+  border-radius:14px !important;
+  font-size:13.5px !important;
+  font-weight:600 !important;
+  background:transparent !important;
+}
+.tp-item.tp-item.tp-item:hover { background:var(--glass-tint) !important; }
+
+.qr-tab.qr-tab.qr-tab {
+  flex:1 1 0 !important;
+  display:block !important;
+  width:auto !important;
+  min-width:0 !important;
+  padding:7px 4px !important;
+  border-radius:11px !important;
+  font-size:12.5px !important;
+  font-weight:700 !important;
+  color:var(--text-2) !important;
+  background:var(--glass-tint) !important;
+}
+
+.m-chip.m-chip.m-chip {
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  width:auto !important;
+  min-width:0 !important;
+  padding:7px 14px !important;
+  border-radius:30px !important;
+  font-size:12.5px !important;
+  font-weight:700 !important;
+  color:var(--text-2) !important;
+  background:var(--glass-card) !important;
+  box-shadow:inset 0 1px 0 var(--glass-hi-top), inset 0 -1px 0 var(--glass-hi-bot) !important;
+}
+
+/* ---- G. 弹出菜单容器:尺寸收口 ---- */
+.lang-pop,
+.look-pop,
+.theme-pop {
+  width:auto !important;
+  max-width:min(92vw,300px) !important;
+}
+
+/* ============================================================
+   顶栏体验微调(高光变细 + 动画收敛) —— 覆盖上方的 v2 参数
+   ============================================================ */
+#hv2 .icon-btn,
+#hv2 .icon-btn:hover {
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45), inset 0 -1px 0 rgba(0,0,0,.04) !important;
+  transition:transform .28s cubic-bezier(.4,0,.2,1),
+             background .25s ease, color .25s ease, box-shadow .25s ease !important;
+}
+#hv2 .icon-btn:hover { transform:scale(1.06) !important; }
+
+/* ============================================================
+   补齐页面使用但 MDUI 1.0.2 中不存在的类
+   (mdui-avatar / mdui-card-title / mdui-card-text / mdui-card-header-text)
+   ============================================================ */
+.mdui-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; flex:none; }
+img.mdui-avatar { display:block; }
+.mdui-card-header-text { flex:1; min-width:0; }
+.mdui-card-title { font-size:16px; font-weight:600; line-height:1.4; margin:0; }
+.mdui-card-text { font-size:13.5px; line-height:1.6; color:var(--text-2); margin:4px 0 0; opacity:.9; }
+
+/* ============================================================
+   MDUI 排版兜底:文本元素挂 mdui-typo 系列后视觉保持不变
+   ============================================================ */
+.mdui-typo { font-family:inherit; font-size:inherit; line-height:inherit; color:inherit; }
+.mdui-typo h1,.mdui-typo h2,.mdui-typo h3,.mdui-typo h4 {
+  margin:0 0 10px; font-size:inherit; font-weight:inherit; line-height:inherit;
+}
+.mdui-typo p { margin:0 0 10px; }
+.mdui-typo p:last-child { margin-bottom:0; }
+.mdui-typo ul,.mdui-typo ol { padding-left:20px; margin:0 0 10px; }
+h1.mdui-typo-headline,h2.mdui-typo-headline,h3.mdui-typo-headline,
+h2.mdui-typo-title,h3.mdui-typo-title,h4.mdui-typo-title {
+  font-size:inherit !important; font-weight:inherit !important;
+  line-height:inherit !important; margin:0;
+}
+
+/* ============================================================
+   顶栏 v3:对齐插件详情 UI 风格 + 防溢出 + 弹层过渡
+   ============================================================ */
+
+/* ---- H. 导航压缩:窄窗口不换行不溢出 ---- */
+#hv2 .nav-links { flex-wrap:nowrap !important; gap:8px !important; overflow:hidden; }
+#hv2 .nav-links a { padding:6px 10px !important; font-size:14px !important; gap:5px !important; white-space:nowrap; }
+#hv2 .nav-more-btn { padding:6px 10px !important; font-size:14px !important; }
+@media (max-width:1200px) {
+  #hv2 .nav-links { gap:4px !important; }
+  #hv2 .nav-links a { padding:5px 7px !important; font-size:13.5px !important; }
+  #hv2 .logo { font-size:16px !important; }
+}
+
+/* ---- I. 语言菜单项:✓ 对齐到最右(原 float 在 flex 下会错位) ---- */
+.lang-item.lang-item.lang-item {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+}
+.lang-item.cur::after { float:none !important; margin-left:auto !important; content:"\2713" !important; }
+
+/* ---- J. 顶栏按钮与链接:插件详情同款(玻璃底+仅 inset 高光,无外发光) ---- */
+#hv2 .icon-btn {
+  background:var(--glass-card) !important;
+}
+#hv2 .nav-links a,
+#hv2 .nav-more-btn,
+#hv2 .nav-more-btn:hover,
+#hv2 .nav-links a:hover {
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45), inset 0 -1px 0 rgba(0,0,0,.04) !important;
+  text-decoration:none !important;
+}
+/* 去掉"两条线"式描边动画(上下双线过渡) */
+#hv2 .nav-links a,
+#hv2 .nav-more-btn { border-top:none !important; border-bottom:none !important; }
+
+/* ---- K. 弹出层与二维码 tab:补流畅过渡 ---- */
+.lang-pop,
+.qr-pop,
+.look-pop,
+.qq-pop,
+.m-pop,
+.theme-pop {
+  transition:opacity .28s ease,
+             transform .42s cubic-bezier(.34,1.56,.64,1),
+             visibility .28s !important;
+}
+.qr-pane {
+  transition:opacity .25s ease, transform .32s cubic-bezier(.34,1.56,.64,1) !important;
+}
+.qr-pane .qr-name { display:block !important; margin-top:8px !important; }
+
+/* ---- L. mdui-tab 切换档:平滑过渡 ---- */
+.mdui-tab a { transition:color .25s ease, background .25s ease !important; }
+
+/* ============================================================
+   全局去静态投影(对齐插件详情:静态仅 inset 高光,无外发光)
+   社区几十条按钮/卡片规则挂了 var(--shadow)(30px 蓝投影)与
+   var(--shadow-hover)(hover 64px)——这就是"社区按钮全都有异常发光"的来源。
+   用变量清零一次性解决(0 0 0 0 transparent 合法且无视觉投影;
+   不能用 none,none 无法与 inset 层组合,会导致整条 box-shadow 失效)。
+   hover 的 --accent-glow 柔光保留(属交互动效,与插件详情一致)。
+   ============================================================ */
+:root, :root body, body,
+body.theme-aurora, body.dark-mode, body.theme-ocean, body.theme-amber {
+  --shadow: 0 0 0 0 rgba(0,0,0,0) !important;
+  --shadow-hover: 0 0 0 0 rgba(0,0,0,0) !important;
+}
+
+/* ============================================================
+   全局按钮动画修复
+   enhance.css 顶部的 transition !important 规则只留了
+   背景/颜色/边框/阴影,把 transform 吞了 —— 所有页面按钮的
+   hover 缩放/位移动画因此全部失效(生硬跳变)。
+   这里按同选择器补回 transform。
+   ============================================================ */
+html, body, header, .page, .container, .card, .right-card,
+.mdui-card, .mdui-tab a, .mdui-menu, .dropdown-content, .board-item,
+.page-title, .search, .btn, button, a {
+  transition:
+    background-color .55s cubic-bezier(.4,0,.2,1),
+    background .55s cubic-bezier(.4,0,.2,1),
+    color .45s ease,
+    border-color .5s ease,
+    box-shadow .5s ease,
+    transform .32s cubic-bezier(.34,1.56,.64,1) !important;
+}
