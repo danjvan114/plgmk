@@ -38,6 +38,11 @@ const config = {
 
   userCenter: {
     base: (env.PGMK_USER_CENTER || 'https://user.pgrm.top').replace(/\/+$/, ''),
+    // 服务器同机部署时，后端请求用户中心走内网（srv=1），避免绕外网穿透。
+    // 前端跨域拉公开资料仍走 base（用户浏览器只能访问外网，localhost 对它不可达）。
+    internalBase: (env.PGMK_SRV === '1' || env.PGMK_SRV === 'true' || env.PGMK_SRV === 1)
+      ? (env.PGMK_USER_CENTER_INTERNAL || 'http://localhost:8843').replace(/\/+$/, '')
+      : '',
     appid: env.PGMK_APPID || 'plgmk',
     callbackPath: '/login/at',
     forcedCallback: env.PGMK_CALLBACK || '',
@@ -48,7 +53,7 @@ const config = {
       iv: env.PGMK_AES_IV || '77fc6145f3a631bd9816119bf69514d6'
     },
     requestTimeout: 8000,
-    checkCacheTtl: 60 * 1000,
+    checkCacheTtl: 20 * 1000,
     profileCacheTtl: 5 * 60 * 1000,
     credentialTtl: 5 * 60 * 1000
   },
@@ -76,6 +81,21 @@ const config = {
 
   ownerNickname: env.PGMK_OWNER_NICKNAME || 'Starry'
 };
+
+// 服务器部署本地配置（可选，不提交，已在 .gitignore）：
+//   module.exports = { srv: true, userCenterInternal: 'http://localhost:8843' }
+// 存在该文件且 srv 为真时，后端请求用户中心改用内网地址；
+// 前端跨域拉公开资料仍用 base（外网），不受影响。
+try {
+  const local = require('./config.srv');
+  if (local && local.srv) {
+    config.userCenter.internalBase =
+      String(local.userCenterInternal || config.userCenter.internalBase || 'http://localhost:8843').replace(/\/+$/, '');
+  }
+  if (local && local.userCenter) {
+    config.userCenter.base = String(local.userCenter).replace(/\/+$/, '');
+  }
+} catch (e) { /* 无本地配置文件则沿用环境变量/默认值 */ }
 
 config.resolveCallback = function resolveCallback(req) {
   if (config.userCenter.forcedCallback) return config.userCenter.forcedCallback;

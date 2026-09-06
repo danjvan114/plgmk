@@ -23,7 +23,28 @@
     if (p.isSelf) {
       try { const md = await App.get('/api/moderation/me'); hasPending = !!(md.hasPendingRequest); } catch (e) {}
     }
-    render(p, hasPending);
+
+    // 跨域拉取用户中心的公开资料（昵称/头像/简介），远端优先、本地兜底。
+    // 用户名是隐私，这里只用于反查 uuid，绝不下发给前端展示。
+    let remote = null;
+    if (p.uuid) {
+      const base = p.userCenter || 'https://user.pgrm.top';
+      try {
+        const r = await fetch(base + '/api/open/public/profile?uuid=' + encodeURIComponent(p.uuid));
+        if (r.ok) {
+          const j = await r.json();
+          if (j && j.code === 200 && j.data) remote = j.data;
+        }
+      } catch (e) { /* 跨域/网络失败则降级到本地资料 */ }
+    }
+    const profile = Object.assign({}, p.profile, {
+      uuid: p.uuid,
+      nickname: (remote && remote.nickname) || p.profile.nickname,
+      avatar: (remote && remote.avatar) || p.profile.avatar,
+      bio: (remote && remote.bio) || p.profile.bio
+    });
+
+    render(Object.assign({}, p, { profile }), hasPending);
   }
 
   function render(d, hasPending) {
@@ -43,13 +64,13 @@
     view.innerHTML = `
       <div class="fade-enter" style="max-width:1000px">
         <div class="profile-head" style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:16px">
-          <img src="${App.urlAvatar({ nickname: profile.nickname })}" style="width:76px;height:76px;border-radius:50%;flex:none" onerror="this.style.display='none'">
+          ${App.avatarImg(profile.avatar, 76)}
           <div class="info">
             <h1>${A(profile.nickname)} ${vBadge}
               ${d.isSelf ? '<span class="chip tonal">我</span>' : ''}
               ${me && me.isAdmin ? '<span class="chip tonal">管理员</span>' : ''}
             </h1>
-            <div class="uname">@${A(profile.username)}${profile.bio ? ' · ' + A(profile.bio) : ''}</div>
+            ${profile.bio ? `<div class="uname" style="margin-top:2px">${A(profile.bio)}</div>` : ''}
             <div class="stat-chips">
               <div class="sc" id="scFollowers" style="cursor:${s.followers ? 'pointer' : 'default'}"><b>${s.followers}</b><span>粉丝</span></div>
               <div class="sc" id="scFollowing" style="cursor:${s.following ? 'pointer' : 'default'}"><b>${s.following}</b><span>关注</span></div>
@@ -92,7 +113,7 @@
           finally { delete followBtn.dataset.busy; }
         };
         if (willUnfollow) {
-          App.confirmDialog('确定取消关注 @' + profile.username + ' ？', doIt, { title: '取消关注' });
+          App.confirmDialog('确定取消关注 ' + A(profile.nickname || profile.username) + ' ？', doIt, { title: '取消关注' });
         } else {
           doIt();
         }
@@ -203,8 +224,8 @@
       body.innerHTML = items.length
         ? `<div style="max-height:55vh;overflow:auto">${items.map((u) => `
             <a href="${App.userUrl(u.username)}" style="display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--mdui-color-outline-variant);text-decoration:none;color:inherit">
-              <img src="${App.urlAvatar(u)}" style="width:36px;height:36px;border-radius:50%" onerror="this.style.display='none'">
-              <div style="flex:1;min-width:0"><div style="font-weight:600">${A(u.nickname)}</div><div style="font-size:12px;color:var(--mdui-color-on-surface-variant)">@${A(u.username)}</div></div>
+              ${App.avatarImg(u.avatar, 36)}
+              <div style="flex:1;min-width:0"><div style="font-weight:600">${A(u.nickname || u.username)}</div></div>
             </a>`).join('')}</div>`
         : '<div class="empty-tip">暂无' + title + '</div>';
       App.dialog({ headline: title + ' · ' + profile.nickname, body, actions: [{ text: '关闭' }] });

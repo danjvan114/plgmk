@@ -54,15 +54,15 @@
   }
 
   function chromeHtml() {
-    const nav = NAVS.map((n) => `<a class="ke-navlink ${n.key === activePage ? 'active' : ''}" data-key="${n.key}" href="${n.href}"><span class="material-icons">${n.icon}</span>${n.label}</a>`).join('');
+    const nav = NAVS.map((n) => `<a class="ke-navlink mdui-ripple mdui-ripple-blue ${n.key === activePage ? 'active' : ''}" data-key="${n.key}" href="${n.href}"><span class="material-icons">${n.icon}</span>${n.label}</a>`).join('');
     return `
 <div class="ke-topbar">
   <div class="ke-topbar-inner">
-    <button class="ke-iconbtn" id="btnNav" aria-label="菜单"><span class="material-icons">menu</span></button>
+    <button class="ke-iconbtn mdui-ripple mdui-ripple-blue" id="btnNav" aria-label="菜单"><span class="material-icons">menu</span></button>
     <a href="/" class="ke-brand"><img src="/uploads/kn.png" alt="">KE Hub</a>
     <nav class="ke-navlinks">${nav}</nav>
     <div class="ke-topbar-right">
-      <a href="/download" class="ke-download-btn" title="下载编辑器 KN Expanse"><span class="material-icons">download</span><span class="dl-label">KN Expanse</span></a>
+      <a href="/download" class="ke-download-btn mdui-ripple mdui-ripple-blue" title="下载编辑器 KN Expanse"><span class="material-icons">download</span><span class="dl-label">KN Expanse</span></a>
       <div class="ke-userarea" id="userArea"></div>
     </div>
   </div>
@@ -74,45 +74,100 @@
     <a class="drawer-link" href="/docs"><span class="material-icons">menu_book</span>开发者文档</a>
     <a class="drawer-link" href="/download"><span class="material-icons">download</span>编辑器下载</a>
   </div>
-  <div class="drawer-foot">由 KT 用户中心提供统一账号</div>
 </aside>`;
   }
 
-  function renderUserArea() {
+  // ── 用户区 ────────────────────────────────────────────────────────────
+  // 约定（不再用 class 控制显示/隐藏）：
+  //   显示 = 立刻创建并插入整个 .menu-pop 元素
+  //   隐藏 = 直接把整个元素 remove() 掉
+  //   按钮状态（登录态 / 头像 / 未读数 / 菜单开合）变化 = 重新绘制按钮
+  let userMenuEl = null;
+  let drawnUnread = -1;
+
+  function msgDotHtml() {
+    const n = App.state.unread;
+    if (!(n > 0)) return '<span id="msgDot" class="ke-dot hidden">0</span>';
+    return '<span id="msgDot" class="ke-dot">' + (n > 99 ? '99+' : String(n)) + '</span>';
+  }
+
+  function userAreaHtml() {
+    const me = App.state.me;
+    if (!me) return '<a href="/login"><button class="btn primary">登录</button></a>';
+    const open = !!userMenuEl;
+    return `
+  <button class="ke-iconbtn mdui-ripple mdui-ripple-blue" id="btnMsg" aria-label="消息"><span class="material-icons">notifications</span>${msgDotHtml()}</button>
+  <button class="ke-avatar-btn mdui-ripple mdui-ripple-blue${open ? ' is-open' : ''}" id="btnUser" aria-haspopup="true" aria-expanded="${open ? 'true' : 'false'}">${avatarBtnHtml(me)}</button>`;
+  }
+
+  // 按钮状态一变就整颗重建：DOM、事件、水波纹绑定一起重生
+  function renderUserBtn() {
     const el = document.getElementById('userArea');
     if (!el) return;
-    const me = App.state.me;
-    if (!me) {
-      el.innerHTML = `<a href="/login"><button class="btn primary">登录</button></a>`;
-      return;
+    const oldUser = el.querySelector('#btnUser');
+    el.innerHTML = userAreaHtml();
+    const msg = el.querySelector('#btnMsg');
+    const user = el.querySelector('#btnUser');
+    if (msg) msg.addEventListener('click', () => openMessages());
+    if (user) user.addEventListener('click', (e) => { e.stopPropagation(); openUserMenu(user); });
+    // 把正在播放的水波纹搬到新按钮上，避免重绘把动画拦腰截断
+    if (oldUser && user) {
+      oldUser.querySelectorAll('.mdui-ripple-wave').forEach((w) => user.insertBefore(w, user.firstChild));
     }
-    el.innerHTML = `
-  <button class="ke-iconbtn" id="btnMsg" aria-label="消息"><span class="material-icons">notifications</span><span id="msgDot" class="ke-dot hidden">0</span></button>
-  <button class="ke-avatar-btn" id="btnUser">${avatarBtnHtml(me)}</button>
-  <div class="menu-pop" id="userMenu">
+    if (window.MDURipple) window.MDURipple.scan(el);
+    drawnUnread = App.state.unread;
+  }
+
+  function userMenuHtml(me) {
+    return `
     <div style="padding:10px 12px 8px;border-bottom:1px solid var(--border)">
       <div style="font-weight:700;display:flex;align-items:center;gap:8px">${App.esc(me.nickname || me.username)} ${App.badgeVerified(me.verified)} ${roleLabel(me)}</div>
     </div>
-    <button class="menu-item" data-v="profile"><span class="material-icons">person</span>我的主页</button>
-    <button class="menu-item" data-v="dev"><span class="material-icons">code</span>开发者中心</button>
-    <button class="menu-item" data-v="upload"><span class="material-icons">upload_file</span>上传插件</button>
-    <button class="menu-item" data-v="works"><span class="material-icons">cloud_upload</span>发布作品</button>
-    ${me.isAdmin ? `<button class="menu-item" data-v="admin"><span class="material-icons">shield</span>管理后台</button>` : ''}
-    <button class="menu-item" data-v="logout"><span class="material-icons">logout</span>退出登录</button>
-  </div>`;
-    const userMenu = el.querySelector('#userMenu');
-    el.querySelector('#btnUser').addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleMenu(userMenu, el.querySelector('#btnUser'));
-    });
-    document.addEventListener('click', (e) => {
-      if (userMenu.classList.contains('open') && !userMenu.contains(e.target) && e.target.id !== 'btnUser') {
-        userMenu.classList.remove('open');
-      }
-    });
-    userMenu.querySelectorAll('.menu-item').forEach((it) => {
+    <button class="menu-item mdui-ripple mdui-ripple-blue" data-v="profile"><span class="material-icons">person</span>我的主页</button>
+    <button class="menu-item mdui-ripple mdui-ripple-blue" data-v="dev"><span class="material-icons">code</span>开发者中心</button>
+    <button class="menu-item mdui-ripple mdui-ripple-blue" data-v="upload"><span class="material-icons">upload_file</span>上传插件</button>
+    <button class="menu-item mdui-ripple mdui-ripple-blue" data-v="works"><span class="material-icons">cloud_upload</span>发布作品</button>
+    ${me.isAdmin ? `<button class="menu-item mdui-ripple mdui-ripple-blue" data-v="admin"><span class="material-icons">shield</span>管理后台</button>` : ''}
+    <button class="menu-item mdui-ripple mdui-ripple-blue" data-v="logout"><span class="material-icons">logout</span>退出登录</button>`;
+  }
+
+  // 隐藏：直接把整个元素删掉
+  function dropUserMenu() {
+    if (!userMenuEl) return false;
+    userMenuEl.remove();
+    userMenuEl = null;
+    return true;
+  }
+
+  function closeUserMenu() {
+    if (dropUserMenu()) renderUserBtn();
+  }
+
+  // 显示：马上绘制整个元素并插入
+  function openUserMenu(anchor) {
+    const me = App.state.me;
+    if (!me) return;
+    if (userMenuEl) { closeUserMenu(); return; } // 已打开 → 直接删掉（收起）
+    const menu = document.createElement('div');
+    menu.className = 'menu-pop open';
+    menu.id = 'userMenu';
+    menu.innerHTML = userMenuHtml(me);
+    document.body.appendChild(menu);
+    userMenuEl = menu;
+
+    const r = anchor.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const w = menu.offsetWidth || 200;
+    let left = r.right - w;
+    if (left < 8) left = 8;
+    if (left + w > vw - 8) left = vw - w - 8;
+    menu.style.top = (r.bottom + 8) + 'px';
+    menu.style.left = left + 'px';
+
+    if (window.MDURipple) window.MDURipple.scan(menu);
+    menu.querySelectorAll('.menu-item').forEach((it) => {
       it.addEventListener('click', () => {
-        userMenu.classList.remove('open');
+        closeUserMenu();
         const v = it.getAttribute('data-v');
         if (v === 'profile') location.href = '/u/' + encodeURIComponent(me.username);
         else if (v === 'dev') location.href = '/dev';
@@ -122,35 +177,34 @@
         else if (v === 'logout') doLogout();
       });
     });
-    el.querySelector('#btnMsg').addEventListener('click', () => openMessages());
-    updateMsgDot();
+    renderUserBtn(); // 展开态变了 → 重新绘制按钮
   }
 
-  function toggleMenu(menu, anchor) {
-    if (menu.classList.contains('open')) { menu.classList.remove('open'); return; }
-    menu.classList.add('open');
-    const r = anchor.getBoundingClientRect();
-    menu.style.left = '';
-    menu.style.right = '';
-    const vw = window.innerWidth;
-    const w = menu.offsetWidth || 200;
-    let left = r.right - w;
-    if (left < 8) left = 8;
-    if (left + w > vw - 8) left = vw - w - 8;
-    menu.style.top = (r.bottom + 8) + 'px';
-    menu.style.left = left + 'px';
+  // 点了别处 / Esc / 窗口尺寸变化 → 直接删掉菜单
+  document.addEventListener('click', (e) => {
+    if (!userMenuEl) return;
+    if (userMenuEl.contains(e.target)) return;
+    const b = document.getElementById('btnUser');
+    if (b && (b === e.target || b.contains(e.target))) return;
+    closeUserMenu();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeUserMenu(); });
+  window.addEventListener('resize', closeUserMenu);
+
+  function renderUserArea() {
+    dropUserMenu();
+    renderUserBtn();
   }
 
   function updateMsgDot() {
-    const dot = document.getElementById('msgDot');
-    if (!dot) return;
-    if (App.state.unread > 0) {
-      dot.textContent = App.state.unread > 99 ? '99+' : String(App.state.unread);
-      dot.classList.remove('hidden');
-    } else dot.classList.add('hidden');
+    if (App.state.unread === drawnUnread) return;
+    renderUserBtn(); // 未读数变化 → 重新绘制按钮
   }
 
   async function doLogout() {
+    dropUserMenu();
+    App.state.me = null;
+    renderUserBtn();
     try { await App.post('/api/auth/logout'); } catch (e) { /* ignore */ }
     location.href = '/';
   }
@@ -219,6 +273,7 @@
     activePage = activeFromPath();
     const host = document.getElementById('app-shell');
     if (!host) return;
+    dropUserMenu();
     chromeRoot = host;
     host.innerHTML = chromeHtml();
     host.querySelector('#btnNav').addEventListener('click', () => toggleDrawer(true));
@@ -248,8 +303,9 @@
   }
   function startPatrol() {
     if (patrolTimer) return;
-    patrolTimer = setInterval(patrol, 60000);
+    patrolTimer = setInterval(patrol, 30000); // 风控：每 30s 校验一次 sso attoken
     document.addEventListener('visibilitychange', () => { if (!document.hidden) patrol(); });
+    patrol(); // 启动后立即校验一次，免得登录态失效要等一个间隔才被发现
   }
 
   async function boot() {
@@ -276,7 +332,7 @@
         <div class="ke-footer-col">
           <h4>KE Hub</h4>
           <p>KE 社区 · 插件市场 / 论坛 / 作品池 / 团队 一站式入口</p>
-          <p style="opacity:.7">由 KT 用户中心统一提供账号 · 上传/评论/回复 全部走真实持久化</p>
+          <p style="opacity:.7">上传/评论/回复 全部走真实持久化</p>
         </div>
         <div class="ke-footer-col">
           <h4>创作</h4>

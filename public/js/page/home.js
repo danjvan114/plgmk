@@ -60,7 +60,7 @@
         <div class="grid-cards">${hot.length ? hot.map(App.cards.pluginCard).join('') : '<div class="empty-tip">还没有插件，来发布第一个吧</div>'}</div>
 
         <div style="text-align:center;margin:40px 0 10px;color:var(--mdui-color-outline);font-size:13px">
-          使用遇到问题？查看 <a href="/docs" style="color:var(--mdui-color-primary)">开发者文档</a> · 需要登录？由 <a href="/login" style="color:var(--mdui-color-primary)">KT 用户中心</a> 统一提供账号
+          使用遇到问题？查看 <a href="/docs" style="color:var(--mdui-color-primary)">开发者文档</a>
         </div>
       </div>`;
   }

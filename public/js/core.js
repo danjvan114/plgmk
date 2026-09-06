@@ -1,6 +1,26 @@
 (function () {
   'use strict';
 
+  /* 性能优化：移除全站毛玻璃模糊。
+     根因：站点大量使用 backdrop-filter: blur()（吸顶导航 veil blur(28px)、顶部栏、玻璃卡片、
+     toast/弹层等），滚动时浏览器需逐帧对背景重采样，是卡顿主因。
+     做法：加载时注入一条全局样式，对当前及后续动态注入的元素（nav veil / 弹层 / toast）一律关闭
+     backdrop-filter 与 filter 模糊。脚本在 <body> 解析到此处即同步执行，先于首屏绘制，无闪烁。 */
+  (function killBlur() {
+    try {
+      const s = document.createElement('style');
+      s.id = 'perf-noblur';
+      s.textContent =
+        'html.perf-noblur *,' +
+        'html.perf-noblur *::before,' +
+        'html.perf-noblur *::after{' +
+        'backdrop-filter:none!important;-webkit-backdrop-filter:none!important;' +
+        'filter:none!important}';
+      document.documentElement.classList.add('perf-noblur');
+      (document.head || document.documentElement).appendChild(s);
+    } catch (e) { /* 忽略：性能优化失败不影响功能 */ }
+  })();
+
   async function request(method, url, body, raw) {
     const headers = {};
     let payload = body;
@@ -423,6 +443,24 @@
     }
   });
 
+  // 头像加载失败时的统一兜底图（用户指定）
+  const AVATAR_FALLBACK =
+    'https://cdn-community.bcmcdn.com/47/community/PwfHE1eFG9DgXvvn5iXzniJ3OkFpcveMgQUgcPe9x0y3.png?hash=Fsd24e1xswiGVQZpOaOUXcDfkdDJ';
+
+  // 生成带「加载失败回退」的头像 DOM（优先用真实头像，失败则用 AVATAR_FALLBACK）
+  function avatarImg(url, size, opts) {
+    const s = size || 36;
+    const o = opts || {};
+    const radius = o.radius || '50%';
+    const src = url || AVATAR_FALLBACK;
+    const cls = o.cls || '';
+    return (
+      `<span class="${cls}" style="width:${s}px;height:${s}px;border-radius:${radius};overflow:hidden;flex:none;display:inline-flex;background:#e5e7eb">` +
+      `<img src="${esc(src)}" alt="" style="width:100%;height:100%;object-fit:cover"` +
+      ` onerror="this.onerror=null;this.src='${esc(AVATAR_FALLBACK)}'"></span>`
+    );
+  }
+
   window.App = {
     get: (u) => request('GET', u),
     post: (u, b) => request('POST', u, b),
@@ -435,7 +473,9 @@
     badgeVerified,
     starHtml,
     avatarHtml,
+    avatarImg,
     urlAvatar,
+    AVATAR_FALLBACK,
     colorOf,
     toast,
     dialog,

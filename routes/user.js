@@ -62,6 +62,8 @@ module.exports = function register(router) {
       .map((t) => ({ id: t.id, name: t.name }));
 
     H.ok(res, {
+      uuid: profiles.getUuid(username),
+      userCenter: config.userCenter.base,
       profile: profileOf(username),
       stats,
       teams: teamList,
