@@ -1,0 +1,15 @@
+{
+  "name": "plgmk",
+  "version": "3.0.0",
+  "private": true,
+  "description": "KE Hub 插件市场 - Node.js 零依赖实现",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {}
+}
