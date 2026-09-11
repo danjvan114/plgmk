@@ -331,8 +331,8 @@
       <div class="ke-footer-inner">
         <div class="ke-footer-col">
           <h4>KE Hub</h4>
-          <p>KE 社区 · 插件市场 / 论坛 / 作品池 / 团队 一站式入口</p>
-          <p style="opacity:.7">上传/评论/回复 全部走真实持久化</p>
+          <p>KE 社区</p>
+          <p style="opacity:.7">Neko Network Ver 26.9.0</p>
         </div>
         <div class="ke-footer-col">
           <h4>创作</h4>
@@ -350,7 +350,7 @@
         <div class="ke-footer-col">
           <h4>关于</h4>
           <p style="opacity:.7">KE 官方团队由站点维护者运营</p>
-          <p style="opacity:.6">© KE Hub · 由本地 Node.js 驱动</p>
+          
         </div>
       </div>`;
     document.body.appendChild(f);

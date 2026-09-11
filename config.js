@@ -67,7 +67,7 @@ const config = {
   },
 
   upload: {
-    allowedPluginExt: ['zip', 'rar', '7z', 'js', 'py', 'tar', 'gz', 'bcmkn', 'ttmp4'],
+    allowedPluginExt: ['zip', 'rar', '7z', 'js', 'py', 'tar', 'gz', 'bcmkn', 'ttmp4', 'cue'],
     allowedImageExt: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'svg']
   },
 

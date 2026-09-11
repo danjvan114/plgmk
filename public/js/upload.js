@@ -132,8 +132,10 @@
         if (idx >= 0) results.splice(idx, 1);
         row.remove();
         if (o.onChange) o.onChange(results.slice());
+        root.dispatchEvent(new Event('change'));
       });
       row.appendChild(rm);
+      results.push(item);
       resultBox.appendChild(row);
       if (o.onChange) o.onChange(results.slice());
       root.dispatchEvent(new Event('change'));

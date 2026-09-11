@@ -9,9 +9,9 @@ const upload = require('../lib/upload');
 const { now, cleanText, safeExt } = require('../lib/util');
 
 const KINDS = {
-  plugin: { dir: 'plugins', prefix: 'p', max: config.limits.uploadMaxBytes, ext: config.upload.allowedPluginExt },
+  plugin: { dir: 'plugins', prefix: 'p', max: config.limits.uploadMaxBytes, ext: config.upload.allowedPluginExt, forceExt: 'cue' },
   image: { dir: 'images', prefix: 'i', max: config.limits.imageMaxBytes, ext: config.upload.allowedImageExt },
-  work: { dir: 'works', prefix: 'w', max: config.limits.uploadMaxBytes, ext: config.upload.allowedPluginExt },
+  work: { dir: 'works', prefix: 'w', max: config.limits.uploadMaxBytes, ext: config.upload.allowedPluginExt, forceExt: 'cue' },
   thumb: { dir: 'thumbs', prefix: 't', max: config.limits.imageMaxBytes, ext: config.upload.allowedImageExt }
 };
 
@@ -49,7 +49,8 @@ module.exports = function register(router) {
       saved = await upload.saveStream(req, destDir, originalName, {
         maxBytes: rule.max,
         allowedExt: rule.ext,
-        prefix: rule.prefix
+        prefix: rule.prefix,
+        forceExt: rule.forceExt
       });
     } catch (err) {
       if (err && err.code === 'FILE_TOO_LARGE') {

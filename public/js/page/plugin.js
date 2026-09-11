@@ -106,7 +106,12 @@
 
     const btnDownload = view.querySelector('#btnDownload');
     btnDownload.addEventListener('click', () => {
-      window.open('/api/market/plugins/' + p.id + '/download');
+      const a = document.createElement('a');
+      a.href = '/api/market/plugins/' + p.id + '/download';
+      a.download = p.fileName || (p.name + '.cue');
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     });
     btnDownload.classList.add('mdui-ripple');
 
@@ -116,8 +121,8 @@
           const d = await App.post(`/api/market/plugins/${p.id}/like`);
           p.liked = d.liked;
           p.likeCount = d.likeCount;
-          const b = view.querySelector('#btnLike mdui-icon-button');
-          b.setAttribute('icon', p.liked ? 'favorite' : 'favorite_border');
+          const btn = view.querySelector('#btnLike .material-icons');
+          if (btn) btn.textContent = p.liked ? 'favorite' : 'favorite_border';
           view.querySelectorAll('.sc b')[2].textContent = p.likeCount;
         } catch (e) {
           App.toast(e.message);
