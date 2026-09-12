@@ -20,22 +20,7 @@
     return PLAYER_BASE + '?' + u.toString();
   }
 
-  function playerBox(w) {
-    const url = playerUrl(w);
-    return `<div class="player-wrap">
-      <div class="player-loading" id="playerLoading"><span class="ke-spinner lg"></span></div>
-      <iframe id="playerFrame" src="${A(url)}" style="width:100%;height:78vh;min-height:520px;border:1px solid var(--mdui-color-outline-variant);border-radius:16px;background:#fff" allowfullscreen onload="var l=document.getElementById('playerLoading');if(l)l.style.display='none'"></iframe>
-    </div>`;
-  }
-
-  async function main() {
-    await App.ready;
-    if (!workId) { location.href = '/workpool'; return; }
-    let d;
-    try { d = await App.get('/api/works/' + workId); }
-    catch (e) { view.innerHTML = `<div class="empty-tip"><div class="material-icons icon">error_outline</div>${A(e.message || '作品不存在')}</div>`; return; }
-    render(d.work, d.comments || [], d.commentTotal || 0);
-  }
+  let work = null;
 
   function flatten(nodes, out, depth) {
     for (const n of nodes) { out.push({ node: n, depth }); if (n.children && n.children.length) flatten(n.children, out, depth + 1); }
@@ -65,77 +50,107 @@
   </div>`;
   }
 
-  let work = null;
+  function bindMedia(w) {
+    // 先隐藏所有
+    view.querySelector('#playerWrap').style.display = 'none';
+    view.querySelector('#imgWrap').style.display = 'none';
+    view.querySelector('#redirectWrap').style.display = 'none';
+
+    if (w.type === 'img') {
+      const imgWrap = view.querySelector('#imgWrap');
+      const src = w.thumbnail || w.fileUrl || '';
+      if (src) {
+        imgWrap.innerHTML = `<img src="${A(src)}" style="width:100%;border-radius:16px;border:1px solid var(--mdui-color-outline-variant)" alt="">`;
+        imgWrap.style.display = '';
+      }
+    } else if (w.type === 'redirect') {
+      const rdWrap = view.querySelector('#redirectWrap');
+      rdWrap.innerHTML = `<a href="${A(w.fileUrl)}" target="_blank" rel="noopener"><button class="btn primary lg" type="button"><span class="material-icons" style="font-size:18px">open_in_new</span>打开外部作品</button></a>`;
+      rdWrap.style.display = '';
+    } else {
+      // 默认 player 类型
+      const iframe = view.querySelector('#playerFrame');
+      iframe.src = playerUrl(w);
+      view.querySelector('#playerWrap').style.display = '';
+    }
+  }
 
   function render(w, comments, total) {
     work = w;
     const me = App.state.me;
     const mine = me && (me.username === w.author || me.isAdmin);
+
+    // 媒体区
+    bindMedia(w);
+
+    // 标题和描述
+    view.querySelector('#wTitle').textContent = w.title;
+    view.querySelector('#wDesc').innerHTML = App.renderRich(w.description || '');
+
+    // 作者卡
+    const authorCard = view.querySelector('#authorCard');
+    authorCard.innerHTML = `
+      <a href="${App.userUrl(w.author)}" style="display:flex;align-items:center;gap:10px;font-weight:600">
+        <img src="${App.urlAvatar({ nickname: w.authorNick, avatar: w.authorAvatar })}" style="width:40px;height:40px;border-radius:50%" onerror="this.style.display='none'">${A(w.authorNick || w.author)} ${App.badgeVerified(w.authorVerified)}
+      </a>
+      <div style="font-size:13px;color:var(--mdui-color-on-surface-variant);margin:6px 0 8px">发布于 ${A(App.fmtTime(w.createdAt))}</div>
+      ${App.cards.tagChips(w.tags, '/workpool')}`;
+
+    // 统计数
+    view.querySelector('#sView').textContent = w.viewCount || 0;
+    view.querySelector('#sLike').textContent = w.likeCount || 0;
+    view.querySelector('#sFav').textContent = w.favCount || 0;
+    view.querySelector('#sCoin').textContent = w.coinCount || 0;
+
+    // 编辑/删除按钮（mine）
+    if (mine) {
+      const editLink = view.querySelector('#editLink');
+      editLink.href = '/workpool/publish?id=' + A(w.id);
+      editLink.style.display = '';
+      view.querySelector('#btnDel').style.display = '';
+    }
+
+    // 互动按钮
+    const actionBtns = view.querySelector('#actionBtns');
+    if (me) {
+      actionBtns.innerHTML = `
+        <button type="button" class="btn ${w.liked ? 'primary' : 'tonal'}" id="btnLike"><span class="material-icons" style="font-size:18px">${w.liked ? 'favorite' : 'favorite_border'}</span>${w.liked ? '已赞' : '点赞'}</button>
+        <button type="button" class="btn ${w.faved ? 'primary' : 'tonal'}" id="btnFav"><span class="material-icons" style="font-size:18px">bookmark</span>${w.faved ? '已收藏' : '收藏'}</button>
+        <button type="button" class="btn tonal" id="btnCoin"><span class="material-icons" style="font-size:18px">paid</span>投币</button>`;
+    } else {
+      actionBtns.innerHTML = `<a href="/login"><button type="button" class="btn tonal">登录后互动</button></a>`;
+    }
+
+    // 关注按钮（me && 非自己）
+    if (me && me.username !== w.author) {
+      const followBtn = view.querySelector('#btnFollow');
+      followBtn.textContent = w.following ? '已关注' : '+ 关注作者';
+      followBtn.style.display = '';
+      followBtn.addEventListener('click', async () => {
+        try {
+          const d = await App.post('/api/users/' + encodeURIComponent(w.author) + '/follow');
+          followBtn.textContent = d.following ? '已关注' : '+ 关注作者';
+          App.toast(d.following ? '已关注' : '已取消关注');
+        } catch (e) { App.toast(e.message); }
+      });
+    }
+
+    // 评论列表
+    view.querySelector('#cc').textContent = total;
     const tree = flatten(comments, [], 0);
     const commentsHtml = tree.length
       ? tree.map(({ node, depth }) => `<div style="${depth > 0 ? 'padding-left:' + Math.min(depth * 26, 80) + 'px' : ''}">${commentRow(node)}</div>`).join('')
       : '<div class="empty-tip">还没有评论，来抢沙发～</div>';
+    view.querySelector('#cBox').innerHTML = commentsHtml;
 
-    let mainMedia = '';
-    if (w.type === 'img') {
-      mainMedia = w.thumbnail ? `<img src="${A(w.thumbnail)}" style="width:100%;border-radius:16px;border:1px solid var(--mdui-color-outline-variant)" alt="">`
-        : (w.fileUrl ? `<img src="${A(w.fileUrl)}" style="width:100%;border-radius:16px;border:1px solid var(--mdui-color-outline-variant)" alt="">` : '');
-    } else if (w.type === 'redirect') {
-      mainMedia = `<a href="${A(w.fileUrl)}" target="_blank" rel="noopener"><button class="btn primary lg" type="button"><span class="material-icons" style="font-size:18px">open_in_new</span>打开外部作品</button></a>`;
-    } else {
-      mainMedia = playerBox(w);
+    // 发表评论框（仅 me）
+    if (me) {
+      view.querySelector('#commentForm').style.display = '';
     }
 
-    view.innerHTML = `
-      <div class="fade-enter" style="max-width:920px">
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
-          <a href="/workpool" style="color:var(--mdui-color-primary)"><button type="button" class="btn text"><span class="material-icons" style="font-size:18px">arrow_back</span>作品池</button></a>
-          <span style="flex:1"></span>
-          ${mine ? `<a href="/workpool/publish?id=${A(w.id)}" style="color:var(--mdui-color-primary)"><button type="button" class="btn text"><span class="material-icons" style="font-size:18px">edit</span>编辑参数</button></a>` : ''}
-          ${mine ? `<button type="button" class="btn text sm" id="btnDel" style="color:#b3261e"><span class="material-icons" style="font-size:18px">delete</span>删除</button>` : ''}
-        </div>
-        <div class="work-detail-grid">
-          <div class="work-main">
-            ${mainMedia}
-            <h1 style="font-size:21px;margin:14px 0 8px">${A(w.title)}</h1>
-            <div class="rich-content markdown-body">${App.renderRich(w.description || '')}</div>
-          </div>
-          <div class="work-side">
-            <div class="work-author-card">
-              <a href="${App.userUrl(w.author)}" style="display:flex;align-items:center;gap:10px;font-weight:600">
-                <img src="${App.urlAvatar({ nickname: w.authorNick, avatar: w.authorAvatar })}" style="width:40px;height:40px;border-radius:50%" onerror="this.style.display='none'">${A(w.authorNick || w.author)} ${App.badgeVerified(w.authorVerified)}
-              </a>
-              <div style="font-size:13px;color:var(--mdui-color-on-surface-variant);margin:6px 0 8px">发布于 ${A(App.fmtTime(w.createdAt))}</div>
-              ${App.cards.tagChips(w.tags, '/workpool')}
-            </div>
-            <div style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:16px;padding:18px;position:sticky;top:80px">
-              <div class="stat-chips" style="gap:16px">
-                <div class="sc"><b>${w.viewCount || 0}</b><span>浏览</span></div>
-                <div class="sc"><b>${w.likeCount || 0}</b><span>点赞</span></div>
-                <div class="sc"><b>${w.favCount || 0}</b><span>收藏</span></div>
-                <div class="sc"><b>${w.coinCount || 0}</b><span>投币</span></div>
-              </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0">
-                ${me ? `<button type="button" class="btn tonal" id="btnLike"><span class="material-icons" style="font-size:18px">${w.liked ? 'favorite' : 'favorite_border'}</span>${w.liked ? '已赞' : '点赞'}</button>
-                <button type="button" class="btn tonal" id="btnFav"><span class="material-icons" style="font-size:18px">bookmark</span>${w.faved ? '已收藏' : '收藏'}</button>
-                <button type="button" class="btn tonal" id="btnCoin"><span class="material-icons" style="font-size:18px">paid</span>投币</button>` : `<a href="/login"><button type="button" class="btn tonal">登录后互动</button></a>`}
-              </div>
-              ${me && me.username !== w.author ? `<button type="button" class="btn text" id="btnFollow" style="width:100%">${w.following ? '已关注' : '+ 关注作者'}</button>` : ''}
-            </div>
-          </div>
-        </div>
+    // === 绑定事件 ===
 
-        <div class="section-title">全部评论（<span id="cc">${total}</span>）</div>
-        <div style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:16px;padding:6px 18px;margin-bottom:18px" id="cBox">${commentsHtml}</div>
-
-        ${me ? `
-        <div style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:16px;padding:16px">
-          <div style="font-weight:600;margin-bottom:8px">发表评论<span id="cRepRow" class="hidden" style="font-weight:400;margin-left:8px;font-size:13px">回复 <b id="cRepName"></b><a href="javascript:;" id="cRepCancel" style="color:var(--mdui-color-outline);margin-left:6px">取消</a></span></div>
-          <textarea class="textarea-input" id="cInput" placeholder="说点什么……（支持 @用户名 提及（会通知对方）；支持 Markdown；Ctrl + Enter 快捷发送）" maxlength="5000"   rows="3"></textarea>
-          <div style="display:flex;justify-content:flex-end;margin-top:10px"><button type="button" class="btn primary" id="btnSend"><span class="material-icons" style="font-size:18px">send</span>发表评论</button></div>
-        </div>` : ''}
-      </div>`;
-
+    // 点赞/收藏/投币
     if (me) {
       view.querySelector('#btnLike').addEventListener('click', async () => {
         try {
@@ -153,33 +168,26 @@
         try {
           const d = await App.post(`/api/works/${w.id}/coin`);
           App.toast('投币成功');
-          view.querySelectorAll('.sc b')[3].textContent = d.coinCount;
+          view.querySelector('#sCoin').textContent = d.coinCount;
         } catch (e) { App.toast(e.message); }
       });
-      function refreshReaction(d, kind, flag, btnId, count) {
-        const map = { like: 1, fav: 2, coin: 3 };
-        w[flag] = d.on;
-        view.querySelectorAll('.sc b')[map[kind]].textContent = count;
-        const btn = view.querySelector('#' + btnId);
-        if (kind === 'like') {
-          btn.innerHTML = '<span class="material-icons" style="font-size:18px">' + (d.on ? 'favorite' : 'favorite_border') + '</span>' + (d.on ? '已赞' : '点赞');
-          btn.className = d.on ? 'btn primary' : 'btn tonal';
-        } else if (kind === 'fav') {
-          btn.innerHTML = '<span class="material-icons" style="font-size:18px">' + (d.on ? 'bookmark' : 'bookmark_border') + '</span>' + (d.on ? '已收藏' : '收藏');
-          btn.className = d.on ? 'btn primary' : 'btn tonal';
-        }
+    }
+
+    function refreshReaction(d, kind, flag, btnId, count) {
+      const idMap = { like: '#sLike', fav: '#sFav' };
+      w[flag] = d.on;
+      if (idMap[kind]) view.querySelector(idMap[kind]).textContent = count;
+      const btn = view.querySelector('#' + btnId);
+      if (kind === 'like') {
+        btn.innerHTML = '<span class="material-icons" style="font-size:18px">' + (d.on ? 'favorite' : 'favorite_border') + '</span>' + (d.on ? '已赞' : '点赞');
+        btn.className = d.on ? 'btn primary' : 'btn tonal';
+      } else if (kind === 'fav') {
+        btn.innerHTML = '<span class="material-icons" style="font-size:18px">bookmark</span>' + (d.on ? '已收藏' : '收藏');
+        btn.className = d.on ? 'btn primary' : 'btn tonal';
       }
     }
-    const followBtn = view.querySelector('#btnFollow');
-    if (followBtn) {
-      followBtn.addEventListener('click', async () => {
-        try {
-          const d = await App.post('/api/users/' + encodeURIComponent(w.author) + '/follow');
-          followBtn.innerHTML = d.following ? '已关注' : '+ 关注作者';
-          App.toast(d.following ? '已关注' : '已取消关注');
-        } catch (e) { App.toast(e.message); }
-      });
-    }
+
+    // 删除按钮（mine）
     if (mine) {
       view.querySelector('#btnDel').addEventListener('click', () => {
         App.confirmDialog('删除这个作品？', async () => {
@@ -189,6 +197,7 @@
       });
     }
 
+    // 评论操作
     let replyTarget = null;
     view.querySelectorAll('#cBox a[data-act]').forEach((a) => {
       a.addEventListener('click', async () => {
@@ -230,6 +239,15 @@
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) doSend();
       });
     }
+  }
+
+  async function main() {
+    await App.ready;
+    if (!workId) { location.href = '/workpool'; return; }
+    let d;
+    try { d = await App.get('/api/works/' + workId); }
+    catch (e) { view.innerHTML = `<div class="empty-tip"><div class="material-icons icon">error_outline</div>${A(e.message || '作品不存在')}</div>`; return; }
+    render(d.work, d.comments || [], d.commentTotal || 0);
   }
 
   main();

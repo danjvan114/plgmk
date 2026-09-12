@@ -1,4 +1,5 @@
-﻿(function () {
+// 插件市场页面：骨架已写入 market.html，此文件绑定事件、填充搜索框初始值/排序状态、加载列表和标签
+(function () {
   'use strict';
 
   const App = window.App;
@@ -8,14 +9,14 @@
   async function load() {
     App.ready.then(async () => {
       try {
-        await render();
+        await init();
       } catch (e) {
         view.innerHTML = `<div class="empty-tip"><div class="material-icons icon">error_outline</div>${A(e.message || '加载失败')}</div>`;
       }
     });
   }
 
-  async function render() {
+  async function init() {
     const state = {
       keyword: App.qs.keyword || '',
       tags: App.qs.tags ? App.qs.tags.split(',') : (App.qs.tag ? [App.qs.tag] : []),
@@ -23,27 +24,25 @@
       page: Number(App.qs.page) || 1
     };
 
-    view.innerHTML = `
-      <div class="page-title">
-        <div><h1>插件市场</h1><div class="sub">为 KE 而生，发现好插件</div></div>
-        <a href="${App.state.me ? '/upload' : '/login'}"><button type="button" class="btn primary"><span class="material-icons" style="font-size:18px">upload_file</span>上传插件</button></a>
-      </div>
-      <div class="toolbar">
-        <input class="text-input grow" type="text" id="kw" placeholder="输入名称 / 作者 / 描述关键字"   clearable="" value="${A(state.keyword)}">
-        <button type="button" class="btn tonal" id="btnSearch"><span class="material-icons" style="font-size:18px">search</span>搜索</button>
-        <div class="grow"></div>
-        <div class="seg-group" data-value="${state.sort}" id="sortGroup" value="${state.sort}">
-          <button type="button" class="seg-item" data-value="newest">最新</button>
-          <button type="button" class="seg-item" data-value="hot">最热</button>
-          <button type="button" class="seg-item" data-value="download">下载</button>
-          <button type="button" class="seg-item" data-value="rating">评分</button>
-        </div>
-      </div>
-      <div id="tagRow" style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center"></div>
-      <div id="listArea"><div class="empty-tip"><span class="ke-spinner lg"></span></div></div>
-    `;
-
+    // 填充搜索框初始值
     const kw = view.querySelector('#kw');
+    if (state.keyword) kw.value = state.keyword;
+
+    // 初始化排序 seg-group 状态
+    const sortGroup = view.querySelector('#sortGroup');
+    sortGroup.setAttribute('data-value', state.sort);
+    sortGroup.setAttribute('value', state.sort);
+    sortGroup.querySelectorAll('.seg-item').forEach((s) => {
+      s.classList.toggle('active', s.getAttribute('data-value') === state.sort);
+    });
+
+    // 上传按钮：未登录跳登录
+    const uploadBtn = view.querySelector('#uploadBtn');
+    if (uploadBtn && !App.state.me) {
+      uploadBtn.href = '/login';
+    }
+
+    // 绑定搜索
     view.querySelector('#btnSearch').addEventListener('click', () => {
       state.keyword = kw.value.trim();
       state.page = 1;
@@ -56,7 +55,7 @@
         goto();
       }
     });
-    const sortGroup = view.querySelector('#sortGroup');
+    // 绑定排序
     sortGroup.querySelectorAll('.seg-item').forEach((item) => {
       item.addEventListener('click', () => {
         sortGroup.querySelectorAll('.seg-item').forEach((s) => s.classList.remove('active'));
@@ -146,6 +145,7 @@
     }
 
     await Promise.all([fetchList(), loadTags()]);
+    if (window.MDURipple) window.MDURipple.scan(view);
   }
 
   load();

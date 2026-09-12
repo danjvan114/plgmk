@@ -14,105 +14,6 @@
     extensionList: []
   };
 
-  function template() {
-    if (state.loading) {
-      return '<div class="ke-center"><span class="ke-spinner lg"></span></div>';
-    }
-    const w = state.work || {};
-    const p = (w.player) || {};
-    const f = p.f || w.fileUrl || '';
-    const u = p.u || '';
-    const o = p.o || '';
-    const auth = p.auth || 0;
-    const auto = p.auto || 0;
-    const vRaw = p.v || '';
-    if (vRaw && !state.extensionList.length) {
-      try {
-        const decoded = Buffer.from(vRaw, 'base64').toString('utf8');
-        const m = decoded.match(/^\[(.*)\]$/s);
-        if (m) state.extensionList = m[1].split(',').map((x) => x.trim()).filter(Boolean);
-      } catch (e) { /* ignore */ }
-    }
-    return `
-<div class="fade-enter">
-  <div class="page-title">
-    <div>
-      <h1>${isEdit ? '编辑作品' : '发布作品'}</h1>
-      <div class="sub">作品以 KN Expanse 播放器运行 · 文件链接 + 扩展配置</div>
-    </div>
-    <a href="${isEdit ? '/work/' + A(pathId) : '/workpool'}"><button type="button" class="btn outline">返回</button></a>
-  </div>
-
-  <div class="plugin-card" style="padding:20px">
-    <div class="form-row">
-      <label class="field-label" for="wTitle">作品标题 *</label>
-      <input class="text-input" id="wTitle" type="text" maxlength="100" placeholder="例：星空躲弹幕" value="${A(w.title)}">
-    </div>
-    <div class="form-row">
-      <label class="field-label" for="wDesc">作品介绍</label>
-      <textarea class="textarea-input" id="wDesc" rows="5" maxlength="8000" placeholder="说说你的作品玩法与亮点">${A(w.description || '')}</textarea>
-    </div>
-    <div class="form-row">
-      <label class="field-label" for="wTags">标签</label>
-      <input class="text-input" id="wTags" type="text" placeholder="例：弹幕, 休闲, 单机" value="${A((w.tags || []).join(', '))}">
-    </div>
-  </div>
-
-  <div class="section-title"><span class="material-icons" style="color:var(--mdui-color-primary)">link</span> 播放器参数</div>
-  <div class="plugin-card" style="padding:20px">
-    <div class="form-row">
-      <label class="field-label" for="wF">f · 作品文件直链 *</label>
-      <input class="text-input" id="wF" type="url" placeholder="http://127.0.0.1:5000/1.bcmkn" value="${A(f)}">
-      <div class="field-hint">必填。播放器将 fetch 此 URL 来加载作品内容。</div>
-    </div>
-
-    <div class="form-row">
-      <label class="field-label" for="wO">o · 扩展加载器</label>
-      <select class="select-input ke-select" id="wO">
-        <option value="">不加载扩展</option>
-        <option value="1"${o === '1' ? ' selected' : ''}>1 = KE 扩展 (KEloader.js)</option>
-        <option value="2"${o === '2' ? ' selected' : ''}>2 = CUELoader 扩展 (cue.user.js)</option>
-      </select>
-      <div class="field-hint">两个加载器互斥，只能选 1 个。</div>
-    </div>
-
-    <div class="form-row">
-      <label class="field-label" for="wV">v · 扩展 URL 列表（每行一个，自动 base64）</label>
-      <textarea class="textarea-input" id="wV" rows="3" placeholder="https://example.com/ext1.js
-https://example.com/ext2.js">${A(state.extensionList.join('\n'))}</textarea>
-      <div class="field-hint">填写一行一个 URL，保存时自动编码为 [<code>url1</code>,<code>url2</code>] 数组（base64）传给播放器。</div>
-    </div>
-
-    <div class="form-row">
-      <label class="field-label" style="display:flex;align-items:center;gap:8px">
-        <input type="checkbox" id="wAuth"${auth ? ' checked' : ''} style="vertical-align:-2px">开启加密 (auth=1)
-      </label>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
-        <input class="text-input" id="wU" type="text" placeholder="鉴权字符（默认 123456）" value="${A(u)}" style="flex:1">
-      </div>
-      <div class="field-hint">开启后，f 拉取的密文经 window.kauth.c(raw, u) 解密后再渲染。</div>
-    </div>
-
-    <div class="form-row">
-      <label class="field-label" style="display:flex;align-items:center;gap:8px">
-        <input type="checkbox" id="wAuto"${auto ? ' checked' : ''} style="vertical-align:-2px">自动播放 (auto=1)
-      </label>
-      <div class="field-hint">开启后播放器加载完成后自动跳过封面蒙层开始运行。</div>
-    </div>
-
-    <div class="form-row">
-      <label class="field-label" for="wThumb">缩略图（可选，URL 或 /uploads/...）</label>
-      <input class="text-input" id="wThumb" type="text" placeholder="https://..." value="${A(w.thumbnail || '')}">
-    </div>
-  </div>
-
-  <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
-    <button type="button" class="btn primary lg" id="btnSave">${isEdit ? '保存修改' : '发布作品'}</button>
-    <a href="${isEdit ? '/work/' + A(pathId) : '/workpool'}"><button type="button" class="btn text lg">取消</button></a>
-  </div>
-</div>`;
-  }
-
   function parseV(s) {
     if (!s) return [];
     return s.split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
@@ -134,6 +35,53 @@ https://example.com/ext2.js">${A(state.extensionList.join('\n'))}</textarea>
     const tags = ((view.querySelector('#wTags') || {}).value || '').split(/[,，]/).map((s) => s.trim()).filter(Boolean).slice(0, 8);
     const thumbnail = (view.querySelector('#wThumb') || {}).value || '';
     return { title: title.trim(), description, tags, thumbnail, type: 'player', f, u, auth, o, v, auto };
+  }
+
+  function bindEvents() {
+    const save = view.querySelector('#btnSave');
+    if (save) save.addEventListener('click', submit);
+  }
+
+  function fillForm() {
+    const w = state.work;
+    if (!w) return;
+    const p = w.player || {};
+    const f = p.f || w.fileUrl || '';
+    const u = p.u || '';
+    const o = p.o || '';
+    const auth = p.auth || 0;
+    const auto = p.auto || 0;
+    const vRaw = p.v || '';
+
+    view.querySelector('#wTitle').value = w.title || '';
+    view.querySelector('#wDesc').value = w.description || '';
+    view.querySelector('#wTags').value = (w.tags || []).join(', ');
+    view.querySelector('#wF').value = f;
+    view.querySelector('#wO').value = o;
+    view.querySelector('#wU').value = u;
+    view.querySelector('#wAuth').checked = !!auth;
+    view.querySelector('#wAuto').checked = !!auto;
+    view.querySelector('#wThumb').value = w.thumbnail || '';
+
+    // 解析 base64 v → 扩展列表，填入 wV textarea
+    if (vRaw) {
+      try {
+        const decoded = Buffer.from(vRaw, 'base64').toString('utf8');
+        const m = decoded.match(/^\[(.*)\]$/s);
+        if (m) {
+          state.extensionList = m[1].split(',').map((x) => x.trim()).filter(Boolean);
+          view.querySelector('#wV').value = state.extensionList.join('\n');
+        }
+      } catch (e) { /* ignore */ }
+    }
+  }
+
+  function setupStaticText() {
+    if (!isEdit) return;
+    view.querySelector('.page-title h1').textContent = '编辑作品';
+    view.querySelector('#btnSave').textContent = '保存修改';
+    view.querySelector('#backLink').href = '/work/' + A(pathId);
+    view.querySelector('#cancelLink').href = '/work/' + A(pathId);
   }
 
   async function submit() {
@@ -160,15 +108,10 @@ https://example.com/ext2.js">${A(state.extensionList.join('\n'))}</textarea>
   }
 
   function render() {
-    view.innerHTML = template();
-    if (state.loading) return;
+    setupStaticText();
     bindEvents();
+    if (state.work) fillForm();
     if (window.MDURipple) window.MDURipple.scan(view);
-  }
-
-  function bindEvents() {
-    const save = view.querySelector('#btnSave');
-    if (save) save.addEventListener('click', submit);
   }
 
   async function main() {
@@ -177,6 +120,18 @@ https://example.com/ext2.js">${A(state.extensionList.join('\n'))}</textarea>
       view.innerHTML = '<div class="empty-tip"><div class="material-icons icon">login</div>请先<a href="/login" style="color:var(--mdui-color-primary)">登录</a>后再发布作品</div>';
       return;
     }
+
+    // 编辑模式：显示 loading 覆盖层
+    let loadingOverlay = null;
+    if (isEdit) {
+      loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'ke-center';
+      loadingOverlay.style.cssText = 'position:absolute;inset:0;z-index:10;background:var(--mdui-color-surface);border-radius:inherit';
+      loadingOverlay.innerHTML = '<span class="ke-spinner lg"></span>';
+      view.style.position = 'relative';
+      view.appendChild(loadingOverlay);
+    }
+
     if (isEdit) {
       try {
         const d = await App.get('/api/works/' + pathId);
@@ -190,6 +145,8 @@ https://example.com/ext2.js">${A(state.extensionList.join('\n'))}</textarea>
         return;
       }
     }
+
+    if (loadingOverlay) loadingOverlay.remove();
     state.loading = false;
     render();
   }

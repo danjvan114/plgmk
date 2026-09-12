@@ -11,43 +11,35 @@
       location.href = '/login';
       return;
     }
+
+    // 加载板块列表填充 select
+    const boardSel = view.querySelector('#fBoard');
     let boards = [];
     try {
       const d = await App.get('/api/forum/boards');
       boards = d.boards;
     } catch (e) { /* ignore */ }
+    boardSel.innerHTML = boards.map((b) => `<option value="${b.id}">${A(b.name)}</option>`).join('');
 
+    // 读草稿回填
     const draftKey = 'ke_post_draft';
     const draft = JSON.parse(localStorage.getItem(draftKey) || 'null');
-
-    view.innerHTML = `
-      <div class="page-title"><div><h1>发布帖子</h1></div></div>
-      <div style="max-width:860px">
-        <div style="display:grid;grid-template-columns:240px 1fr;gap:14px">
-          <select class="select-input ke-select" id="fBoard" label="选择板块 *" boards.length="" :="" disabled="">
-            ${boards.map((b) => `<option value="${b.id}">${A(b.name)}</option>`).join('')}
-          </select>
-          <input class="text-input" type="text" id="fTitle" placeholder="标题 *" maxlength="120"   value="${A(draft && draft.title ? draft.title : '')}">
-        </div>
-        <div style="margin:14px 0">
-          <input class="text-input" type="text" id="fTags" placeholder="标签（可选，空格分隔）"  value="${A(draft && draft.tags ? draft.tags : '')}">
-        </div>
-        <textarea class="textarea-input" id="fContent" placeholder="支持 Markdown：加粗 **文字**、行内 code、代码块、[链接](https://)、自动识别 URL；输入 @用户名 可提醒对方" maxlength="20000"   rows="14"></textarea>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-          <span style="font-size:12px;color:var(--mdui-color-outline)">草稿已自动保存在本地浏览器（${draft ? App.fmtTime(draft.time) : '无'}）</span>
-          <div style="display:flex;gap:10px">
-            <button type="button" class="btn text" id="btnPrev"><span class="material-icons" style="font-size:18px">visibility</span>预览</button>
-            <button type="button" class="btn text" id="btnCancel">清空草稿</button>
-            <button type="button" class="btn primary" id="btnSubmit"><span class="material-icons" style="font-size:18px">send</span>发布</button>
-          </div>
-        </div>
-      </div>`;
-
-    const boardSel = view.querySelector('#fBoard');
-    if (App.qs.board) boardSel.value = String(App.qs.board);
     const titleEl = view.querySelector('#fTitle');
     const tagsEl = view.querySelector('#fTags');
     const contentEl = view.querySelector('#fContent');
+
+    if (draft) {
+      if (draft.title) titleEl.value = draft.title;
+      if (draft.tags) tagsEl.value = draft.tags;
+      if (draft.board) boardSel.value = String(draft.board);
+    }
+    if (App.qs.board) boardSel.value = String(App.qs.board);
+
+    // 更新草稿状态提示
+    const draftInfo = view.querySelector('#draftInfo');
+    if (draftInfo) {
+      draftInfo.textContent = '草稿已自动保存在本地浏览器（' + (draft ? App.fmtTime(draft.time) : '无') + '）';
+    }
 
     function saveDraft() {
       localStorage.setItem(draftKey, JSON.stringify({
@@ -66,6 +58,8 @@
       titleEl.value = '';
       tagsEl.value = '';
       contentEl.value = '';
+      const info = view.querySelector('#draftInfo');
+      if (info) info.textContent = '草稿已自动保存在本地浏览器（无）';
       App.toast('草稿已清空');
     });
 

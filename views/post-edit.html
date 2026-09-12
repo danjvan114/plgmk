@@ -13,7 +13,28 @@
 </head>
 <body class="theme-aurora" data-page="post-edit">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+<div class="page-title"><div><h1>发布帖子</h1></div></div>
+<div style="max-width:860px">
+  <div style="display:grid;grid-template-columns:240px 1fr;gap:14px">
+    <select class="select-input ke-select" id="fBoard" label="选择板块 *">
+    </select>
+    <input class="text-input" type="text" id="fTitle" placeholder="标题 *" maxlength="120">
+  </div>
+  <div style="margin:14px 0">
+    <input class="text-input" type="text" id="fTags" placeholder="标签（可选，空格分隔）">
+  </div>
+  <textarea class="textarea-input" id="fContent" placeholder="支持 Markdown：加粗 **文字**、行内 code、代码块、[链接](https://)、自动识别 URL；输入 @用户名 可提醒对方" maxlength="20000" rows="14"></textarea>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+    <span id="draftInfo" style="font-size:12px;color:var(--mdui-color-outline)">草稿已自动保存在本地浏览器</span>
+    <div style="display:flex;gap:10px">
+      <button type="button" class="btn text" id="btnPrev"><span class="material-icons" style="font-size:18px">visibility</span>预览</button>
+      <button type="button" class="btn text" id="btnCancel">清空草稿</button>
+      <button type="button" class="btn primary" id="btnSubmit"><span class="material-icons" style="font-size:18px">send</span>发布</button>
+    </div>
+  </div>
+</div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>

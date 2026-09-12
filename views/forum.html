@@ -13,7 +13,26 @@
 </head>
 <body class="theme-aurora" data-page="forum">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+  <div class="page-title">
+    <div><h1>论坛</h1>
+    <div class="sub">交流插件开发、使用心得，互相帮助</div></div>
+    <a href="/post/new" id="newPostLink"><button type="button" class="btn primary"><span class="material-icons" style="font-size:18px">edit_square</span>发帖</button></a>
+  </div>
+  <div class="board-grid" id="boardGrid"></div>
+  <div id="boardMore"></div>
+  <div class="toolbar">
+    <div class="grow">
+      <div class="section-title" style="margin:0" id="sectionTitle">全部主题</div>
+    </div>
+    <div class="seg-group" data-value="newest" id="sortGroup" value="newest">
+      <button type="button" class="seg-item" data-value="newest">最新</button>
+      <button type="button" class="seg-item" data-value="hot">最热</button>
+      <button type="button" class="seg-item" data-value="reply">回复多</button>
+    </div>
+  </div>
+  <div id="listBox" style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:14px;overflow:hidden"></div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>

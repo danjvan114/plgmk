@@ -13,7 +13,18 @@
 </head>
 <body class="theme-aurora" data-page="team">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+  <div class="page-title">
+    <div><h1>团队</h1><div class="sub">组队协作、共同发布作品</div></div>
+    <span id="createBtnWrap"></span>
+  </div>
+  <div id="invites"></div>
+  <div class="toolbar">
+    <input class="text-input grow" type="text" id="kw" placeholder="搜索团队">
+    <button type="button" class="btn tonal" id="btnSearch"><span class="material-icons" style="font-size:18px">search</span>搜索</button>
+  </div>
+  <div id="list"><div class="empty-tip"><span class="ke-spinner"></span></div></div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>

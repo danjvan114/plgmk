@@ -13,7 +13,84 @@
 </head>
 <body class="theme-aurora" data-page="work-edit">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+<div class="fade-enter">
+  <div class="page-title">
+    <div>
+      <h1>发布作品</h1>
+      <div class="sub">作品以 KN Expanse 播放器运行 · 文件链接 + 扩展配置</div>
+    </div>
+    <a href="/workpool" id="backLink"><button type="button" class="btn outline">返回</button></a>
+  </div>
+
+  <div class="plugin-card" style="padding:20px">
+    <div class="form-row">
+      <label class="field-label" for="wTitle">作品标题 *</label>
+      <input class="text-input" id="wTitle" type="text" maxlength="100" placeholder="例：星空躲弹幕">
+    </div>
+    <div class="form-row">
+      <label class="field-label" for="wDesc">作品介绍</label>
+      <textarea class="textarea-input" id="wDesc" rows="5" maxlength="8000" placeholder="说说你的作品玩法与亮点"></textarea>
+    </div>
+    <div class="form-row">
+      <label class="field-label" for="wTags">标签</label>
+      <input class="text-input" id="wTags" type="text" placeholder="例：弹幕, 休闲, 单机">
+    </div>
+  </div>
+
+  <div class="section-title"><span class="material-icons" style="color:var(--mdui-color-primary)">link</span> 播放器参数</div>
+  <div class="plugin-card" style="padding:20px">
+    <div class="form-row">
+      <label class="field-label" for="wF">f · 作品文件直链 *</label>
+      <input class="text-input" id="wF" type="url" placeholder="http://127.0.0.1:5000/1.bcmkn">
+      <div class="field-hint">必填。播放器将 fetch 此 URL 来加载作品内容。</div>
+    </div>
+
+    <div class="form-row">
+      <label class="field-label" for="wO">o · 扩展加载器</label>
+      <select class="select-input ke-select" id="wO">
+        <option value="">不加载扩展</option>
+        <option value="1">1 = KE 扩展 (KEloader.js)</option>
+        <option value="2">2 = CUELoader 扩展 (cue.user.js)</option>
+      </select>
+      <div class="field-hint">两个加载器互斥，只能选 1 个。</div>
+    </div>
+
+    <div class="form-row">
+      <label class="field-label" for="wV">v · 扩展 URL 列表（每行一个，自动 base64）</label>
+      <textarea class="textarea-input" id="wV" rows="3" placeholder="https://example.com/ext1.js&#10;https://example.com/ext2.js"></textarea>
+      <div class="field-hint">填写一行一个 URL，保存时自动编码为 [<code>url1</code>,<code>url2</code>] 数组（base64）传给播放器。</div>
+    </div>
+
+    <div class="form-row">
+      <label class="field-label" style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="wAuth" style="vertical-align:-2px">开启加密 (auth=1)
+      </label>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+        <input class="text-input" id="wU" type="text" placeholder="鉴权字符（默认 123456）" style="flex:1">
+      </div>
+      <div class="field-hint">开启后，f 拉取的密文经 window.kauth.c(raw, u) 解密后再渲染。</div>
+    </div>
+
+    <div class="form-row">
+      <label class="field-label" style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="wAuto" style="vertical-align:-2px">自动播放 (auto=1)
+      </label>
+      <div class="field-hint">开启后播放器加载完成后自动跳过封面蒙层开始运行。</div>
+    </div>
+
+    <div class="form-row">
+      <label class="field-label" for="wThumb">缩略图（可选，URL 或 /uploads/...）</label>
+      <input class="text-input" id="wThumb" type="text" placeholder="https://...">
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
+    <button type="button" class="btn primary lg" id="btnSave">发布作品</button>
+    <a href="/workpool" id="cancelLink"><button type="button" class="btn text lg">取消</button></a>
+  </div>
+</div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>

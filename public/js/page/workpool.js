@@ -14,34 +14,17 @@
 
   async function main() {
     await App.ready;
-    view.innerHTML = `
-      <div class="page-title">
-        <div><h1>作品池</h1><div class="sub">分享你的 bcmkn / 图片 / 外链作品</div></div>
-        <a href="${App.state.me ? '/workpool/publish' : '/login'}"><button type="button" class="btn primary"><span class="material-icons" style="font-size:18px">add_circle</span>发布作品</button></a>
-      </div>
-      <div class="toolbar">
-        <input class="text-input grow" type="text" id="kw" placeholder="搜索作品"   value="${A(state.keyword)}">
-        <button type="button" class="btn tonal" id="btnSearch"><span class="material-icons" style="font-size:18px">search</span>搜索</button>
-        <div class="grow"></div>
-        <div class="ke-filter-group" id="typeGroup">
-          <button type="button" class="ke-filter-btn${state.types.indexOf('player') >= 0 ? ' active' : ''}" data-value="player">作品文件</button>
-          <button type="button" class="ke-filter-btn${state.types.indexOf('img') >= 0 ? ' active' : ''}" data-value="img">图片</button>
-          <button type="button" class="ke-filter-btn${state.types.indexOf('redirect') >= 0 ? ' active' : ''}" data-value="redirect">跳转外链</button>
-        </div>
-        <div class="seg-group" data-value="${state.sort}" id="sortGroup" value="${state.sort}">
-          <button type="button" class="seg-item" data-value="newest">最新</button>
-          <button type="button" class="seg-item" data-value="hot">最热</button>
-          <button type="button" class="seg-item" data-value="like">点赞多</button>
-        </div>
-      </div>
-      <div id="list"><div class="empty-tip"><span class="ke-spinner"></span></div></div>`;
 
-    view.querySelector('#btnSearch').addEventListener('click', () => {
-      state.keyword = view.querySelector('#kw').value.trim();
-      state.page = 1;
-      goto();
-    });
-    view.querySelector('#typeGroup').querySelectorAll('.ke-filter-btn').forEach((item) => {
+    // 上传按钮 href 根据登录态决定
+    view.querySelector('#uploadLink').href = App.state.me ? '/workpool/publish' : '/login';
+
+    // 搜索框初始值
+    view.querySelector('#kw').value = state.keyword;
+
+    // 类型筛选按钮 active 状态
+    const typeGroup = view.querySelector('#typeGroup');
+    typeGroup.querySelectorAll('.ke-filter-btn').forEach((item) => {
+      if (state.types.indexOf(item.dataset.value) >= 0) item.classList.add('active');
       item.addEventListener('click', () => {
         const v = item.getAttribute('data-value');
         const i = state.types.indexOf(v);
@@ -52,8 +35,23 @@
         goto();
       });
     });
-    view.querySelector('#sortGroup').addEventListener('change', (e) => {
+
+    // sort seg-group 初始化 active 状态和 change 事件
+    const sortGroup = view.querySelector('#sortGroup');
+    sortGroup.dataset.value = state.sort;
+    sortGroup.setAttribute('value', state.sort);
+    sortGroup.querySelectorAll('.seg-item').forEach((item) => {
+      if (item.dataset.value === state.sort) item.classList.add('active');
+    });
+    sortGroup.addEventListener('change', (e) => {
       state.sort = e.target.value || 'newest';
+      state.page = 1;
+      goto();
+    });
+
+    // 搜索按钮事件
+    view.querySelector('#btnSearch').addEventListener('click', () => {
+      state.keyword = view.querySelector('#kw').value.trim();
       state.page = 1;
       goto();
     });

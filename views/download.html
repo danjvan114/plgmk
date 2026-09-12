@@ -13,14 +13,71 @@
 </head>
 <body class="theme-aurora" data-page="download">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+  <div class="fade-enter" style="max-width:780px;margin:0 auto">
+    <div class="page-title">
+      <div>
+        <h1>编辑器下载</h1>
+        <div class="sub">KN Expanse · 图形化编程 + 在线作品播放器</div>
+      </div>
+    </div>
+
+    <div class="plugin-card" style="padding:28px;text-align:center;background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(56,189,248,.04))">
+      <div style="width:96px;height:96px;margin:0 auto 14px;border-radius:24px;background:linear-gradient(135deg,#3b82f6,#38bdf8);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px rgba(59,130,246,.32)">
+        <span class="material-icons" style="color:#fff;font-size:54px">build</span>
+      </div>
+      <h2 style="margin:8px 0 6px;font-size:22px">KN Expanse</h2>
+      <p style="color:var(--mdui-color-on-surface-variant);margin:0 0 18px;font-size:14px">KE 生态官方图形化编程 + 编辑器，与本站"作品池"深度整合，支持 ke/cue 双加载器。</p>
+      <a href="/app/player/KN%20Expanse.exe" download="KN Expanse.exe">
+        <button type="button" class="btn primary lg" style="background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;font-weight:700">
+          <span class="material-icons" style="font-size:20px">download</span>
+          下载 KN Expanse.exe（约 3.3 MB）
+        </button>
+      </a>
+      <p style="margin:14px 0 0;font-size:12px;color:var(--mdui-color-on-surface-variant)">
+        本地直接双击运行；如被 Windows SmartScreen 拦截，请右键 → 属性 → 勾选"解除锁定"。
+      </p>
+    </div>
+
+    <div class="section-title">功能亮点</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+      <div class="plugin-card" style="padding:16px">
+        <span class="material-icons" style="color:var(--mdui-color-primary)">code</span>
+        <div style="font-weight:700;margin:8px 0 4px">图形化编程</div>
+        <div style="font-size:13px;color:var(--mdui-color-on-surface-variant)">拖拽积木即可生成可发布的 KE / CUE 作品</div>
+      </div>
+      <div class="plugin-card" style="padding:16px">
+        <span class="material-icons" style="color:var(--mdui-color-primary)">extension</span>
+        <div style="font-weight:700;margin:8px 0 4px">扩展加载器互斥</div>
+        <div style="font-size:13px;color:var(--mdui-color-on-surface-variant)">支持 KE 扩展与 CUELoader (cue.user.js) 互斥运行</div>
+      </div>
+      <div class="plugin-card" style="padding:16px">
+        <span class="material-icons" style="color:var(--mdui-color-primary)">cloud_upload</span>
+        <div style="font-weight:700;margin:8px 0 4px">一键发布作品</div>
+        <div style="font-size:13px;color:var(--mdui-color-on-surface-variant)">编辑器内登录后，可直接推送到本站作品池</div>
+      </div>
+      <div class="plugin-card" style="padding:16px">
+        <span class="material-icons" style="color:var(--mdui-color-primary)">lock</span>
+        <div style="font-weight:700;margin:8px 0 4px">作品加密 (auth/u)</div>
+        <div style="font-size:13px;color:var(--mdui-color-on-surface-variant)">可选加密模式，密文经 kauth.c(raw, u) 解密</div>
+      </div>
+    </div>
+
+    <div class="section-title">使用方式</div>
+    <div class="plugin-card" style="padding:18px;font-size:14px;line-height:1.8">
+      <p>1. 下载并双击运行 KN Expanse.exe；</p>
+      <p>2. 在编辑器里完成作品，登录 KE 用户中心；</p>
+      <p>3. 点击"发布作品"，填写作品文件直链 <code>f</code>（必填）、可选 <code>o/v/u/auth/auto</code> 等播放器参数；</p>
+      <p>4. 提交后即可在本站 <a href="/workpool" style="color:var(--mdui-color-primary)">/workpool</a> 查看并运行。</p>
+    </div>
+  </div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>
 <script src="/js/upload.js"></script>
 <script src="/js/bots-manager.js"></script>
 <script src="/js/shell.js"></script>
-<script src="/js/page/download.js"></script>
 <script>window.__mdui && window.__mdui.mutation && window.__mdui.mutation();</script>
 </body>
 </html>

@@ -7,22 +7,15 @@
 
   async function main() {
     await App.ready;
-    view.innerHTML = `
-      <div class="page-title">
-        <div><h1>团队</h1><div class="sub">组队协作、共同发布作品</div></div>
-        ${App.state.me ? '<button type="button" class="btn primary" id="btnCreate"><span class="material-icons" style="font-size:18px">group_add</span>创建团队</button>' : ''}
-      </div>
-      <div id="invites"></div>
-      <div class="toolbar">
-        <input class="text-input grow" type="text" id="kw" placeholder="搜索团队"  >
-        <button type="button" class="btn tonal" id="btnSearch"><span class="material-icons" style="font-size:18px">search</span>搜索</button>
-      </div>
-      <div id="list"><div class="empty-tip"><span class="ke-spinner"></span></div></div>`;
 
+    // 根据登录态决定是否显示创建按钮
     if (App.state.me) {
+      view.querySelector('#createBtnWrap').innerHTML = '<button type="button" class="btn primary" id="btnCreate"><span class="material-icons" style="font-size:18px">group_add</span>创建团队</button>';
       view.querySelector('#btnCreate').addEventListener('click', createDialog);
       loadInvites();
     }
+
+    // 搜索按钮事件
     view.querySelector('#btnSearch').addEventListener('click', () => {
       const kw = view.querySelector('#kw').value.trim();
       location.href = '/team' + (kw ? '?keyword=' + encodeURIComponent(kw) : '');
@@ -98,13 +91,13 @@
     function createDialog() {
       const panel = document.createElement('div');
       panel.innerHTML = `
-        <input class="text-input" type="text" id="tName" placeholder="团队名称 *" maxlength="60"  >
+        <input class="text-input" type="text" id="tName" placeholder="团队名称 *" maxlength="60">
         <div style="height:12px"></div>
-        <textarea class="textarea-input" id="tDesc" placeholder="团队简介" maxlength="2000"   rows="3"></textarea>
+        <textarea class="textarea-input" id="tDesc" placeholder="团队简介" maxlength="2000" rows="3"></textarea>
         <div style="height:12px"></div>
-        <input class="text-input" type="text" id="tCover" placeholder="封面图片 URL（可填图片直链或 /uploads/...，留空则使用默认）"  >
+        <input class="text-input" type="text" id="tCover" placeholder="封面图片 URL（可填图片直链或 /uploads/...，留空则使用默认）">
         <div style="height:12px"></div>
-        <input class="text-input" type="text" id="tTags" placeholder="标签（可选）" >`;
+        <input class="text-input" type="text" id="tTags" placeholder="标签（可选）">`;
       App.dialog({
         headline: '创建团队',
         body: panel,

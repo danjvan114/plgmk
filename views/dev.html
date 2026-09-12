@@ -13,7 +13,17 @@
 </head>
 <body class="theme-aurora" data-page="dev">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+  <div class="page-title">
+    <div><h1>开发者中心</h1><div id="devSub" class="sub"></div></div>
+    <a href="/upload"><button type="button" class="btn primary"><span class="material-icons" style="font-size:18px">upload_file</span>上传新插件</button></a>
+  </div>
+  <div id="statsGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px"></div>
+  <div class="section-title">我的插件（<span id="pluginCount">0</span>）</div>
+  <div id="list"></div>
+  <div class="section-title"><span class="material-icons" style="color:var(--mdui-color-primary)">smart_toy</span> 我的 AI 机器人</div>
+  <div id="botsArea"></div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>

@@ -13,7 +13,56 @@
 </head>
 <body class="theme-aurora" data-page="work">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+<div class="fade-enter" style="max-width:920px">
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+    <a href="/workpool" style="color:var(--mdui-color-primary)"><button type="button" class="btn text"><span class="material-icons" style="font-size:18px">arrow_back</span>作品池</button></a>
+    <span style="flex:1"></span>
+    <a id="editLink" style="color:var(--mdui-color-primary);display:none"><button type="button" class="btn text"><span class="material-icons" style="font-size:18px">edit</span>编辑参数</button></a>
+    <button type="button" class="btn text sm" id="btnDel" style="color:#b3261e;display:none"><span class="material-icons" style="font-size:18px">delete</span>删除</button>
+  </div>
+
+  <div class="work-detail-grid">
+    <div class="work-main">
+      <!-- 播放器类型 -->
+      <div class="player-wrap" id="playerWrap" style="display:none">
+        <div class="player-loading" id="playerLoading"><span class="ke-spinner lg"></span></div>
+        <iframe id="playerFrame" style="width:100%;height:78vh;min-height:520px;border:1px solid var(--mdui-color-outline-variant);border-radius:16px;background:#fff" allowfullscreen onload="var l=document.getElementById('playerLoading');if(l)l.style.display='none'"></iframe>
+      </div>
+      <!-- 图片类型 -->
+      <div id="imgWrap" style="display:none"></div>
+      <!-- 重定向类型 -->
+      <div id="redirectWrap" style="display:none"></div>
+
+      <h1 id="wTitle" style="font-size:21px;margin:14px 0 8px"></h1>
+      <div class="rich-content markdown-body" id="wDesc"></div>
+    </div>
+
+    <div class="work-side">
+      <div class="work-author-card" id="authorCard"></div>
+      <div style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:16px;padding:18px;position:sticky;top:80px">
+        <div class="stat-chips" style="gap:16px">
+          <div class="sc"><b id="sView">0</b><span>浏览</span></div>
+          <div class="sc"><b id="sLike">0</b><span>点赞</span></div>
+          <div class="sc"><b id="sFav">0</b><span>收藏</span></div>
+          <div class="sc"><b id="sCoin">0</b><span>投币</span></div>
+        </div>
+        <div id="actionBtns" style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0"></div>
+        <button type="button" class="btn text" id="btnFollow" style="width:100%;display:none"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">全部评论（<span id="cc">0</span>）</div>
+  <div style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:16px;padding:6px 18px;margin-bottom:18px" id="cBox"></div>
+
+  <div id="commentForm" style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:16px;padding:16px;display:none">
+    <div style="font-weight:600;margin-bottom:8px">发表评论<span id="cRepRow" class="hidden" style="font-weight:400;margin-left:8px;font-size:13px">回复 <b id="cRepName"></b><a href="javascript:;" id="cRepCancel" style="color:var(--mdui-color-outline);margin-left:6px">取消</a></span></div>
+    <textarea class="textarea-input" id="cInput" placeholder="说点什么……（支持 @用户名 提及（会通知对方）；支持 Markdown；Ctrl + Enter 快捷发送）" maxlength="5000" rows="3"></textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button type="button" class="btn primary" id="btnSend"><span class="material-icons" style="font-size:18px">send</span>发表评论</button></div>
+  </div>
+</div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>

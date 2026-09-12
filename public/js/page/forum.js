@@ -16,7 +16,7 @@
       ]);
       render(boards.boards, listData);
     } catch (e) {
-      view.innerHTML = `<div class="empty-tip">${A(e.message || '加载失败')}</div>`;
+      view.querySelector('#listBox').innerHTML = `<div class="empty-tip">${A(e.message || '加载失败')}</div>`;
     }
   }
 
@@ -36,37 +36,44 @@
     const isAll = !board;
     const sortVal = App.qs.sort || 'newest';
 
-    view.innerHTML = `
-      <div class="page-title">
-        <div><h1>${cur ? A(cur.name) : '论坛'}</h1>
-        <div class="sub">${cur ? A(cur.description) : '交流插件开发、使用心得，互相帮助'}</div></div>
-        <a href="/post/new${board ? '?board=' + board : ''}"><button type="button" class="btn primary"><span class="material-icons" style="font-size:18px">edit_square</span>发帖</button></a>
-      </div>
-      <div class="board-grid">${boards.map((b) => `
-        <div class="board-card ${b.id === board ? 'selected' : ''}" onclick="location.href='/forum/${b.id}'" style="${b.id === board ? 'outline:2px solid var(--mdui-color-primary)' : ''}">
-          <div class="board-icon" style="background:${A(b.color || '#6750a4')}"><span class="material-icons">${A(b.icon || 'forum')}</span></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:600">${A(b.name)} ${b.id === board ? '(当前)' : ''}</div>
-            <div style="font-size:12px;color:var(--mdui-color-on-surface-variant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${A(b.description || '')}</div>
-          </div>
-          <div style="font-size:12px;color:var(--mdui-color-on-surface-variant);flex:none;text-align:right">${b.postCount}<br>主题</div>
-        </div>`).join('') || '<div class="empty-tip">暂无板块</div>'}
-      </div>
-      ${!cur ? `<div style="color:var(--mdui-color-primary);font-size:13px;margin-bottom:10px;cursor:pointer" onclick="location.href='/forum'">全部板块 ›</div>` : ''}
-      <div class="toolbar">
-        <div class="grow">
-          <div class="section-title" style="margin:0">${isAll ? '全部主题' : '主题列表'}</div>
-        </div>
-        <div class="seg-group" data-value="${App.qs.sort || 'newest'}" id="sortGroup" value="${App.qs.sort || 'newest'}">
-          <button type="button" class="seg-item" data-value="newest">最新</button>
-          <button type="button" class="seg-item" data-value="hot">最热</button>
-          <button type="button" class="seg-item" data-value="reply">回复多</button>
-        </div>
-      </div>
-      <div id="listBox" style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:14px;overflow:hidden"></div>`;
+    // 动态设置 page-title 文本
+    const pageTitle = view.querySelector('.page-title');
+    pageTitle.querySelector('h1').textContent = cur ? cur.name : '论坛';
+    pageTitle.querySelector('.sub').textContent = cur ? cur.description : '交流插件开发、使用心得，互相帮助';
 
+    // 发帖按钮 href
+    const newPostLink = view.querySelector('#newPostLink');
+    newPostLink.href = '/post/new' + (board ? '?board=' + board : '');
+
+    // 板块卡片
+    const boardGrid = view.querySelector('#boardGrid');
+    boardGrid.innerHTML = boards.map((b) => `
+      <div class="board-card ${b.id === board ? 'selected' : ''}" onclick="location.href='/forum/${b.id}'" style="${b.id === board ? 'outline:2px solid var(--mdui-color-primary)' : ''}">
+        <div class="board-icon" style="background:${A(b.color || '#6750a4')}"><span class="material-icons">${A(b.icon || 'forum')}</span></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600">${A(b.name)} ${b.id === board ? '(当前)' : ''}</div>
+          <div style="font-size:12px;color:var(--mdui-color-on-surface-variant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${A(b.description || '')}</div>
+        </div>
+        <div style="font-size:12px;color:var(--mdui-color-on-surface-variant);flex:none;text-align:right">${b.postCount}<br>主题</div>
+      </div>`).join('') || '<div class="empty-tip">暂无板块</div>';
+
+    // "全部板块" 链接（仅在当前非具体板块时显示）
+    const boardMore = view.querySelector('#boardMore');
+    if (!cur) {
+      boardMore.innerHTML = `<div style="color:var(--mdui-color-primary);font-size:13px;margin-bottom:10px;cursor:pointer" onclick="location.href='/forum'">全部板块 ›</div>`;
+    } else {
+      boardMore.innerHTML = '';
+    }
+
+    // section-title
+    view.querySelector('#sectionTitle').textContent = isAll ? '全部主题' : '主题列表';
+
+    // sort seg-group 初始化 active 状态和点击事件
     const sortGroup = view.querySelector('#sortGroup');
+    sortGroup.dataset.value = sortVal;
+    sortGroup.setAttribute('value', sortVal);
     sortGroup.querySelectorAll('.seg-item').forEach((item) => {
+      if (item.dataset.value === sortVal) item.classList.add('active');
       item.addEventListener('click', () => {
         sortGroup.querySelectorAll('.seg-item').forEach((s) => s.classList.remove('active'));
         item.classList.add('active');

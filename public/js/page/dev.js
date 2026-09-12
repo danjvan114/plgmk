@@ -5,6 +5,13 @@
   const A = App.esc;
   const view = document.getElementById('view');
 
+  function stat(label, v) {
+    return `<div style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:14px;padding:14px 16px">
+      <div style="font-size:22px;font-weight:700">${v}</div>
+      <div style="font-size:12px;color:var(--mdui-color-on-surface-variant)">${label}</div>
+    </div>`;
+  }
+
   async function main() {
     await App.ready;
     if (!App.state.me) {
@@ -15,36 +22,28 @@
     try {
       data = await App.get('/api/market/dev/stats');
     } catch (e) {
-      view.innerHTML = `<div class="empty-tip">${A(e.message || '加载失败')}</div>`;
+      view.querySelector('#list').innerHTML = `<div class="empty-tip">${A(e.message || '加载失败')}</div>`;
       return;
     }
     const s = data.summary;
-    view.innerHTML = `
-      <div class="page-title">
-        <div><h1>开发者中心</h1><div class="sub">@${A(App.state.me.username)} · ${A(App.state.me.nickname)}</div></div>
-        <a href="/upload"><button type="button" class="btn primary"><span class="material-icons" style="font-size:18px">upload_file</span>上传新插件</button></a>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px">
-        ${stat('插件总数', s.total)}
-        ${stat('已上架', s.active)}
-        ${stat('累计下载', s.downloads)}
-        ${stat('累计浏览', s.views)}
-        ${stat('累计点赞', s.likes)}
-        ${stat('累计投币', s.coins)}
-        ${stat('平均评分', s.rating ? s.rating.toFixed(2) : '-')}
-      </div>
-      <div class="section-title">我的插件（${data.items.length}）</div>
-      <div id="list"></div>
-      <div class="section-title"><span class="material-icons" style="color:var(--mdui-color-primary)">smart_toy</span> 我的 AI 机器人</div>
-      <div id="botsArea"></div>`;
 
-    function stat(label, v) {
-      return `<div style="background:var(--mdui-color-surface);border:1px solid var(--mdui-color-outline-variant);border-radius:14px;padding:14px 16px">
-        <div style="font-size:22px;font-weight:700">${v}</div>
-        <div style="font-size:12px;color:var(--mdui-color-on-surface-variant)">${label}</div>
-      </div>`;
-    }
+    // 填充开发者信息
+    view.querySelector('#devSub').textContent = '@' + App.state.me.username + ' · ' + App.state.me.nickname;
 
+    // 填充统计卡
+    view.querySelector('#statsGrid').innerHTML =
+      stat('插件总数', s.total) +
+      stat('已上架', s.active) +
+      stat('累计下载', s.downloads) +
+      stat('累计浏览', s.views) +
+      stat('累计点赞', s.likes) +
+      stat('累计投币', s.coins) +
+      stat('平均评分', s.rating ? s.rating.toFixed(2) : '-');
+
+    // 填充插件数量
+    view.querySelector('#pluginCount').textContent = data.items.length;
+
+    // 填充插件列表
     const list = view.querySelector('#list');
     const botsArea = view.querySelector('#botsArea');
     if (App.botsManager && botsArea) App.botsManager(botsArea);

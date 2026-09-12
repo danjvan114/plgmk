@@ -13,7 +13,28 @@
 </head>
 <body class="theme-aurora" data-page="workpool">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+  <div class="page-title">
+    <div><h1>作品池</h1><div class="sub">分享你的 bcmkn / 图片 / 外链作品</div></div>
+    <a href="/workpool/publish" id="uploadLink"><button type="button" class="btn primary"><span class="material-icons" style="font-size:18px">add_circle</span>发布作品</button></a>
+  </div>
+  <div class="toolbar">
+    <input class="text-input grow" type="text" id="kw" placeholder="搜索作品">
+    <button type="button" class="btn tonal" id="btnSearch"><span class="material-icons" style="font-size:18px">search</span>搜索</button>
+    <div class="grow"></div>
+    <div class="ke-filter-group" id="typeGroup">
+      <button type="button" class="ke-filter-btn" data-value="player">作品文件</button>
+      <button type="button" class="ke-filter-btn" data-value="img">图片</button>
+      <button type="button" class="ke-filter-btn" data-value="redirect">跳转外链</button>
+    </div>
+    <div class="seg-group" data-value="newest" id="sortGroup" value="newest">
+      <button type="button" class="seg-item" data-value="newest">最新</button>
+      <button type="button" class="seg-item" data-value="hot">最热</button>
+      <button type="button" class="seg-item" data-value="like">点赞多</button>
+    </div>
+  </div>
+  <div id="list"><div class="empty-tip"><span class="ke-spinner"></span></div></div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>

@@ -13,7 +13,29 @@
 </head>
 <body class="theme-aurora" data-page="market">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+  <!-- page-title + 上传按钮 -->
+  <div class="page-title">
+    <div><h1>插件市场</h1><div class="sub">为 KE 而生，发现好插件</div></div>
+    <a id="uploadBtn" href="/upload"><button type="button" class="btn primary"><span class="material-icons" style="font-size:18px">upload_file</span>上传插件</button></a>
+  </div>
+  <!-- 搜索 + 排序工具栏 -->
+  <div class="toolbar">
+    <input class="text-input grow" type="text" id="kw" placeholder="输入名称 / 作者 / 描述关键字" clearable>
+    <button type="button" class="btn tonal" id="btnSearch"><span class="material-icons" style="font-size:18px">search</span>搜索</button>
+    <div class="grow"></div>
+    <div class="seg-group" data-value="newest" id="sortGroup" value="newest">
+      <button type="button" class="seg-item" data-value="newest">最新</button>
+      <button type="button" class="seg-item" data-value="hot">最热</button>
+      <button type="button" class="seg-item" data-value="download">下载</button>
+      <button type="button" class="seg-item" data-value="rating">评分</button>
+    </div>
+  </div>
+  <!-- 标签筛选（JS 动态填充） -->
+  <div id="tagRow" style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center"></div>
+  <!-- 插件列表（JS 动态填充） -->
+  <div id="listArea"><div class="empty-tip"><span class="ke-spinner lg"></span></div></div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>

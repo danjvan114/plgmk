@@ -37,20 +37,21 @@
     isOwner = !!App.state.me.isOwner;
 
     const tabs = TABS.concat(isOwner ? SUPER_TABS : []);
-    view.innerHTML = `
-      <div class="page-title"><div><h1>管理后台</h1></div><div style="opacity:.6;font-size:13px">${isSuper || isOwner ? '超级管理员' : '巡查管理员'}</div></div>
-      <div class="toolbar" style="overflow-x:auto">
-        <div class="seg-group" data-value="overview" id="nav" value="overview">
-          ${tabs.map((t) => `<button type="button" class="seg-item" data-value="${t[0]}">${t[1]}</button>`).join('')}
-        </div>
-      </div>
-      <div id="panel"></div>`;
 
-    const panel = view.querySelector('#panel');
-    view.querySelector('#nav').addEventListener('change', (e) => {
+    // 填充 tab 栏按钮
+    const adminNav = view.querySelector('#adminNav');
+    adminNav.innerHTML = tabs.map((t) => `<button type="button" class="seg-item" data-value="${t[0]}">${t[1]}</button>`).join('');
+
+    // 设置管理员等级标签
+    view.querySelector('#adminLevelTag').textContent = (isSuper || isOwner) ? '超级管理员' : '巡查管理员';
+
+    // 绑定 tab 切换事件
+    adminNav.addEventListener('change', (e) => {
       const v = e.target.value || 'overview';
       switchTo(v);
     });
+
+    const panel = view.querySelector('#panel');
 
     function switchTo(v) {
       if (v === 'plugins') loadPlugins();
@@ -257,9 +258,9 @@
     function boardDialog(b) {
       const panelBody = document.createElement('div');
       panelBody.innerHTML = `
-        <input class="text-input" type="text" id="bName" placeholder="板块名称"  value="${b ? A(b.name) : ''}">
+        <input class="text-input" type="text" id="bName" placeholder="板块名称" value="${b ? A(b.name) : ''}">
         <div style="height:12px"></div>
-        <input class="text-input" type="text" id="bDesc" placeholder="简介"  value="${b ? A(b.description || '') : ''}">`;
+        <input class="text-input" type="text" id="bDesc" placeholder="简介" value="${b ? A(b.description || '') : ''}">`;
       App.dialog({
         headline: b ? '编辑板块' : '新增板块',
         body: panelBody,
@@ -328,8 +329,8 @@
     function showAnnounce() {
       panel.innerHTML = `
         <div style="max-width:640px">
-          <textarea class="textarea-input" id="annText" placeholder="将推送给所有活跃用户"  rows="4"></textarea>
-          <div style="margin:10px 0"><input class="text-input" type="text" id="annLink" placeholder="/forum 或外部网址" ></div>
+          <textarea class="textarea-input" id="annText" placeholder="将推送给所有活跃用户" rows="4"></textarea>
+          <div style="margin:10px 0"><input class="text-input" type="text" id="annLink" placeholder="/forum 或外部网址"></div>
           <button type="button" class="btn primary" id="annSend"><span class="material-icons" style="font-size:18px">campaign</span>发布公告</button>
         </div>`;
       bind('#annSend', async () => {
@@ -426,26 +427,26 @@
       const body = document.createElement('div');
       body.innerHTML = `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <input class="text-input" type="text" id="btName" placeholder="如：KE小助手"  value="${A(orig.name)}">
-          <input class="text-input" type="text" id="btModel" placeholder="如 gpt-4o-mini"  value="${A(orig.model)}">
+          <input class="text-input" type="text" id="btName" placeholder="如：KE小助手" value="${A(orig.name)}">
+          <input class="text-input" type="text" id="btModel" placeholder="如 gpt-4o-mini" value="${A(orig.model)}">
         </div>
         <div style="height:10px"></div>
-        <input class="text-input" type="text" id="btUrl" placeholder="https://api.openai.com/v1 或完整 /chat/completions 地址；本地演示填 stub://demo"  value="${A(orig.url)}">
+        <input class="text-input" type="text" id="btUrl" placeholder="https://api.openai.com/v1 或完整 /chat/completions 地址；本地演示填 stub://demo" value="${A(orig.url)}">
         <div style="height:10px"></div>
-        <input class="text-input" type="password" id="btKey" placeholder="${isEdit ? '留空表示不修改' : 'sk-...'}"  value="${A(orig.key)}">
+        <input class="text-input" type="password" id="btKey" placeholder="${isEdit ? '留空表示不修改' : 'sk-...'}" value="${A(orig.key)}">
         <div style="height:10px"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <input class="text-input" type="text" id="btU" placeholder="用户中心用户名"  value="${A(orig.acc.username)}">
-          <input class="text-input" type="text" id="btN" placeholder="默认同用户名"  value="${A(orig.acc.nickname)}">
+          <input class="text-input" type="text" id="btU" placeholder="用户中心用户名" value="${A(orig.acc.username)}">
+          <input class="text-input" type="text" id="btN" placeholder="默认同用户名" value="${A(orig.acc.nickname)}">
         </div>
         <div style="height:10px"></div>
-        <input class="text-input" type="text" id="btAvatar" placeholder="头像地址（可选）"  value="${A(orig.acc.avatar || '')}">
+        <input class="text-input" type="text" id="btAvatar" placeholder="头像地址（可选）" value="${A(orig.acc.avatar || '')}">
         <div style="height:10px"></div>
-        <textarea class="textarea-input" id="btPrompt" placeholder="不填则使用默认人设"  rows="3">${A(orig.prompt)}</textarea>
+        <textarea class="textarea-input" id="btPrompt" placeholder="不填则使用默认人设" rows="3">${A(orig.prompt)}</textarea>
         <div style="height:10px"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center">
-          <input class="text-input" type="number" id="btProb" placeholder="回复概率 %（0-100）"  value="${A(orig.prob)}">
-          <input class="text-input" type="number" id="btCd" placeholder="冷却秒数（0=不限）"  value="${A(orig.cd)}">
+          <input class="text-input" type="number" id="btProb" placeholder="回复概率 %（0-100）" value="${A(orig.prob)}">
+          <input class="text-input" type="number" id="btCd" placeholder="冷却秒数（0=不限）" value="${A(orig.cd)}">
         </div>
         <div style="height:10px"></div>
         <div id="btHint" style="font-size:13px;min-height:20px"></div>`;

@@ -13,14 +13,84 @@
 </head>
 <body class="theme-aurora" data-page="plugin-edit">
 <div id="app-shell"></div>
-<main class="page-container" id="view"></main>
+<main class="page-container" id="view">
+<div class="fade-enter">
+  <div class="page-title">
+    <div>
+      <h1>上传插件</h1>
+      <div class="sub">发布你的插件到 KE 插件市场</div>
+    </div>
+    <a href="/market" id="backLink"><button type="button" class="btn outline">返回</button></a>
+  </div>
+
+  <div class="plugin-card" style="padding:20px">
+    <div class="form-row">
+      <label class="field-label" for="fName">插件名称 *</label>
+      <input class="text-input" id="fName" type="text" maxlength="80" placeholder="例如：迷你浏览器面板">
+    </div>
+    <div class="form-row">
+      <label class="field-label" for="fVersion">版本号</label>
+      <input class="text-input" id="fVersion" type="text" maxlength="32" placeholder="1.0.0">
+    </div>
+    <div class="form-row">
+      <label class="field-label" for="fTags">标签 *（逗号分隔，最多 8 个）</label>
+      <input class="text-input" id="fTags" type="text" placeholder="工具, 面板, 示例">
+      <div class="field-hint">标签决定插件会被哪些人搜到</div>
+    </div>
+    <div class="form-row">
+      <label class="field-label" for="fDesc">插件介绍 *（支持 Markdown）</label>
+      <textarea class="textarea-input" id="fDesc" rows="12" maxlength="4000" placeholder="介绍你的插件：功能、用法、截图说明……"></textarea>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="material-icons" style="color:var(--mdui-color-primary)">image</span> 图标与截图</div>
+  <div class="plugin-card" style="padding:20px">
+    <div class="form-row">
+      <label class="field-label">插件图标</label>
+      <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+        <img id="iconPrev" alt="" style="width:64px;height:64px;border-radius:14px;object-fit:cover;background:var(--mdui-color-surface-container-high);display:none">
+        <div id="up_icon" style="flex:1;min-width:220px"></div>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="field-label">展示截图（最多 8 张）</label>
+      <div id="up_shots"></div>
+      <div id="shotPreview" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"></div>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="material-icons" style="color:var(--mdui-color-primary)">inventory_2</span> 插件文件</div>
+  <div class="plugin-card" style="padding:20px">
+    <div class="seg-group" id="srcGroup" data-value="file">
+      <button type="button" class="seg-item active" data-value="file">上传文件</button>
+      <button type="button" class="seg-item" data-value="url">外部链接</button>
+    </div>
+    <div class="form-row" style="margin-top:16px">
+      <div id="pane_file">
+        <div id="up_file"></div>
+        <div class="field-hint" id="fileInfo">支持上传插件文件，单个不超过 10 MB</div>
+      </div>
+      <div id="pane_url" style="display:none">
+        <label class="field-label" for="fUrl">外部下载链接 *</label>
+        <input class="text-input" id="fUrl" type="url" placeholder="https://example.com/plugin.zip">
+        <div class="field-hint">链接必须以 http:// 或 https:// 开头，用户下载时跳转到该地址</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
+    <button type="button" class="btn primary lg" id="btnSave">发布插件</button>
+    <a href="/market" id="cancelLink"><button type="button" class="btn text lg">取消</button></a>
+  </div>
+</div>
+</main>
 <script src="/js/core.js"></script>
 <script src="/js/ripple.js"></script>
 <script src="/js/cards.js"></script>
 <script src="/js/upload.js"></script>
 <script src="/js/bots-manager.js"></script>
 <script src="/js/shell.js"></script>
-<script src="/js/page/plugin-edit-fixed.js"></script>
+<script src="/js/page/plugin-edit.js"></script>
 <script>window.__mdui && window.__mdui.mutation && window.__mdui.mutation();</script>
 </body>
 </html>
