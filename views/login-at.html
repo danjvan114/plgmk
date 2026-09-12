@@ -3,24 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="renderer" content="webkit"/>
 <title>登录中 - KE Hub</title>
 <link rel="icon" type="image/png" href="/uploads/kn.png">
-<link rel="stylesheet" href="/vendor/ke/mdui.min.css">
-<link rel="stylesheet" href="/vendor/ke/vendor/fontawesome/all.min.css">
-<link rel="stylesheet" href="/vendor/ke/env.css">
-<link rel="stylesheet" href="/css/app.css">
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: #fff;
+  }
+  .spin {
+    width: 72px;
+    height: 72px;
+    animation: s 1.4s linear infinite;
+  }
+  @keyframes s { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+  .err { text-align: center; padding: 40px; }
+  .err h2 { margin: 0 0 8px; font-size: 18px; }
+  .err p { margin: 0 0 20px; color: rgba(255,255,255,.7); font-size: 14px; }
+  .err a { color: #7ab8ff; text-decoration: none; margin: 0 8px; }
+</style>
 </head>
-<body class="theme-aurora" data-page="login-at">
-<div id="app-shell"></div>
-<main class="page-container" id="view"></main>
-<script src="/js/core.js"></script>
-<script src="/js/ripple.js"></script>
-<script src="/js/cards.js"></script>
-<script src="/js/upload.js"></script>
-<script src="/js/bots-manager.js"></script>
-<script src="/js/shell.js"></script>
+<body>
+  <img id="spinner" class="spin" src="/loading.png" alt="" />
+  <div id="errbox" hidden></div>
+
 <script src="/js/page/login-at.js"></script>
-<script>window.__mdui && window.__mdui.mutation && window.__mdui.mutation();</script>
 </body>
 </html>

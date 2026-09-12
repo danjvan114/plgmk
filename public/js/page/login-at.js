@@ -1,51 +1,58 @@
 (function () {
   'use strict';
 
-  const App = window.App;
-  const A = App.esc;
-  const view = document.getElementById('view');
+  const spinner = document.getElementById('spinner');
+  const errbox = document.getElementById('errbox');
+
+  // 解析 URL query（纯原生，不依赖 App.qs）
+  function qs(key) {
+    const m = new URL(location.href).searchParams.get(key);
+    return m;
+  }
+
+  function showError(title, message) {
+    spinner.hidden = true;
+    errbox.hidden = false;
+    errbox.className = 'err';
+    errbox.innerHTML =
+      `<h2>${title}</h2>` +
+      `<p>${message}</p>` +
+      `<a href="/login">重新登录</a>` +
+      `<a href="/">返回首页</a>`;
+  }
 
   async function main() {
-    await App.ready;
-    const login = App.qs.login;
+    const login = qs('login');
     if (!login) {
-      if (App.state.me) {
-        location.replace('/');
-        return;
-      }
-      view.innerHTML = `<div class="empty-tip" style="padding-top:100px">
-        <div class="material-icons icon">vpn_key_off</div>
-        <div style="margin-bottom:16px">未检测到登录凭据</div>
-        <a href="/login"><button type="button" class="btn primary">去登录</button></a>
-      </div>`;
+      // 没凭据 → 有 session 就跳首页，否则去登录
+      try {
+        const r = await fetch('/api/auth/state', { credentials: 'include' });
+        const d = await r.json();
+        if (d.ok && d.loggedIn) { location.replace('/'); return; }
+      } catch {}
+      showError('未检测到登录凭据', '请先发起登录流程。');
       return;
     }
 
-    view.innerHTML = `<div class="empty-tip" style="padding-top:120px">
-      <span class="ke-spinner"></span>
-      <div style="margin-top:14px;color:var(--mdui-color-on-surface-variant)">正在验证登录信息……</div>
-    </div>`;
-
     try {
-      const d = await App.post('/api/auth/sso/decode', { login });
-      App.state.me = d.user;
-      App.toast(`欢迎回来，${A(d.user.nickname || d.user.username)}`);
-      const back = App.qs.back || '/';
-      setTimeout(() => location.replace(back), 300);
+      const r = await fetch('/api/auth/sso/decode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ login })
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw { data: d };
+      // 成功 → 跳首页（Vue SPA 会自动识别已登录态）
+      location.replace('/');
     } catch (e) {
-      const err = e.data || {};
+      const err = (e && e.data) || {};
       const tips = {
         EXPIRED: '登录信息已过期，请重新登录',
         REPLAYED: '该登录凭据已被使用，请重新登录',
         DECRYPT_FAILED: '凭据解密失败，请确认密钥配置正确'
       };
-      view.innerHTML = `<div class="empty-tip" style="padding-top:100px">
-        <div class="material-icons icon">error_outline</div>
-        <div style="margin-bottom:6px;font-weight:600">登录失败</div>
-        <div style="color:var(--mdui-color-on-surface-variant);margin-bottom:18px;max-width:420px">${A(tips[err.reason] || e.message || '未知错误')}</div>
-        <a href="/login"><button type="button" class="btn primary">重新登录</button></a>
-        <a href="/"><button type="button" class="btn text">返回首页</button></a>
-      </div>`;
+      showError('登录失败', tips[err.reason] || err.msg || e.message || '未知错误');
     }
   }
 

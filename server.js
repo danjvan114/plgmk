@@ -16,52 +16,29 @@ const H = require('./lib/http');
 const apiRouter = new Router();
 const pageRouter = new Router();
 
-const PAGES = [
-  ['/', 'index.html'],
-  ['/market', 'market.html'],
-  ['/plugin/:id', 'plugin.html'],
-  ['/plugin/:id/edit', 'plugin-edit.html'],
-  ['/upload', 'plugin-edit.html'],
-  ['/dev', 'dev.html'],
-  ['/forum', 'forum.html'],
-  ['/forum/:id', 'forum.html'],
-  ['/post/new', 'post-edit.html'],
-  ['/post/:id', 'post.html'],
-  ['/workpool', 'workpool.html'],
-  ['/workpool/publish', 'work-edit.html'],
-  ['/workpool/publish/:id', 'work-edit.html'],
-  ['/work/:id', 'work.html'],
-  ['/team', 'team.html'],
-  ['/team/:id', 'team-detail.html'],
-  ['/u/:username', 'user.html'],
-  ['/admin', 'admin.html'],
-  ['/login/at', 'login-at.html'],
-  ['/docs', 'docs.html'],
-  ['/download', 'download.html']
-];
+const VUE_DIST = path.join(__dirname, 'vue', 'dist');
 
-let viewCache = new Map();
+async function readVueIndex() {
+  // 每次都重新读，不用缓存 —— Vue build 后 hash 会变，缓存会导致旧 js 引用 404
+  const file = path.join(VUE_DIST, 'index.html');
+  return await fsp.readFile(file, 'utf8');
+}
 
-async function readView(name) {
-  if (viewCache.has(name)) return viewCache.get(name);
-  const file = path.join(config.viewDir, name);
-  const html = await fsp.readFile(file, 'utf8');
-  viewCache.set(name, html);
-  return html;
+async function serveVueStatic(req, res, pathname) {
+  // pathname 形如 /assets/index-xxx.js 或 /assets/sub/xxx.css
+  const rel = pathname.replace(/^\/+/, '');
+  const full = path.resolve(VUE_DIST, rel);
+  const base = path.resolve(VUE_DIST);
+  if (full !== base && !full.startsWith(base + path.sep)) return false;
+  const served = await H.serveFile(req, res, full, {
+    maxAge: 31536000,
+    cacheControl: 'public, max-age=31536000, immutable'
+  });
+  return served;
 }
 
 function registerPages() {
-  for (const [pattern, file] of PAGES) {
-    pageRouter.get(pattern, async (req, res) => {
-      let html;
-      try {
-        html = await readView(file);
-      } catch (e) {
-        return sendErrorPage(req, res, 500, '页面加载失败');
-      }
-      H.sendHtml(res, html);
-    });
-  }
+  // ===== 精确路由（必须在通配符 * 之前注册）=====
 
   pageRouter.get('/login', (req, res) => {
     if (req.session) {
@@ -70,6 +47,16 @@ function registerPages() {
     }
     const back = config.resolveCallback(req);
     H.redirect(res, sso.buildAuthorizeUrl(back), 302);
+  });
+
+  // SSO 回调 → 保留原来的 SSR 页面（非 SPA）
+  pageRouter.get('/login/at', async (req, res) => {
+    try {
+      const html = await fsp.readFile(path.join(config.viewDir, 'login-at.html'), 'utf8');
+      H.sendHtml(res, html);
+    } catch (e) {
+      H.sendHtml(res, '<h1>login-at.html missing</h1>', 500);
+    }
   });
 
   pageRouter.get('/app/player', (req, res) => {
@@ -98,12 +85,31 @@ function registerPages() {
     session.clearCookie(res);
     H.redirect(res, '/');
   });
+
+  // ===== SPA fallback（必须放最后）=====
+  pageRouter.get('*', async (req, res) => {
+    // 如果 pathname 看起来像静态资源（有扩展名）但前面 serveVueStatic 也没找到 → 返回 404 JSON，别返回 index.html
+    // 否则浏览器缓存了旧 hash 的 index.html 时，每次请求旧 js 都会拿到 text/html，触发 MIME 错误
+    if (/\.[a-z0-9]+$/i.test(req.url.split('?')[0])) {
+      H.fail(res, 404, `Static file not found: ${req.url}`, 404);
+      return;
+    }
+    let html;
+    try {
+      html = await readVueIndex();
+    } catch (e) {
+      return sendErrorPage(req, res, 500, 'Vue 前端未构建，请先运行: cd vue && npm run build');
+    }
+    // index.html 必须不缓存 —— Vite build 后 js hash 会变，缓存会导致旧引用 404
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    H.sendHtml(res, html);
+  });
 }
 
 async function sendErrorPage(req, res, status, message) {
   let html;
   try {
-    html = await readView('error.html');
+    html = await readVueIndex();
   } catch (e) {
     html = null;
   }
@@ -111,15 +117,12 @@ async function sendErrorPage(req, res, status, message) {
     H.sendHtml(res, `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>${status}</title></head><body><h1>${status}</h1><p>${H.mimeOf ? '' : ''}${message || ''}</p></body></html>`, status);
     return;
   }
-  const rendered = html
-    .replace(/\{\{code\}\}/g, String(status))
-    .replace(/\{\{message\}\}/g, String(message || ''));
   res.writeHead(status, {
     'Content-Type': 'text/html; charset=utf-8',
-    'Content-Length': Buffer.byteLength(rendered),
+    'Content-Length': Buffer.byteLength(html),
     'Cache-Control': 'no-store'
   });
-  res.end(rendered);
+  res.end(html);
 }
 
 async function serveStatic(req, res, pathname) {
@@ -194,9 +197,12 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (pathname.startsWith('/static/') || pathname.startsWith('/uploads/') || pathname.startsWith('/app/') || /\.(css|js|png|jpg|jpeg|gif|webp|svg|woff2?|ttf|ico|mp4|webm|json|map|zip|bcmkn|ttmp4|txt|html|exe|wasm)$/i.test(pathname)) {
+    if (pathname.startsWith('/static/') || pathname.startsWith('/uploads/') || pathname.startsWith('/app/') || /\.(css|js|png|jpg|jpeg|gif|webp|svg|woff2?|ttf|ico|mp4|webm|m4a|mp3|wav|ogg|flac|aac|json|map|zip|bcmkn|ttmp4|txt|html|exe|wasm)$/i.test(pathname)) {
       const served = await serveStatic(req, res, pathname);
       if (served) return;
+      // 静态资源从 public 找不到 → 试试 Vue dist（/assets/xxx.js 等）
+      const vueServed = await serveVueStatic(req, res, pathname);
+      if (vueServed) return;
     }
 
     const matched = pageRouter.match(req.method, pathname);

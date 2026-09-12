@@ -109,6 +109,21 @@ module.exports = function register(router) {
     });
   });
 
+  // 站点公告（后台 admin/announce 写入 store，这里公开读）
+  router.get('/api/site/announcements', (req, res) => {
+    const items = store.col('announcements').all()
+      .filter((a) => a && a.status !== 'deleted')
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+      .slice(0, 5)
+      .map((a) => ({
+        id: a.id,
+        text: a.text,
+        link: a.link || '',
+        createdAt: a.createdAt || 0
+      }));
+    H.ok(res, { items });
+  });
+
   router.get('/api/upload/config', (req, res) => {
     H.ok(res, {
       maxBytes: config.limits.uploadMaxBytes,

@@ -1,0 +1,22 @@
+{
+  "name": "ke-hub-vue",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@shi-zhong/genshin-ui": "^1.0.3",
+    "chigura2": "file:../chigura2",
+    "lucide-vue-next": "^0.577.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.5"
+  }
+}
