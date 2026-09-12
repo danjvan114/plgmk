@@ -246,6 +246,17 @@ module.exports = function register(router) {
     });
   });
 
+  router.get('/api/works/:id/comments', (req, res) => {
+    const w = works.get(req.params.id);
+    if (!w || w.status === 'deleted') { H.fail(res, 404, '作品不存在', 404); return; }
+    if (w.isHidden && (!req.session || (req.session.username !== w.author && req.session.role !== 'admin'))) {
+      H.fail(res, 403, '该作品已被隐藏', 403);
+      return;
+    }
+    const tree = buildCommentTree(w.id);
+    H.ok(res, { comments: tree.items, total: tree.total });
+  });
+
   router.post('/api/works', async (req, res) => {
     if (!req.session) {
       H.fail(res, 401, '请先登录', 401);

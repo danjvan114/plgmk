@@ -37,16 +37,221 @@
     return out;
   }
 
-  function render(replies) {
-    const me = App.state.me;
-    const isMine = me && (me.username === post.author || me.isAdmin);
+  function getMentionCandidates(replies) {
     const tree = flatten(replies || [], [], 0);
     const seenU = {};
     const mentionList = [{ username: post.author, nickname: post.authorNick }];
     tree.forEach(({ node }) => { if (node.author) mentionList.push({ username: node.author, nickname: node.authorNick }); });
+    const me = App.state.me;
     if (me) mentionList.push({ username: me.username, nickname: me.nickname });
     mentionList.forEach((c) => App.addMention(c.username, c.nickname));
-    const mentionCands = mentionList.filter((c) => c.username && !seenU[c.username] && (seenU[c.username] = 1));
+    return mentionList.filter((c) => c.username && !seenU[c.username] && (seenU[c.username] = 1));
+  }
+
+  function renderReplies(replies) {
+    const replyBox = view.querySelector('#replyBox');
+    const rcEl = view.querySelector('#rc');
+    if (!replyBox) return;
+    const tree = flatten(replies || [], [], 0);
+    replyBox.innerHTML = tree.length
+      ? tree
+          .map(({ node, depth }) => {
+            const item = Object.assign({}, node, { isAuthor: node.author === post.author });
+            return `<div style="${depth > 0 ? 'padding-left:' + Math.min(depth * 26, 80) + 'px' : ''}">${App.cards.replyRow(item, postId)}</div>`;
+          })
+          .join('')
+      : '<div class="empty-tip">还没有回复，抢个沙发～</div>';
+    if (rcEl) rcEl.textContent = post.replyCount || 0;
+    bindReplyEvents();
+    const mentionCands = getMentionCandidates(replies);
+    const replyInput = view.querySelector('#replyInput');
+    if (replyInput) App.bindMention(replyInput, () => mentionCands);
+  }
+
+  async function refreshReplies() {
+    try {
+      const d = await App.get(`/api/forum/posts/${postId}/replies`);
+      post.replyCount = d.total || (d.items || []).length;
+      renderReplies(d.items || []);
+    } catch (e) { App.toast(e.message || '刷新回复失败'); }
+  }
+
+  function bindReplyEvents() {
+    const repRow = view.querySelector('#repRow');
+    const repName = view.querySelector('#repName');
+    view.querySelectorAll('#replyBox a[data-act]').forEach((a) => {
+      a.addEventListener('click', async () => {
+        const act = a.dataset.act;
+        const id = a.dataset.id;
+        if (act === 'reply') {
+          replyTarget = { id: Number(id), name: a.dataset.name };
+          repName.textContent = a.dataset.name;
+          repRow.classList.remove('hidden');
+          repRow.style.display = '';
+          view.querySelector('#replyInput').focus();
+        } else if (act === 'del') {
+          App.confirmDialog('删除这条回复？', async () => {
+            try {
+              await App.post('/api/forum/replies/' + id + '/delete');
+              App.toast('已删除');
+              refreshReplies();
+            } catch (e) {
+              App.toast(e.message);
+            }
+          }, { danger: true, title: '删除回复' });
+        } else if (act === 'pin') {
+          try {
+            await App.post('/api/forum/replies/' + id + '/pin');
+            App.toast('操作成功');
+            refreshReplies();
+          } catch (e) {
+            App.toast(e.message);
+          }
+        }
+      });
+    });
+  }
+
+  function bindMainEvents() {
+    const me = App.state.me;
+    const isMine = me && (me.username === post.author || me.isAdmin);
+
+    view.querySelector('#btnLike').addEventListener('click', async () => {
+      if (!me) {
+        location.href = '/login';
+        return;
+      }
+      try {
+        const d = await App.post('/api/forum/posts/' + postId + '/like');
+        post.liked = d.liked;
+        post.likeCount = d.likeCount;
+        const btn = view.querySelector('#btnLike .material-icons');
+        if (btn) btn.textContent = d.liked ? 'thumb_up' : 'thumb_up_off_alt';
+        view.querySelector('#likeN').textContent = d.likeCount;
+      } catch (e) {
+        App.toast(e.message);
+      }
+    });
+
+    if (isMine) {
+      view.querySelector('#btnEdit').addEventListener('click', () => {
+        const panel = document.createElement('div');
+        panel.innerHTML = `
+          <input class="text-input" type="text" id="eTitle" placeholder="标题" maxlength="120" value="${A(post.title)}">
+          <div style="height:12px"></div>
+          <textarea class="textarea-input" id="eContent" placeholder="正文" maxlength="20000" rows="10"></textarea>`;
+        App.dialog({
+          headline: '编辑帖子',
+          body: panel,
+          actions: [
+            { text: '取消' },
+            {
+              text: '保存',
+              onClick: async () => {
+                const nt = panel.querySelector('#eTitle').value.trim();
+                const nc = panel.querySelector('#eContent').value.trim();
+                if (!nt || !nc) {
+                  App.toast('标题和正文不能为空');
+                  return false;
+                }
+                try {
+                  await App.post('/api/forum/posts/' + postId, { title: nt, content: nc });
+                  App.toast('已保存');
+                  post.title = nt;
+                  post.content = nc;
+                  view.querySelector('h1').innerHTML = (post.isPinned ? '<span class="material-icons" style="font-size:20px;vertical-align:-3px;color:#e65100">push_pin</span> ' : '') + A(nt);
+                  view.querySelector('.rich-content').innerHTML = App.renderRich(nc);
+                  return true;
+                } catch (e) {
+                  App.toast(e.message);
+                  return false;
+                }
+              }
+            }
+          ]
+        });
+        setTimeout(() => { panel.querySelector('#eContent').value = post.content; }, 0);
+      });
+      view.querySelector('#btnDel').addEventListener('click', () => {
+        App.confirmDialog('确定删除该帖子？', async () => {
+          try {
+            await App.post('/api/forum/posts/' + postId + '/delete');
+            App.toast('已删除');
+            location.href = '/forum/' + post.boardId;
+          } catch (e) {
+            App.toast(e.message);
+          }
+        }, { title: '删除帖子', danger: true });
+      });
+    }
+    if (me && me.isAdmin) {
+      view.querySelector('#btnPin').addEventListener('click', async () => {
+        try {
+          const d = await App.post('/api/forum/posts/' + postId + '/pin');
+          App.toast(d.isPinned ? '已置顶' : '已取消置顶');
+          post.isPinned = d.isPinned;
+          const h1 = view.querySelector('h1');
+          h1.innerHTML = (d.isPinned ? '<span class="material-icons" style="font-size:20px;vertical-align:-3px;color:#e65100">push_pin</span> ' : '') + A(post.title);
+          const btn = view.querySelector('#btnPin');
+          btn.innerHTML = `<span class="material-icons" style="font-size:18px">push_pin</span>${d.isPinned ? '取消置顶' : '置顶'}`;
+        } catch (e) {
+          App.toast(e.message);
+        }
+      });
+    }
+
+    const repRow = view.querySelector('#repRow');
+    if (repRow && view.querySelector('#repCancel')) {
+      view.querySelector('#repCancel').addEventListener('click', () => {
+        replyTarget = null;
+        repRow.classList.add('hidden');
+        repRow.style.display = 'none';
+      });
+    }
+
+    const replyInput = view.querySelector('#replyInput');
+    if (replyInput) {
+      const replyBtn = view.querySelector('#btnReply');
+      replyBtn.addEventListener('click', submitReply);
+      replyInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) submitReply();
+      });
+    }
+
+    async function submitReply() {
+      const input = view.querySelector('#replyInput');
+      const content = input.value.trim();
+      if (!content) {
+        App.toast('回复内容不能为空');
+        return;
+      }
+      const btn = view.querySelector('#btnReply');
+      App.setBusy(btn, true);
+      try {
+        await App.post('/api/forum/posts/' + postId + '/replies', {
+          content,
+          parentId: replyTarget ? replyTarget.id : 0
+        });
+        App.toast('回复成功');
+        const hitBot = (content.match(/@([^\s@]+)/g) || []).map((x) => x.slice(1)).find((n) => botUsernames.some((b) => b && b.toLowerCase() === n.toLowerCase()));
+        if (hitBot) App.toast('已 @机器人 ' + hitBot + '，稍候自动回复');
+        input.value = '';
+        replyTarget = null;
+        const rr = view.querySelector('#repRow');
+        if (rr) { rr.classList.add('hidden'); rr.style.display = 'none'; }
+        refreshReplies();
+      } catch (e) {
+        App.toast(e.message);
+      } finally {
+        App.setBusy(btn, false);
+      }
+    }
+  }
+
+  function render(replies) {
+    const me = App.state.me;
+    const isMine = me && (me.username === post.author || me.isAdmin);
+    const tree = flatten(replies || [], [], 0);
     const repliesHtml = tree.length
       ? tree
           .map(({ node, depth }) => {
@@ -77,7 +282,7 @@
             <span style="color:var(--mdui-color-on-surface-variant);font-size:13px">发布于 ${A(App.fmtTime(post.createdAt))}</span>
             <span style="color:var(--mdui-color-on-surface-variant);font-size:13px">浏览 ${post.viewCount}</span>
             <span style="flex:1"></span>
-            <button type="button" class="btn text sm" id="btnLike"><span class="material-icons" style="font-size:18px">thumb_up_off_alt</span><span id="likeN">${post.likeCount || 0}</span></button>
+            <button type="button" class="btn text sm" id="btnLike"><span class="material-icons" style="font-size:18px">${post.liked ? 'thumb_up' : 'thumb_up_off_alt'}</span><span id="likeN">${post.likeCount || 0}</span></button>
           </div>
           <div class="rich-content">${App.renderRich(post.content)}</div>
         </div>
@@ -92,7 +297,7 @@
             <span style="color:var(--mdui-color-on-surface-variant)">正在回复</span><b id="repName"></b>
             <a href="javascript:;" id="repCancel" style="color:var(--mdui-color-outline)">取消</a>
           </div>
-          <textarea class="textarea-input" id="replyInput" placeholder="友善发言，理性讨论……（支持 @用户名 提醒；使用 Markdown；Ctrl + Enter 快捷发送）" maxlength="5000"   rows="4"></textarea>
+          <textarea class="textarea-input" id="replyInput" placeholder="友善发言，理性讨论……（支持 @用户名 提醒；使用 Markdown；Ctrl + Enter 快捷发送）" maxlength="5000" rows="4"></textarea>
           <div style="display:flex;justify-content:flex-end;margin-top:10px"><button type="button" class="btn primary" id="btnReply"><span class="material-icons" style="font-size:18px">send</span>发布回复</button></div>
         </div>` : `
         <div class="empty-tip" style="padding:24px">
@@ -100,149 +305,12 @@
         </div>`}
       </div>`;
 
-    view.querySelector('#btnLike').addEventListener('click', async () => {
-      if (!me) {
-        location.href = '/login';
-        return;
-      }
-      try {
-        const d = await App.post('/api/forum/posts/' + postId + '/like');
-        const btn = view.querySelector('#btnLike');
-        btn.setAttribute('icon', d.liked ? 'thumb_up' : 'thumb_up_off_alt');
-        view.querySelector('#likeN').textContent = d.likeCount;
-      } catch (e) {
-        App.toast(e.message);
-      }
-    });
-
-    if (isMine) {
-      view.querySelector('#btnEdit').addEventListener('click', () => {
-        const panel = document.createElement('div');
-        panel.innerHTML = `
-          <input class="text-input" type="text" id="eTitle" placeholder="标题" maxlength="120"   value="${A(post.title)}">
-          <div style="height:12px"></div>
-          <textarea class="textarea-input" id="eContent" placeholder="正文" maxlength="20000"   rows="10"></textarea>`;
-        App.dialog({
-          headline: '编辑帖子',
-          body: panel,
-          actions: [
-            { text: '取消' },
-            {
-              text: '保存',
-              onClick: async () => {
-                const nt = panel.querySelector('#eTitle').value.trim();
-                const nc = panel.querySelector('#eContent').value.trim();
-                if (!nt || !nc) {
-                  App.toast('标题和正文不能为空');
-                  return false;
-                }
-                await App.post('/api/forum/posts/' + postId, { title: nt, content: nc });
-                App.toast('已保存');
-                location.reload();
-                return false;
-              }
-            }
-          ]
-        });
-      });
-      view.querySelector('#btnDel').addEventListener('click', () => {
-        App.confirmDialog('确定删除该帖子？', async () => {
-          try {
-            await App.post('/api/forum/posts/' + postId + '/delete');
-            App.toast('已删除');
-            location.href = '/forum/' + post.boardId;
-          } catch (e) {
-            App.toast(e.message);
-          }
-        }, { title: '删除帖子', danger: true });
-      });
-    }
-    if (me && me.isAdmin) {
-      view.querySelector('#btnPin').addEventListener('click', async () => {
-        try {
-          const d = await App.post('/api/forum/posts/' + postId + '/pin');
-          App.toast(d.isPinned ? '已置顶' : '已取消置顶');
-          location.reload();
-        } catch (e) {
-          App.toast(e.message);
-        }
-      });
-    }
-
-    const repRow = view.querySelector('#repRow');
-    const repName = view.querySelector('#repName');
-    view.querySelectorAll('#replyBox a[data-act]').forEach((a) => {
-      a.addEventListener('click', async () => {
-        const act = a.dataset.act;
-        const id = a.dataset.id;
-        if (act === 'reply') {
-          replyTarget = { id: Number(id), name: a.dataset.name };
-          repName.textContent = a.dataset.name;
-          repRow.classList.remove('hidden');
-          repRow.style.display = '';
-          view.querySelector('#replyInput').focus();
-        } else if (act === 'del') {
-          App.confirmDialog('删除这条回复？', async () => {
-            try {
-              await App.post('/api/forum/replies/' + id + '/delete');
-              App.toast('已删除');
-              location.reload();
-            } catch (e) {
-              App.toast(e.message);
-            }
-          }, { danger: true, title: '删除回复' });
-        } else if (act === 'pin') {
-          try {
-            await App.post('/api/forum/replies/' + id + '/pin');
-            location.reload();
-          } catch (e) {
-            App.toast(e.message);
-          }
-        }
-      });
-    });
-
-    if (repRow && view.querySelector('#repCancel')) {
-      view.querySelector('#repCancel').addEventListener('click', () => {
-        replyTarget = null;
-        repRow.classList.add('hidden');
-        repRow.style.display = 'none';
-      });
-    }
-
+    const mentionCands = getMentionCandidates(replies);
     const replyInput = view.querySelector('#replyInput');
-    if (replyInput) {
-      const replyBtn = view.querySelector('#btnReply');
-      replyBtn.addEventListener('click', submitReply);
-      replyInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) submitReply();
-      });
-      App.bindMention(replyInput, () => mentionCands);
-    }
+    if (replyInput) App.bindMention(replyInput, () => mentionCands);
 
-    async function submitReply() {
-      const input = view.querySelector('#replyInput');
-      const content = input.value.trim();
-      if (!content) {
-        App.toast('回复内容不能为空');
-        return;
-      }
-      const btn = view.querySelector('#btnReply');
-      App.setBusy(btn, true);
-      try {
-        await App.post('/api/forum/posts/' + postId + '/replies', {
-          content,
-          parentId: replyTarget ? replyTarget.id : 0
-        });
-        App.toast('回复成功');
-        const hitBot = (content.match(/@([^\s@]+)/g) || []).map((x) => x.slice(1)).find((n) => botUsernames.some((b) => b && b.toLowerCase() === n.toLowerCase()));
-        if (hitBot) App.toast('已 @机器人 ' + hitBot + '，稍候自动回复');
-        location.reload();
-      } catch (e) {
-        App.toast(e.message);
-        App.setBusy(btn, false);
-      }
-    }
+    bindMainEvents();
+    bindReplyEvents();
   }
 
   main();

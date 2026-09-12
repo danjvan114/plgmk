@@ -152,11 +152,13 @@ function resolveFileSource(body) {
     if (full !== base && !full.startsWith(base + path.sep)) {
       return { error: '文件路径不合法' };
     }
+    let fileName = cleanText(body.fileName, 200) || path.basename(rel);
+    fileName = fileName.replace(/\.[^.]+$/, '') + '.cue';
     return {
       source: 'local',
       fileUrl: '',
       filePath: `/uploads/${rel.split(path.sep).join('/')}`,
-      fileName: cleanText(body.fileName, 200) || path.basename(rel),
+      fileName,
       fileSize: toNum(body.fileSize, 0),
       fileSha: cleanText(body.fileSha, 128)
     };
@@ -459,7 +461,7 @@ module.exports = function register(router) {
     }
     const served = await H.serveFile(req, res, full, {
       download: true,
-      downloadName: p.fileName || `${p.name}.${safeExt(p.filePath) || 'zip'}`
+      downloadName: p.fileName || `${p.name}.cue`
     });
     if (!served) H.fail(res, 404, '插件文件已丢失', 404);
   });

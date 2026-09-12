@@ -138,7 +138,7 @@
     // 评论列表
     view.querySelector('#cc').textContent = total;
     const tree = flatten(comments, [], 0);
-    const commentsHtml = tree.length
+    cBox.innerHTML = tree.length
       ? tree.map(({ node, depth }) => `<div style="${depth > 0 ? 'padding-left:' + Math.min(depth * 26, 80) + 'px' : ''}">${commentRow(node)}</div>`).join('')
       : '<div class="empty-tip">还没有评论，来抢沙发～</div>';
     view.querySelector('#cBox').innerHTML = commentsHtml;
@@ -231,8 +231,13 @@
         try {
           await App.post(`/api/works/${w.id}/comments`, { content, parentId: replyTarget ? replyTarget.id : 0 });
           App.toast('评论成功');
-          location.reload();
-        } catch (e) { App.toast(e.message); App.setBusy(send, false); }
+          input.value = '';
+          replyTarget = null;
+          const repRow = view.querySelector('#cRepRow');
+          if (repRow) repRow.classList.add('hidden');
+          refreshComments();
+        } catch (e) { App.toast(e.message); }
+        finally { App.setBusy(send, false); }
       };
       send.addEventListener('click', doSend);
       view.querySelector('#cInput').addEventListener('keydown', (e) => {
