@@ -79,7 +79,7 @@ const config = {
     search: { windowMs: 10 * 1000, max: 40 }
   },
 
-  ownerNickname: env.PGMK_OWNER_NICKNAME || 'Starry'
+  ownerNickname: (env.PGMK_OWNER_NICKNAME || 'danjvan114,danjvan114000').split(',').map(s => s.trim()).filter(Boolean)
 };
 
 // 服务器部署本地配置（可选，不提交，已在 .gitignore）：

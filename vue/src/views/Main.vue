@@ -76,6 +76,32 @@
       </button>
     </div>
 
+
+    <!-- 消息弹窗 -->
+    <Modal v-model:visible="showMessages" title="消息中心" width="720px" open-sound="/pic/mp/MenuOpen.wav" close-sound="/pic/mp/BattlePassClose.wav">
+      <div class="msg-wrap">
+        <div v-if="!user" class="msg-empty">请先登录查看消息</div>
+        <div v-else-if="msgLoading" class="msg-empty">加载中…</div>
+        <div v-else-if="!msgItems.length" class="msg-empty">暂无消息</div>
+        <div v-else class="msg-list">
+          <a
+            v-for="m in msgItems"
+            :key="m.id"
+            class="msg-item"
+            :class="{ unread: !m.isRead }"
+            :href="m.link || 'javascript:void(0)'"
+            @click.prevent="m.link && onOpenLink(m.link); markRead(m.id)"
+          >
+            <div class="msg-head">
+              <span class="msg-type">{{ msgTypeLabel(m.type) }}</span>
+              <span class="msg-from">{{ m.fromNick || m.fromUser }}</span>
+              <span class="msg-time">{{ fmt(m.createdAt) }}</span>
+            </div>
+            <div class="msg-body">{{ m.text }}</div>
+          </a>
+        </div>
+      </div>
+    </Modal>
     <!-- 设置弹窗 -->
     <Modal v-model:visible="showSettings" title="系统设置" width="800px" open-sound="/pic/mp/MenuOpen.wav" close-sound="/pic/mp/BattlePassClose.wav">
       <div class="demo-content">
@@ -164,12 +190,36 @@ function fmt(ts) {
 }
 
 // —— 按钮行为（占位，后续填充）
-function onMessages() {
-  // TODO: 消息中心
-  alert('消息中心（开发中）');
+const showMessages = ref(false);
+const msgItems = ref([]);
+const msgLoading = ref(false);
+async function onMessages() {
+  showMessages.value = true;
+  if (!user.value) { msgItems.value = []; return; }
+  msgLoading.value = true;
+  try {
+    const r = await fetch('/api/messages', { credentials: 'include' });
+    const j = await r.json();
+    if (j.ok) {
+      msgItems.value = j.items || [];
+      unread.value = j.unread || 0;
+    }
+  } catch {}
+  msgLoading.value = false;
 }
 function onSettings() {
   showSettings.value = true;
+}
+async function markRead(id) {
+  try {
+    await fetch('/api/messages/read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }), credentials: 'include' });
+    const m = msgItems.value.find(x => x.id === id);
+    if (m) m.isRead = true;
+    unread.value = Math.max(0, unread.value - 1);
+  } catch {}
+}
+function msgTypeLabel(t) {
+  return ({ announce: '公告', reply: '回复', like: '点赞', fav: '收藏', coin: '金币', follow: '关注', team: '团队', system: '系统' })[t] || '通知';
 }
 function onProfile() {
   if (user.value?.username) router.push(`/u/${user.value.username}`);
@@ -182,7 +232,7 @@ function onOpenLink(href) {
 
 // 右侧 2x2 功能按钮
 const rightButtons = [
-  { key: 'create',   label: '开始创作', img: '/pic/main/01.png', route: '/plugin/edit' },
+  { key: 'create',   label: '开始创作', img: '/pic/main/01.png', route: '/workpool' },
   { key: 'forum',    label: '论坛大厅', img: '/pic/main/02.png', route: '/forum' },
   { key: 'team',     label: '团队协作', img: '/pic/main/3.png',  route: '/team' },
   { key: 'market',   label: '插件市场', img: '/pic/main/4.png',  route: '/market' }
@@ -281,7 +331,7 @@ function onFnBtn(btn) {
   max-width: 360px;
   background: rgba(0,0,0,0.35);
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(0,0,0,0.12);
   cursor: pointer;
   transition: background .15s, transform .15s;
 }
@@ -340,14 +390,14 @@ function onFnBtn(btn) {
   max-width: calc(100vw - 40px);
   background: rgba(0,0,0,0.4);
   border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(0,0,0,0.12);
   overflow: hidden;
 }
 .bulletin-head {
   display: flex; align-items: center; gap: 6px;
   padding: 10px 14px;
   font-size: 13px; font-weight: 700;
-  color: #ffd666;
+  color: #b07400;
   border-bottom: 1px solid rgba(255,255,255,0.1);
   background: rgba(255,214,102,0.08);
 }
@@ -356,19 +406,19 @@ function onFnBtn(btn) {
 .ann-item {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 14px;
-  color: rgba(255,255,255,.85);
+  color: #1a1a1a;
   text-decoration: none;
   font-size: 13px;
   cursor: pointer;
   transition: background .15s;
 }
-.ann-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
-.ann-dot { color: #ffd666; font-size: 8px; flex-shrink: 0; }
+.ann-item:hover { background: rgba(0,0,0,0.06); color: #000; }
+.ann-dot { color: #b07400; font-size: 8px; flex-shrink: 0; }
 .ann-text {
   flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .ann-time {
-  font-size: 11px; color: rgba(255,255,255,.45); flex-shrink: 0;
+  font-size: 11px; color: rgba(0,0,0,.5); flex-shrink: 0;
 }
 .ann-loading, .ann-empty {
   padding: 12px 14px; font-size: 12px; color: rgba(255,255,255,.5);
@@ -425,4 +475,16 @@ function onFnBtn(btn) {
   font-size: 14px;
   cursor: pointer;
 }
+
+.msg-wrap { max-height: 60vh; overflow-y: auto; padding: 4px 0; }
+.msg-empty { text-align: center; color: #aaa; padding: 40px 0; font-size: 14px; }
+.msg-list { display: flex; flex-direction: column; gap: 8px; }
+.msg-item { display: block; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); color: inherit; text-decoration: none; transition: background 0.15s; }
+.msg-item:hover { background: rgba(255,255,255,0.08); }
+.msg-item.unread { border-color: rgba(255,200,80,0.45); background: rgba(255,200,80,0.08); }
+.msg-head { display: flex; gap: 8px; font-size: 12px; color: #bbb; margin-bottom: 6px; align-items: center; }
+.msg-type { padding: 2px 8px; border-radius: 4px; background: rgba(120,160,255,0.18); color: #b8d0ff; font-size: 11px; }
+.msg-from { font-weight: 600; color: #ddd; }
+.msg-time { margin-left: auto; color: #888; }
+.msg-body { font-size: 14px; color: #fff; line-height: 1.5; }
 </style>

@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const config = require('../config');
 const H = require('../lib/http');

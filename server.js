@@ -86,23 +86,49 @@ function registerPages() {
     H.redirect(res, '/');
   });
 
-  // ===== SPA fallback（必须放最后）=====
+  // ===== HTML 页面路由（原版）=====
+  // pathname → views/<name>.html 映射表
+  const PAGE_MAP = {
+    '/': 'index.html',
+    '/market': 'market.html',
+    '/forum': 'forum.html',
+    '/post': 'post.html',
+    '/post/edit': 'post-edit.html',
+    '/plugin': 'plugin.html',
+    '/plugin/edit': 'plugin-edit.html',
+    '/workpool': 'workpool.html',
+    '/work': 'work.html',
+    '/workpool/publish': 'work-edit.html',
+    '/admin': 'admin.html',
+    '/team': 'team.html',
+    '/user': 'user.html',
+    '/download': 'download.html',
+    '/docs': 'docs.html',
+    '/dev': 'dev.html'
+  };
+
   pageRouter.get('*', async (req, res) => {
-    // 如果 pathname 看起来像静态资源（有扩展名）但前面 serveVueStatic 也没找到 → 返回 404 JSON，别返回 index.html
-    // 否则浏览器缓存了旧 hash 的 index.html 时，每次请求旧 js 都会拿到 text/html，触发 MIME 错误
-    if (/\.[a-z0-9]+$/i.test(req.url.split('?')[0])) {
-      H.fail(res, 404, `Static file not found: ${req.url}`, 404);
+    const raw = req.url.split('?')[0].replace(/\/+$/, '') || '/';
+    let htmlName = PAGE_MAP[raw];
+    if (!htmlName) {
+      // 带动态 id 的路由：/post/123 /work/456 /team/789 /u/danjvan114
+      const m = raw.match(/^\/(post|work|team|u|plugin)\/[^/]+$/);
+      if (m) {
+        const k = m[1] === 'u' ? 'user' : m[1];
+        htmlName = PAGE_MAP['/' + k];
+      }
+    }
+    if (!htmlName) {
+      const errHtml = await fsp.readFile(path.join(config.viewDir, 'error.html'), 'utf8').catch(() => '<h1>404</h1>');
+      H.sendHtml(res, errHtml, 404);
       return;
     }
-    let html;
     try {
-      html = await readVueIndex();
+      const html = await fsp.readFile(path.join(config.viewDir, htmlName), 'utf8');
+      H.sendHtml(res, html);
     } catch (e) {
-      return sendErrorPage(req, res, 500, 'Vue 前端未构建，请先运行: cd vue && npm run build');
+      H.sendHtml(res, `<h1>${htmlName} missing</h1>`, 500);
     }
-    // index.html 必须不缓存 —— Vite build 后 js hash 会变，缓存会导致旧引用 404
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    H.sendHtml(res, html);
   });
 }
 
